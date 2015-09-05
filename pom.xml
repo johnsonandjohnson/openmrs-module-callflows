@@ -18,7 +18,11 @@
     </properties>
 
     <dependencies>
-
+        <!-- Repository -->
+        <dependency>
+            <groupId>${motech.groupId}</groupId>
+            <artifactId>motech-platform-dataservices</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -34,10 +38,13 @@
                         <Resource-Path>callflows/resources</Resource-Path>
                         <Context-Path>callflows</Context-Path>
                         <Import-Package>
-
+                          org.motechproject.mds.service;version=${motech.version},
+                            *
                         </Import-Package>
                         <Export-Package>
-
+                            com.janssen.connectforlife.callflows.domain;version=${project.version},
+                            com.janssen.connectforlife.callflows.domain.types;version=${project.version},
+                            com.janssen.connectforlife.callflows.repository;version=${project.version}
                         </Export-Package>
                     </instructions>
                 </configuration>
@@ -63,6 +70,24 @@
                                     </includes>
                                 </resource>
                             </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>${maven.dependency.version}</version>
+                <executions>
+                    <execution>
+                        <id>list-dependencies</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>resolve</goal>
+                        </goals>
+                        <configuration>
+                            <outputFile>${dependencies.list}</outputFile>
                         </configuration>
                     </execution>
                 </executions>
