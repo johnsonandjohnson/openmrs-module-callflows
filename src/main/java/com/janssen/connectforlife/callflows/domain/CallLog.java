@@ -1,12 +1,12 @@
 package com.janssen.connectforlife.callflows.domain;
 
+import com.janssen.connectforlife.callflows.domain.types.CallDirection;
+import com.janssen.connectforlife.callflows.domain.types.CallStatus;
+
 import org.motechproject.mds.annotations.Entity;
 
 import org.joda.time.DateTime;
 import java.util.Map;
-
-import com.janssen.connectforlife.callflows.domain.types.CallDirection;
-import com.janssen.connectforlife.callflows.domain.types.CallStatus;
 
 /**
  * Call Log, a log of what happens at each step of a call

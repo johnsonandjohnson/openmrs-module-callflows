@@ -1,5 +1,8 @@
 package com.janssen.connectforlife.callflows.domain;
 
+import com.janssen.connectforlife.callflows.domain.types.CallDirection;
+import com.janssen.connectforlife.callflows.domain.types.CallStatus;
+
 import org.motechproject.mds.annotations.Entity;
 import org.motechproject.mds.annotations.Field;
 import org.motechproject.mds.annotations.UIDisplayable;
@@ -7,9 +10,6 @@ import org.motechproject.mds.annotations.UIDisplayable;
 import org.joda.time.DateTime;
 import java.util.Map;
 import java.util.Objects;
-
-import com.janssen.connectforlife.callflows.domain.types.CallDirection;
-import com.janssen.connectforlife.callflows.domain.types.CallStatus;
 
 /**
  * The Call class represents the context of a IVR call

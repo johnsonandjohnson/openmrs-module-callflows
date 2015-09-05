@@ -1,12 +1,12 @@
 package com.janssen.connectforlife.callflows.repository;
 
+import com.janssen.connectforlife.callflows.domain.CallFlow;
+
 import org.motechproject.mds.annotations.Lookup;
 import org.motechproject.mds.annotations.LookupField;
 import org.motechproject.mds.service.MotechDataService;
 
 import java.util.List;
-
-import com.janssen.connectforlife.callflows.domain.CallFlow;
 
 /**
  * Repository service for managing call flow domain objects in the system

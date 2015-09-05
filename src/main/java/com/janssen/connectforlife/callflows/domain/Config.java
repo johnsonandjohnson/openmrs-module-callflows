@@ -32,10 +32,7 @@ public class Config {
         this.gson = new Gson();
     }
 
-    public Config(String name,
-                  String outgoingCallUriTemplate,
-                  String outgoingCallMethod,
-                  String servicesMapString,
+    public Config(String name, String outgoingCallUriTemplate, String outgoingCallMethod, String servicesMapString,
                   String testUsersMapString) {
         gson = new Gson();
         this.name = name;
