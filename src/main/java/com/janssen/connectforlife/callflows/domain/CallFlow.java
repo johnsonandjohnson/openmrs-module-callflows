@@ -48,6 +48,8 @@ public class CallFlow {
      * The JSON structure itself is inspired from the VoiceXML format as that's the standard for Voice communications
      * However best effort has been made to choose those elements/attributes that can be applicable even in areas
      * where VoiceXML might not be used. The flow structure is therefore a very minified subset of the whole VoiceXML schema
+     *
+     * @see com.janssen.connectforlife.callflows.domain.flow.Flow
      */
     @Field(type = "text")
     private String raw;
