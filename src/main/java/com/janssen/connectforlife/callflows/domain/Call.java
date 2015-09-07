@@ -8,6 +8,7 @@ import org.motechproject.mds.annotations.Field;
 import org.motechproject.mds.annotations.UIDisplayable;
 
 import org.joda.time.DateTime;
+import javax.jdo.annotations.Unique;
 import java.util.Map;
 import java.util.Objects;
 
@@ -19,7 +20,8 @@ import java.util.Objects;
  * @author bramak09
  * @see com.janssen.connectforlife.callflows.domain.CallLog
  */
-@Entity
+@Entity(recordHistory = true, tableName = "cfl_calls")
+@Unique(name = "UNIQUE_CALLFLOWS_CALL_IDX", members = { "callId" })
 public class Call {
 
     private Long id;
@@ -225,12 +227,12 @@ public class Call {
             return false;
         }
         final Call other = (Call) o;
-        return Objects.equals(this.id, other.id) && Objects.equals(this.callId, other.callId);
+        return Objects.equals(this.callId, other.callId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, callId);
+        return Objects.hash(callId);
     }
 
     @Override

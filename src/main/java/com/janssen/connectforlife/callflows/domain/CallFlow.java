@@ -14,7 +14,7 @@ import java.util.Objects;
  *
  * @author bramak09
  */
-@Entity(recordHistory = true)
+@Entity(recordHistory = true, tableName = "cfl_callflows")
 @Unique(name = "UNIQUE_CALLFLOW_IDX", members = { "name" })
 public class CallFlow {
 
@@ -48,8 +48,6 @@ public class CallFlow {
      * The JSON structure itself is inspired from the VoiceXML format as that's the standard for Voice communications
      * However best effort has been made to choose those elements/attributes that can be applicable even in areas
      * where VoiceXML might not be used. The flow structure is therefore a very minified subset of the whole VoiceXML schema
-     *
-     * @see com.janssen.connectforlife.callflows.domain.flow.Flow
      */
     @Field(type = "text")
     private String raw;
@@ -57,10 +55,10 @@ public class CallFlow {
     /**
      * Creates a CallFlow instance
      *
-     * @param name
-     * @param description
-     * @param status
-     * @param raw
+     * @param name        The name of a callflow, typically title cased and can contain only alphanumeric characters
+     * @param description The callflow description
+     * @param status      Callflow status
+     * @param raw         A json serialized representation of the callflow
      */
     public CallFlow(String name, String description, CallFlowStatus status, String raw) {
         this.name = name;
@@ -118,12 +116,12 @@ public class CallFlow {
             return false;
         }
         final CallFlow other = (CallFlow) o;
-        return Objects.equals(this.id, other.id) && Objects.equals(this.name, other.name);
+        return Objects.equals(this.name, other.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name);
+        return Objects.hash(name);
     }
 
     @Override
