@@ -32,10 +32,8 @@ public class CallFlowServiceImpl implements CallFlowService {
     @Transactional
     public CallFlow create(CallFlow callflow) throws CallFlowAlreadyExistsException {
         if (StringUtils.isEmpty(callflow.getName()) || !ALPHA_NUMERIC.matcher(callflow.getName()).matches()) {
-            LOGGER.error("Callflow name is required and must contain only alphanumeric characters {} ",
-                         callflow.getName());
             throw new IllegalArgumentException(
-                    "Callflow name is required and must contain only alphanumeric characters " + callflow.getName());
+                    "Callflow name is required and must contain only alphanumeric characters : " + callflow.getName());
         }
         // check for duplicates in database
         if (null != callFlowDataService.findByName(callflow.getName())) {
