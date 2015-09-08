@@ -6,8 +6,6 @@ import com.janssen.connectforlife.callflows.repository.CallFlowDataService;
 import com.janssen.connectforlife.callflows.service.CallFlowService;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,8 +18,6 @@ import java.util.regex.Pattern;
  */
 @Service("callFlowService")
 public class CallFlowServiceImpl implements CallFlowService {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(CallFlowServiceImpl.class);
 
     private static final Pattern ALPHA_NUMERIC = Pattern.compile("^[a-zA-Z0-9]+$");
 
@@ -37,7 +33,7 @@ public class CallFlowServiceImpl implements CallFlowService {
         }
         // check for duplicates in database
         if (null != callFlowDataService.findByName(callflow.getName())) {
-            throw new CallFlowAlreadyExistsException("CallFlow already exists! " + callflow.getName());
+            throw new CallFlowAlreadyExistsException("CallFlow already exists! : " + callflow.getName());
         }
         return callFlowDataService.create(callflow);
     }
