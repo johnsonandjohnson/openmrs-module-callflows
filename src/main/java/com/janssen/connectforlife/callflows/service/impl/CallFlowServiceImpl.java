@@ -29,11 +29,11 @@ public class CallFlowServiceImpl implements CallFlowService {
     public CallFlow create(CallFlow callflow) throws CallFlowAlreadyExistsException {
         if (StringUtils.isEmpty(callflow.getName()) || !ALPHA_NUMERIC.matcher(callflow.getName()).matches()) {
             throw new IllegalArgumentException(
-                    "Callflow name is required and must contain only alphanumeric characters : " + callflow.getName());
+                    "Callflow name is required and must contain only alphanumeric characters :" + callflow.getName());
         }
         // check for duplicates in database
         if (null != callFlowDataService.findByName(callflow.getName())) {
-            throw new CallFlowAlreadyExistsException("CallFlow already exists! : " + callflow.getName());
+            throw new CallFlowAlreadyExistsException("CallFlow already exists! :" + callflow.getName());
         }
         return callFlowDataService.create(callflow);
     }
