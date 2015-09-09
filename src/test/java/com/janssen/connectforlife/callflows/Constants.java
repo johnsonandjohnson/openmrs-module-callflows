@@ -30,4 +30,7 @@ public final class Constants {
     public static final String CALLFLOW_BAD_DESCRIPTION = "This is a badly formatted callflow";
 
     public static final String CALLFLOW_BAD_RAW = "{}";
+
+    public static final String UPDATED = "-updated";
+
 }

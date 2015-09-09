@@ -1,6 +1,6 @@
 package com.janssen.connectforlife.callflows.builder;
 
-import com.janssen.connectforlife.callflows.contract.CallFlowCreationRequest;
+import com.janssen.connectforlife.callflows.contract.CallFlowRequest;
 import com.janssen.connectforlife.callflows.domain.CallFlow;
 import com.janssen.connectforlife.callflows.domain.types.CallFlowStatus;
 
@@ -17,13 +17,13 @@ public class CallFlowBuilder {
     /**
      * Creates a new Call Flow from a Call flow creation request
      *
-     * @param callFlowCreationRequest containing attributes used during call flow creation
+     * @param callFlowRequest containing attributes used during call flow creation
      * @return a new CallFlow object
      */
-    public CallFlow createFrom(CallFlowCreationRequest callFlowCreationRequest) {
-        return new CallFlow(callFlowCreationRequest.getName(),
-                            callFlowCreationRequest.getDescription(),
-                            CallFlowStatus.valueOf(callFlowCreationRequest.getStatus()),
-                            callFlowCreationRequest.getRaw());
+    public CallFlow createFrom(CallFlowRequest callFlowRequest) {
+        return new CallFlow(callFlowRequest.getName(),
+                            callFlowRequest.getDescription(),
+                            CallFlowStatus.valueOf(callFlowRequest.getStatus()),
+                            callFlowRequest.getRaw());
     }
 }

@@ -1,7 +1,7 @@
 package com.janssen.connectforlife.callflows.helper;
 
 import com.janssen.connectforlife.callflows.Constants;
-import com.janssen.connectforlife.callflows.contract.CallFlowCreationRequest;
+import com.janssen.connectforlife.callflows.contract.CallFlowRequest;
 import com.janssen.connectforlife.callflows.contract.CallFlowResponse;
 import com.janssen.connectforlife.callflows.domain.types.CallFlowStatus;
 
@@ -25,8 +25,8 @@ public final class CallFlowContractHelper {
                                     Constants.CALLFLOW_MAIN_RAW);
     }
 
-    public static CallFlowCreationRequest createMainFlowCreationRequest() {
-        CallFlowCreationRequest request = new CallFlowCreationRequest();
+    public static CallFlowRequest createMainFlowRequest() {
+        CallFlowRequest request = new CallFlowRequest();
         request.setName(Constants.CALLFLOW_MAIN);
         request.setDescription(Constants.CALLFLOW_MAIN_DESCRIPTION);
         request.setStatus(CallFlowStatus.DRAFT.name());
@@ -34,13 +34,14 @@ public final class CallFlowContractHelper {
         return request;
     }
 
-    public static CallFlowCreationRequest createBadFlowCreationRequest() {
-        CallFlowCreationRequest request = new CallFlowCreationRequest();
+    public static CallFlowRequest createBadFlowRequest() {
+        CallFlowRequest request = new CallFlowRequest();
         request.setName(Constants.CALLFLOW_BAD);
         request.setDescription(Constants.CALLFLOW_BAD_DESCRIPTION);
         request.setStatus(CallFlowStatus.DRAFT.name());
         request.setRaw(Constants.CALLFLOW_BAD_RAW);
         return request;
     }
+
 
 }

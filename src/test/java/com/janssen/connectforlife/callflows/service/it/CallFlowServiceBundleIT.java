@@ -1,5 +1,6 @@
 package com.janssen.connectforlife.callflows.service.it;
 
+import com.janssen.connectforlife.callflows.Constants;
 import com.janssen.connectforlife.callflows.domain.CallFlow;
 import com.janssen.connectforlife.callflows.domain.types.CallFlowStatus;
 import com.janssen.connectforlife.callflows.exception.CallFlowAlreadyExistsException;
@@ -87,5 +88,45 @@ public class CallFlowServiceBundleIT extends BasePaxIT {
     public void shouldThrowIllegalArgumentIfCallFlowWithNonAlphanumericCharactersIsCreated() throws CallFlowAlreadyExistsException {
         // Given, When And Then
         CallFlow callFlow = callFlowService.create(badFlow);
+    }
+
+    @Test
+    public void shouldReturnNewlyUpdatedCallFlow() throws CallFlowAlreadyExistsException {
+        // Given
+        CallFlow existingFlow = callFlowService.create(mainFlow);
+
+        // When
+        existingFlow.setDescription(Constants.CALLFLOW_MAIN_DESCRIPTION + Constants.UPDATED);
+        CallFlow callFlow = callFlowService.update(existingFlow);
+
+        // Then
+        assertNotNull(callFlow);
+        assertThat(callFlow.getId(), equalTo(existingFlow.getId()));
+        assertThat(callFlow.getName(), equalTo(existingFlow.getName()));
+        assertThat(callFlow.getDescription(), equalTo(existingFlow.getDescription()));
+        assertThat(callFlow.getStatus(), equalTo(existingFlow.getStatus()));
+        assertThat(callFlow.getRaw(), equalTo(existingFlow.getRaw()));
+    }
+
+    @Test(expected = CallFlowAlreadyExistsException.class)
+    public void shouldThrowCallFlowAlreadyExistsIfCallFlowExistsDuringUpdate() throws CallFlowAlreadyExistsException {
+        // Given Two flows with name MainFlow and NewMainFlow
+        CallFlow flow1 = CallFlowHelper.createMainFlow();
+        CallFlow flow2 = CallFlowHelper.createMainFlow();
+        flow2.setName("NewMainFlow");
+        callFlowService.create(flow1);
+        CallFlow flowToUpdate = callFlowService.create(flow2);
+
+        // When we try to update name of NewMainFlow to MainFlow and update
+        flowToUpdate.setName(flow1.getName());
+        callFlowService.update(flowToUpdate);
+
+        // Then we expect a exception
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldThrowIllegalArgumentIfCallFlowWithNonAlphanumericCharactersIsUsedDuringUpdate() throws CallFlowAlreadyExistsException {
+        // Given, When And Then
+        CallFlow callFlow = callFlowService.update(badFlow);
     }
 }

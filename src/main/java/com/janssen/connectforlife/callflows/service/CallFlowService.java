@@ -23,5 +23,17 @@ public interface CallFlowService {
      */
     CallFlow create(CallFlow callflow) throws CallFlowAlreadyExistsException;
 
+    /**
+     * Updates a call flow in the system.
+     * If the name of the call flow is being changed, it cannot be the same as that of an existing call flow
+     * and special characters cannot be used in the name of the callflow as they have special significance during call flow execution
+     *
+     * @param callflow the call flow object to be updated
+     * @return the callflow object
+     * @throws CallFlowAlreadyExistsException if a duplicate callflow with the same name already exists
+     * @throws IllegalArgumentException if the call flow name does not contain only alphanumeric characters
+     */
+    CallFlow update(CallFlow callflow) throws CallFlowAlreadyExistsException;
+
 }
 

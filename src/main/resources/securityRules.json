@@ -11,7 +11,7 @@
     "origin": "MODULE_CALLFLOWS",
     "version": "0.25.3",
     "methodsRequired": [
-      "POST"
+      "POST", "PUT"
     ]
   }
 ]

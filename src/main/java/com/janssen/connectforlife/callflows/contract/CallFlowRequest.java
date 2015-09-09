@@ -1,11 +1,11 @@
 package com.janssen.connectforlife.callflows.contract;
 
 /**
- * The CallFlow contract
+ * The CallFlow contract used in both create and update requests
  *
  * @author bramak09
  */
-public class CallFlowCreationRequest {
+public class CallFlowRequest {
 
     /**
      * Name of the call flow

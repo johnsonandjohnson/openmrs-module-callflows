@@ -38,6 +38,8 @@ public class CallFlowServiceTest extends BaseTest {
 
     private CallFlow badCallFlow;
 
+    private CallFlow existingMainFlow;
+
     @InjectMocks
     private CallFlowService callFlowService = new CallFlowServiceImpl();
 
@@ -48,10 +50,13 @@ public class CallFlowServiceTest extends BaseTest {
     public void setUp() {
         mainFlow = CallFlowHelper.createMainFlow();
         badCallFlow = CallFlowHelper.createBadFlow();
+
+        existingMainFlow = CallFlowHelper.createMainFlow();
+        existingMainFlow.setId(1L);
     }
 
     @Test
-    public void shouldcreateCallFlow() throws CallFlowAlreadyExistsException {
+    public void shouldCreateCallFlow() throws CallFlowAlreadyExistsException {
         // Given
         ArgumentCaptor<CallFlow> callFlowArgumentCaptor = ArgumentCaptor.forClass(CallFlow.class);
         given(callFlowDataService.create(callFlowArgumentCaptor.capture())).willReturn(mainFlow);
@@ -123,4 +128,85 @@ public class CallFlowServiceTest extends BaseTest {
         }
     }
 
+    @Test
+    public void shouldUpdateCallFlow() throws CallFlowAlreadyExistsException {
+
+        // Given a Main Flow exists
+        given(callFlowDataService.findByName(Constants.CALLFLOW_MAIN)).willReturn(existingMainFlow);
+
+        // And the update on the data service returns the updated callflow
+        ArgumentCaptor<CallFlow> callFlowArgumentCaptor = ArgumentCaptor.forClass(CallFlow.class);
+        given(callFlowDataService.update(callFlowArgumentCaptor.capture())).willReturn(existingMainFlow);
+
+        // When we try to update it
+        existingMainFlow.setDescription(existingMainFlow.getDescription() + Constants.UPDATED);
+        CallFlow updatedFlow = callFlowService.update(existingMainFlow);
+
+        // Then
+        verify(callFlowDataService, times(1)).update(existingMainFlow);
+        assertNotNull(updatedFlow);
+        assertThat(updatedFlow.getName(), equalTo(existingMainFlow.getName()));
+        assertThat(updatedFlow.getDescription(), equalTo(existingMainFlow.getDescription()));
+        assertThat(updatedFlow.getStatus(), equalTo(existingMainFlow.getStatus()));
+        assertThat(updatedFlow.getRaw(), equalTo(existingMainFlow.getRaw()));
+    }
+
+    @Test
+    public void shouldThrowIllegalArgumentIfCallFlowNameDoesNotHaveAlphanumericCharactersDuringUpdate() throws CallFlowAlreadyExistsException {
+        expectException(IllegalArgumentException.class);
+        // Given A bad call flow
+        try {
+            // When
+            CallFlow updatedCallFlow = callFlowService.update(badCallFlow);
+        } finally {
+            // Then since it's a bad name, no need to perform any DB operations
+            verifyZeroInteractions(callFlowDataService);
+        }
+    }
+
+    @Test
+    public void shouldThrowIllegalArgumentIfCallFlowNameIsNullDuringUpdate() throws CallFlowAlreadyExistsException {
+        expectException(IllegalArgumentException.class);
+        // Given
+        badCallFlow.setName(null);
+        try {
+            // When
+            CallFlow updatedCallFlow = callFlowService.update(badCallFlow);
+        } finally {
+            // Then since it's a bad name, no need to perform any DB operations
+            verifyZeroInteractions(callFlowDataService);
+        }
+    }
+
+    @Test
+    public void shouldThrowIllegalArgumentIfCallFlowNameIsBlankDuringUpdate() throws CallFlowAlreadyExistsException {
+        expectException(IllegalArgumentException.class);
+        // Given
+        badCallFlow.setName(StringUtils.EMPTY);
+        try {
+            // When
+            CallFlow updatedCallFlow = callFlowService.update(badCallFlow);
+        } finally {
+            // Then since it's a bad name, no need to perform any DB operations
+            verifyZeroInteractions(callFlowDataService);
+        }
+    }
+
+    @Test
+    public void shouldThrowCallFlowAlreadyExistsIfAnotherCallFlowExistsWithDuplicateNameDuringUpdate() throws CallFlowAlreadyExistsException {
+        expectException(CallFlowAlreadyExistsException.class);
+        // Given
+        given(callFlowDataService.findByName(Constants.CALLFLOW_MAIN)).willReturn(existingMainFlow);
+        // And that we make the bad call flow good and duplicate by just changing the name
+        CallFlow duplicateFlow = badCallFlow;
+        duplicateFlow.setName(existingMainFlow.getName());
+        try {
+            // When we try to update this duplicate call flow
+            CallFlow updatedFlow = callFlowService.update(duplicateFlow);
+        } finally {
+            // Then we expect an exception
+            // And the below
+            verify(callFlowDataService, times(1)).findByName(mainFlow.getName());
+        }
+    }
 }

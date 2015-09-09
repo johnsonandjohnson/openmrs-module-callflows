@@ -1,7 +1,7 @@
 package com.janssen.connectforlife.callflows.builder;
 
 import com.janssen.connectforlife.callflows.BaseTest;
-import com.janssen.connectforlife.callflows.contract.CallFlowCreationRequest;
+import com.janssen.connectforlife.callflows.contract.CallFlowRequest;
 import com.janssen.connectforlife.callflows.domain.CallFlow;
 import com.janssen.connectforlife.callflows.helper.CallFlowContractHelper;
 
@@ -21,7 +21,7 @@ import static org.junit.Assert.assertThat;
 @RunWith(MockitoJUnitRunner.class)
 public class CallFlowBuilderTest extends BaseTest {
 
-    private CallFlowCreationRequest callFlowCreationRequest;
+    private CallFlowRequest callFlowRequest;
 
     private CallFlow callFlow;
 
@@ -29,19 +29,19 @@ public class CallFlowBuilderTest extends BaseTest {
     private CallFlowBuilder callFlowBuilder = new CallFlowBuilder();
 
     @Test
-    public void shouldBuildCallFlowFromCallFlowCreationRequest() {
+    public void shouldBuildCallFlowFromCallFlowRequest() {
         // Given
-        callFlowCreationRequest = CallFlowContractHelper.createMainFlowCreationRequest();
+        callFlowRequest = CallFlowContractHelper.createMainFlowRequest();
 
         // When
-        callFlow = callFlowBuilder.createFrom(callFlowCreationRequest);
+        callFlow = callFlowBuilder.createFrom(callFlowRequest);
 
         // Then
         assertThat(callFlow.getId(), equalTo(null));
-        assertThat(callFlow.getName(), equalTo(callFlowCreationRequest.getName()));
-        assertThat(callFlow.getDescription(), equalTo(callFlowCreationRequest.getDescription()));
-        assertThat(callFlow.getStatus().name(), equalTo(callFlowCreationRequest.getStatus()));
-        assertThat(callFlow.getRaw(), equalTo(callFlowCreationRequest.getRaw()));
+        assertThat(callFlow.getName(), equalTo(callFlowRequest.getName()));
+        assertThat(callFlow.getDescription(), equalTo(callFlowRequest.getDescription()));
+        assertThat(callFlow.getStatus().name(), equalTo(callFlowRequest.getStatus()));
+        assertThat(callFlow.getRaw(), equalTo(callFlowRequest.getRaw()));
     }
 
 }

@@ -147,4 +147,26 @@ public class RESTControllerPaxIT extends BasePaxIT {
         addAuthHeader(httpPost, CFL_TEST_USER_NAME, CFL_TEST_USER_PASSWORD);
         return httpPost;
     }
+
+    /**
+     * Handy wrapper to build a PUT request
+     *
+     * @param path to invoke
+     * @param requestBody as json typically
+     * @return HttpPut
+     * @throws URISyntaxException
+     * @throws UnsupportedEncodingException
+     */
+    protected HttpPut buildPutRequest(String path, String requestBody)
+            throws URISyntaxException, UnsupportedEncodingException {
+        URIBuilder builder = new URIBuilder();
+        builder.setScheme("http").setHost("localhost").setPort(TestContext.getJettyPort())
+               .setPath(path);
+        URI uri = builder.build();
+        HttpPut httpPut = new HttpPut(uri);
+        httpPut.setHeader(HEADER_CONTENT_TYPE, MIME_JSON);
+        httpPut.setEntity(new StringEntity(requestBody));
+        addAuthHeader(httpPut, CFL_TEST_USER_NAME, CFL_TEST_USER_PASSWORD);
+        return httpPut;
+    }
 }
