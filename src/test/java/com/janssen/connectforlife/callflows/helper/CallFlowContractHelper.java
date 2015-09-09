@@ -43,5 +43,19 @@ public final class CallFlowContractHelper {
         return request;
     }
 
+    public static CallFlowResponse createFlow1Response() {
+        return new CallFlowResponse(1L,
+                                    Constants.CALLFLOW_MAIN,
+                                    Constants.CALLFLOW_MAIN_DESCRIPTION,
+                                    CallFlowStatus.DRAFT.name(),
+                                    Constants.CALLFLOW_MAIN_RAW);
+    }
 
+    public static CallFlowResponse createFlow2Response() {
+        return new CallFlowResponse(2L,
+                                    Constants.CALLFLOW_MAIN2,
+                                    Constants.CALLFLOW_MAIN_DESCRIPTION,
+                                    CallFlowStatus.DRAFT.name(),
+                                    Constants.CALLFLOW_MAIN_RAW);
+    }
 }

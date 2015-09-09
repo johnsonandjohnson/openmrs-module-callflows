@@ -169,4 +169,25 @@ public class RESTControllerPaxIT extends BasePaxIT {
         addAuthHeader(httpPut, CFL_TEST_USER_NAME, CFL_TEST_USER_PASSWORD);
         return httpPut;
     }
+
+    /**
+     * Handy wrapper to build a GET request
+     *
+     * @param path to invoke
+     * @return HttpGet
+     * @throws URISyntaxException
+     * @throws UnsupportedEncodingException
+     */
+    protected HttpGet buildGetRequest(String path, String... params)
+            throws URISyntaxException, UnsupportedEncodingException {
+        URIBuilder builder = new URIBuilder();
+        builder.setScheme("http").setHost("localhost").setPort(TestContext.getJettyPort()).setPath(path);
+        for (int i = 0; i < params.length; i += 2) {
+            builder.addParameter(params[i], params[i + 1]);
+        }
+        URI uri = builder.build();
+        HttpGet httpGet = new HttpGet(uri);
+        addAuthHeader(httpGet, CFL_TEST_USER_NAME, CFL_TEST_USER_PASSWORD);
+        return httpGet;
+    }
 }

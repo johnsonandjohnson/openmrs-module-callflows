@@ -3,6 +3,8 @@ package com.janssen.connectforlife.callflows.service;
 import com.janssen.connectforlife.callflows.domain.CallFlow;
 import com.janssen.connectforlife.callflows.exception.CallFlowAlreadyExistsException;
 
+import java.util.List;
+
 /**
  * Service to manage CallFlows
  *
@@ -35,5 +37,12 @@ public interface CallFlowService {
      */
     CallFlow update(CallFlow callflow) throws CallFlowAlreadyExistsException;
 
+    /**
+     * Find all callflows that start with a specific name
+     *
+     * @param prefix a search term that is used to search for callflows
+     * @return a list of found callflows
+     */
+    List<CallFlow> findAllByNamePrefix(String prefix);
 }
 

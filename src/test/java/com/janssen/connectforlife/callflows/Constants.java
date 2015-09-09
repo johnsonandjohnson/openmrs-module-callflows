@@ -21,6 +21,8 @@ public final class Constants {
 
     public static final String CALLFLOW_MAIN = "MainFlow";
 
+    public static final String CALLFLOW_MAIN2 = "MainFlow2";
+
     public static final String CALLFLOW_MAIN_DESCRIPTION = "This is the Main Flow";
 
     public static final String CALLFLOW_MAIN_RAW = "{}";
@@ -30,6 +32,10 @@ public final class Constants {
     public static final String CALLFLOW_BAD_DESCRIPTION = "This is a badly formatted callflow";
 
     public static final String CALLFLOW_BAD_RAW = "{}";
+
+    public static final String CALLFLOW_MAIN_PREFIX = "Ma";
+
+    public static final String CALLFLOW_INVALID_PREFIX = "Xu";
 
     public static final String UPDATED = "-updated";
 

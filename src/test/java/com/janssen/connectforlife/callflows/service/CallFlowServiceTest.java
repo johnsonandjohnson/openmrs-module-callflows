@@ -18,6 +18,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static junit.framework.TestCase.assertNotNull;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -40,6 +43,8 @@ public class CallFlowServiceTest extends BaseTest {
 
     private CallFlow existingMainFlow;
 
+    private List<CallFlow> searchedFlows;
+
     @InjectMocks
     private CallFlowService callFlowService = new CallFlowServiceImpl();
 
@@ -53,6 +58,9 @@ public class CallFlowServiceTest extends BaseTest {
 
         existingMainFlow = CallFlowHelper.createMainFlow();
         existingMainFlow.setId(1L);
+
+        searchedFlows = new ArrayList<>();
+        searchedFlows.add(CallFlowHelper.createMainFlow());
     }
 
     @Test
@@ -208,5 +216,31 @@ public class CallFlowServiceTest extends BaseTest {
             // And the below
             verify(callFlowDataService, times(1)).findByName(mainFlow.getName());
         }
+    }
+
+    @Test
+    public void shouldFindCallFlowsForValidSearchTerm() {
+        // Given
+        given(callFlowDataService.findAllByName(Constants.CALLFLOW_MAIN_PREFIX)).willReturn(searchedFlows);
+
+        // When we search for a callflow by a prefix
+        List<CallFlow> foundCallflows = callFlowService.findAllByNamePrefix(Constants.CALLFLOW_MAIN_PREFIX);
+
+        // Then
+        assertThat(foundCallflows.size(), equalTo(searchedFlows.size()));
+        verify(callFlowDataService, times(1)).findAllByName(Constants.CALLFLOW_MAIN_PREFIX);
+    }
+
+    @Test
+    public void shouldReturnEmptyListOfCallFlowsIfInvalidSearchTermIsUsed() {
+        // Given
+        given(callFlowDataService.findAllByName(Constants.CALLFLOW_MAIN_PREFIX)).willReturn(searchedFlows);
+
+        // When we search for a callflow by a invalid prefix
+        List<CallFlow> foundCallflows = callFlowService.findAllByNamePrefix(Constants.CALLFLOW_INVALID_PREFIX);
+
+        // Then
+        assertThat(foundCallflows.size(), equalTo(0));
+        verify(callFlowDataService, times(1)).findAllByName(Constants.CALLFLOW_INVALID_PREFIX);
     }
 }

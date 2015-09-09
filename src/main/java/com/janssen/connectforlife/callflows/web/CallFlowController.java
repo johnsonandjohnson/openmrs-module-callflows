@@ -4,6 +4,7 @@ import com.janssen.connectforlife.callflows.builder.CallFlowBuilder;
 import com.janssen.connectforlife.callflows.builder.CallFlowResponseBuilder;
 import com.janssen.connectforlife.callflows.contract.CallFlowRequest;
 import com.janssen.connectforlife.callflows.contract.CallFlowResponse;
+import com.janssen.connectforlife.callflows.contract.SearchResponse;
 import com.janssen.connectforlife.callflows.domain.CallFlow;
 import com.janssen.connectforlife.callflows.exception.CallFlowAlreadyExistsException;
 import com.janssen.connectforlife.callflows.service.CallFlowService;
@@ -15,8 +16,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Call Flow Controller to manage call flows
@@ -25,6 +29,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  */
 @Controller
 public class CallFlowController extends RestController {
+
+    private static final String LOOKUP_BY_NAME_PREFIX = "By Name";
 
     @Autowired
     private CallFlowService callFlowService;
@@ -66,6 +72,26 @@ public class CallFlowController extends RestController {
         CallFlow callflow = callFlowBuilder.createFrom(callFlowRequest);
         callflow.setId(id);
         return callFlowResponseBuilder.createFrom(callFlowService.update(callflow));
+    }
+
+    /**
+     * REST API to search for callflows
+     *
+     * @param lookup a lookup term - currently only "By Name" is supported
+     * @param term a search term that is interpreted by the concerned lookup function invoked
+     * @return a list of found callflows
+     */
+    @RequestMapping(value = "/flows", method = RequestMethod.GET)
+    @ResponseBody
+    public SearchResponse searchFlowsByName(@RequestParam String lookup, @RequestParam String term) {
+        List<CallFlowResponse> callFlowResponses = new ArrayList<>();
+        if (LOOKUP_BY_NAME_PREFIX.equals(lookup)) {
+            List<CallFlow> callFlows = callFlowService.findAllByNamePrefix(term);
+            for (CallFlow callFlow : callFlows) {
+                callFlowResponses.add(callFlowResponseBuilder.createFrom(callFlow));
+            }
+        }
+        return new SearchResponse(callFlowResponses);
     }
 
 }

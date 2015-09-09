@@ -21,6 +21,8 @@ import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerSuite;
 import javax.inject.Inject;
 
+import java.util.List;
+
 import static junit.framework.TestCase.assertNotNull;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -37,6 +39,10 @@ public class CallFlowServiceBundleIT extends BasePaxIT {
 
     private CallFlow mainFlow;
 
+    private CallFlow mainFlow2;
+
+    private CallFlow nonMainFlow;
+
     private CallFlow badFlow;
 
     @Inject
@@ -49,6 +55,12 @@ public class CallFlowServiceBundleIT extends BasePaxIT {
     public void setUp() {
         mainFlow = CallFlowHelper.createMainFlow();
         badFlow = CallFlowHelper.createBadFlow();
+
+        mainFlow2 = CallFlowHelper.createMainFlow();
+        mainFlow2.setName("MainFlow2");
+
+        nonMainFlow = CallFlowHelper.createMainFlow();
+        nonMainFlow.setName("NonMainFlow");
     }
 
     @After
@@ -129,4 +141,37 @@ public class CallFlowServiceBundleIT extends BasePaxIT {
         // Given, When And Then
         CallFlow callFlow = callFlowService.update(badFlow);
     }
+
+    @Test
+    public void shouldFindCallFlowsForValidSearchTerm() throws CallFlowAlreadyExistsException {
+        // Given three call flows that have names MainFlow and MainFlow2 and NonMainFlow
+        callFlowService.create(mainFlow);
+        callFlowService.create(mainFlow2);
+        callFlowService.create(nonMainFlow);
+
+        // When we search for a callflow by the Ma prefix
+        List<CallFlow> foundCallflows = callFlowService.findAllByNamePrefix(Constants.CALLFLOW_MAIN_PREFIX);
+
+        // Then we should find the two flows that start with Ma, but not the other one
+        assertNotNull(foundCallflows);
+        assertThat(foundCallflows.size(), equalTo(2));
+        assertThat(foundCallflows.get(0).getName(), equalTo(mainFlow.getName()));
+        assertThat(foundCallflows.get(1).getName(), equalTo(mainFlow2.getName()));
+    }
+
+    @Test
+    public void shouldReturnEmptyListOfCallFlowsIfInvalidSearchTermIsUsed() throws CallFlowAlreadyExistsException {
+        // Given three call flows that have names MainFlow and MainFlow2 and NonMainFlow
+        callFlowService.create(mainFlow);
+        callFlowService.create(mainFlow2);
+        callFlowService.create(nonMainFlow);
+
+        // When we search for a callflow by the Xu (invalid) prefix
+        List<CallFlow> foundCallflows = callFlowService.findAllByNamePrefix(Constants.CALLFLOW_INVALID_PREFIX);
+
+        // Then we should find no flows
+        assertNotNull(foundCallflows);
+        assertThat(foundCallflows.size(), equalTo(0));
+    }
+
 }

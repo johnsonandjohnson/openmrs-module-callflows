@@ -12,6 +12,7 @@ import org.motechproject.testing.osgi.container.MotechNativeTestContainerFactory
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.junit.After;
@@ -41,6 +42,8 @@ import static org.junit.Assert.assertThat;
 public class CallFlowControllerBundleIT extends RESTControllerPaxIT {
 
     private CallFlow mainFlow;
+    private CallFlow mainFlow2;
+    private CallFlow nonMainFlow;
 
     private CallFlowRequest mainFlowRequest;
     private CallFlowRequest badFlowRequest;
@@ -59,6 +62,12 @@ public class CallFlowControllerBundleIT extends RESTControllerPaxIT {
         mainFlowRequest = CallFlowContractHelper.createMainFlowRequest();
         badFlowRequest = CallFlowContractHelper.createBadFlowRequest();
         mainFlow = CallFlowHelper.createMainFlow();
+        // for searches
+        mainFlow2 = CallFlowHelper.createMainFlow();
+        mainFlow2.setName("MainFlow2");
+
+        nonMainFlow = CallFlowHelper.createMainFlow();
+        nonMainFlow.setName("NonMainFlow");
     }
 
     @After
@@ -165,5 +174,41 @@ public class CallFlowControllerBundleIT extends RESTControllerPaxIT {
         // Then
         assertNotNull(response);
         assertThat(response.getStatusLine().getStatusCode(), equalTo(HttpStatus.SC_BAD_REQUEST));
+    }
+
+    @Test
+    public void shouldReturnStatusOKForSuccessfulCallFlowSearches()
+            throws CallFlowAlreadyExistsException, IOException, URISyntaxException, InterruptedException {
+
+        // Given three call flows that have names MainFlow and MainFlow2 and NonMainFlow
+        callFlowService.create(mainFlow);
+        callFlowService.create(mainFlow2);
+        callFlowService.create(nonMainFlow);
+
+        // When we search for callflows by the name prefix "Ma"
+        HttpGet httpGet = buildGetRequest("/callflows/flows", "lookup", "By Name", "term", "Ma");
+        HttpResponse response = getHttpClient().execute(httpGet);
+
+        // Then
+        assertNotNull(response);
+        assertThat(response.getStatusLine().getStatusCode(), equalTo(HttpStatus.SC_OK));
+    }
+
+    @Test
+    public void shouldReturnStatusOKForUnSuccessfulCallFlowSearches()
+            throws CallFlowAlreadyExistsException, IOException, URISyntaxException, InterruptedException {
+
+        // Given three call flows that have names MainFlow and MainFlow2 and NonMainFlow
+        callFlowService.create(mainFlow);
+        callFlowService.create(mainFlow2);
+        callFlowService.create(nonMainFlow);
+
+        // When we search for callflows by the name prefix "Xu" (invalid)
+        HttpGet httpGet = buildGetRequest("/callflows/flows", "lookup", "By Name", "term", "Xu");
+        HttpResponse response = getHttpClient().execute(httpGet);
+
+        // Then
+        assertNotNull(response);
+        assertThat(response.getStatusLine().getStatusCode(), equalTo(HttpStatus.SC_OK));
     }
 }
