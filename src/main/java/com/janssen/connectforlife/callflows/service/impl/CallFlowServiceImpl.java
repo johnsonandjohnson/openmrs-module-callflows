@@ -66,6 +66,7 @@ public class CallFlowServiceImpl implements CallFlowService {
     }
 
     @Override
+    @Transactional
     public List<CallFlow> findAllByNamePrefix(String prefix) {
         return callFlowDataService.findAllByName(prefix);
     }
