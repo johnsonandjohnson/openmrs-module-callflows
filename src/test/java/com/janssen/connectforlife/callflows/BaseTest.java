@@ -3,13 +3,18 @@ package com.janssen.connectforlife.callflows;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import java.io.IOException;
 
 /**
  * All unit tests must extend this
+ * <p/>
+ * The statement @PowerMockIgnore("org.jacoco.agent.rt.*") is a workaround to https://code.google.com/p/powermock/issues/detail?id=458
+ * to allow Jacoco agent to run correclty with Power Mock.
  *
  * @author bramak09
  */
+@PowerMockIgnore("org.jacoco.agent.rt.*")
 public class BaseTest {
 
 
