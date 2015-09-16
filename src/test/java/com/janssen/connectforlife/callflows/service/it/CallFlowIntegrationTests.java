@@ -10,6 +10,6 @@ import org.junit.runners.Suite;
  */
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ CallFlowServiceBundleIT.class })
+@Suite.SuiteClasses({ CallFlowServiceBundleIT.class, ConfigServiceBundleIT.class })
 public class CallFlowIntegrationTests {
 }

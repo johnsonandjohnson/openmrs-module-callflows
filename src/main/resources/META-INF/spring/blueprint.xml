@@ -18,4 +18,10 @@
 
     <osgi:reference id="callFlowDataService"
                     interface="com.janssen.connectforlife.callflows.repository.CallFlowDataService" />
+
+    <osgi:service ref="configService"
+                  interface="com.janssen.connectforlife.callflows.service.ConfigService" />
+
+    <osgi:reference id="configServiceRef" interface="org.motechproject.config.service.ConfigurationService" />
+
 </beans>

@@ -24,6 +24,12 @@
             <artifactId>motech-platform-osgi-extender-fragment</artifactId>
         </dependency>
 
+        <!-- Settings -->
+        <dependency>
+            <groupId>${motech.groupId}</groupId>
+            <artifactId>motech-platform-server-config</artifactId>
+        </dependency>
+
         <!-- OSGi IT -->
         <dependency>
             <groupId>${motech.groupId}</groupId>
@@ -37,20 +43,6 @@
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.eventadmin</artifactId>
-        </dependency>
-
-        <!-- SLF4J -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jcl-over-slf4j</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
         </dependency>
 
         <!-- Spring -->
@@ -159,6 +151,7 @@
                             org.springframework.transaction,
                             org.motechproject.osgi.web;version=${motech.version},
                             org.motechproject.mds.service;version=${motech.version},
+                            org.motechproject.config.service;version=${motech.version},
                             org.motechproject.security.service;version=${motech.version},
                             org.motechproject.security.model;version=${motech.version},
                             *

@@ -1,48 +1,49 @@
 package com.janssen.connectforlife.callflows.domain;
 
-import org.apache.commons.lang.StringUtils;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
 /**
- * Configuration entity, adapted from IVR Module
+ * Configuration entity, adapted from IVR Module and enhanced
  */
 public class Config {
 
+    /**
+     * The configuration name, say voxeo
+     */
     private String name;
 
+    /**
+     * The url to use when connecting to the IVR provider.
+     * This is IVR provider specific. Use [xxx], [yyy] to denote placeholders that will be substituted at runtime
+     */
     private String outgoingCallUriTemplate;
 
+    /**
+     * The request method that is used when connecting to the IVR provider
+     */
     private String outgoingCallMethod;
 
+    /**
+     * A map of OSGI services that can be used in the callflows
+     * The key is the friendly name to use in the templates and the value is the fully qualified name of the OSGI interface
+     */
     private Map<String, String> servicesMap = new HashMap<>();
 
-    private String testUsersMapString;
+    /**
+     * A map of Renderers for this configuration keyed by the renderer name
+     * Renderers are used to generate the output at each node
+     */
+    private Map<String, Renderer> renderersMap = new HashMap<>();
 
+    /**
+     * A map of test users
+     * The key is a phone number and the value is a URL that can respond to a specific call request
+     * This can be used to over-ride the outbound URL used for a given user and like in outgoingCallUriTemplate, this can also
+     * use [xxx], [yyy] to denote placeholders that will be substituted at runtime
+     * The test users can thus be used to connect individual simulators to specific phone numbers for testing
+     */
     private Map<String, String> testUsersMap = new HashMap<>();
-
-    private String servicesMapString;
-
-    private Gson gson;
-
-    public Config() {
-        this.gson = new Gson();
-    }
-
-    public Config(String name, String outgoingCallUriTemplate, String outgoingCallMethod, String servicesMapString,
-                  String testUsersMapString) {
-        gson = new Gson();
-        this.name = name;
-        this.outgoingCallUriTemplate = outgoingCallUriTemplate;
-        this.outgoingCallMethod = outgoingCallMethod;
-        this.servicesMapString = servicesMapString;
-        this.servicesMap = parseStringToMap(servicesMapString);
-        this.testUsersMapString = testUsersMapString;
-        this.testUsersMap = parseJsonToMap(testUsersMapString);
-    }
 
     public String getName() {
         return name;
@@ -84,48 +85,12 @@ public class Config {
         this.testUsersMap = testUsersMap;
     }
 
-    public String getTestUsersMapString() {
-        return testUsersMapString;
+    public Map<String, Renderer> getRenderersMap() {
+        return renderersMap;
     }
 
-    public void setTestUsersMapString(String testUsersMapString) {
-        this.testUsersMapString = testUsersMapString;
-        this.testUsersMap = parseJsonToMap(this.testUsersMapString);
-    }
-
-    public String getServicesMapString() {
-        return servicesMapString;
-    }
-
-    public void setServicesMapString(String servicesMapString) {
-        this.servicesMapString = servicesMapString;
-        this.servicesMap = parseStringToMap(this.servicesMapString);
-    }
-
-    private Map<String, String> parseJsonToMap(String string) {
-        if (string == null) {
-            return new HashMap<>();
-        }
-        return gson.fromJson(string, new TypeToken<Map<String, String>>() {
-        }.getType());
-    }
-
-    private Map<String, String> parseStringToMap(String string) {
-        //todo: replace that with guava Splitter when guava 18.0 is available in external-osgi-bundles
-        Map<String, String> map = new HashMap<>();
-        if (StringUtils.isBlank(string)) {
-            return map;
-        }
-        String[] strings = string.split("\\s*,\\s*");
-        for (String s : strings) {
-            String[] kv = s.split("\\s*:\\s*");
-            if (kv.length == 2) {
-                map.put(kv[0], kv[1]);
-            } else {
-                throw new IllegalArgumentException(String.format("%s is an invalid map", string));
-            }
-        }
-        return map;
+    public void setRenderersMap(Map<String, Renderer> renderersMap) {
+        this.renderersMap = renderersMap;
     }
 }
 
