@@ -9,7 +9,6 @@ import org.motechproject.server.config.SettingsFacade;
 import org.motechproject.testing.osgi.BasePaxIT;
 import org.motechproject.testing.osgi.container.MotechNativeTestContainerFactory;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -133,8 +132,5 @@ public class ConfigServiceBundleIT extends BasePaxIT {
         assertThat(allConfigs.get(1).getName(), equalTo(Constants.CONFIG_YO));
     }
 
-    private String json(Object obj) throws IOException {
-        return new ObjectMapper().writeValueAsString(obj);
-    }
 
 }

@@ -64,7 +64,6 @@ public class ConfigServiceImpl implements ConfigService {
             return configs.get(name);
         }
         String message = String.format("Unknown config: '%s'.", name);
-        LOGGER.error(message);
         throw new IllegalArgumentException(message);
     }
 
@@ -99,7 +98,6 @@ public class ConfigServiceImpl implements ConfigService {
             String message = String.format("There seems to be a problem with the json text in %s: %s",
                                            CONFIG_FILE_NAME,
                                            e.getMessage());
-            LOGGER.error(message, e);
             throw new JsonIOException(message, e);
         }
 
