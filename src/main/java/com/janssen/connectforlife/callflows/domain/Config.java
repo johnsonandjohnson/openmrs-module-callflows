@@ -2,6 +2,7 @@ package com.janssen.connectforlife.callflows.domain;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Configuration entity, adapted from IVR Module and enhanced
@@ -91,6 +92,23 @@ public class Config {
 
     public void setRenderersMap(Map<String, Renderer> renderersMap) {
         this.renderersMap = renderersMap;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Config)) {
+            return false;
+        }
+        final Config other = (Config) o;
+        return Objects.equals(this.name, other.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
     }
 }
 
