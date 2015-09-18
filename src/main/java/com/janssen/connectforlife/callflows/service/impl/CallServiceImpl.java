@@ -10,6 +10,7 @@ import com.janssen.connectforlife.callflows.service.CallService;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.Map;
 import java.util.UUID;
 
@@ -25,6 +26,7 @@ public class CallServiceImpl implements CallService {
     private CallDataService callDataService;
 
     @Override
+    @Transactional
     public Call create(String config,
                        CallFlow start,
                        String startNode,
@@ -73,6 +75,7 @@ public class CallServiceImpl implements CallService {
     }
 
     @Override
+    @Transactional
     public Call create(String config,
                        CallFlow start,
                        String startNode,
@@ -82,6 +85,7 @@ public class CallServiceImpl implements CallService {
     }
 
     @Override
+    @Transactional
     public Call findByCallId(String callId) {
         return callDataService.findByCallId(callId);
     }
