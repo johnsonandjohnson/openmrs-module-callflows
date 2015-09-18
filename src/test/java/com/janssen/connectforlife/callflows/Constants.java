@@ -2,6 +2,7 @@ package com.janssen.connectforlife.callflows;
 
 import org.springframework.http.MediaType;
 import java.nio.charset.Charset;
+import java.util.UUID;
 
 /**
  * Test Constants
@@ -16,10 +17,12 @@ public final class Constants {
     }
 
     public static final MediaType APPLICATION_JSON_UTF8 = new MediaType("application",
-                                                                         "json",
-                                                                         Charset.forName("UTF-8"));
+                                                                        "json",
+                                                                        Charset.forName("UTF-8"));
 
     public static final String CALLFLOW_MAIN = "MainFlow";
+
+    public static final String CALLFLOW_MAIN_ENTRY = "entry";
 
     public static final String CALLFLOW_MAIN2 = "MainFlow2";
 
@@ -80,5 +83,25 @@ public final class Constants {
     public static final String CONFIG_RENDERER_TXT_MIME = "text/plain";
 
     public static final String CONFIG_RENDERER_TXT_TPL = "Text Renderer. Doesn't do much, unless am changed.";
+
+    public static final String ACTOR_ID = "1223";
+
+    public static final String ACTOR_TYPE = "Patient";
+
+    public static final String KEY_GREETING = "greeting";
+
+    public static final String KEY_PIN = "pid";
+
+    public static final String VALUE_GREETING = "Hello Martian!";
+
+    public static final Integer VALUE_PIN = 1234;
+
+    public static final String DATE_CURRENT = "09/16/2015";
+
+    public static final String DATE_FORMAT = "MM/dd/yyyy";
+
+    public static final UUID INBOUND_CALL_ID = UUID.randomUUID();
+
+    public static final UUID OUTBOUND_CALL_ID = UUID.randomUUID();
 
 }

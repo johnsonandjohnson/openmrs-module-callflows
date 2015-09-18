@@ -11,17 +11,23 @@
 
     <import resource="classpath*:META-INF/motech/*.xml"/>
 
-    <osgi:reference id="transactionManager" interface="org.springframework.transaction.PlatformTransactionManager" />
+    <osgi:reference id="transactionManager" interface="org.springframework.transaction.PlatformTransactionManager"/>
 
     <osgi:service ref="callFlowService"
-                  interface="com.janssen.connectforlife.callflows.service.CallFlowService" />
+                  interface="com.janssen.connectforlife.callflows.service.CallFlowService"/>
 
     <osgi:reference id="callFlowDataService"
-                    interface="com.janssen.connectforlife.callflows.repository.CallFlowDataService" />
+                    interface="com.janssen.connectforlife.callflows.repository.CallFlowDataService"/>
 
     <osgi:service ref="configService"
-                  interface="com.janssen.connectforlife.callflows.service.ConfigService" />
+                  interface="com.janssen.connectforlife.callflows.service.ConfigService"/>
 
-    <osgi:reference id="configServiceRef" interface="org.motechproject.config.service.ConfigurationService" />
+    <osgi:service ref="callService"
+                  interface="com.janssen.connectforlife.callflows.service.CallService"/>
+
+    <osgi:reference id="callDataService"
+                    interface="com.janssen.connectforlife.callflows.repository.CallDataService"/>
+
+    <osgi:reference id="configServiceRef" interface="org.motechproject.config.service.ConfigurationService"/>
 
 </beans>
