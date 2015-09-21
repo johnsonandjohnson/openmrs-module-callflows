@@ -31,6 +31,13 @@ public final class CallHelper {
         return params;
     }
 
+    public static Map<String, Object> createUpdatedParams() {
+        Map<String, Object> params = new HashMap<>();
+        params.put(Constants.KEY_GREETING, Constants.VALUE_GREETING + Constants.UPDATED);
+        params.put(Constants.KEY_PIN, Constants.VALUE_PIN + Constants.UPDATED);
+        return params;
+    }
+
     public static Call createInboundCall() {
         Call call = createCall();
         call.setStatus(CallStatus.INITIATED);
@@ -66,6 +73,40 @@ public final class CallHelper {
 
         call.setActorId(Constants.ACTOR_ID);
         call.setActorType(Constants.ACTOR_TYPE);
+
+        return call;
+    }
+
+    public static Call updateAllPropertiesInOutboundCall(Call existingCall) {
+        Call call = new Call();
+        call.setId(existingCall.getId() == null ? 1L : existingCall.getId());
+        call.setConfig(Constants.CONFIG_VOXEO + Constants.UPDATED);
+        call.setCallId(existingCall.getCallId() + Constants.UPDATED);
+
+        CallFlow mainFlow = CallFlowHelper.createMainFlow();
+        mainFlow.setName(Constants.CALLFLOW_MAIN2);
+        call.setStartFlow(mainFlow);
+        call.setStartNode(Constants.CALLFLOW_MAIN_ENTRY + Constants.UPDATED);
+        call.setStartTime(formatter.parseDateTime(Constants.DATE_NEXT_DAY));
+
+        call.setEndFlow(mainFlow);
+        call.setEndNode(Constants.CALLFLOW_MAIN_ENTRY + Constants.UPDATED);
+        call.setEndTime(formatter.parseDateTime(Constants.DATE_NEXT_DAY));
+
+        call.setSteps(1L);
+
+        call.setContext(createUpdatedParams());
+
+        call.setProviderData(new HashMap<String, String>());
+
+        call.setProviderTime(Constants.DATE_CURRENT);
+        call.setProviderCallId(Constants.UPDATED);
+
+        call.setActorId(Constants.ACTOR_ID + Constants.UPDATED);
+        call.setActorType(Constants.ACTOR_TYPE + Constants.UPDATED);
+
+        call.setStatus(CallStatus.IN_PROGRESS);
+        call.setDirection(CallDirection.INCOMING);
 
         return call;
     }

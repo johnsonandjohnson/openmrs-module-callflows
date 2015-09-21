@@ -98,6 +98,8 @@ public final class Constants {
 
     public static final String DATE_CURRENT = "09/16/2015";
 
+    public static final String DATE_NEXT_DAY = "09/17/2015";
+
     public static final String DATE_FORMAT = "MM/dd/yyyy";
 
     public static final UUID INBOUND_CALL_ID = UUID.randomUUID();

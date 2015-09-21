@@ -174,5 +174,62 @@ public class CallServiceBundleIT extends BasePaxIT {
         assertNotNull(call);
         assertThat(call.getCallId(), equalTo(inboundCall.getCallId()));
     }
+
+    @Test
+    public void shouldUpdateOnlyAllowedFieldsInCall() {
+        // Given a existing outbound call without actors
+        outboundCall.setActorId(null);
+        outboundCall.setActorType(null);
+        callDataService.update(outboundCall);
+
+        // And we updated *all* the properties
+        Call updatedCall = CallHelper.updateAllPropertiesInOutboundCall(outboundCall);
+
+        // When
+        Call returnedCall = callService.update(updatedCall);
+
+        // Then
+        CallAssert.assertNoChangeToNonChangeableFields(returnedCall,
+                                                       outboundCall.getCallId(),
+                                                       outboundCall.getStartTime());
+        CallAssert.assertChangeToChangeableFields(returnedCall, outboundCall.getEndTime());
+        CallAssert.assertActorUpdated(returnedCall);
+
+    }
+
+    @Test
+    public void shouldNotUpdateActorIfCallWasCreatedWithActorSet() {
+        // Given a existing outbound call with actors
+        outboundCall.setActorId(Constants.ACTOR_ID);
+        outboundCall.setActorType(Constants.ACTOR_TYPE);
+        callDataService.update(outboundCall);
+
+        // And we update all of it's properties
+        Call updatedCall = CallHelper.updateAllPropertiesInOutboundCall(outboundCall);
+
+        // When
+        Call returnedCall = callService.update(updatedCall);
+
+        // Then
+        assertNotNull(returnedCall);
+        CallAssert.assertNoChangeToNonChangeableFields(returnedCall,
+                                                       outboundCall.getCallId(),
+                                                       outboundCall.getStartTime());
+        CallAssert.assertChangeToChangeableFields(returnedCall, outboundCall.getEndTime());
+        CallAssert.assertActor(returnedCall);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldThrowIllegalArgumentIfInvalidCallWasProvided() {
+
+        // Given a invalid call ID
+        outboundCall.setId(-1L);
+
+        // When
+        Call updatedCall = callService.update(outboundCall);
+
+        // Then we expect an expection
+    }
+
 }
 
