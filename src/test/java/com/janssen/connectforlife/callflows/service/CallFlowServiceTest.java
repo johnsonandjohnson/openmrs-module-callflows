@@ -24,6 +24,7 @@ import static junit.framework.TestCase.assertNotNull;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -188,6 +189,30 @@ public class CallFlowServiceTest extends BaseTest {
     }
 
     @Test
+    public void shouldThrowIllegalArgumentIfCallFlowNameIsNewButIdIsInvalidDuringUpdate() throws CallFlowAlreadyExistsException {
+        expectException(IllegalArgumentException.class);
+
+        // Given a Main Flow exists
+        given(callFlowDataService.findByName(Constants.CALLFLOW_MAIN)).willReturn(existingMainFlow);
+
+        // And the update on the data service returns the updated callflow
+        ArgumentCaptor<CallFlow> callFlowArgumentCaptor = ArgumentCaptor.forClass(CallFlow.class);
+        given(callFlowDataService.update(callFlowArgumentCaptor.capture())).willReturn(existingMainFlow);
+        given(callFlowDataService.findById(1L)).willReturn(existingMainFlow);
+
+        existingMainFlow.setName(Constants.CALLFLOW_MAIN2);
+        existingMainFlow.setId(-1L);
+        try {
+            // When we try to update with a new name but a bad id
+            CallFlow updatedFlow = callFlowService.update(existingMainFlow);
+        } finally {
+            // Then
+            verify(callFlowDataService, times(1)).findByName(Constants.CALLFLOW_MAIN2);
+            verify(callFlowDataService, times(1)).findById(-1L);
+            verify(callFlowDataService, never()).update(any(CallFlow.class));
+        }
+    }
+    @Test
     public void shouldThrowIllegalArgumentIfCallFlowNameDoesNotHaveAlphanumericCharactersDuringUpdate()
             throws CallFlowAlreadyExistsException {
         expectException(IllegalArgumentException.class);
@@ -328,7 +353,7 @@ public class CallFlowServiceTest extends BaseTest {
         } finally {
             // Then
             verify(callFlowDataService, times(1)).findById(-1L);
-            verify(callFlowDataService, never()).delete(mainFlow);
+            verify(callFlowDataService, never()).delete(any(CallFlow.class));
         }
     }
 }
