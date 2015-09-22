@@ -33,7 +33,7 @@ public interface CallFlowService {
      * @param callflow the call flow object to be updated
      * @return the callflow object
      * @throws CallFlowAlreadyExistsException if a duplicate callflow with the same name already exists
-     * @throws IllegalArgumentException if the call flow name does not contain only alphanumeric characters
+     * @throws IllegalArgumentException       if the call flow name does not contain only alphanumeric characters
      */
     CallFlow update(CallFlow callflow) throws CallFlowAlreadyExistsException;
 
@@ -44,5 +44,23 @@ public interface CallFlowService {
      * @return a list of found callflows
      */
     List<CallFlow> findAllByNamePrefix(String prefix);
+
+    /**
+     * Find a callflow by the given name
+     *
+     * @param name to search by
+     * @return the callflow corresponding to the passed name
+     * @throws IllegalArgumentException if the callflow cannot be found with the given name
+     *
+     */
+    CallFlow findByName(String name);
+
+    /**
+     * Deletes a callflow
+     *
+     * @param id of the callflow to delete
+     * @throws IllegalArgumentException if no callflow with the given id exists
+     */
+    void delete(Long id);
 }
 
