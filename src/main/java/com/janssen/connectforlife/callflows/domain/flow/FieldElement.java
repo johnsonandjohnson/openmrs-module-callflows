@@ -14,9 +14,9 @@ public class FieldElement extends Element {
     private String fieldType;
 
     /**
-     * A grammar associated with this field
+     * Any meta of the field, like for digits, a minLength and a maxLength or a length can be supported
      */
-    private String grammar;
+    private String fieldMeta;
 
     /**
      * Each field can have a prompt or label text associated with it
@@ -29,6 +29,18 @@ public class FieldElement extends Element {
     private boolean bargeIn;
 
     /**
+     * Whether dual tone multi frequency (DTMF) input is enabled for this field
+     * This is often used in conjunction with the other mode - voice
+     */
+    private boolean dtmf;
+
+    /**
+     * Whether voice mode is enabled for this field
+     * This is often used in conjunction with the other mode - DTMF
+     */
+    private boolean voice;
+
+    /**
      * The text to read out if there was no input within a acceptable period of time
      */
     private String noInput;
@@ -39,9 +51,14 @@ public class FieldElement extends Element {
     private String noMatch;
 
     /**
-     * Whether re-prompt should be supported in case we encounter a no input or a no match event
+     * The goodBye message. If set control terminates if noInput and noMatch are encountered
      */
-    private boolean reprompt;
+    private String goodBye;
+
+    /**
+     * Number of times reprompt is supported
+     */
+    private int reprompt;
 
     public String getFieldType() {
         return fieldType;
@@ -49,14 +66,6 @@ public class FieldElement extends Element {
 
     public void setFieldType(String fieldType) {
         this.fieldType = fieldType;
-    }
-
-    public String getGrammar() {
-        return grammar;
-    }
-
-    public void setGrammar(String grammar) {
-        this.grammar = grammar;
     }
 
     public String getTxt() {
@@ -75,6 +84,22 @@ public class FieldElement extends Element {
         this.bargeIn = bargeIn;
     }
 
+    public boolean isDtmf() {
+        return dtmf;
+    }
+
+    public void setDtmf(boolean dtmf) {
+        this.dtmf = dtmf;
+    }
+
+    public boolean isVoice() {
+        return voice;
+    }
+
+    public void setVoice(boolean voice) {
+        this.voice = voice;
+    }
+
     public String getNoInput() {
         return noInput;
     }
@@ -91,11 +116,27 @@ public class FieldElement extends Element {
         this.noMatch = noMatch;
     }
 
-    public boolean isReprompt() {
+    public String getGoodBye() {
+        return goodBye;
+    }
+
+    public void setGoodBye(String goodBye) {
+        this.goodBye = goodBye;
+    }
+
+    public int getReprompt() {
         return reprompt;
     }
 
-    public void setReprompt(boolean reprompt) {
+    public void setReprompt(int reprompt) {
         this.reprompt = reprompt;
+    }
+
+    public String getFieldMeta() {
+        return fieldMeta;
+    }
+
+    public void setFieldMeta(String fieldMeta) {
+        this.fieldMeta = fieldMeta;
     }
 }

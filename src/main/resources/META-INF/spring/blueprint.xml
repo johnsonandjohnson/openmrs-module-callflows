@@ -25,6 +25,9 @@
     <osgi:service ref="callService"
                   interface="com.janssen.connectforlife.callflows.service.CallService"/>
 
+    <osgi:service ref="flowService"
+                  interface="com.janssen.connectforlife.callflows.service.FlowService"/>
+
     <osgi:reference id="callDataService"
                     interface="com.janssen.connectforlife.callflows.repository.CallDataService"/>
 

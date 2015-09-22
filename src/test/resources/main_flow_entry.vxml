@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vxml version="2.1">
+	<form>
+		<block><prompt>Hello! Welcome</prompt></block>
+		<field name="input" type="number">
+			<prompt bargein="true">Please enter a input</prompt>
+		</field>
+	<filled mode="all" namelist="input">	<submit next="http://localhost/motech-platform-server/modules/callflows/in/voxeo/flows/MainFlow/342ds.vxml" />
+	</filled>
+	</form>
+</vxml>

@@ -84,6 +84,8 @@ public final class Constants {
 
     public static final String CONFIG_RENDERER_TXT_TPL = "Text Renderer. Doesn't do much, unless am changed.";
 
+    public static final String CONFIG_RENDERER_JSON = "json";
+
     public static final String ACTOR_ID = "1223";
 
     public static final String ACTOR_TYPE = "Patient";
@@ -103,5 +105,11 @@ public final class Constants {
     public static final UUID INBOUND_CALL_ID = UUID.randomUUID();
 
     public static final UUID OUTBOUND_CALL_ID = UUID.randomUUID();
+
+    public static final String PARAM_NEXT_URL = "nextURL";
+
+    public static final String NEXT_URL_JSON = "http://localhost/motech-platform-server/modules/callflows/in/voxeo/flows/MainFlow/342ds.json";
+
+    public static final String NEXT_URL_VXML = "http://localhost/motech-platform-server/modules/callflows/in/voxeo/flows/MainFlow/342ds.vxml";
 
 }

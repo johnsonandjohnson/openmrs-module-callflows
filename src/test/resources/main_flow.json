@@ -1,0 +1,135 @@
+{
+  "nodes": [
+    {
+      "nodeType": "user",
+      "templates": {
+        "text": {
+          "content": "\n[say] Hello! Welcome\n----\n[say] Please enter a input [allow barge in]\n[hear] \"input\" [check for] number\n----",
+          "isDirty": false
+        },
+        "vxml": {
+          "content": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<vxml version=\"2.1\">\n\t<form>\n\t\t<block><prompt>Hello! Welcome</prompt></block>\n\t\t<field name=\"input\" type=\"number\">\n\t\t\t<prompt bargein=\"true\">Please enter a input</prompt>\n\t\t</field>\n\t<filled mode=\"all\" namelist=\"input\">\t<submit next=\"${nextURL}\" />\n\t</filled>\n\t</form>\n</vxml>\n",
+          "isDirty": false
+        },
+        "kookoo": {
+          "content": "Unfortunately only the default renderer is registered for the [kookoo] format, which as you can see doesn't do much, other than displaying this helpful message :)",
+          "isDirty": false
+        }
+      },
+      "blocks": [
+        {
+          "type": "form",
+          "name": "Form",
+          "elements": [
+            {
+              "type": "txt",
+              "name": "Txt",
+              "txt": "Hello! Welcome"
+            },
+            {
+              "type": "field",
+              "fieldType": "number",
+              "bargeIn": true,
+              "dtmf"  : true,
+              "voice" : false,
+              "name": "input",
+              "txt": "Please enter a input",
+              "reprompt": 3
+            }
+          ]
+        }
+      ],
+      "step": "entry"
+    },
+    {
+      "nodeType": "system",
+      "templates": {
+        "velocity": {
+           "content" : "#if ($params.input == 1)\n  |active|\n#elseif ($params.input == 2)\n  |inactive|\n#end\n ",
+           "isDirty" : false
+        }
+      },
+      "step": "entry-handler"
+    },
+    {
+      "nodeType": "user",
+      "templates": {
+        "text": {
+           "content" : "\n[say] Welcome to the active node\n----",
+           "isDirty" : false
+        },
+        "vxml": {
+           "content" : "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<vxml version=\"2.1\">\n\t<form>\n\t\t<block><prompt>Welcome to the active node</prompt></block>\n\t</form>\n</vxml>",
+           "isDirty" : false
+        },
+        "kookoo": {
+           "content" : "Unfortunately only the default renderer is registered for the [kookoo] format, which as you can see doesn't do much, other than displaying this helpful message :)",
+           "isDirty" : false
+         }
+      },
+      "blocks": [
+        {
+          "type": "form",
+          "name": "Form",
+          "elements": [
+            {
+              "type": "txt",
+              "name": "Txt",
+              "txt": "Welcome to the active node"
+            }
+          ]
+        }
+      ],
+      "step": "active",
+      "currentBlock": null,
+      "currentElement": null
+    },
+    {
+      "nodeType": "system",
+      "templates": {
+
+      },
+      "step": "active-handler"
+    },
+    {
+      "nodeType": "user",
+      "templates": {
+        "text": {
+           "content" : "\n[say] Welcome to the inactive node\n----",
+           "isDirty" : false
+         },
+        "vxml": {
+           "content" : "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<vxml version=\"2.1\">\n\t<form>\n\t\t<block><prompt>Welcome to the inactive node</prompt></block>\n\t</form>\n</vxml>",
+           "isDirty" : false
+        },
+        "kookoo": {
+            "content" : "Unfortunately only the default renderer is registered for the [kookoo] format, which as you can see doesn't do much, other than displaying this helpful message :)",
+            "isDirty" : false
+        }
+      },
+      "blocks": [
+        {
+          "type": "form",
+          "name": "Form",
+          "elements": [
+            {
+              "type": "txt",
+              "name": "Txt",
+              "txt": "Welcome to the inactive node"
+            }
+          ]
+        }
+      ],
+      "step": "inactive",
+      "currentBlock": null,
+      "currentElement": null
+    },
+    {
+      "nodeType": "system",
+      "templates": {
+
+      }
+    }
+  ],
+  "name": "MainFlow"
+}
