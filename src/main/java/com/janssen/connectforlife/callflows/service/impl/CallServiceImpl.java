@@ -86,6 +86,47 @@ public class CallServiceImpl implements CallService {
 
     @Override
     @Transactional
+    public Call update(Call call) {
+        Call currentCall = callDataService.findById(call.getId());
+
+        if (null == currentCall) {
+            throw new IllegalArgumentException("Invalid call {} " + call);
+        }
+        // We can't allow updation of the start properties AND the callID AND the config
+        // as those are write-once
+
+        // We can update the end properties
+        currentCall.setEndFlow(call.getEndFlow());
+        currentCall.setEndNode(call.getEndNode());
+        currentCall.setEndTime(DateTime.now());
+
+        // AND parameters we were passed
+        currentCall.setContext(call.getContext());
+
+        // AND no of steps that have happened so far, incremented duly by the caller
+        // We don't increment it here, as an update might be called multiple times in a single request by the caller
+        currentCall.setSteps(call.getSteps());
+
+        // The status
+        currentCall.setStatus(call.getStatus());
+
+        // The provider data, cause we didn't have it at the time of creation
+        currentCall.setProviderData(call.getProviderData());
+        currentCall.setProviderCallId(call.getProviderCallId());
+        currentCall.setProviderTime(call.getProviderTime());
+
+        // We can update the actor data, if it wasn't set earlier
+        if (null == currentCall.getActorId()) {
+            currentCall.setActorId(call.getActorId());
+            currentCall.setActorType(call.getActorType());
+        }
+
+        // update in the database
+        return callDataService.update(currentCall);
+    }
+
+    @Override
+    @Transactional
     public Call findByCallId(String callId) {
         return callDataService.findByCallId(callId);
     }

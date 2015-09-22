@@ -31,6 +31,8 @@ import static junit.framework.TestCase.assertNotNull;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -200,5 +202,98 @@ public class CallServiceTest extends BaseTest {
         assertThat(call.getCallId(), equalTo(Constants.INBOUND_CALL_ID.toString()));
     }
 
+    @Test
+    public void shouldUpdateOnlyAllowedFieldsInCall() {
+
+        // Given a outbound call without an actor yet
+        outboundCall.setId(1L);
+        outboundCall.setActorId(null);
+        outboundCall.setActorType(null);
+        DateTime oldEndTime = outboundCall.getEndTime();
+        // And we update all properties
+        Call updatedCall = CallHelper.updateAllPropertiesInOutboundCall(outboundCall);
+
+        ArgumentCaptor<Call> callArgumentCaptor = ArgumentCaptor.forClass(Call.class);
+        given(callDataService.findById(1L)).willReturn(outboundCall);
+
+        // Given for create we returned DATE_CURRENT, And for update we return DATE_NEXT_DAY
+        given(DateTime.now()).willReturn(formatter.parseDateTime(Constants.DATE_NEXT_DAY));
+
+        // When
+        callService.update(updatedCall);
+
+        // Then
+        verify(callDataService, times(1)).update(callArgumentCaptor.capture());
+
+        // And let's see what gets sent to the database
+        Call returnedCall = callArgumentCaptor.getValue();
+        assertNotNull(returnedCall);
+
+        // And we are ** not ** supposed to update the following properties
+        CallAssert.assertNoChangeToNonChangeableFields(returnedCall,
+                                                       outboundCall.getCallId(),
+                                                       outboundCall.getStartTime());
+
+        // And we are supposed to update the following
+        CallAssert.assertChangeToChangeableFields(returnedCall, oldEndTime);
+
+        // And we are supposed to update the actor
+        CallAssert.assertActorUpdated(returnedCall);
+    }
+
+    @Test
+    public void shouldNotUpdateActorIfCallWasCreatedWithActorSet() {
+        // Given
+        outboundCall.setId(1L);
+        DateTime oldEndTime = outboundCall.getEndTime();
+
+        // And we update all properties
+        Call updatedCall = CallHelper.updateAllPropertiesInOutboundCall(outboundCall);
+
+        ArgumentCaptor<Call> callArgumentCaptor = ArgumentCaptor.forClass(Call.class);
+        given(callDataService.findById(1L)).willReturn(outboundCall);
+
+        // Given for create we returned DATE_CURRENT, for update we return DATE_NEXT_DAY
+        given(DateTime.now()).willReturn(formatter.parseDateTime(Constants.DATE_NEXT_DAY));
+
+        // When
+        callService.update(updatedCall);
+
+        // Then
+        verify(callDataService, times(1)).update(callArgumentCaptor.capture());
+
+        // And let's see what gets sent to the database
+        Call returnedCall = callArgumentCaptor.getValue();
+        assertNotNull(returnedCall);
+
+        // And we are ** not ** supposed to update the following properties
+        CallAssert.assertNoChangeToNonChangeableFields(returnedCall,
+                                                       outboundCall.getCallId(),
+                                                       outboundCall.getStartTime());
+
+        // AND we are ** not ** supposed to update the actor now
+        CallAssert.assertActor(returnedCall);
+
+        // And we are supposed to update the following
+        CallAssert.assertChangeToChangeableFields(returnedCall, oldEndTime);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldThrowIllegalArgumentIfInvalidCallWasProvided() {
+
+        // Given
+        Call updatedCall = CallHelper.updateAllPropertiesInOutboundCall(outboundCall);
+        updatedCall.setId(2L);
+        given(callDataService.findById(1L)).willReturn(outboundCall);
+        // Given for create we returned DATE_CURRENT, for update we return DATE_NEXT_DAY
+        given(DateTime.now()).willReturn(formatter.parseDateTime(Constants.DATE_NEXT_DAY));
+
+        // When
+        try {
+            callService.update(updatedCall);
+        } finally {
+            verify(callDataService, never()).update(any(Call.class));
+        }
+    }
 
 }

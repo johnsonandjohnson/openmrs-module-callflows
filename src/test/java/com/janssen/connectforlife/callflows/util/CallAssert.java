@@ -8,6 +8,7 @@ import com.janssen.connectforlife.callflows.domain.types.CallStatus;
 import com.janssen.connectforlife.callflows.helper.CallFlowHelper;
 import com.janssen.connectforlife.callflows.helper.CallHelper;
 
+import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -16,6 +17,7 @@ import java.util.Map;
 import static junit.framework.Assert.assertNull;
 import static junit.framework.TestCase.assertNotNull;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -61,9 +63,42 @@ public final class CallAssert {
         assertThat(newCall.getSteps(), equalTo(0L));
     }
 
+    public static void assertNoChangeToNonChangeableFields(Call call, String oldCallId, DateTime oldStartTime) {
+        assertThat(call.getCallId(), equalTo(oldCallId));
+        assertThat(call.getConfig(), equalTo(Constants.CONFIG_VOXEO));
+        assertThat(call.getDirection(), equalTo(CallDirection.OUTGOING));
+
+        CallFlow mainFlow = CallFlowHelper.createMainFlow();
+        assertThat(call.getStartFlow(), equalTo(mainFlow));
+
+        assertThat(call.getStartNode(), equalTo(Constants.CALLFLOW_MAIN_ENTRY));
+        assertThat(call.getStartTime(), equalTo(oldStartTime));
+    }
+
+    public static void assertChangeToChangeableFields(Call call, DateTime oldEndTime) {
+        CallFlow mainFlow = CallFlowHelper.createMainFlow();
+        mainFlow.setName(Constants.CALLFLOW_MAIN2);
+        assertThat(call.getEndFlow(), equalTo(mainFlow));
+        assertThat(call.getEndNode(), equalTo(Constants.CALLFLOW_MAIN_ENTRY + Constants.UPDATED));
+        assertThat(call.getEndTime(), not(equalTo(oldEndTime)));
+
+        assertThat(call.getSteps(), equalTo(1L));
+
+        assertThat(call.getProviderCallId(), equalTo(Constants.UPDATED));
+        assertNotNull(call.getProviderTime());
+        assertThat(call.getContext(), equalTo(CallHelper.createUpdatedParams()));
+
+        assertThat(call.getStatus(), equalTo(CallStatus.IN_PROGRESS));
+    }
+
     public static void assertActor(Call call) {
         assertThat(call.getActorId(), equalTo(Constants.ACTOR_ID));
         assertThat(call.getActorType(), equalTo(Constants.ACTOR_TYPE));
+    }
+
+    public static void assertActorUpdated(Call call) {
+        assertThat(call.getActorId(), equalTo(Constants.ACTOR_ID + Constants.UPDATED));
+        assertThat(call.getActorType(), equalTo(Constants.ACTOR_TYPE + Constants.UPDATED));
     }
 
     public static void assertNullActor(Call call) {

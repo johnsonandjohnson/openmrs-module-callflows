@@ -47,6 +47,18 @@ public interface CallService {
     Call create(String config, CallFlow start, String startNode, CallDirection direction, Map<String, Object> params);
 
     /**
+     * Update a call in the system with new properties set
+     * The service will not update the three start properties, the config or the call ID as those are write once only
+     * The actor properties (actorId and actorType) can be set if they have not already been set
+     * All other properties can be updated
+     *
+     * @param call to update
+     * @return the updated call object
+     * @throws IllegalArgumentException if the call could not be retrieved in the system
+     */
+    Call update(Call call);
+
+    /**
      * Find a call by it's unique call ID, i.e the generated call ID
      *
      * @param callId to lookup by
