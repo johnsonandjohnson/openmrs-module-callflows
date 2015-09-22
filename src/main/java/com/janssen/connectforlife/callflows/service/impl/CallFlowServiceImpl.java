@@ -52,13 +52,18 @@ public class CallFlowServiceImpl implements CallFlowService {
         // Second we can check whether the id of this call flow matches the one we are trying to update
         // If the second condition fails, it means that the call flow name is being changed to another callflow's name
         CallFlow existingFlow = callFlowDataService.findByName(callflow.getName());
-        if (null == existingFlow) {
-            throw new IllegalArgumentException("Callflow does not exist! :" + callflow.getName());
+        if (null != existingFlow && existingFlow.getId() != callflow.getId()) {
+            throw new CallFlowAlreadyExistsException(
+                    "Callflow name is already used by another flow :" + callflow.getName());
         }
-        if (existingFlow.getId() != callflow.getId()) {
-            throw new CallFlowAlreadyExistsException("Callflow name is already used by another flow :" + callflow.getName());
+        if (null == existingFlow) {
+            existingFlow = callFlowDataService.findById(callflow.getId());
+            if (null == existingFlow) {
+                throw new IllegalArgumentException("Callflow not retrievable for invalid id : " + callflow.getId());
+            }
         }
         // update the fields on the retrieved object, so that JDO correctly recognizes the object's state
+        existingFlow.setName(callflow.getName());
         existingFlow.setDescription(callflow.getDescription());
         existingFlow.setRaw(callflow.getRaw());
         existingFlow.setStatus(callflow.getStatus());
@@ -69,6 +74,26 @@ public class CallFlowServiceImpl implements CallFlowService {
     @Transactional
     public List<CallFlow> findAllByNamePrefix(String prefix) {
         return callFlowDataService.findAllByName(prefix);
+    }
+
+    @Override
+    public CallFlow findByName(String name) {
+        CallFlow callflow = callFlowDataService.findByName(name);
+        if (null == callflow) {
+            throw new IllegalArgumentException("Callflow cannot be found for name : " + name);
+        } else {
+            return callflow;
+        }
+    }
+
+    @Override
+    public void delete(Long id) {
+        CallFlow callflow = callFlowDataService.findById(id);
+        if (callflow == null) {
+            throw new IllegalArgumentException("Callflow cannot be found for id : " + id);
+        } else {
+            callFlowDataService.delete(callflow);
+        }
     }
 }
 

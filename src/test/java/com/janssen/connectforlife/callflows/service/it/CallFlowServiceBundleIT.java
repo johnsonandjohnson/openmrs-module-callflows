@@ -20,9 +20,9 @@ import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerSuite;
 import javax.inject.Inject;
-
 import java.util.List;
 
+import static junit.framework.Assert.assertNull;
 import static junit.framework.TestCase.assertNotNull;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -97,7 +97,8 @@ public class CallFlowServiceBundleIT extends BasePaxIT {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void shouldThrowIllegalArgumentIfCallFlowWithNonAlphanumericCharactersIsCreated() throws CallFlowAlreadyExistsException {
+    public void shouldThrowIllegalArgumentIfCallFlowWithNonAlphanumericCharactersIsCreated()
+            throws CallFlowAlreadyExistsException {
         // Given, When And Then
         CallFlow callFlow = callFlowService.create(badFlow);
     }
@@ -137,7 +138,23 @@ public class CallFlowServiceBundleIT extends BasePaxIT {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void shouldThrowIllegalArgumentIfCallFlowWithNonAlphanumericCharactersIsUsedDuringUpdate() throws CallFlowAlreadyExistsException {
+    public void shouldThrowIllegalArgumentIfNameIsNewButIdIsInvalidDuringUpdate()
+            throws CallFlowAlreadyExistsException {
+        // Given  flow named MainFlow
+        CallFlow flow1 = CallFlowHelper.createMainFlow();
+        callFlowService.create(flow1);
+
+        // When we try to update with a brand new name, but a invalid ID
+        flow1.setName(Constants.CALLFLOW_MAIN2);
+        flow1.setId(-1L);
+        CallFlow callFlow = callFlowService.update(flow1);
+
+        // Then expect a exception
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldThrowIllegalArgumentIfCallFlowWithNonAlphanumericCharactersIsUsedDuringUpdate()
+            throws CallFlowAlreadyExistsException {
         // Given, When And Then
         CallFlow callFlow = callFlowService.update(badFlow);
     }
@@ -174,4 +191,50 @@ public class CallFlowServiceBundleIT extends BasePaxIT {
         assertThat(foundCallflows.size(), equalTo(0));
     }
 
+    @Test
+    public void shouldFindCallFlowByValidName() throws CallFlowAlreadyExistsException {
+        // Given
+        callFlowService.create(mainFlow);
+
+        // When we search for that flow
+        CallFlow returnedFlow = callFlowService.findByName(Constants.CALLFLOW_MAIN);
+
+        // Then
+        assertNotNull(returnedFlow);
+        assertThat(returnedFlow.getName(), equalTo(mainFlow.getName()));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldThrowIllegalArgumentIfAttemptedToFindCallFlowByInvalidName()
+            throws CallFlowAlreadyExistsException {
+        // Given
+        callFlowService.create(mainFlow);
+
+        // When we search for a non existent flow
+        CallFlow returnedFlow = callFlowService.findByName(Constants.CALLFLOW_MAIN2);
+
+        // Then
+    }
+
+    @Test
+    public void shouldDeleteCallFlow() throws CallFlowAlreadyExistsException {
+        // Given
+        mainFlow = callFlowService.create(mainFlow);
+
+        // When
+        callFlowService.delete(mainFlow.getId());
+
+        // Then
+        assertNull(callFlowDataService.findById(mainFlow.getId()));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldThrowIllegalArgumentIfAttemptedToDeleteCallFlowByInvalidId()
+            throws CallFlowAlreadyExistsException {
+        // Given
+        mainFlow = callFlowService.create(mainFlow);
+
+        // When
+        callFlowService.delete(-1L);
+    }
 }

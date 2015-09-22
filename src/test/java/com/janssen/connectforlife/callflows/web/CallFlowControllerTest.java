@@ -32,6 +32,8 @@ import java.util.List;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.springframework.test.web.server.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.server.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.server.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.server.request.MockMvcRequestBuilders.put;
@@ -210,6 +212,26 @@ public class CallFlowControllerTest extends BaseTest {
                .andExpect(content().type(Constants.APPLICATION_JSON_UTF8))
                .andExpect(content().string(json(new SearchResponse(new ArrayList<CallFlow>()))));
 
+    }
+
+    @Test
+    public void shouldReturnStatusOKForSuccessfulDelete() throws Exception {
+        // Given a valid flow by name mainFlow
+
+        // When we delete by a valid ID , Then
+        mockMvc.perform(delete("/flows/1"))
+               .andExpect(status().is(HttpStatus.OK.value()));
+
+    }
+
+    @Test
+    public void shouldReturnStatusBadRequestForUnSuccessfulDelete() throws Exception {
+        // Given that deleting by a bad id will throw illegal argument
+        doThrow(new IllegalArgumentException()).when(callFlowService).delete(-1L);
+
+        // When we delete by a invalid ID , Then
+        mockMvc.perform(delete("/flows/-1"))
+               .andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
     }
 
 }
