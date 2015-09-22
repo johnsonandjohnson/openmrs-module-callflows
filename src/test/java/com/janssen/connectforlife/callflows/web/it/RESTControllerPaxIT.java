@@ -190,4 +190,22 @@ public class RESTControllerPaxIT extends BasePaxIT {
         addAuthHeader(httpGet, CFL_TEST_USER_NAME, CFL_TEST_USER_PASSWORD);
         return httpGet;
     }
+
+    /**
+     * Wrapper to build a DELETE request
+     *
+     * @param path to build
+     * @return HttpDelete
+     * @throws URISyntaxException
+     * @throws UnsupportedEncodingException
+     */
+    protected HttpDelete buildDeleteRequest(String path)
+            throws URISyntaxException, UnsupportedEncodingException {
+        URIBuilder builder = new URIBuilder();
+        builder.setScheme("http").setHost("localhost").setPort(TestContext.getJettyPort()).setPath(path);
+        URI uri = builder.build();
+        HttpDelete httpDelete = new HttpDelete(uri);
+        addAuthHeader(httpDelete, CFL_TEST_USER_NAME, CFL_TEST_USER_PASSWORD);
+        return httpDelete;
+    }
 }

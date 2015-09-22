@@ -12,6 +12,7 @@ import org.motechproject.testing.osgi.container.MotechNativeTestContainerFactory
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
@@ -210,5 +211,35 @@ public class CallFlowControllerBundleIT extends RESTControllerPaxIT {
         // Then
         assertNotNull(response);
         assertThat(response.getStatusLine().getStatusCode(), equalTo(HttpStatus.SC_OK));
+    }
+
+    @Test
+    public void shouldReturnStatusOKForSuccessfulDelete()
+            throws CallFlowAlreadyExistsException, IOException, URISyntaxException, InterruptedException {
+        // Given a callflow by name MainFlow
+        mainFlow = callFlowService.create(mainFlow);
+
+        // When we try to delete this callflow by passing it's ID
+        HttpDelete httpDelete = buildDeleteRequest("/callflows/flows/" + mainFlow.getId());
+        HttpResponse response = getHttpClient().execute(httpDelete);
+
+        // Then
+        assertNotNull(response);
+        assertThat(response.getStatusLine().getStatusCode(), equalTo(HttpStatus.SC_OK));
+    }
+
+    @Test
+    public void shouldReturnStatusBadRequestForUnsuccessfulDelete()
+            throws CallFlowAlreadyExistsException, IOException, URISyntaxException, InterruptedException {
+        // Given a callflow by name MainFlow
+        mainFlow = callFlowService.create(mainFlow);
+
+        // When we invoke a deletion operation with a invalid ID
+        HttpDelete httpDelete = buildDeleteRequest("/callflows/flows/-1");
+        HttpResponse response = getHttpClient().execute(httpDelete);
+
+        // Then
+        assertNotNull(response);
+        assertThat(response.getStatusLine().getStatusCode(), equalTo(HttpStatus.SC_BAD_REQUEST));
     }
 }

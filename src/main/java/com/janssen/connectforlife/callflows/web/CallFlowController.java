@@ -75,10 +75,22 @@ public class CallFlowController extends RestController {
     }
 
     /**
+     * REST API to delete a callflow
+     *
+     * @param id of callflow to delete
+     * @throws IllegalArgumentException if id is invalid
+     */
+    @RequestMapping(value = "/flows/{id}", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteFlow(@PathVariable Long id) {
+        callFlowService.delete(id);
+    }
+
+    /**
      * REST API to search for callflows
      *
      * @param lookup a lookup term - currently only "By Name" is supported
-     * @param term a search term that is interpreted by the concerned lookup function invoked
+     * @param term   a search term that is interpreted by the concerned lookup function invoked
      * @return a list of found callflows
      */
     @RequestMapping(value = "/flows", method = RequestMethod.GET)
