@@ -6,7 +6,6 @@ import com.janssen.connectforlife.callflows.domain.Call;
 import com.janssen.connectforlife.callflows.domain.CallFlow;
 import com.janssen.connectforlife.callflows.domain.Config;
 import com.janssen.connectforlife.callflows.domain.flow.Flow;
-import com.janssen.connectforlife.callflows.domain.flow.Node;
 import com.janssen.connectforlife.callflows.domain.flow.TextElement;
 import com.janssen.connectforlife.callflows.domain.flow.UserNode;
 import com.janssen.connectforlife.callflows.domain.types.CallDirection;
