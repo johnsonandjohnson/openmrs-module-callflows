@@ -58,8 +58,12 @@ public class CallFlowServiceImpl implements CallFlowService {
         }
         if (null == existingFlow) {
             existingFlow = callFlowDataService.findById(callflow.getId());
+            if (null == existingFlow) {
+                throw new IllegalArgumentException("Callflow not retrievable for invalid id : " + callflow.getId());
+            }
         }
         // update the fields on the retrieved object, so that JDO correctly recognizes the object's state
+        existingFlow.setName(callflow.getName());
         existingFlow.setDescription(callflow.getDescription());
         existingFlow.setRaw(callflow.getRaw());
         existingFlow.setStatus(callflow.getStatus());

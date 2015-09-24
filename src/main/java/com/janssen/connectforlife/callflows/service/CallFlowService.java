@@ -33,7 +33,7 @@ public interface CallFlowService {
      * @param callflow the call flow object to be updated
      * @return the callflow object
      * @throws CallFlowAlreadyExistsException if a duplicate callflow with the same name already exists
-     * @throws IllegalArgumentException       if the call flow name does not contain only alphanumeric characters
+     * @throws IllegalArgumentException       if the call flow is not retrievable or does not contain only alphanumeric characters
      */
     CallFlow update(CallFlow callflow) throws CallFlowAlreadyExistsException;
 

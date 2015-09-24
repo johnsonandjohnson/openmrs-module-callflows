@@ -138,6 +138,21 @@ public class CallFlowServiceBundleIT extends BasePaxIT {
     }
 
     @Test(expected = IllegalArgumentException.class)
+    public void shouldThrowIllegalArgumentIfNameIsNewButIdIsInvalidDuringUpdate()
+            throws CallFlowAlreadyExistsException {
+        // Given  flow named MainFlow
+        CallFlow flow1 = CallFlowHelper.createMainFlow();
+        callFlowService.create(flow1);
+
+        // When we try to update with a brand new name, but a invalid ID
+        flow1.setName(Constants.CALLFLOW_MAIN2);
+        flow1.setId(-1L);
+        CallFlow callFlow = callFlowService.update(flow1);
+
+        // Then expect a exception
+    }
+
+    @Test(expected = IllegalArgumentException.class)
     public void shouldThrowIllegalArgumentIfCallFlowWithNonAlphanumericCharactersIsUsedDuringUpdate()
             throws CallFlowAlreadyExistsException {
         // Given, When And Then

@@ -59,9 +59,7 @@ public class FlowUtilTest extends BaseTest {
         String[] parsed = flowUtil.parse(input, null);
 
         // Then
-        assertNotNull(parsed);
-        assertThat(parsed[0], equalTo("MainFlow"));
-        assertThat(parsed[1], equalTo("entry"));
+        assertFlowStep(parsed, "MainFlow", "entry");
     }
 
     @Test
@@ -73,9 +71,7 @@ public class FlowUtilTest extends BaseTest {
         String[] parsed = flowUtil.parse(input, null);
 
         // Then
-        assertNotNull(parsed);
-        assertThat(parsed[0], equalTo("MainFlow"));
-        assertThat(parsed[1], equalTo(null));
+        assertFlowStep(parsed, "MainFlow", null);
     }
 
     @Test
@@ -87,9 +83,7 @@ public class FlowUtilTest extends BaseTest {
         String[] parsed = flowUtil.parse(input, null);
 
         // Then
-        assertNotNull(parsed);
-        assertThat(parsed[0], equalTo(null));
-        assertThat(parsed[1], equalTo("entry"));
+        assertFlowStep(parsed, null, "entry");
     }
 
     @Test
@@ -101,9 +95,7 @@ public class FlowUtilTest extends BaseTest {
         String[] parsed = flowUtil.parse(input, null);
 
         // Then
-        assertNotNull(parsed);
-        assertThat(parsed[0], equalTo(null));
-        assertThat(parsed[1], equalTo("entry"));
+        assertFlowStep(parsed, null, "entry");
     }
 
     @Test
@@ -113,8 +105,7 @@ public class FlowUtilTest extends BaseTest {
         String input = "";
 
         // When
-        String[] parsed = flowUtil.parse(input, null);
-
+        flowUtil.parse(input, null);
     }
 
     @Test
@@ -124,7 +115,7 @@ public class FlowUtilTest extends BaseTest {
         String input = null;
 
         // When
-        String[] parsed = flowUtil.parse(input, null);
+        flowUtil.parse(input, null);
     }
 
     @Test
@@ -134,7 +125,7 @@ public class FlowUtilTest extends BaseTest {
         String input = "MainFlow.";
 
         // When
-        String[] parsed = flowUtil.parse(input, null);
+        flowUtil.parse(input, null);
     }
 
     @Test
@@ -144,7 +135,7 @@ public class FlowUtilTest extends BaseTest {
         String input = "|MainFlow.";
 
         // When
-        String[] parsed = flowUtil.parse(input, null);
+        flowUtil.parse(input, null);
     }
 
     @Test
@@ -156,9 +147,7 @@ public class FlowUtilTest extends BaseTest {
         String[] parsed = flowUtil.parse(input, null);
 
         // Then
-        assertNotNull(parsed);
-        assertThat(parsed[0], equalTo("MainFlow"));
-        assertThat(parsed[1], equalTo("entry"));
+        assertFlowStep(parsed, "MainFlow", "entry");
     }
 
     @Test
@@ -170,9 +159,7 @@ public class FlowUtilTest extends BaseTest {
         String[] parsed = flowUtil.parse(input, null);
 
         // Then
-        assertNotNull(parsed);
-        assertThat(parsed[0], equalTo("MainFlow"));
-        assertThat(parsed[1], equalTo("entry"));
+        assertFlowStep(parsed, "MainFlow", "entry");
     }
 
     @Test
@@ -184,9 +171,7 @@ public class FlowUtilTest extends BaseTest {
         String[] parsed = flowUtil.parse(input, null);
 
         // Then
-        assertNotNull(parsed);
-        assertThat(parsed[0], equalTo("MainFlow"));
-        assertThat(parsed[1], equalTo("entry"));
+        assertFlowStep(parsed, "MainFlow", "entry");
     }
 
     @Test
@@ -198,9 +183,7 @@ public class FlowUtilTest extends BaseTest {
         String[] parsed = flowUtil.parse(input, null);
 
         // Then
-        assertNotNull(parsed);
-        assertThat(parsed[0], equalTo("MainFlow"));
-        assertThat(parsed[1], equalTo("entry"));
+        assertFlowStep(parsed, "MainFlow", "entry");
     }
 
     @Test
@@ -212,9 +195,7 @@ public class FlowUtilTest extends BaseTest {
         String[] parsed = flowUtil.parse(input, null);
 
         // Then
-        assertNotNull(parsed);
-        assertThat(parsed[0], equalTo("MainFlow"));
-        assertThat(parsed[1], equalTo("entry"));
+        assertFlowStep(parsed, "MainFlow", "entry");
     }
 
     @Test
@@ -226,9 +207,7 @@ public class FlowUtilTest extends BaseTest {
         String[] parsed = flowUtil.parse(input, null);
 
         // Then
-        assertNotNull(parsed);
-        assertThat(parsed[0], equalTo(null));
-        assertThat(parsed[1], equalTo("entry         handler"));
+        assertFlowStep(parsed, null, "entry         handler");
     }
 
     @Test
@@ -240,9 +219,7 @@ public class FlowUtilTest extends BaseTest {
         String[] parsed = flowUtil.parse(input, null);
 
         // Then
-        assertNotNull(parsed);
-        assertThat(parsed[0], equalTo("Main   Flow"));
-        assertThat(parsed[1], equalTo(null));
+        assertFlowStep(parsed, "Main   Flow", null);
     }
 
     @Test
@@ -254,9 +231,7 @@ public class FlowUtilTest extends BaseTest {
         String[] parsed = flowUtil.parse(input, null);
 
         // Then
-        assertNotNull(parsed);
-        assertThat(parsed[0], equalTo("Main   Flow"));
-        assertThat(parsed[1], equalTo("entry  handler"));
+        assertFlowStep(parsed, "Main   Flow", "entry  handler");
     }
 
     // getNodeByStep
@@ -407,6 +382,12 @@ public class FlowUtilTest extends BaseTest {
         Map<String, String> internalCtx = new HashMap<>();
         internalCtx.put(property, val);
         ctx.put(Constants.PARAM_INTERNAL, internalCtx);
+    }
+    private void assertFlowStep(String[] flowAndStep, String expectedFlow, String expectedStep) {
+        assertNotNull(flowAndStep);
+        assertThat(flowAndStep.length, equalTo(2));
+        assertThat(flowAndStep[0], equalTo(expectedFlow));
+        assertThat(flowAndStep[1], equalTo(expectedStep));
     }
 
 }
