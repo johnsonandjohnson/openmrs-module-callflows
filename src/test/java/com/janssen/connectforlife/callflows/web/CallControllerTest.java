@@ -47,6 +47,7 @@ import java.util.Map;
 
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -332,7 +333,9 @@ public class CallControllerTest extends BaseTest {
         mockMvc.perform(customGet("/in/voxeo/flows/MainFlow.json"))
                .andExpect(status().is(HttpStatus.INTERNAL_SERVER_ERROR.value()))
                .andExpect(content().type(Constants.APPLICATION_JSON_UTF8))
-               .andExpect(content().string(sameAsFile("error_bad_script.json")));
+               .andExpect(content().string(containsString("Encountered \\\"<EOF>\\\" at MainFlow.entry[line 1, column 24]")));
+        // We check enough of the content to have confidence in the velocity error, but not the complete text as the string
+        // is too deeply nested and on windows and unix escapes with different line endings
 
         assertConfigAndFlowLoaded(Constants.CONFIG_VOXEO, Constants.CALLFLOW_MAIN);
         assertCallNeverSearched();
