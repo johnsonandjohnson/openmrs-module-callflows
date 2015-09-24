@@ -168,7 +168,7 @@ public class CallUtil {
     }
 
     /**
-     * Builds a error string in JSON format
+     * Builds a error string in a format particular to the extension provided
      *
      * @param node  current
      * @param error indicating the exception that led to invoking this method
