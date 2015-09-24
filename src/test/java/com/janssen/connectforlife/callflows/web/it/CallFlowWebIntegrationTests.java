@@ -9,6 +9,6 @@ import org.junit.runners.Suite;
  * @author bramak09
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ CallFlowControllerBundleIT.class, ConfigControllerBundleIT.class })
+@Suite.SuiteClasses({ CallFlowControllerBundleIT.class, ConfigControllerBundleIT.class, CallControllerBundleIT.class })
 public class CallFlowWebIntegrationTests {
 }

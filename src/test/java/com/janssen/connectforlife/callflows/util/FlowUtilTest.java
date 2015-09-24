@@ -16,6 +16,8 @@ import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import static junit.framework.Assert.assertNull;
 import static junit.framework.TestCase.assertNotNull;
@@ -315,7 +317,7 @@ public class FlowUtilTest extends BaseTest {
     @Test
     public void shouldEvalNode() throws IOException {
         // Given
-        context.put(Constants.PARAM_NEXT_URL, Constants.NEXT_URL_VXML);
+        prepareInternalContext(context, Constants.PARAM_NEXT_URL, Constants.NEXT_URL_VXML);
 
         // When
         String output = flowUtil.evalNode(flow, flow.getNodes().get(0), context, Constants.CONFIG_RENDERER_VXML);
@@ -328,7 +330,7 @@ public class FlowUtilTest extends BaseTest {
     @Test
     public void shouldEvalNodeWithAllAttributes() throws IOException {
         // Given
-        context.put(Constants.PARAM_NEXT_URL, Constants.NEXT_URL_JSON);
+        prepareInternalContext(context, Constants.PARAM_NEXT_URL, Constants.NEXT_URL_JSON);
         // And we take the first user node
         UserNode entry = (UserNode) flow.getNodes().get(0);
         // And it's first field element (2nd element by index)
@@ -349,7 +351,7 @@ public class FlowUtilTest extends BaseTest {
     @Test
     public void shouldEvalNodeAsJSON() throws IOException {
         // Given
-        context.put(Constants.PARAM_NEXT_URL, Constants.NEXT_URL_JSON);
+        prepareInternalContext(context, Constants.PARAM_NEXT_URL, Constants.NEXT_URL_JSON);
 
         // When
         String output = flowUtil.evalNode(flow, flow.getNodes().get(0), context, Constants.CONFIG_RENDERER_JSON);
@@ -362,7 +364,7 @@ public class FlowUtilTest extends BaseTest {
     @Test
     public void shouldEvalSystemNodeAsJSON() throws IOException {
         // Given
-        context.put(Constants.PARAM_NEXT_URL, Constants.NEXT_URL_JSON);
+        prepareInternalContext(context, Constants.PARAM_NEXT_URL, Constants.NEXT_URL_JSON);
 
         // When
         String output = flowUtil.evalNode(flow, flow.getNodes().get(1), context, Constants.CONFIG_RENDERER_JSON);
@@ -375,7 +377,7 @@ public class FlowUtilTest extends BaseTest {
     @Test
     public void shouldEvalNullTemplateInNodeAndReturnEmptyString() throws IOException {
         // Given
-        context.put(Constants.PARAM_NEXT_URL, Constants.NEXT_URL_VXML);
+        prepareInternalContext(context, Constants.PARAM_NEXT_URL, Constants.NEXT_URL_VXML);
         Node entry = flow.getNodes().get(0);
         entry.getTemplates().get(Constants.CONFIG_RENDERER_VXML).setContent(null);
         // When
@@ -389,7 +391,8 @@ public class FlowUtilTest extends BaseTest {
     @Test
     public void shouldEvalEmptyTemplateInNodeAndReturnEmptyString() throws IOException {
         // Given
-        context.put(Constants.PARAM_NEXT_URL, Constants.NEXT_URL_VXML);
+        prepareInternalContext(context, Constants.PARAM_NEXT_URL, Constants.NEXT_URL_VXML);
+
         Node entry = flow.getNodes().get(0);
         entry.getTemplates().get(Constants.CONFIG_RENDERER_VXML).setContent(StringUtils.EMPTY);
         // When
@@ -398,6 +401,12 @@ public class FlowUtilTest extends BaseTest {
         // Then
         assertNotNull(output);
         assertThat(output, equalTo(StringUtils.EMPTY));
+    }
+
+    private void prepareInternalContext(VelocityContext ctx, String property, String val) {
+        Map<String, String> internalCtx = new HashMap<>();
+        internalCtx.put(property, val);
+        ctx.put(Constants.PARAM_INTERNAL, internalCtx);
     }
 
 }

@@ -20,6 +20,12 @@ public final class Constants {
                                                                         "json",
                                                                         Charset.forName("UTF-8"));
 
+    public static final MediaType APPLICATION_VXML = new MediaType("application",
+                                                                   "voicexml+xml",
+                                                                   Charset.forName("UTF-8"));
+
+    public static final MediaType PLAIN_TEXT = new MediaType("text", "plain", Charset.forName("UTF-8"));
+
     public static final String CALLFLOW_MAIN = "MainFlow";
 
     public static final String CALLFLOW_MAIN_ENTRY = "entry";
@@ -64,13 +70,9 @@ public final class Constants {
 
     public static final String CONFIG_YO_USER_URL = "http://some-other-api-server/?phone=2222222222";
 
-    public static final String CONFIG_SRVC_PATIENT = "patientSrvc";
+    public static final String CONFIG_SRVC_CALL = "callSrvc";
 
-    public static final String CONFIG_SRVC_PATIENT_CLASS = "com.janssen.connectforlife.patient.service.PatientService";
-
-    public static final String CONFIG_SRVC_HEALTHTIP = "healthTipSrvc";
-
-    public static final String CONFIG_SRVC_HEALTHTIP_CLASS = "com.janssen.connectforlife.patient.service.HealthTipService";
+    public static final String CONFIG_SRVC_CALL_CLASS = "com.janssen.connectforlife.callflows.service.CallService";
 
     public static final String CONFIG_RENDERER_VXML = "vxml";
 
@@ -104,14 +106,27 @@ public final class Constants {
 
     public static final String DATE_FORMAT = "MM/dd/yyyy";
 
-    public static final UUID INBOUND_CALL_ID = UUID.randomUUID();
+    public static final UUID INBOUND_CALL_ID = UUID.fromString("6acafc03-3818-4e36-b40a-8881fe5ac71b");
 
-    public static final UUID OUTBOUND_CALL_ID = UUID.randomUUID();
+    public static final UUID OUTBOUND_CALL_ID = UUID.fromString("5c8f6f83-567c-4586-a3b6-368397d5aba8");
 
     public static final String PARAM_NEXT_URL = "nextURL";
 
-    public static final String NEXT_URL_JSON = "http://localhost/motech-platform-server/modules/callflows/in/voxeo/flows/MainFlow/342ds.json";
+    public static final String PARAM_INTERNAL = "internal";
 
-    public static final String NEXT_URL_VXML = "http://localhost/motech-platform-server/modules/callflows/in/voxeo/flows/MainFlow/342ds.vxml";
+    public static final String NEXT_URL_JSON = "http://localhost/motech-platform-server/modules/callflows/calls/6acafc03-3818-4e36-b40a-8881fe5ac71b.json";
 
+    public static final String NEXT_URL_VXML = "http://localhost/motech-platform-server/modules/callflows/calls/6acafc03-3818-4e36-b40a-8881fe5ac71b.vxml";
+
+    public static final String ERROR_SCRIPT = "error:SCRIPT:error in script";
+
+    public static final String ERROR_SYSTEM = "error:SYSTEM:system error";
+
+    public static final String ERROR_YO = "yo config cannot be loaded";
+
+    public static final String ERROR_MAIN_FLOW2 = "MainFlow2 flow cannot be loaded";
+
+    public static final String ERROR_CALLFLOW = "error:BAD_INPUT:" + ERROR_MAIN_FLOW2;
+
+    public static final String ERROR_CONFIG = "error:BAD_INPUT:" + ERROR_YO;
 }

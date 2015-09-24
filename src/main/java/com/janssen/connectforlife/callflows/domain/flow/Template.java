@@ -16,7 +16,7 @@ public class Template {
      * Some template contents are auto-generated. Some are edited manually. This field captures whether a call flow designer has
      * manually edited the content of this template
      */
-    private boolean isDirty;
+    private boolean dirty;
 
     public String getContent() {
         return content;
@@ -27,10 +27,10 @@ public class Template {
     }
 
     public boolean isDirty() {
-        return isDirty;
+        return dirty;
     }
 
-    public void setIsDirty(boolean isDirty) {
-        this.isDirty = isDirty;
+    public void setDirty(boolean dirty) {
+        this.dirty = dirty;
     }
 }

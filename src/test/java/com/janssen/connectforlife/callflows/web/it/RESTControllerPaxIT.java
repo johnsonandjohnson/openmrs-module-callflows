@@ -8,6 +8,7 @@ import org.motechproject.testing.osgi.TestContext;
 import org.motechproject.testing.osgi.container.MotechNativeTestContainerFactory;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -23,6 +24,7 @@ import org.ops4j.pax.exam.ExamFactory;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerSuite;
+import org.springframework.http.MediaType;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -30,6 +32,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Locale;
+
+import static junit.framework.TestCase.assertNotNull;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
 
 /**
  * The base class for REST Controller integration tests running with Pax Exam.
@@ -207,5 +213,19 @@ public class RESTControllerPaxIT extends BasePaxIT {
         HttpDelete httpDelete = new HttpDelete(uri);
         addAuthHeader(httpDelete, CFL_TEST_USER_NAME, CFL_TEST_USER_PASSWORD);
         return httpDelete;
+    }
+
+
+    /**
+     * Handy assert for checking that the response is not null, the status is a certain kind and of a certain MediaType
+     *
+     * @param response  got
+     * @param status    to assert
+     * @param mediaType to assert
+     */
+    protected void assertResponseToBe(HttpResponse response, int status, MediaType mediaType) {
+        assertNotNull(response);
+        assertThat(response.getStatusLine().getStatusCode(), equalTo(status));
+        assertThat(response.getEntity().getContentType().getValue(), equalTo(mediaType.toString()));
     }
 }
