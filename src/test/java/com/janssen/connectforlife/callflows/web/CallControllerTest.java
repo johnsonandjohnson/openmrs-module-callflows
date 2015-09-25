@@ -5,7 +5,9 @@ import com.janssen.connectforlife.callflows.Constants;
 import com.janssen.connectforlife.callflows.domain.Call;
 import com.janssen.connectforlife.callflows.domain.CallFlow;
 import com.janssen.connectforlife.callflows.domain.Config;
+import com.janssen.connectforlife.callflows.domain.FlowPosition;
 import com.janssen.connectforlife.callflows.domain.flow.Flow;
+import com.janssen.connectforlife.callflows.domain.flow.Node;
 import com.janssen.connectforlife.callflows.domain.flow.TextElement;
 import com.janssen.connectforlife.callflows.domain.flow.UserNode;
 import com.janssen.connectforlife.callflows.domain.types.CallDirection;
@@ -53,6 +55,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -117,6 +120,14 @@ public class CallControllerTest extends BaseTest {
 
     private Flow flow;
 
+    private FlowPosition flowPosition;
+
+    private Node entryHandlerNode;
+
+    private Node inactiveNode;
+
+    private Long steps;
+
     private Call inboundCall;
 
     private String nextURLFormat = "http://localhost/motech-platform-server/modules/callflows/calls/%s.%s";
@@ -172,11 +183,28 @@ public class CallControllerTest extends BaseTest {
 
         // Flow Service
         flow = FlowHelper.createFlow(raw);
+        entryHandlerNode = flow.getNodes().get(1);
+        inactiveNode = flow.getNodes().get(4);
         given(flowService.load(Constants.CALLFLOW_MAIN)).willReturn(flow);
+        flowPosition = new FlowPosition();
+        flowPosition.setStart(entryHandlerNode)
+                    .setEnd(inactiveNode)
+                    .setTerminated(false)
+                    .setOutput("|active|")
+                    .setStartFlow(flow)
+                    .setEndFlow(flow);
+
+        given(flowService.evalNode(eq(flow),
+                                   eq(entryHandlerNode),
+                                   any(VelocityContext.class))).willReturn(flowPosition);
 
         // Call Service
         inboundCall = CallHelper.createInboundCall();
+        inboundCall.setStatus(CallStatus.IN_PROGRESS);
+        steps = inboundCall.getSteps();
+
         outboundCall = CallHelper.createOutboundCall();
+
         given(callService.create(Constants.CONFIG_VOXEO,
                                  mainFlow,
                                  Constants.CALLFLOW_MAIN_ENTRY,
@@ -451,6 +479,122 @@ public class CallControllerTest extends BaseTest {
         assertNoActionOnCall();
     }
 
+    /* Handle Call Continuation */
+    /* ======================== */
+
+    @Test
+    public void shouldHandleCallContinuation() throws Exception {
+
+        // When we make a call continuation request for a existing inbound call with vxml
+        mockMvc.perform(customGet("/calls/" + inboundCall.getCallId() + ".vxml"))
+               .andExpect(status().is(HttpStatus.OK.value()))
+               .andExpect(content().type(Constants.APPLICATION_VXML))
+               .andExpect(content().string(sameAsFile("main_flow_inactive.vxml")));
+
+        // Then we should have tried to load the call first and then config and then flow
+        assertCallConfigFlowLoaded(inboundCall, Constants.CONFIG_VOXEO, mainFlow.getName());
+        // And we evaluated the next node
+        verify(flowService, times(1)).evalNode(flow, entryHandlerNode, velocityContextCaptor.getValue());
+        // And we must have updated the call eventually by incrementing the steps and status to as set
+        assertCallUpdatedWithIncrementedSteps(CallStatus.IN_PROGRESS);
+    }
+
+    @Test
+    public void shouldHandleCallContinuationWithJsonExtension() throws Exception {
+        // When we make a call continuation request for a existing inbound call with json
+        mockMvc.perform(customGet("/calls/" + inboundCall.getCallId() + ".json"))
+               .andExpect(status().is(HttpStatus.OK.value()))
+               .andExpect(content().type(Constants.APPLICATION_JSON_UTF8))
+               .andExpect(content().string(sameAsFile("main_flow_inactive_with_body.json")));
+
+        // Then we should have tried to load the call first and then config and then flow
+        assertCallConfigFlowLoaded(inboundCall, Constants.CONFIG_VOXEO, mainFlow.getName());
+        // And we evaluated the next node
+        verify(flowService, times(1)).evalNode(flow, entryHandlerNode, velocityContextCaptor.getValue());
+        // And we must have updated the call eventually by incrementing the steps and status to as set
+        assertCallUpdatedWithIncrementedSteps(CallStatus.IN_PROGRESS);
+    }
+
+    @Test
+    public void shouldTerminateCallInHandleCallContinuationIfNotAbleToGetToAUserNode() throws Exception {
+        // Given
+        flowPosition.setTerminated(true);
+
+        // When we make a call continuation request for a existing inbound call with vxml
+        mockMvc.perform(customGet("/calls/" + inboundCall.getCallId() + ".vxml"))
+               .andExpect(status().is(HttpStatus.OK.value()))
+               .andExpect(content().type(Constants.APPLICATION_VXML))
+               .andExpect(content().string("|active|"));
+
+        // Then call, config and flow must be loaded
+        assertCallConfigFlowLoaded(inboundCall, Constants.CONFIG_VOXEO, mainFlow.getName());
+        // And we evaluated the next node
+        verify(flowService, times(1)).evalNode(flow, entryHandlerNode, velocityContextCaptor.getValue());
+        // And we must have updated the call eventually by incrementing the steps and status to as set
+        assertCallUpdatedWithIncrementedSteps(CallStatus.COMPLETED);
+    }
+
+    @Test
+    public void shouldTerminateCallInHandleCallContinuationWithJsonExtensionIfNotAbleToGetToAUserNode()
+            throws Exception {
+        // Given
+        flowPosition.setTerminated(true);
+
+        // When we make a call continuation request for a existing inbound call with json
+        mockMvc.perform(customGet("/calls/" + inboundCall.getCallId() + ".json"))
+               .andExpect(status().is(HttpStatus.OK.value()))
+               .andExpect(content().type(Constants.APPLICATION_JSON_UTF8))
+               .andExpect(content().string(sameAsFile("main_flow_inactive_terminated_with_body.json")));
+
+        // Then
+        assertCallConfigFlowLoaded(inboundCall, Constants.CONFIG_VOXEO, mainFlow.getName());
+        // And we evaluated the next node
+        verify(flowService, times(1)).evalNode(flow, entryHandlerNode, velocityContextCaptor.getValue());
+        // And we must have updated the call eventually by incrementing the steps and status to as set
+        assertCallUpdatedWithIncrementedSteps(CallStatus.COMPLETED);
+    }
+
+    @Test
+    public void shouldReturnInternalServerErrorForCyclicLoopDetectionInHandleCallContinuation() throws Exception {
+        // Given a cyclic loop that will throw a illegal state exception when evaluating a node
+        given(flowService.evalNode(eq(flow),
+                                   eq(entryHandlerNode),
+                                   any(VelocityContext.class))).willThrow(new IllegalStateException("Cyclic Loop!"));
+
+        // When we make a call continuation request for a existing inbound call with json
+        mockMvc.perform(customGet("/calls/" + inboundCall.getCallId() + ".vxml"))
+               .andExpect(status().is(HttpStatus.INTERNAL_SERVER_ERROR.value()))
+               .andExpect(content().type(Constants.PLAIN_TEXT))
+               .andExpect(content().string("error:SYSTEM:system error"));
+        // Then
+        assertCallConfigFlowLoaded(inboundCall, Constants.CONFIG_VOXEO, mainFlow.getName());
+        // And we evaluated the next node
+        verify(flowService, times(1)).evalNode(flow, entryHandlerNode, velocityContextCaptor.getValue());
+        // And call must be updated with failure
+        assertCallFailureUpdated();
+    }
+
+    @Test
+    public void shouldReturnInternalServerErrorForCyclicLoopDetectionInHandleCallContinuationWithJsonExtension()
+            throws Exception {
+        // Given a cyclic loop that will throw a illegal state exception when evaluating a node
+        given(flowService.evalNode(eq(flow),
+                                   eq(entryHandlerNode),
+                                   any(VelocityContext.class))).willThrow(new IllegalStateException("Cyclic Loop!"));
+
+        // When we make a call continuation request for a existing inbound call with json
+        mockMvc.perform(customGet("/calls/" + inboundCall.getCallId() + ".json"))
+               .andExpect(status().is(HttpStatus.INTERNAL_SERVER_ERROR.value()))
+               .andExpect(content().type(Constants.APPLICATION_JSON_UTF8))
+               .andExpect(content().string(sameAsFile("error_cyclic_loop.json")));
+        // Then
+        assertCallConfigFlowLoaded(inboundCall, Constants.CONFIG_VOXEO, mainFlow.getName());
+        // And we evaluated the next node
+        verify(flowService, times(1)).evalNode(flow, entryHandlerNode, velocityContextCaptor.getValue());
+        // And call must be updated with failure
+        assertCallFailureUpdated();
+    }
+
     private void assertContext(VelocityContext context, String callId, String nextURL) {
         assertNotNull(context);
         assertTrue(context.containsKey("internal"));
@@ -459,6 +603,15 @@ public class CallControllerTest extends BaseTest {
         assertThat((String) internalContext.get("callId"), equalTo(callId));
         assertThat((String) internalContext.get("nextURL"), equalTo(nextURL));
 
+    }
+
+    private void assertCallConfigFlowLoaded(Call call, String config, String callflow) {
+        // These must be loaded
+        verify(callService, times(1)).findByCallId(call.getCallId());
+        verify(configService, times(1)).getConfig(config);
+        verify(flowService, times(1)).load(callflow);
+        // And we called the merge to load previously persisted data
+        verify(callUtil, times(1)).mergeCallWithContext(eq(inboundCall), velocityContextCaptor.capture());
     }
 
     private void assertConfigAndFlowLoaded(String config, String callflow) {
@@ -485,6 +638,16 @@ public class CallControllerTest extends BaseTest {
         verify(callService, times(1)).update(callArgumentCaptor.capture());
         Call failedCall = callArgumentCaptor.getValue();
         assertThat(failedCall.getStatus(), equalTo(CallStatus.FAILED));
+    }
+
+    private void assertCallUpdatedWithIncrementedSteps(CallStatus status) {
+        // Before updating the call we expect a merge back operation
+        verify(callUtil, times(1)).mergeContextWithCall(velocityContextCaptor.getValue(), inboundCall);
+        verify(callService, times(1)).update(callCaptor.capture());
+        // And we expect the steps to be incremented in that
+        Call updatedCall = callCaptor.getValue();
+        assertThat(updatedCall.getSteps(), equalTo(steps + 1));
+        assertThat(updatedCall.getStatus(), equalTo(status));
     }
 
     private void assertNoActionOnCall() {

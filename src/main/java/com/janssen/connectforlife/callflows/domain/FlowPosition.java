@@ -14,9 +14,14 @@ import java.util.List;
 public class FlowPosition {
 
     /**
-     * The flow in this instance
+     * The start flow in this instance
      */
-    private Flow flow;
+    private Flow startFlow;
+
+    /**
+     * The end flow in this instance
+     */
+    private Flow endFlow;
 
     /**
      * The node that we started at to arrive at this position
@@ -43,12 +48,21 @@ public class FlowPosition {
      */
     private boolean terminated;
 
-    public Flow getFlow() {
-        return flow;
+    public Flow getStartFlow() {
+        return startFlow;
     }
 
-    public FlowPosition setFlow(Flow flow) {
-        this.flow = flow;
+    public FlowPosition setStartFlow(Flow startFlow) {
+        this.startFlow = startFlow;
+        return this;
+    }
+
+    public Flow getEndFlow() {
+        return endFlow;
+    }
+
+    public FlowPosition setEndFlow(Flow endFlow) {
+        this.endFlow = endFlow;
         return this;
     }
 

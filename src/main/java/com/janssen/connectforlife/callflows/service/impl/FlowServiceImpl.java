@@ -84,14 +84,14 @@ public class FlowServiceImpl implements FlowService {
     }
 
     @Override
-    public FlowPosition evalNode(Flow flow, Node startNode, VelocityContext context) throws IOException {
+    public FlowPosition evalNode(Flow startFlow, Node startNode, VelocityContext context) throws IOException {
 
         // capture the output after evaluation
         String output = null;
         // visited Nodes
         List<Node> visited = new ArrayList<>();
         // pointers to current flow and node
-        Flow currentFlow = flow;
+        Flow currentFlow = startFlow;
         Node currentNode = startNode;
 
         // Idea is to keep evaluating until we arrive at a user node, cause at the time of confronting a user-node
@@ -109,25 +109,27 @@ public class FlowServiceImpl implements FlowService {
                 }
                 visited.add(currentNode);
                 output = flowUtil.evalNode(currentFlow, currentNode, context, VELOCITY);
-                FlowStep flowStep = parse(output, flow);
+                FlowStep flowStep = parse(output, currentFlow);
 
                 currentFlow = flowStep.getFlow();
                 currentNode = flowUtil.getNodeByStep(flowStep.getFlow(), flowStep.getStep());
             }
         } catch (IllegalArgumentException e) {
             LOGGER.error(e.getMessage(), e);
-            return buildFlowPosition(flow, startNode, currentNode, visited, output, true);
+            return buildFlowPosition(startFlow, currentFlow, startNode, currentNode, visited, output, true);
         }
-        return buildFlowPosition(flow, startNode, currentNode, visited, output, false);
+        return buildFlowPosition(startFlow, currentFlow, startNode, currentNode, visited, output, false);
     }
 
-    private FlowPosition buildFlowPosition(Flow flow,
+    private FlowPosition buildFlowPosition(Flow startFlow,
+                                           Flow endFlow,
                                            Node start,
                                            Node end,
                                            List<Node> visited,
                                            String output,
                                            boolean terminated) {
-        return new FlowPosition().setFlow(flow)
+        return new FlowPosition().setStartFlow(startFlow)
+                                 .setEndFlow(endFlow)
                                  .setStart(start)
                                  .setEnd(end)
                                  .setVisited(visited)
