@@ -20,4 +20,20 @@
         </property>
     </bean>
 
+    <bean id="moduleRegistrationData" class="org.motechproject.osgi.web.ModuleRegistrationData">
+        <constructor-arg name="moduleName" value="Call Flows" />
+        <constructor-arg name="url" value="../callflows/resources/index.html" />
+        <constructor-arg name="angularModules">
+            <list>
+                <value>callflows</value>
+            </list>
+        </constructor-arg>
+        <constructor-arg name="i18n">
+            <map>
+                <entry key="messages" value="../callflows/resources/messages/" />
+            </map>
+        </constructor-arg>
+        <property name="defaultURL" value="/designer" />
+    </bean>
+
 </beans>
