@@ -48,6 +48,8 @@ public final class Constants {
 
     public static final String UPDATED = "-updated";
 
+    public static final String VELOCITY = "velocity";
+
     public static final String CONFIG_VOXEO = "voxeo";
 
     public static final String CONFIG_YO = "yo";

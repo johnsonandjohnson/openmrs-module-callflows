@@ -87,7 +87,10 @@
     {
       "nodeType": "system",
       "templates": {
-
+          "velocity" : {
+              "content" : "Nothing to do",
+              "dirty"   : false
+          }
       },
       "step": "active-handler"
     },
@@ -127,8 +130,12 @@
     {
       "nodeType": "system",
       "templates": {
-
-      }
+        "velocity" : {
+          "content" : "Nothing to do",
+          "dirty"   : false
+        }
+      },
+      "step": "inactive-handler"
     }
   ],
   "name": "MainFlow"

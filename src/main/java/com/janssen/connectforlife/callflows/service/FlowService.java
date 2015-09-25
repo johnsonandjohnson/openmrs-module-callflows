@@ -1,7 +1,12 @@
 package com.janssen.connectforlife.callflows.service;
 
+import com.janssen.connectforlife.callflows.domain.FlowPosition;
 import com.janssen.connectforlife.callflows.domain.FlowStep;
 import com.janssen.connectforlife.callflows.domain.flow.Flow;
+import com.janssen.connectforlife.callflows.domain.flow.Node;
+
+import org.apache.velocity.VelocityContext;
+import java.io.IOException;
 
 /**
  * Flow Service to manage the representation of a callflow
@@ -41,6 +46,22 @@ public interface FlowService {
      * @throws IllegalArgumentException if the flow could not be loaded
      */
     Flow load(String name);
+
+    /**
+     * Evaluate a node
+     * If a user node was passed, will not evaluate, but return the current position
+     * If a system node was passed, will evaluate until control reaches a user node. The user node encountered will not be evaulated
+     * After each evaluation, if the output is a regular jump syntax in one of the acceptable formats and the result points
+     * to a subsequent System Node, then evaluation is continued
+     * Has guards against infinite and circular loops by checking the number of jumps, max allowed = 20
+     *
+     * @param flow    current
+     * @param node    current - either a user node or a system node
+     * @param context current context
+     * @return FlowPosition with current flow, node, output of evaluation and whether the flow is supposed to be terminated
+     * @throws IllegalStateException if a long running loop with respect to number of jumps is detected
+     */
+    FlowPosition evalNode(Flow flow, Node node, VelocityContext context) throws IOException;
 }
 
 

@@ -2,8 +2,10 @@ package com.janssen.connectforlife.callflows.service.it;
 
 import com.janssen.connectforlife.callflows.Constants;
 import com.janssen.connectforlife.callflows.domain.CallFlow;
+import com.janssen.connectforlife.callflows.domain.FlowPosition;
 import com.janssen.connectforlife.callflows.domain.FlowStep;
 import com.janssen.connectforlife.callflows.domain.flow.Flow;
+import com.janssen.connectforlife.callflows.domain.flow.Node;
 import com.janssen.connectforlife.callflows.helper.CallFlowHelper;
 import com.janssen.connectforlife.callflows.helper.FlowHelper;
 import com.janssen.connectforlife.callflows.repository.CallFlowDataService;
@@ -13,6 +15,8 @@ import com.janssen.connectforlife.callflows.util.TestUtil;
 import org.motechproject.testing.osgi.BasePaxIT;
 import org.motechproject.testing.osgi.container.MotechNativeTestContainerFactory;
 
+import org.apache.velocity.VelocityContext;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,7 +29,9 @@ import javax.inject.Inject;
 import java.io.IOException;
 
 import static junit.framework.TestCase.assertNotNull;
+import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -46,7 +52,19 @@ public class FlowServiceBundleIT extends BasePaxIT {
 
     private CallFlow mainFlow;
 
-    private Flow expectedFlow;
+    private Flow loadedFlow;
+
+    private Node activeHandlerNode;
+
+    private Node inactiveHandlerNode;
+
+    private Node inactiveNode;
+
+    private Node entryHandlerNode;
+
+    private VelocityContext context;
+
+    private ObjectMapper objectMapper;
 
     @Before
     public void setUp() throws IOException {
@@ -55,7 +73,14 @@ public class FlowServiceBundleIT extends BasePaxIT {
         mainFlow.setRaw(raw);
         callFlowDataService.create(mainFlow);
 
-        expectedFlow = FlowHelper.createFlow(raw);
+        loadedFlow = FlowHelper.createFlow(raw);
+        entryHandlerNode = loadedFlow.getNodes().get(1);
+        activeHandlerNode = loadedFlow.getNodes().get(3);
+        inactiveNode = loadedFlow.getNodes().get(4);
+        inactiveHandlerNode = loadedFlow.getNodes().get(5);
+
+        objectMapper = new ObjectMapper();
+        context = new VelocityContext();
     }
 
     @After
@@ -146,13 +171,68 @@ public class FlowServiceBundleIT extends BasePaxIT {
     @Test
     public void shouldSubstitutePassedFlowIfFlowInformationIsNotPresentDuringParse() {
         // When
-        FlowStep flowStep = flowService.parse("|entry|", expectedFlow);
+        FlowStep flowStep = flowService.parse("|entry|", loadedFlow);
 
         // Then
         assertNotNull(flowStep);
         assertThat(flowStep.getFlow().getName(), equalTo("MainFlow"));
         assertThat(flowStep.getStep(), equalTo("entry"));
     }
-}
 
+    @Test
+    public void shouldEvalContinuouslyAndTerminateIfBadJumpIsEncountered() throws IOException {
+
+        // Given entry-handler is set to go to active-handler
+        entryHandlerNode.getTemplates().get(Constants.VELOCITY).setContent("|active-handler|");
+        // And active-handler to inactive-handler
+        activeHandlerNode.getTemplates().get(Constants.VELOCITY).setContent("|inactive-handler|");
+        // And inactive-handler to not a known place
+        inactiveHandlerNode.getTemplates().get(Constants.VELOCITY).setContent("am_in_a_bad_place");
+        mainFlow.setRaw(objectMapper.writeValueAsString(loadedFlow));
+        callFlowDataService.update(mainFlow);
+
+        // When
+        FlowPosition position = flowService.evalNode(loadedFlow, entryHandlerNode, context);
+
+        // Then
+        assertNotNull(position);
+        assertTrue(position.isTerminated());
+        // Then since we couldn't jump, our end node is in the last correct node
+        assertThat(position.getEnd(), equalTo(inactiveHandlerNode));
+    }
+
+    @Test
+    public void shouldEvalContinuouslyAndNotTerminateIfWeAreAbleToGoToAUserNode() throws IOException {
+
+        // Given entry-handler is set to go to active-handler
+        entryHandlerNode.getTemplates().get(Constants.VELOCITY).setContent("|active-handler|");
+        // And active-handler to inactive-handler
+        activeHandlerNode.getTemplates().get(Constants.VELOCITY).setContent("|inactive-handler|");
+        // And inactive-handler to inactive
+        inactiveHandlerNode.getTemplates().get(Constants.VELOCITY).setContent("|inactive|");
+        mainFlow.setRaw(objectMapper.writeValueAsString(loadedFlow));
+        callFlowDataService.update(mainFlow);
+
+        // When
+        FlowPosition position = flowService.evalNode(loadedFlow, entryHandlerNode, context);
+
+        // Then
+        assertNotNull(position);
+        assertFalse(position.isTerminated());
+        assertThat(position.getEnd(), equalTo(inactiveNode));
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void shouldThrowIllegalStateWhenLongRunningLoopsAreDetected() throws IOException {
+        // Given
+        entryHandlerNode.getTemplates().get(Constants.VELOCITY).setContent("|active-handler|");
+        activeHandlerNode.getTemplates().get(Constants.VELOCITY).setContent("|entry-handler|");
+        mainFlow.setRaw(objectMapper.writeValueAsString(loadedFlow));
+        callFlowDataService.update(mainFlow);
+
+        // When we try to run from entry-handler
+        flowService.evalNode(loadedFlow, entryHandlerNode, context);
+    }
+
+}
 

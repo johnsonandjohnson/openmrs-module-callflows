@@ -3,6 +3,7 @@ package com.janssen.connectforlife.callflows.domain.flow;
 import org.codehaus.jackson.annotate.JsonSubTypes;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Any flow consists of a series of nodes, this being the base class of all nodes
@@ -87,4 +88,31 @@ public class Node {
     public void setCurrentElement(Element currentElement) {
         this.currentElement = currentElement;
     }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Node)) {
+            return false;
+        }
+        final Node other = (Node) o;
+        return Objects.equals(this.step, other.step);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(step);
+    }
+
+    @Override
+    public String toString() {
+        return "Node{" +
+                "step='" + step +
+                '}';
+    }
+
+
 }

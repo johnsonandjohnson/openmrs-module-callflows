@@ -3,8 +3,10 @@ package com.janssen.connectforlife.callflows.service;
 import com.janssen.connectforlife.callflows.BaseTest;
 import com.janssen.connectforlife.callflows.Constants;
 import com.janssen.connectforlife.callflows.domain.CallFlow;
+import com.janssen.connectforlife.callflows.domain.FlowPosition;
 import com.janssen.connectforlife.callflows.domain.FlowStep;
 import com.janssen.connectforlife.callflows.domain.flow.Flow;
+import com.janssen.connectforlife.callflows.domain.flow.Node;
 import com.janssen.connectforlife.callflows.helper.CallFlowHelper;
 import com.janssen.connectforlife.callflows.helper.FlowHelper;
 import com.janssen.connectforlife.callflows.repository.CallFlowDataService;
@@ -12,6 +14,7 @@ import com.janssen.connectforlife.callflows.service.impl.FlowServiceImpl;
 import com.janssen.connectforlife.callflows.util.FlowUtil;
 import com.janssen.connectforlife.callflows.util.TestUtil;
 
+import org.apache.velocity.VelocityContext;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,7 +24,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.io.IOException;
 
 import static junit.framework.TestCase.assertNotNull;
+import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
@@ -51,6 +56,20 @@ public class FlowServiceTest extends BaseTest {
 
     private Flow expectedFlow;
 
+    private Node entryNode;
+
+    private Node entryHandlerNode;
+
+    private Node activeNode;
+
+    private Node activeHandlerNode;
+
+    private Node inactiveNode;
+
+    private Node inactiveHandlerNode;
+
+    private VelocityContext context;
+
     @Before
     public void setUp() throws IOException {
         mainFlow = CallFlowHelper.createMainFlow();
@@ -58,16 +77,44 @@ public class FlowServiceTest extends BaseTest {
         expectedFlow = FlowHelper.createFlow(raw);
         mainFlow.setRaw(raw);
 
+        // Nodes
+        entryNode = expectedFlow.getNodes().get(0);
+        entryHandlerNode = expectedFlow.getNodes().get(1);
+        activeNode = expectedFlow.getNodes().get(2);
+        activeHandlerNode = expectedFlow.getNodes().get(3);
+        inactiveNode = expectedFlow.getNodes().get(4);
+        inactiveHandlerNode = expectedFlow.getNodes().get(5);
+
         // Given a MainFlow
         given(callFlowDataService.findByName(Constants.CALLFLOW_MAIN)).willReturn(mainFlow);
+
         // And the following parse behavior
         given(flowUtil.parse("|MainFlow.|", null)).willReturn(new String[]{ "MainFlow", null });
         given(flowUtil.parse("|MainFlow.entry|", null)).willReturn(new String[]{ "MainFlow", "entry" });
         given(flowUtil.parse("|entry|", expectedFlow.getName())).willReturn(new String[]{ "MainFlow", "entry" });
         given(flowUtil.parse("|MainFlow.non-existent|", null)).willReturn(new String[]{ "MainFlow", "non-existent" });
         given(flowUtil.parse("|MainFlow2.|", null)).willReturn(new String[]{ "MainFlow2", null });
+        given(flowUtil.parse("finished", expectedFlow.getName())).willThrow(new IllegalArgumentException("Bad format"));
+
+        given(flowUtil.parse("|active|", expectedFlow.getName())).willReturn(new String[]{ "MainFlow", "active" });
+        given(flowUtil.parse("|active-handler|", expectedFlow.getName())).willReturn(new String[]{ "MainFlow",
+                "active-handler" });
+        given(flowUtil.parse("|inactive|", expectedFlow.getName())).willReturn(new String[]{ "MainFlow", "inactive" });
+        given(flowUtil.parse("|inactive-handler|", expectedFlow.getName())).willReturn(new String[]{ "MainFlow",
+                "inactive-handler" });
+        given(flowUtil.parse("|entry-handler|", expectedFlow.getName())).willReturn(new String[]{ "MainFlow",
+                "entry-handler" });
+
         // And one way to find a node
-        given(flowUtil.getNodeByStep(expectedFlow, "entry")).willReturn(expectedFlow.getNodes().get(0));
+        given(flowUtil.getNodeByStep(expectedFlow, "entry")).willReturn(entryNode);
+        given(flowUtil.getNodeByStep(expectedFlow, "entry-handler")).willReturn(entryHandlerNode);
+        given(flowUtil.getNodeByStep(expectedFlow, "active")).willReturn(activeNode);
+        given(flowUtil.getNodeByStep(expectedFlow, "active-handler")).willReturn(activeHandlerNode);
+        given(flowUtil.getNodeByStep(expectedFlow, "inactive")).willReturn(inactiveNode);
+        given(flowUtil.getNodeByStep(expectedFlow, "inactive-handler")).willReturn(inactiveHandlerNode);
+
+        // Introducing a infinite loop
+        context = new VelocityContext();
     }
 
     @Test
@@ -187,6 +234,56 @@ public class FlowServiceTest extends BaseTest {
         assertNotNull(flowStep);
         assertThat(flowStep.getFlow().getName(), equalTo("MainFlow"));
         assertThat(flowStep.getStep(), equalTo("entry"));
+    }
+
+    @Test
+    public void shouldEvalContinuouslyAndTerminateIfBadJumpIsEncountered() throws IOException {
+        // Given that we introduce a waterfall that leads to a bad jump
+        given(flowUtil.evalNode(expectedFlow, entryHandlerNode, context, "velocity")).willReturn("|active-handler|");
+        given(flowUtil.evalNode(expectedFlow, activeHandlerNode, context, "velocity")).willReturn("|inactive-handler|");
+        // Not surrounded by pipes, so bad jump
+        given(flowUtil.evalNode(expectedFlow, inactiveHandlerNode, context, "velocity")).willReturn("finished");
+
+        // When
+        FlowPosition position = flowService.evalNode(expectedFlow, entryHandlerNode, context);
+
+        // Then
+        assertTrue(position.isTerminated());
+        assertThat(position.getFlow().getName(), equalTo(Constants.CALLFLOW_MAIN));
+        assertThat(position.getStart().getStep(), equalTo("entry-handler"));
+        assertThat(position.getEnd().getStep(), equalTo("inactive-handler"));
+        assertThat(position.getOutput(), equalTo("finished"));
+    }
+
+    @Test
+    public void shouldEvalContinuouslyAndNotTerminateIfWeAreAbleToGoToAUserNode() throws IOException {
+        // Given that we introduce a waterfall that jumps to a good user node at the end
+        given(flowUtil.evalNode(expectedFlow, entryHandlerNode, context, "velocity")).willReturn("|active-handler|");
+        given(flowUtil.evalNode(expectedFlow, activeHandlerNode, context, "velocity")).willReturn("|inactive-handler|");
+        // now we jump to inactive again - a valid user name
+        given(flowUtil.evalNode(expectedFlow, inactiveHandlerNode, context, "velocity")).willReturn("|inactive|");
+
+        // When
+        FlowPosition position = flowService.evalNode(expectedFlow, entryHandlerNode, context);
+
+        // Then
+        assertFalse(position.isTerminated());
+        assertThat(position.getFlow().getName(), equalTo(Constants.CALLFLOW_MAIN));
+        assertThat(position.getStart().getStep(), equalTo("entry-handler"));
+        assertThat(position.getEnd().getStep(), equalTo("inactive"));
+        assertThat(position.getOutput(), equalTo("|inactive|"));
+    }
+
+    @Test
+    public void shouldThrowIllegalStateWhenLongRunningLoopsAreDetected() throws IOException {
+        expectException(IllegalStateException.class);
+
+        // Given that we introduce a infinite loop between two nodes
+        given(flowUtil.evalNode(expectedFlow, entryHandlerNode, context, "velocity")).willReturn("|active-handler|");
+        given(flowUtil.evalNode(expectedFlow, activeHandlerNode, context, "velocity")).willReturn("|entry-handler|");
+
+        // When
+        flowService.evalNode(expectedFlow, entryHandlerNode, context);
     }
 
 }
