@@ -1,0 +1,22 @@
+<div id="inner-center" class="inner-center ui-layout-center ui-layout-pane ui-layout-pane-center etllite">
+    <div class="header-footer-breadcrumb">
+        <ul class="breadcrumb" role="navigation">
+            <li><a role="menu" href=".">{{msg('server.home')}}</a></li>
+            <li class="active"><a role="menu" href="#/callflow">{{msg('callflow')}}</a></li>
+        </ul>
+    </div>
+    <div class="header-footer">
+        <ul id="content-tabs" class="nav nav-tabs">
+            <li ng-class="active('#/mappings')"><a href="#/designer" >{{msg('callflow.tab.designer')}}</a></li>
+            <li ng-class="active('#/settings')"><a href="#/settings" >{{msg('callflow.tab.settings')}}</a></li>
+        </ul>
+    </div>
+    <div class="ui-layout-content">
+        <div class="tab-content" id="tab-content">
+            <div id="main-content" class="tab-pane active">
+                <div ng-view></div>
+            </div>
+        </div>
+    </div>
+</div>
+
