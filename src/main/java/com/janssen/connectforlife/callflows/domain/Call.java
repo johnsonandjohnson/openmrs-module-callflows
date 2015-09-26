@@ -137,6 +137,12 @@ public class Call {
     private String actorType;
 
     /**
+     * This field will store any textual information about current call status
+     */
+    @Field
+    private String statusText;
+
+    /**
      * The current context of this call
      * Context variables are as set in the various templates of the callflow and contain information to continue handling the call
      * Typically params from the caller are short-lived per single request and are not stored here for security reasons,
@@ -277,6 +283,14 @@ public class Call {
 
     public void setActorType(String actorType) {
         this.actorType = actorType;
+    }
+
+    public String getStatusText() {
+        return statusText;
+    }
+
+    public void setStatusText(String statusText) {
+        this.statusText = statusText;
     }
 
     public Map<String, Object> getContext() {

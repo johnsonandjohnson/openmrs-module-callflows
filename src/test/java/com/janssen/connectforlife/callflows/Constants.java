@@ -94,6 +94,8 @@ public final class Constants {
 
     public static final String ACTOR_TYPE = "Patient";
 
+    public static final String CALL_ID = "1223";
+
     public static final String KEY_GREETING = "greeting";
 
     public static final String KEY_PIN = "pid";
@@ -131,4 +133,8 @@ public final class Constants {
     public static final String ERROR_CALLFLOW = "error:BAD_INPUT:" + ERROR_MAIN_FLOW2;
 
     public static final String ERROR_CONFIG = "error:BAD_INPUT:" + ERROR_YO;
+
+    public static final String XML_OK_RESPONSE = "<?xml version=\"1.0\"?><response>OK</response>";
+
+    public static final String XML_ERROR_RESPONSE = "<?xml version=\"1.0\"?><response>ERROR</response>";
 }
