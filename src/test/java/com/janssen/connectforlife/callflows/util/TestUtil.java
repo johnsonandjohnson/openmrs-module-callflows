@@ -17,7 +17,7 @@ public final class TestUtil {
 
     public static String loadFile(String filename) throws IOException {
         try (InputStream in = TestUtil.class.getClassLoader().getResourceAsStream(filename)) {
-            return IOUtils.toString(in);
+            return IOUtils.toString(in).replace("\r\n", "\n");
         }
     }
 }
