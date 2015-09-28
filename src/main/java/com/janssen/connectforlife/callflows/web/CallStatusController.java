@@ -54,7 +54,7 @@ public class CallStatusController {
         }
 
         if (params.containsKey(PARAM_REASON) && StringUtils.isNotEmpty(params.get(PARAM_REASON))) {
-            call.setStatus(CallStatus.valueOf(params.get(PARAM_REASON)));
+            call.setStatusText(params.get(PARAM_REASON));
         }
         callService.update(call);
         return XML_OK_RESPONSE;

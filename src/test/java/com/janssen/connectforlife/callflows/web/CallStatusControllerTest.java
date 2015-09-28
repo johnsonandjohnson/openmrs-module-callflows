@@ -17,6 +17,9 @@ import org.springframework.test.web.server.MockMvc;
 import org.springframework.test.web.server.setup.MockMvcBuilders;
 
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.server.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.server.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.server.result.MockMvcResultMatchers.status;
@@ -55,6 +58,9 @@ public class CallStatusControllerTest extends BaseTest {
                 get("/status/" + Constants.INBOUND_CALL_ID.toString() + "?status = ANSWERED & reason = call answered"))
 
                .andExpect(status().is(HttpStatus.OK.value())).andExpect(content().string(Constants.XML_OK_RESPONSE));
+
+        verify(callService, times(1)).findByCallId(Constants.INBOUND_CALL_ID.toString());
+        verify(callService, times(1)).update(call);
     }
 
     @Test
@@ -69,5 +75,7 @@ public class CallStatusControllerTest extends BaseTest {
 
                .andExpect(status().is(HttpStatus.OK.value())).andExpect(content().string(Constants.XML_ERROR_RESPONSE));
 
+        verify(callService, times(1)).findByCallId(Constants.INBOUND_CALL_ID.toString());
+        verify(callService, never()).update(call);
     }
 }
