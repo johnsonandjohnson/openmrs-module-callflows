@@ -48,10 +48,11 @@ public class CallStatusControllerTest extends BaseTest {
     @Test
     public void shouldReturnXMLOkIfTheCallStatusUpdateIsSuccessful() throws Exception {
         //Given
-        given(callService.findByCallId(Constants.CALL_ID)).willReturn(call);
+        given(callService.findByCallId(Constants.INBOUND_CALL_ID.toString())).willReturn(call);
 
         //When && Then
-        mockMvc.perform(get("/status/" + Constants.CALL_ID + "?status = ANSWERED & reason = call answered"))
+        mockMvc.perform(
+                get("/status/" + Constants.INBOUND_CALL_ID.toString() + "?status = ANSWERED & reason = call answered"))
 
                .andExpect(status().is(HttpStatus.OK.value())).andExpect(content().string(Constants.XML_OK_RESPONSE));
     }
@@ -60,10 +61,11 @@ public class CallStatusControllerTest extends BaseTest {
     public void shouldReturnXMLErrorIfTheCallIsNotFoundInDatabase() throws Exception {
 
         //Given
-        given(callService.findByCallId(Constants.CALL_ID)).willReturn(null);
+        given(callService.findByCallId(Constants.INBOUND_CALL_ID.toString())).willReturn(null);
 
         //When && Then
-        mockMvc.perform(get("/status/" + Constants.CALL_ID + "?status = ANSWERED & reason = call answered"))
+        mockMvc.perform(
+                get("/status/" + Constants.INBOUND_CALL_ID.toString() + "?status = ANSWERED & reason = call answered"))
 
                .andExpect(status().is(HttpStatus.OK.value())).andExpect(content().string(Constants.XML_ERROR_RESPONSE));
 

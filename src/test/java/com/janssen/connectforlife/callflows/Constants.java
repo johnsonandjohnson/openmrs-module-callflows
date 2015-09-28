@@ -94,8 +94,6 @@ public final class Constants {
 
     public static final String ACTOR_TYPE = "Patient";
 
-    public static final String CALL_ID = "1223";
-
     public static final String KEY_GREETING = "greeting";
 
     public static final String KEY_PIN = "pid";

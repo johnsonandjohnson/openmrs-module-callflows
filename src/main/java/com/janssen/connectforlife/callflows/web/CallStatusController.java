@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import java.util.Map;
 
 /**
- * Call Status Controller
+ * This controller is used typically by a CCXML event handler to update the call status periodically. It can also be used by other IVR providers
  *
  * @author nanakapa
  */
