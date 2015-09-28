@@ -266,6 +266,98 @@ public class CallControllerBundleIT extends RESTControllerPaxIT {
         assertResponseToBe(response, HttpStatus.SC_BAD_REQUEST, Constants.APPLICATION_JSON_UTF8);
     }
 
+    /* Call Continuation */
+    /* ================= */
+
+    @Test
+    public void shouldHandleCallContinuation() throws Exception {
+        // When we make a call continuation request for a created call
+        HttpGet httpGet = buildGetRequest("/callflows/calls/" + outboundCall.getCallId() + ".vxml");
+        HttpResponse response = getHttpClient().execute(httpGet);
+
+        // Then
+        assertResponseToBe(response, HttpStatus.SC_OK, Constants.APPLICATION_VXML);
+    }
+
+    @Test
+    public void shouldHandleCallContinuationWithJsonExtension() throws Exception {
+        // When we make a call continuation request for a created call with json extension
+        HttpGet httpGet = buildGetRequest("/callflows/calls/" + outboundCall.getCallId() + ".json");
+        HttpResponse response = getHttpClient().execute(httpGet);
+
+        // Then
+        assertResponseToBe(response, HttpStatus.SC_OK, Constants.APPLICATION_JSON_UTF8);
+    }
+
+    @Test
+    public void shouldTerminateCallInHandleCallContinuationIfNotAbleToGetToAUserNode() throws Exception {
+        // Given
+        givenABadJumpFromASystemNodeThatLeadsToNowhere();
+
+        // When we make a inbound call continuation request for a created call
+        HttpGet httpGet = buildGetRequest("/callflows/calls/" + outboundCall.getCallId() + ".vxml");
+        HttpResponse response = getHttpClient().execute(httpGet);
+
+        // Then
+        assertResponseToBe(response, HttpStatus.SC_OK, Constants.APPLICATION_VXML);
+    }
+
+    @Test
+    public void shouldTerminateCallInHandleCallContinuationWithJsonExtensionIfNotAbleToGetToAUserNode()
+            throws Exception {
+        // Given
+        givenABadJumpFromASystemNodeThatLeadsToNowhere();
+
+        // When we make a inbound call continuation request for a created call
+        HttpGet httpGet = buildGetRequest("/callflows/calls/" + outboundCall.getCallId() + ".json");
+        HttpResponse response = getHttpClient().execute(httpGet);
+
+        // Then
+        assertResponseToBe(response, HttpStatus.SC_OK, Constants.APPLICATION_JSON_UTF8);
+    }
+
+    @Test
+    public void shouldReturnInternalServerErrorForCyclicLoopDetectionInHandleCallContinuation() throws Exception {
+        // Given
+        givenACyclicLoopExists();
+
+        // When we make a inbound call continuation request for a created call
+        HttpGet httpGet = buildGetRequest("/callflows/calls/" + outboundCall.getCallId() + ".vxml");
+        HttpResponse response = getHttpClient().execute(httpGet);
+
+        // Then
+        assertResponseToBe(response, HttpStatus.SC_INTERNAL_SERVER_ERROR, Constants.PLAIN_TEXT);
+    }
+
+    @Test
+    public void shouldReturnInternalServerErrorForCyclicLoopDetectionInHandleCallContinuationWithJsonExtension()
+            throws Exception {
+        // Given
+        givenACyclicLoopExists();
+
+        // When we make a inbound call continuation request for a created call
+        HttpGet httpGet = buildGetRequest("/callflows/calls/" + outboundCall.getCallId() + ".json");
+        HttpResponse response = getHttpClient().execute(httpGet);
+
+        // Then
+        assertResponseToBe(response, HttpStatus.SC_INTERNAL_SERVER_ERROR, Constants.APPLICATION_JSON_UTF8);
+    }
+
+    private void givenACyclicLoopExists() throws IOException, CallFlowAlreadyExistsException {
+        flow.getNodes().get(1).getTemplates().get(Constants.VELOCITY).setContent("|active-handler|");
+        flow.getNodes().get(3).getTemplates().get(Constants.VELOCITY).setContent("|entry-handler|");
+        mainFlow.setRaw(json(flow));
+        callFlowService.update(mainFlow);
+    }
+
+    private void givenABadJumpFromASystemNodeThatLeadsToNowhere() throws IOException, CallFlowAlreadyExistsException {
+        flow.getNodes().get(1).getTemplates().get(Constants.VELOCITY).setContent("|active-handler|");
+        flow.getNodes().get(3).getTemplates().get(Constants.VELOCITY).setContent("|inactive-handler|");
+        flow.getNodes().get(5).getTemplates().get(Constants.VELOCITY).setContent("no where in particular");
+        mainFlow.setRaw(json(flow));
+        callFlowService.update(mainFlow);
+    }
+
     private void givenABadServiceExists() {
         Map<String, String> badServices = new HashMap<>();
         badServices.put("badSrvc", "com.underground.missing.but.useful.if.found.Service");

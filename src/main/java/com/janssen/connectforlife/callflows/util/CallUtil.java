@@ -134,57 +134,35 @@ public class CallUtil {
      */
     public String buildOutput(Exception error, String content, Node node, Call call, String extension) {
         try {
-            // If error
-            if (error != null) {
-                return buildError(error, node, extension);
-            }
 
-            // If non JSON response required
-            if (!JSON.equals(extension)) {
-                return content;
-            }
-
-            // JSON response required for runner
-            JsonExecutionResponse response = new JsonExecutionResponse();
-            if (node != null) {
-                if (call.getStartFlow().equals(call.getEndFlow())) {
-                    response.setNode(node.getStep());
-                } else {
-                    response.setNode(buildFullNodePath(call.getEndFlow(), node));
-                }
-                if (node instanceof UserNode) {
-                    response.setContinueNode(((UserNode) node).isContinueNode());
-                } else {
-                    response.setContinueNode(false);
+            if (JSON.equals(extension)) {
+                // This handles both OK and error responses
+                return buildJsonResponse(error, content, node, call);
+            } else {
+                // At this point we have to worry only about other non JSON formats
+                // If error
+                if (error != null) {
+                    return buildError(error, extension);
                 }
             }
-            response.setCallId(call.getCallId());
-            response.setBody(content);
-            return objectMapper.writeValueAsString(response);
         } catch (IOException e) {
             LOGGER.error(e.toString(), e);
             return ERROR_RESPONSE_JSON;
         }
+        return content;
     }
 
     /**
      * Builds a error string in a format particular to the extension provided
      *
-     * @param node  current
-     * @param error indicating the exception that led to invoking this method
-     * @param extension that was requested
-     * @return a JSON formatted error string
+     * @param error     indicating the exception that led to invoking this method
+     * @param extension current extension used in the call
+     * @return a error message depending on the extension that was passed
      * @throws IOException if there is a issue in generating the JSON response
      */
-    public String buildError(Exception error, Node node, String extension) throws IOException {
+    public String buildError(Exception error, String extension) throws IOException {
         if (JSON.equals(extension)) {
-            JsonExecutionResponse response = new JsonExecutionResponse();
-            response.setIsError(true);
-            response.setBody(error.getMessage());
-            if (node != null) {
-                response.setNode(node.getStep());
-            }
-            return objectMapper.writeValueAsString(response);
+            return error.getMessage();
         } else {
             return buildTextError(error);
         }
@@ -236,6 +214,29 @@ public class CallUtil {
         }
         // The rest are all 500 errors for now
         return HttpStatus.INTERNAL_SERVER_ERROR;
+    }
+
+    private String buildJsonResponse(Exception error, String content, Node node, Call call) throws IOException {
+        // JSON response required for runner
+        JsonExecutionResponse response = new JsonExecutionResponse();
+        if (node != null) {
+            if (call.getStartFlow().equals(call.getEndFlow())) {
+                response.setNode(node.getStep());
+            } else {
+                response.setNode(buildFullNodePath(call.getEndFlow(), node));
+            }
+            if (node instanceof UserNode) {
+                response.setContinueNode(((UserNode) node).isContinueNode());
+            } else {
+                response.setContinueNode(false);
+            }
+        }
+        if (call != null) {
+            response.setCallId(call.getCallId());
+        }
+        response.setIsError(error != null);
+        response.setBody(error == null ? content : buildError(error, JSON));
+        return objectMapper.writeValueAsString(response);
     }
 
     private String buildTextError(Exception error) {

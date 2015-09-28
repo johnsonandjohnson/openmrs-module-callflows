@@ -249,7 +249,8 @@ public class FlowServiceTest extends BaseTest {
 
         // Then
         assertTrue(position.isTerminated());
-        assertThat(position.getFlow().getName(), equalTo(Constants.CALLFLOW_MAIN));
+        assertThat(position.getStartFlow().getName(), equalTo(Constants.CALLFLOW_MAIN));
+        assertThat(position.getEndFlow().getName(), equalTo(Constants.CALLFLOW_MAIN));
         assertThat(position.getStart().getStep(), equalTo("entry-handler"));
         assertThat(position.getEnd().getStep(), equalTo("inactive-handler"));
         assertThat(position.getOutput(), equalTo("finished"));
@@ -268,7 +269,8 @@ public class FlowServiceTest extends BaseTest {
 
         // Then
         assertFalse(position.isTerminated());
-        assertThat(position.getFlow().getName(), equalTo(Constants.CALLFLOW_MAIN));
+        assertThat(position.getStartFlow().getName(), equalTo(Constants.CALLFLOW_MAIN));
+        assertThat(position.getEndFlow().getName(), equalTo(Constants.CALLFLOW_MAIN));
         assertThat(position.getStart().getStep(), equalTo("entry-handler"));
         assertThat(position.getEnd().getStep(), equalTo("inactive"));
         assertThat(position.getOutput(), equalTo("|inactive|"));

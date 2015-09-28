@@ -3,6 +3,7 @@ package com.janssen.connectforlife.callflows.web;
 import com.janssen.connectforlife.callflows.domain.Call;
 import com.janssen.connectforlife.callflows.domain.CallFlow;
 import com.janssen.connectforlife.callflows.domain.Config;
+import com.janssen.connectforlife.callflows.domain.FlowPosition;
 import com.janssen.connectforlife.callflows.domain.flow.Flow;
 import com.janssen.connectforlife.callflows.domain.flow.Node;
 import com.janssen.connectforlife.callflows.domain.types.CallDirection;
@@ -162,7 +163,7 @@ public class CallController extends RestController {
         String output = null;
 
         // current node being evaled
-        Node node = null;
+        Node currentNode = null;
 
         // current call object
         Call call = null;
@@ -181,11 +182,11 @@ public class CallController extends RestController {
             Flow flow = flowService.load(startCallFlow.getName());
 
             // get the entry/first step of this node
-            node = flow.getNodes().get(0);
+            currentNode = flow.getNodes().get(0);
 
             if (callId == null) {
                 // Create a new incoming Call
-                call = callService.create(conf, startCallFlow, node.getStep(), CallDirection.INCOMING, null);
+                call = callService.create(conf, startCallFlow, currentNode.getStep(), CallDirection.INCOMING, null);
             } else {
                 // we arrived here from a outbound Call
                 call = callService.findByCallId(callId);
@@ -198,12 +199,15 @@ public class CallController extends RestController {
             setInInternalContext(context, KEY_CALL_ID, call.getCallId());
 
             // eval the template
-            output = flowUtil.evalNode(flow, node, context, extension);
+            output = flowUtil.evalNode(flow, currentNode, context, extension);
 
             // We are working in a pure state-less model, so everything that is needed for the next interaction must be
             // persisted in the database, so that everything works seamlessly, especially in a clustered setup
             // Merge the output of variables set in velocity templates using #set into the call instance's context
             callUtil.mergeContextWithCall(context, call);
+            // We add status even though it will be updated via a CCXML status handler in order to update status
+            // if someone doesn't use the CCXML handler
+            call.setStatus(CallStatus.IN_PROGRESS);
 
             // By default we don't persist the params in the database, as that's coming from the user
             // and that's all potentially PII (Personally Identifiable) data
@@ -213,19 +217,119 @@ public class CallController extends RestController {
 
         } catch (Exception e) {
             error = e;
-            LOGGER.error(e.toString(), e);
-            // Say config/flow was not loaded yet, we don't have a call record in such cases
-            if (null != call) {
-                call.setStatus(CallStatus.FAILED);
-                callService.update(call);
-            }
+            handleError(call, error);
         }
+        return buildOutput(error, output, currentNode, call, extension, config);
+    }
 
+    /**
+     * REST API to handle a call continuation. After a inbound or outbound call has run through handleIncoming method once,
+     * all subsequent requests for that particular call will hit this API right through to call termination
+     * The URL is always the same as it is differentiated by only the unique callId
+     * The system remembers in which the node the user is currently at and handles subsequent interactions accordingly
+     *
+     * @param request   HttpServletRequest
+     * @param callId    the current call's unique identifier
+     * @param extension the extension to process. For IVR typically this would be vxml
+     * @param params    a map of parameters that are passed along with the request
+     * @param headers   a map of headers that are passed along with the request
+     * @return
+     */
+    @RequestMapping(value = "/calls/{callId}.{extension}", method = RequestMethod.GET)
+    public ResponseEntity<String> handleContinuation(HttpServletRequest request,
+                                                     @PathVariable String callId,
+                                                     @PathVariable String extension,
+                                                     @RequestParam Map<String, String> params,
+                                                     @RequestHeader Map<String, String> headers) {
+
+        LOGGER.debug("handleContinuation(callId={}, params={}, headers={}", callId, params, headers);
+
+        // The requested configuration from the URL
+        Config config = null;
+
+        // velocity context
+        VelocityContext context = null;
+
+        // captures any exception that happens.
+        Exception error = null;
+
+        // final output string as a result of evaluating one/more templates. Can also be a JSON string if extension was json
+        String output = null;
+
+        // current node being evaled
+        Node currentNode = null;
+
+        // current call object
+        Call call = null;
+
+        try {
+            // load current call here persisted from the last persistence
+            call = callService.findByCallId(callId);
+
+            // The configuration is part of the call, and hence why we need to retrieve the call first
+            config = configService.getConfig(call.getConfig());
+
+            context = initContext(config, params);
+
+            // merge back
+            callUtil.mergeCallWithContext(call, context);
+
+            // Load flow object
+            Flow flow = flowService.load(call.getEndFlow().getName());
+
+            // Go to next node of where control last terminated, this would be a system node since nodes are in pairs
+            currentNode = flowUtil.getNextNodeByStep(flow, call.getEndNode());
+
+            // evaluate node sequentially across jumps to arrive at a position
+            // The position we arrived at will be a userNode or a systemNode
+            // IF it's a system node it's normally a error and call will also terminate
+            FlowPosition position = flowService.evalNode(flow, currentNode, context);
+
+            output = position.getOutput();
+            currentNode = position.getEnd();
+
+            call.setEndFlow(callFlowService.findByName(position.getEndFlow().getName()));
+            call.setEndNode(currentNode.getStep());
+
+            if (!position.isTerminated()) {
+                // We are now back at a user node, so evaluate that again
+                output = flowUtil.evalNode(flow, currentNode, context, extension);
+            }
+            call.setStatus(position.isTerminated() ? CallStatus.COMPLETED : call.getStatus());
+            // one more interaction happened
+            call.setSteps(call.getSteps() + 1);
+            // merge everything back
+            callUtil.mergeContextWithCall(context, call);
+            // persist
+            callService.update(call);
+
+        } catch (Exception e) {
+            error = e;
+            handleError(call, error);
+        }
+        return buildOutput(error, output, currentNode, call, extension, config);
+    }
+
+    private ResponseEntity buildOutput(Exception error,
+                                       String output,
+                                       Node node,
+                                       Call call,
+                                       String extension,
+                                       Config config) {
         // We want very fine grained control over the final responses as they vary with extension, errors, content, etc
         // So here we control all aspects of the output rather than deferring to the RestController
         return new ResponseEntity<String>(callUtil.buildOutput(error, output, node, call, extension),
                                           callUtil.buildHeaders(error, extension, config),
                                           callUtil.buildStatus(error));
+    }
+
+    private void handleError(Call call, Exception error) {
+        LOGGER.error(error.toString(), error);
+        // Say config/flow was not loaded yet, we don't have a call record in such cases
+        if (null != call) {
+            call.setStatus(CallStatus.FAILED);
+            callService.update(call);
+        }
     }
 
     private VelocityContext initContext(Config config, Map<String, String> params) {
