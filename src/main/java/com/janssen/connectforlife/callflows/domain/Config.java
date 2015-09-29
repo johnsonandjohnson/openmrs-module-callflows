@@ -32,12 +32,6 @@ public class Config {
     private Map<String, String> servicesMap = new HashMap<>();
 
     /**
-     * A map of Renderers for this configuration keyed by the renderer name
-     * Renderers are used to generate the output at each node
-     */
-    private Map<String, Renderer> renderersMap = new HashMap<>();
-
-    /**
      * A map of test users
      * The key is a phone number and the value is a URL that can respond to a specific call request
      * This can be used to over-ride the outbound URL used for a given user and like in outgoingCallUriTemplate, this can also
@@ -84,14 +78,6 @@ public class Config {
 
     public void setTestUsersMap(Map<String, String> testUsersMap) {
         this.testUsersMap = testUsersMap;
-    }
-
-    public Map<String, Renderer> getRenderersMap() {
-        return renderersMap;
-    }
-
-    public void setRenderersMap(Map<String, Renderer> renderersMap) {
-        this.renderersMap = renderersMap;
     }
 
     @Override

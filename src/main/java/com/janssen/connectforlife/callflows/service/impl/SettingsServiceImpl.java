@@ -1,7 +1,9 @@
 package com.janssen.connectforlife.callflows.service.impl;
 
 import com.janssen.connectforlife.callflows.domain.Config;
-import com.janssen.connectforlife.callflows.service.ConfigService;
+import com.janssen.connectforlife.callflows.domain.Renderer;
+import com.janssen.connectforlife.callflows.domain.Settings;
+import com.janssen.connectforlife.callflows.service.SettingsService;
 
 import org.motechproject.config.core.constants.ConfigurationConstants;
 import org.motechproject.event.MotechEvent;
@@ -25,28 +27,31 @@ import java.util.Map;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
-import com.google.gson.reflect.TypeToken;
 
 /**
  * Configuration Service Implementation
  *
  * @author bramak09
  */
-@Service("configService")
-public class ConfigServiceImpl implements ConfigService {
+@Service("settingsService")
+public class SettingsServiceImpl implements SettingsService {
 
-    private static final String CONFIG_FILE_NAME = "callflows-configs.json";
+    private static final String CONFIG_FILE_NAME = "callflows-settings.json";
     private static final String CONFIG_FILE_PATH = "/com.janssen.connectforlife.callflows/raw/" + CONFIG_FILE_NAME;
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConfigServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SettingsServiceImpl.class);
 
     @Autowired
     private SettingsFacade settingsFacade;
 
+    private Settings settings = new Settings();
+
     private Map<String, Config> configs = new LinkedHashMap<>();
+
+    private Map<String, Renderer> renderers = new LinkedHashMap<>();
 
     @PostConstruct
     public void initialize() {
-        loadConfigs();
+        loadSettings();
     }
 
     @MotechListener(subjects = { ConfigurationConstants.FILE_CHANGED_EVENT_SUBJECT })
@@ -54,7 +59,7 @@ public class ConfigServiceImpl implements ConfigService {
         String filePath = (String) event.getParameters().get(ConfigurationConstants.FILE_PATH);
         if (!StringUtils.isBlank(filePath) && filePath.endsWith(CONFIG_FILE_PATH)) {
             LOGGER.info("{} has changed, reloading configs.", CONFIG_FILE_NAME);
-            loadConfigs();
+            loadSettings();
         }
     }
 
@@ -79,21 +84,53 @@ public class ConfigServiceImpl implements ConfigService {
 
     @Override
     public void updateConfigs(List<Config> configs) {
-        Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-        String jsonText = gson.toJson(configs);
-        ByteArrayResource resource = new ByteArrayResource(jsonText.getBytes());
-        settingsFacade.saveRawConfig(CONFIG_FILE_NAME, resource);
-        loadConfigs();
+        settings.setConfigs(configs);
+        updateSettings(settings);
     }
 
-    private synchronized void loadConfigs() {
+    @Override
+    public boolean hasRenderer(String name) {
+        return renderers.containsKey(name);
+    }
+
+    @Override
+    public Renderer getRenderer(String name) {
+        if (renderers.containsKey(name)) {
+            return renderers.get(name);
+        }
+        String message = String.format("Unknown config: '%s'.", name);
+        throw new IllegalArgumentException(message);
+    }
+
+    @Override
+    public List<Renderer> allRenderers() {
+        return new ArrayList<Renderer>(renderers.values());
+    }
+
+    @Override
+    public void updateRenderers(List<Renderer> renderers) {
+        settings.setRenderers(renderers);
+        updateSettings(settings);
+    }
+
+    private void updateSettings(Settings settings) {
+        Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+        String jsonText = gson.toJson(settings);
+        ByteArrayResource resource = new ByteArrayResource(jsonText.getBytes());
+        settingsFacade.saveRawConfig(CONFIG_FILE_NAME, resource);
+        loadSettings();
+    }
+
+    private synchronized void loadSettings() {
         List<Config> configList;
+        List<Renderer> rendererList;
         try (InputStream is = settingsFacade.getRawConfig(CONFIG_FILE_NAME)) {
             String jsonText = IOUtils.toString(is);
             LOGGER.debug("Loading {}", CONFIG_FILE_NAME);
             Gson gson = new Gson();
-            configList = gson.fromJson(jsonText, new TypeToken<List<Config>>() {
-            }.getType());
+            settings = gson.fromJson(jsonText, Settings.class);
+            configList = settings.getConfigs();
+            rendererList = settings.getRenderers();
         } catch (Exception e) {
             String message = String.format("There seems to be a problem with the json text in %s: %s",
                                            CONFIG_FILE_NAME,
@@ -105,6 +142,10 @@ public class ConfigServiceImpl implements ConfigService {
         for (Config config : configList) {
             configs.put(config.getName(), config);
         }
-    }
 
+        renderers = new LinkedHashMap<>();
+        for (Renderer renderer : rendererList) {
+            renderers.put(renderer.getName(), renderer);
+        }
+    }
 }

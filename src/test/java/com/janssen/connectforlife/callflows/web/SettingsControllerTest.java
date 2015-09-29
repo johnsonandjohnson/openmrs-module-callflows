@@ -4,11 +4,17 @@ import com.janssen.connectforlife.callflows.BaseTest;
 import com.janssen.connectforlife.callflows.Constants;
 import com.janssen.connectforlife.callflows.builder.ConfigBuilder;
 import com.janssen.connectforlife.callflows.builder.ConfigContractBuilder;
+import com.janssen.connectforlife.callflows.builder.RendererBuilder;
+import com.janssen.connectforlife.callflows.builder.RendererContractBuilder;
 import com.janssen.connectforlife.callflows.contract.ConfigContract;
+import com.janssen.connectforlife.callflows.contract.RendererContract;
 import com.janssen.connectforlife.callflows.domain.Config;
-import com.janssen.connectforlife.callflows.helper.ConfigContractHelper;
+import com.janssen.connectforlife.callflows.domain.Renderer;
+import com.janssen.connectforlife.callflows.domain.Settings;
 import com.janssen.connectforlife.callflows.helper.ConfigHelper;
-import com.janssen.connectforlife.callflows.service.ConfigService;
+import com.janssen.connectforlife.callflows.helper.GenericHelper;
+import com.janssen.connectforlife.callflows.helper.RendererHelper;
+import com.janssen.connectforlife.callflows.service.SettingsService;
 
 import org.motechproject.mds.util.SecurityUtil;
 
@@ -42,15 +48,15 @@ import static org.springframework.test.web.server.result.MockMvcResultMatchers.s
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(SecurityUtil.class)
-public class ConfigControllerTest extends BaseTest {
+public class SettingsControllerTest extends BaseTest {
 
     private MockMvc mockMvc;
 
     @InjectMocks
-    private ConfigController configController = new ConfigController();
+    private SettingsController settingsController = new SettingsController();
 
     @Mock
-    private ConfigService configService;
+    private SettingsService settingsService;
 
     @Mock
     private ConfigContractBuilder configContractBuilder;
@@ -58,9 +64,19 @@ public class ConfigControllerTest extends BaseTest {
     @Mock
     private ConfigBuilder configBuilder;
 
+    @Mock
+    private RendererContractBuilder rendererContractBuilder;
+
+    @Mock
+    private RendererBuilder rendererBuilder;
+
     private Config voxeo;
 
     private Config yo;
+
+    private Renderer vxml;
+
+    private Renderer txt;
 
     private ConfigContract voxeoContract;
 
@@ -70,18 +86,37 @@ public class ConfigControllerTest extends BaseTest {
 
     private List<ConfigContract> configContracts;
 
+    private RendererContract vxmlContract;
+
+    private RendererContract txtContract;
+
+    private List<Renderer> renderers;
+
+    private List<RendererContract> rendererContracts;
+
+    private Settings settings;
+
     @Before
     public void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(configController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(settingsController).build();
 
-        configs = ConfigHelper.createConfigs();
-        configContracts = ConfigContractHelper.createConfigContracts();
+        settings = GenericHelper.createSettings();
+        configs = settings.getConfigs();
+        renderers = settings.getRenderers();
+        configContracts = ConfigHelper.createConfigContracts();
+        rendererContracts = RendererHelper.createRendererContracts();
 
         voxeo = configs.get(0);
         yo = configs.get(1);
 
+        vxml = renderers.get(0);
+        txt = renderers.get(1);
+
         voxeoContract = configContracts.get(0);
         yoContract = configContracts.get(1);
+
+        vxmlContract = rendererContracts.get(0);
+        txtContract = rendererContracts.get(1);
     }
 
 
@@ -91,7 +126,7 @@ public class ConfigControllerTest extends BaseTest {
         given(configContractBuilder.createFrom(voxeo)).willReturn(voxeoContract);
         given(configContractBuilder.createFrom(yo)).willReturn(yoContract);
         // And
-        given(configService.allConfigs()).willReturn(configs);
+        given(settingsService.allConfigs()).willReturn(configs);
 
         // When and Then
         mockMvc.perform(get("/configs").contentType(MediaType.APPLICATION_JSON))
@@ -102,7 +137,7 @@ public class ConfigControllerTest extends BaseTest {
         // Then no incoming, so no builders
         verify(configBuilder, never()).createFrom(any(ConfigContract.class));
         // And one service call
-        verify(configService, times(1)).allConfigs();
+        verify(settingsService, times(1)).allConfigs();
         // And two response builders
         verify(configContractBuilder, times(2)).createFrom(any(Config.class));
     }
@@ -116,7 +151,7 @@ public class ConfigControllerTest extends BaseTest {
         given(configContractBuilder.createFrom(voxeo)).willReturn(voxeoContract);
         given(configContractBuilder.createFrom(yo)).willReturn(yoContract);
         // And
-        given(configService.allConfigs()).willReturn(configs);
+        given(settingsService.allConfigs()).willReturn(configs);
 
         // When and Then
         mockMvc.perform(post("/configs").contentType(MediaType.APPLICATION_JSON).body(jsonBytes(configContracts)))
@@ -127,10 +162,60 @@ public class ConfigControllerTest extends BaseTest {
         // Then two builders for request
         verify(configBuilder, times(2)).createFrom(any(ConfigContract.class));
         // And must update once with correct data
-        verify(configService, times(1)).updateConfigs(configs);
+        verify(settingsService, times(1)).updateConfigs(configs);
         // and must retrieve again to return back
-        verify(configService, times(1)).allConfigs();
+        verify(settingsService, times(1)).allConfigs();
         // And must call response builder twice
         verify(configContractBuilder, times(2)).createFrom(any(Config.class));
+    }
+
+
+    @Test
+    public void shouldReturnAllRenderersAsJSON() throws Exception {
+        // Given
+        given(rendererContractBuilder.createFrom(vxml)).willReturn(vxmlContract);
+        given(rendererContractBuilder.createFrom(txt)).willReturn(txtContract);
+        // And
+        given(settingsService.allRenderers()).willReturn(renderers);
+
+        // When and Then
+        mockMvc.perform(get("/renderers").contentType(MediaType.APPLICATION_JSON))
+               .andExpect(status().is(HttpStatus.OK.value()))
+               .andExpect(content().type(Constants.APPLICATION_JSON_UTF8))
+               .andExpect(content().string(json(rendererContracts)));
+
+        // Then no incoming, so no builders
+        verify(configBuilder, never()).createFrom(any(ConfigContract.class));
+        // And one service call
+        verify(settingsService, times(1)).allRenderers();
+        // And two response builders
+        verify(rendererContractBuilder, times(2)).createFrom(any(Renderer.class));
+    }
+
+    @Test
+    public void shouldUpdateAllRenderersAndReturnBackAllAsJson() throws Exception {
+        // Given
+        given(rendererBuilder.createFrom(vxmlContract)).willReturn(vxml);
+        given(rendererBuilder.createFrom(txtContract)).willReturn(txt);
+        // And
+        given(rendererContractBuilder.createFrom(vxml)).willReturn(vxmlContract);
+        given(rendererContractBuilder.createFrom(txt)).willReturn(txtContract);
+        // And
+        given(settingsService.allRenderers()).willReturn(renderers);
+
+        // When and Then
+        mockMvc.perform(post("/renderers").contentType(MediaType.APPLICATION_JSON).body(jsonBytes(rendererContracts)))
+               .andExpect(status().is(HttpStatus.OK.value()))
+               .andExpect(content().type(Constants.APPLICATION_JSON_UTF8))
+               .andExpect(content().string(json(rendererContracts)));
+
+        // Then two builders for request
+        verify(rendererBuilder, times(2)).createFrom(any(RendererContract.class));
+        // And must update once with correct data
+        verify(settingsService, times(1)).updateRenderers(renderers);
+        // and must retrieve again to return back
+        verify(settingsService, times(1)).allRenderers();
+        // And must call response builder twice
+        verify(rendererContractBuilder, times(2)).createFrom(any(Renderer.class));
     }
 }

@@ -6,6 +6,7 @@ import com.janssen.connectforlife.callflows.domain.Call;
 import com.janssen.connectforlife.callflows.domain.CallFlow;
 import com.janssen.connectforlife.callflows.domain.Config;
 import com.janssen.connectforlife.callflows.domain.FlowPosition;
+import com.janssen.connectforlife.callflows.domain.Renderer;
 import com.janssen.connectforlife.callflows.domain.flow.Flow;
 import com.janssen.connectforlife.callflows.domain.flow.Node;
 import com.janssen.connectforlife.callflows.domain.flow.TextElement;
@@ -16,10 +17,11 @@ import com.janssen.connectforlife.callflows.helper.CallFlowHelper;
 import com.janssen.connectforlife.callflows.helper.CallHelper;
 import com.janssen.connectforlife.callflows.helper.ConfigHelper;
 import com.janssen.connectforlife.callflows.helper.FlowHelper;
+import com.janssen.connectforlife.callflows.helper.RendererHelper;
 import com.janssen.connectforlife.callflows.service.CallFlowService;
 import com.janssen.connectforlife.callflows.service.CallService;
-import com.janssen.connectforlife.callflows.service.ConfigService;
 import com.janssen.connectforlife.callflows.service.FlowService;
+import com.janssen.connectforlife.callflows.service.SettingsService;
 import com.janssen.connectforlife.callflows.util.CallUtil;
 import com.janssen.connectforlife.callflows.util.FlowUtil;
 import com.janssen.connectforlife.callflows.util.TestUtil;
@@ -85,7 +87,7 @@ public class CallControllerTest extends BaseTest {
     private CallController callController = new CallController();
 
     @Mock
-    private ConfigService configService;
+    private SettingsService settingsService;
 
     @Mock
     private CallFlowService callFlowService;
@@ -115,6 +117,8 @@ public class CallControllerTest extends BaseTest {
     private ArgumentCaptor<Call> callCaptor;
 
     private Config voxeo;
+
+    private Renderer vxml;
 
     private CallFlow mainFlow;
 
@@ -161,14 +165,18 @@ public class CallControllerTest extends BaseTest {
         // Contexts
         context = new HashMap<>();
 
-        // Config
+        // Config & Renderer
         voxeo = ConfigHelper.createConfigs().get(0);
+        vxml = RendererHelper.createRenderers().get(0);
+
         servicesMap = new HashMap<>();
         // We'll use a service that we can use for integration testing also
         servicesMap.put("callService", CALL_SERVICE_CLASS);
         voxeo.setServicesMap(servicesMap);
-        given(configService.getConfig(Constants.CONFIG_VOXEO)).willReturn(voxeo);
-        given(configService.getConfig(Constants.CONFIG_YO)).willThrow(new IllegalArgumentException(Constants.ERROR_YO));
+        given(settingsService.getConfig(Constants.CONFIG_VOXEO)).willReturn(voxeo);
+        given(settingsService.getConfig(Constants.CONFIG_YO)).willThrow(new IllegalArgumentException(Constants.ERROR_YO));
+        given(settingsService.hasRenderer(Constants.CONFIG_RENDERER_VXML)).willReturn(true);
+        given(settingsService.getRenderer(Constants.CONFIG_RENDERER_VXML)).willReturn(vxml);
 
         // Call Flow Service
         mainFlow = CallFlowHelper.createMainFlow();
@@ -253,6 +261,8 @@ public class CallControllerTest extends BaseTest {
         verify(callService, times(1)).update(inboundCall);
         // And let's look at what got persisted with the call data is what we wanted to do
         assertContext(velocityContextCaptor.getValue(), inboundCall.getCallId(), inboundNextURLVxml);
+        // Assert that the renderer is used appropriately
+        assertRenderer(Constants.CONFIG_RENDERER_VXML);
     }
 
     @Test
@@ -276,6 +286,8 @@ public class CallControllerTest extends BaseTest {
         verify(callService, times(1)).update(inboundCall);
         // And let's look at what got persisted with the call data is what we wanted to do
         assertContext(velocityContextCaptor.getValue(), inboundCall.getCallId(), inboundNextURLJson);
+        // Assert that the renderer is used appropriately
+        assertRendererForJson();
     }
 
     @Test
@@ -301,6 +313,7 @@ public class CallControllerTest extends BaseTest {
         verify(callService, times(1)).update(outboundCall);
         // And let's look at what got persisted with the call data is what we wanted to do
         assertContext(velocityContextCaptor.getValue(), outboundCall.getCallId(), outboundNextURLVxml);
+        assertRenderer(Constants.CONFIG_RENDERER_VXML);
     }
 
     @Test
@@ -326,6 +339,8 @@ public class CallControllerTest extends BaseTest {
         verify(callService, times(1)).update(outboundCall);
         // And let's look at what got persisted with the call data is what we wanted to do
         assertContext(velocityContextCaptor.getValue(), outboundCall.getCallId(), outboundNextURLJson);
+        // Assert that the renderer is used appropriately
+        assertRendererForJson();
     }
 
     @Test
@@ -348,7 +363,7 @@ public class CallControllerTest extends BaseTest {
         assertConfigAndFlowLoaded(Constants.CONFIG_VOXEO, Constants.CALLFLOW_MAIN);
         assertCallNeverSearched();
         assertCallFailureUpdated();
-
+        assertRenderer(Constants.CONFIG_RENDERER_VXML);
     }
 
     @Test
@@ -361,13 +376,16 @@ public class CallControllerTest extends BaseTest {
         mockMvc.perform(customGet("/in/voxeo/flows/MainFlow.json"))
                .andExpect(status().is(HttpStatus.INTERNAL_SERVER_ERROR.value()))
                .andExpect(content().type(Constants.APPLICATION_JSON_UTF8))
-               .andExpect(content().string(containsString("Encountered \\\"<EOF>\\\" at MainFlow.entry[line 1, column 24]")));
+               .andExpect(content().string(containsString(
+                       "Encountered \\\"<EOF>\\\" at MainFlow.entry[line 1, column 24]")));
         // We check enough of the content to have confidence in the velocity error, but not the complete text as the string
         // is too deeply nested and on windows and unix escapes with different line endings
 
         assertConfigAndFlowLoaded(Constants.CONFIG_VOXEO, Constants.CALLFLOW_MAIN);
         assertCallNeverSearched();
         assertCallFailureUpdated();
+        // Assert that the renderer is used appropriately
+        assertRendererForJson();
     }
 
     @Test
@@ -386,11 +404,12 @@ public class CallControllerTest extends BaseTest {
         //TODO: Can possibly replace this with a standard error response in VXML itself by changing config and register a error template?
 
         // Then we should have tried to load the config cause the OSGI services are part of the config
-        verify(configService, times(1)).getConfig(Constants.CONFIG_VOXEO);
+        verify(settingsService, times(1)).getConfig(Constants.CONFIG_VOXEO);
         // And we should NOT have loaded the callflow
         verify(callFlowService, never()).findByName(anyString());
         // And nothing happened with calls
         assertNoActionOnCall();
+        assertRenderer(Constants.CONFIG_RENDERER_VXML);
     }
 
     @Test
@@ -408,11 +427,13 @@ public class CallControllerTest extends BaseTest {
                .andExpect(content().string(sameAsFile("error_bad_services.json")));
 
         // Then we should have tried to load the config cause the OSGI services are part of the config
-        verify(configService, times(1)).getConfig(Constants.CONFIG_VOXEO);
+        verify(settingsService, times(1)).getConfig(Constants.CONFIG_VOXEO);
         // And we should NOT have loaded the callflow
         verify(callFlowService, never()).findByName(anyString());
         // And nothing happened with calls
         assertNoActionOnCall();
+        // Assert that the renderer is used appropriately
+        assertRendererForJson();
     }
 
     @Test
@@ -424,11 +445,12 @@ public class CallControllerTest extends BaseTest {
                .andExpect(content().type(Constants.PLAIN_TEXT))
                .andExpect(content().string(Constants.ERROR_CONFIG));
         // Then we should have tried to load the config cause the OSGI services are part of the config
-        verify(configService, times(1)).getConfig(Constants.CONFIG_YO);
+        verify(settingsService, times(1)).getConfig(Constants.CONFIG_YO);
         // And we should NOT have loaded the callflow
         verify(callFlowService, never()).findByName(anyString());
         // And nothing happened with calls
         assertNoActionOnCall();
+        assertRenderer(Constants.CONFIG_RENDERER_VXML);
     }
 
     @Test
@@ -440,11 +462,13 @@ public class CallControllerTest extends BaseTest {
                .andExpect(content().type(Constants.APPLICATION_JSON_UTF8))
                .andExpect(content().string(sameAsFile("error_bad_config.json")));
         // Then we should have tried to load the config cause the OSGI services are part of the config
-        verify(configService, times(1)).getConfig(Constants.CONFIG_YO);
+        verify(settingsService, times(1)).getConfig(Constants.CONFIG_YO);
         // And we should NOT have loaded the callflow
         verify(callFlowService, never()).findByName(anyString());
         // And nothing happened with calls
         assertNoActionOnCall();
+        // Assert that the renderer is used appropriately
+        assertRendererForJson();
     }
 
     @Test
@@ -456,11 +480,12 @@ public class CallControllerTest extends BaseTest {
                .andExpect(content().type(Constants.PLAIN_TEXT))
                .andExpect(content().string(Constants.ERROR_CALLFLOW));
         // Then we should have tried to load the config
-        verify(configService, times(1)).getConfig(Constants.CONFIG_VOXEO);
+        verify(settingsService, times(1)).getConfig(Constants.CONFIG_VOXEO);
         // And we should NOT have loaded the callflow
         verify(callFlowService, times(1)).findByName(Constants.CALLFLOW_MAIN2);
         // And nothing happened with calls
         assertNoActionOnCall();
+        assertRenderer(Constants.CONFIG_RENDERER_VXML);
     }
 
     @Test
@@ -472,11 +497,13 @@ public class CallControllerTest extends BaseTest {
                .andExpect(content().type(Constants.APPLICATION_JSON_UTF8))
                .andExpect(content().string(sameAsFile("error_bad_callflow.json")));
         // Then we should have tried to load the config
-        verify(configService, times(1)).getConfig(Constants.CONFIG_VOXEO);
+        verify(settingsService, times(1)).getConfig(Constants.CONFIG_VOXEO);
         // And we should NOT have loaded the callflow
         verify(callFlowService, times(1)).findByName(Constants.CALLFLOW_MAIN2);
         // And nothing happened with calls
         assertNoActionOnCall();
+        // Assert that the renderer is used appropriately
+        assertRendererForJson();
     }
 
     /* Handle Call Continuation */
@@ -497,6 +524,7 @@ public class CallControllerTest extends BaseTest {
         verify(flowService, times(1)).evalNode(flow, entryHandlerNode, velocityContextCaptor.getValue());
         // And we must have updated the call eventually by incrementing the steps and status to as set
         assertCallUpdatedWithIncrementedSteps(CallStatus.IN_PROGRESS);
+        assertRenderer(Constants.CONFIG_RENDERER_VXML);
     }
 
     @Test
@@ -513,6 +541,8 @@ public class CallControllerTest extends BaseTest {
         verify(flowService, times(1)).evalNode(flow, entryHandlerNode, velocityContextCaptor.getValue());
         // And we must have updated the call eventually by incrementing the steps and status to as set
         assertCallUpdatedWithIncrementedSteps(CallStatus.IN_PROGRESS);
+        // Assert that the renderer is used appropriately
+        assertRendererForJson();
     }
 
     @Test
@@ -532,6 +562,7 @@ public class CallControllerTest extends BaseTest {
         verify(flowService, times(1)).evalNode(flow, entryHandlerNode, velocityContextCaptor.getValue());
         // And we must have updated the call eventually by incrementing the steps and status to as set
         assertCallUpdatedWithIncrementedSteps(CallStatus.COMPLETED);
+        assertRenderer(Constants.CONFIG_RENDERER_VXML);
     }
 
     @Test
@@ -552,6 +583,8 @@ public class CallControllerTest extends BaseTest {
         verify(flowService, times(1)).evalNode(flow, entryHandlerNode, velocityContextCaptor.getValue());
         // And we must have updated the call eventually by incrementing the steps and status to as set
         assertCallUpdatedWithIncrementedSteps(CallStatus.COMPLETED);
+        // Assert that the renderer is used appropriately
+        assertRendererForJson();
     }
 
     @Test
@@ -572,6 +605,7 @@ public class CallControllerTest extends BaseTest {
         verify(flowService, times(1)).evalNode(flow, entryHandlerNode, velocityContextCaptor.getValue());
         // And call must be updated with failure
         assertCallFailureUpdated();
+        assertRenderer(Constants.CONFIG_RENDERER_VXML);
     }
 
     @Test
@@ -593,6 +627,8 @@ public class CallControllerTest extends BaseTest {
         verify(flowService, times(1)).evalNode(flow, entryHandlerNode, velocityContextCaptor.getValue());
         // And call must be updated with failure
         assertCallFailureUpdated();
+        // Assert that the renderer is used appropriately
+        assertRendererForJson();
     }
 
     private void assertContext(VelocityContext context, String callId, String nextURL) {
@@ -608,7 +644,7 @@ public class CallControllerTest extends BaseTest {
     private void assertCallConfigFlowLoaded(Call call, String config, String callflow) {
         // These must be loaded
         verify(callService, times(1)).findByCallId(call.getCallId());
-        verify(configService, times(1)).getConfig(config);
+        verify(settingsService, times(1)).getConfig(config);
         verify(flowService, times(1)).load(callflow);
         // And we called the merge to load previously persisted data
         verify(callUtil, times(1)).mergeCallWithContext(eq(inboundCall), velocityContextCaptor.capture());
@@ -616,7 +652,7 @@ public class CallControllerTest extends BaseTest {
 
     private void assertConfigAndFlowLoaded(String config, String callflow) {
         // Then we have to find the configuration
-        verify(configService, times(1)).getConfig(config);
+        verify(settingsService, times(1)).getConfig(config);
         // And we need to load the flow
         verify(callFlowService, times(1)).findByName(callflow);
     }
@@ -658,6 +694,17 @@ public class CallControllerTest extends BaseTest {
         verify(callService, never()).findByCallId(anyString());
         // And of course there's no need to merge the call with the context since we are creating it
         verify(callUtil, never()).mergeCallWithContext(any(Call.class), any(VelocityContext.class));
+    }
+
+    private void assertRenderer(String renderer) {
+        verify(settingsService, times(1)).hasRenderer(renderer);
+        verify(settingsService, times(1)).getRenderer(renderer);
+    }
+
+    private void assertRendererForJson() {
+        verify(settingsService, times(1)).hasRenderer(Constants.CONFIG_RENDERER_JSON);
+        // We don't provide a JSON renderer, so get shouldn't be called
+        verify(settingsService, never()).getRenderer(Constants.CONFIG_RENDERER_JSON);
     }
 
     private String sameAsFile(String file) throws IOException {

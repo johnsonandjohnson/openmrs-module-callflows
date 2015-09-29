@@ -1,11 +1,8 @@
 package com.janssen.connectforlife.callflows.builder;
 
 import com.janssen.connectforlife.callflows.contract.ConfigContract;
-import com.janssen.connectforlife.callflows.contract.RendererContract;
 import com.janssen.connectforlife.callflows.domain.Config;
-import com.janssen.connectforlife.callflows.domain.Renderer;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -17,9 +14,6 @@ import java.util.Map;
  */
 @Component
 public class ConfigContractBuilder {
-
-    @Autowired
-    private RendererContractBuilder rendererContractBuilder;
 
     /**
      * Create a ConfigContract for use from Config domain
@@ -40,12 +34,6 @@ public class ConfigContractBuilder {
         Map<String, String> servicesMap = new LinkedHashMap<>();
         servicesMap.putAll(config.getServicesMap());
         configContract.setServicesMap(servicesMap);
-
-        Map<String, RendererContract> rendererMap = new LinkedHashMap<>();
-        for (Map.Entry<String, Renderer> rendererEntry : config.getRenderersMap().entrySet()) {
-            rendererMap.put(rendererEntry.getKey(), rendererContractBuilder.createFrom(rendererEntry.getValue()));
-        }
-        configContract.setRenderersMap(rendererMap);
 
         return configContract;
     }

@@ -19,8 +19,8 @@
     <osgi:reference id="callFlowDataService"
                     interface="com.janssen.connectforlife.callflows.repository.CallFlowDataService"/>
 
-    <osgi:service ref="configService"
-                  interface="com.janssen.connectforlife.callflows.service.ConfigService"/>
+    <osgi:service ref="settingsService"
+                  interface="com.janssen.connectforlife.callflows.service.SettingsService"/>
 
     <osgi:service ref="callService"
                   interface="com.janssen.connectforlife.callflows.service.CallService"/>

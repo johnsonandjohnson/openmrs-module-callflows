@@ -1,8 +1,7 @@
 package com.janssen.connectforlife.callflows.helper;
 
 import com.janssen.connectforlife.callflows.Constants;
-import com.janssen.connectforlife.callflows.contract.RendererContract;
-import com.janssen.connectforlife.callflows.domain.Renderer;
+import com.janssen.connectforlife.callflows.domain.Settings;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,6 +12,8 @@ import java.util.Map;
  * @author bramak09
  */
 public final class GenericHelper {
+
+    public static final String SETTINGS_FILE_NAME = "callflows-settings.json";
 
     // private constructor
     private GenericHelper() {
@@ -32,42 +33,11 @@ public final class GenericHelper {
         return testUsersMap;
     }
 
-    public static Map<String, Renderer> buildRenderersMap() {
-        // Renderers
-        Renderer vxmlRenderer = new Renderer();
-        vxmlRenderer.setName(Constants.CONFIG_RENDERER_VXML);
-        vxmlRenderer.setMimeType(Constants.CONFIG_RENDERER_VXML_MIME);
-        vxmlRenderer.setTemplate(Constants.CONFIG_RENDERER_VXML_TPL);
-
-        Renderer textRenderer = new Renderer();
-        textRenderer.setName(Constants.CONFIG_RENDERER_TXT);
-        textRenderer.setMimeType(Constants.CONFIG_RENDERER_TXT_MIME);
-        textRenderer.setTemplate(Constants.CONFIG_RENDERER_TXT_TPL);
-
-        // Renderer Map
-        Map<String, Renderer> rendererMap = new HashMap<>();
-        rendererMap.put(Constants.CONFIG_RENDERER_VXML, vxmlRenderer);
-        rendererMap.put(Constants.CONFIG_RENDERER_TXT, textRenderer);
-        return rendererMap;
-    }
-
-    public static Map<String, RendererContract> buildRenderersContractMap() {
-        // Renderer contract
-        RendererContract vxmlRenderer = new RendererContract();
-        vxmlRenderer.setName(Constants.CONFIG_RENDERER_VXML);
-        vxmlRenderer.setMimeType(Constants.CONFIG_RENDERER_VXML_MIME);
-        vxmlRenderer.setTemplate(Constants.CONFIG_RENDERER_VXML_TPL);
-
-        RendererContract textRenderer = new RendererContract();
-        textRenderer.setName(Constants.CONFIG_RENDERER_TXT);
-        textRenderer.setMimeType(Constants.CONFIG_RENDERER_TXT_MIME);
-        textRenderer.setTemplate(Constants.CONFIG_RENDERER_TXT_TPL);
-
-        // Renderer Map
-        Map<String, RendererContract> rendererMap = new HashMap<>();
-        rendererMap.put(Constants.CONFIG_RENDERER_VXML, vxmlRenderer);
-        rendererMap.put(Constants.CONFIG_RENDERER_TXT, textRenderer);
-        return rendererMap;
+    public static Settings createSettings() {
+        Settings settings = new Settings();
+        settings.setConfigs(ConfigHelper.createConfigs());
+        settings.setRenderers(RendererHelper.createRenderers());
+        return settings;
     }
 
 }

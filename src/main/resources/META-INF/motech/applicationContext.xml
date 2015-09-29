@@ -15,7 +15,7 @@
     <bean id="callflowsSettings" class="org.motechproject.server.config.SettingsFacade" autowire="byType">
         <property name="rawConfigFiles">
             <list>
-                <value>classpath:callflows-configs.json</value>
+                <value>classpath:callflows-settings.json</value>
             </list>
         </property>
     </bean>

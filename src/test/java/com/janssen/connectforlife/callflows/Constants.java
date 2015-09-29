@@ -54,7 +54,7 @@ public final class Constants {
 
     public static final String CONFIG_YO = "yo";
 
-    public static final String CONFIG_INVALID = "invalid";
+    public static final String INVALID = "invalid";
 
     public static final String CONFIG_VOXEO_OUT_TEMPLATE = "http://some-api-server/?flow=[flow]&callid=[callid]";
 

@@ -49,6 +49,8 @@ public class Renderer {
     }
 
     public void setTemplate(String template) {
+
         this.template = template;
     }
+
 }

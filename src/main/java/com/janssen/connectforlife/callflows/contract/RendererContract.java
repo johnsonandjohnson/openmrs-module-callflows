@@ -1,5 +1,7 @@
 package com.janssen.connectforlife.callflows.contract;
 
+import java.util.Objects;
+
 /**
  * Renderer Contract, maps directly to the Renderer domain
  *
@@ -46,6 +48,24 @@ public class RendererContract {
 
     public void setTemplate(String template) {
         this.template = template;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof RendererContract)) {
+            return false;
+        }
+        final RendererContract other = (RendererContract) o;
+        return Objects.equals(this.name, other.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
     }
 }
 

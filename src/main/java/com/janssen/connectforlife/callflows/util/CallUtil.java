@@ -175,9 +175,10 @@ public class CallUtil {
      * @param error     any exception that happened before building headers
      * @param extension that is being currently processed
      * @param config    to use
+     * @param renderer  indicating the mime type to use
      * @return HttpHeaders
      */
-    public HttpHeaders buildHeaders(Exception error, String extension, Config config) {
+    public HttpHeaders buildHeaders(Exception error, String extension, Config config, Renderer renderer) {
         HttpHeaders responseHeaders = new HttpHeaders();
         if (JSON.equals(extension)) {
             responseHeaders.setContentType(JSON_MEDIA_TYPE);
@@ -186,9 +187,8 @@ public class CallUtil {
             // cause the renderers and mime types are all part of the config!
             responseHeaders.setContentType(DEFAULT_MEDIA_TYPE);
         } else {
-            Map<String, Renderer> rendererMap = config.getRenderersMap();
-            if (rendererMap.get(extension) != null) {
-                String[] mimeParts = rendererMap.get(extension).getMimeType().split("/");
+            if (renderer != null) {
+                String[] mimeParts = renderer.getMimeType().split("/");
                 responseHeaders.setContentType(new MediaType(mimeParts[0], mimeParts[1], UTF8_CHARSET));
             } else {
                 // default type

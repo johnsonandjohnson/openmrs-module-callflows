@@ -44,12 +44,6 @@ public class ConfigContract {
      */
     private Map<String, String> testUsersMap = new HashMap<>();
 
-    /**
-     * A map of Renderers for this configuration keyed by the renderer name
-     * Renderers are used to generate the output at each node
-     */
-    private Map<String, RendererContract> renderersMap = new HashMap<>();
-
     public String getName() {
         return name;
     }
@@ -88,14 +82,6 @@ public class ConfigContract {
 
     public void setTestUsersMap(Map<String, String> testUsersMap) {
         this.testUsersMap = testUsersMap;
-    }
-
-    public Map<String, RendererContract> getRenderersMap() {
-        return renderersMap;
-    }
-
-    public void setRenderersMap(Map<String, RendererContract> renderersMap) {
-        this.renderersMap = renderersMap;
     }
 
     @Override

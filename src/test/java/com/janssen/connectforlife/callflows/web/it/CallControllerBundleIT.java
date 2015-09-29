@@ -4,6 +4,7 @@ import com.janssen.connectforlife.callflows.Constants;
 import com.janssen.connectforlife.callflows.domain.Call;
 import com.janssen.connectforlife.callflows.domain.CallFlow;
 import com.janssen.connectforlife.callflows.domain.Config;
+import com.janssen.connectforlife.callflows.domain.Renderer;
 import com.janssen.connectforlife.callflows.domain.flow.Flow;
 import com.janssen.connectforlife.callflows.domain.flow.Template;
 import com.janssen.connectforlife.callflows.domain.flow.TextElement;
@@ -12,12 +13,13 @@ import com.janssen.connectforlife.callflows.domain.types.CallDirection;
 import com.janssen.connectforlife.callflows.exception.CallFlowAlreadyExistsException;
 import com.janssen.connectforlife.callflows.helper.CallFlowHelper;
 import com.janssen.connectforlife.callflows.helper.ConfigHelper;
+import com.janssen.connectforlife.callflows.helper.RendererHelper;
 import com.janssen.connectforlife.callflows.repository.CallDataService;
 import com.janssen.connectforlife.callflows.repository.CallFlowDataService;
 import com.janssen.connectforlife.callflows.service.CallFlowService;
 import com.janssen.connectforlife.callflows.service.CallService;
-import com.janssen.connectforlife.callflows.service.ConfigService;
 import com.janssen.connectforlife.callflows.service.FlowService;
+import com.janssen.connectforlife.callflows.service.SettingsService;
 import com.janssen.connectforlife.callflows.util.TestUtil;
 
 import org.motechproject.testing.osgi.container.MotechNativeTestContainerFactory;
@@ -51,7 +53,7 @@ import java.util.Map;
 public class CallControllerBundleIT extends RESTControllerPaxIT {
 
     @Inject
-    private ConfigService configService;
+    private SettingsService settingsService;
 
     @Inject
     private CallDataService callDataService;
@@ -69,6 +71,8 @@ public class CallControllerBundleIT extends RESTControllerPaxIT {
     private CallFlowDataService callFlowDataService;
 
     private List<Config> configs;
+
+    private List<Renderer> renderers;
 
     private CallFlow mainFlow;
 
@@ -88,7 +92,11 @@ public class CallControllerBundleIT extends RESTControllerPaxIT {
         // Save only voxeo in the DB and not yo
         configs = ConfigHelper.createConfigs();
         configs.remove(1);
-        configService.updateConfigs(configs);
+        settingsService.updateConfigs(configs);
+
+        renderers = RendererHelper.createRenderers();
+        renderers.remove(1);
+        settingsService.updateRenderers(renderers);
 
         // create a callflow
         mainFlow = CallFlowHelper.createMainFlow();
@@ -112,7 +120,7 @@ public class CallControllerBundleIT extends RESTControllerPaxIT {
 
     @After
     public void tearDown() {
-        configService.updateConfigs(new ArrayList());
+        settingsService.updateConfigs(new ArrayList());
         callDataService.deleteAll();
         callFlowDataService.deleteAll();
     }
@@ -362,7 +370,7 @@ public class CallControllerBundleIT extends RESTControllerPaxIT {
         Map<String, String> badServices = new HashMap<>();
         badServices.put("badSrvc", "com.underground.missing.but.useful.if.found.Service");
         configs.get(0).setServicesMap(badServices);
-        configService.updateConfigs(configs);
+        settingsService.updateConfigs(configs);
     }
 
 }

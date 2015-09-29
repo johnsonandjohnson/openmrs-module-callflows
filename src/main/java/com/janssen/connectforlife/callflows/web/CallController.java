@@ -4,14 +4,15 @@ import com.janssen.connectforlife.callflows.domain.Call;
 import com.janssen.connectforlife.callflows.domain.CallFlow;
 import com.janssen.connectforlife.callflows.domain.Config;
 import com.janssen.connectforlife.callflows.domain.FlowPosition;
+import com.janssen.connectforlife.callflows.domain.Renderer;
 import com.janssen.connectforlife.callflows.domain.flow.Flow;
 import com.janssen.connectforlife.callflows.domain.flow.Node;
 import com.janssen.connectforlife.callflows.domain.types.CallDirection;
 import com.janssen.connectforlife.callflows.domain.types.CallStatus;
 import com.janssen.connectforlife.callflows.service.CallFlowService;
 import com.janssen.connectforlife.callflows.service.CallService;
-import com.janssen.connectforlife.callflows.service.ConfigService;
 import com.janssen.connectforlife.callflows.service.FlowService;
+import com.janssen.connectforlife.callflows.service.SettingsService;
 import com.janssen.connectforlife.callflows.util.CallUtil;
 import com.janssen.connectforlife.callflows.util.FlowUtil;
 
@@ -84,7 +85,7 @@ public class CallController extends RestController {
     private static final String INTERNAL_CALL_ID = KEY_INTERNAL + "." + KEY_CALL_ID;
 
     @Autowired
-    private ConfigService configService;
+    private SettingsService settingsService;
 
     @Autowired
     private CallFlowService callFlowService;
@@ -170,7 +171,7 @@ public class CallController extends RestController {
 
         try {
             // load configuration first, cause it has the OSGI services to load. This throws IllegalArgument if can't load config
-            config = configService.getConfig(conf);
+            config = settingsService.getConfig(conf);
 
             // initialize velocity context next. Can throw IllegalState if some OSGI services could not be loaded
             context = initContext(config, params);
@@ -267,7 +268,7 @@ public class CallController extends RestController {
             call = callService.findByCallId(callId);
 
             // The configuration is part of the call, and hence why we need to retrieve the call first
-            config = configService.getConfig(call.getConfig());
+            config = settingsService.getConfig(call.getConfig());
 
             context = initContext(config, params);
 
@@ -316,10 +317,14 @@ public class CallController extends RestController {
                                        Call call,
                                        String extension,
                                        Config config) {
+        Renderer renderer = null;
+        if (settingsService.hasRenderer(extension)) {
+            renderer = settingsService.getRenderer(extension);
+        }
         // We want very fine grained control over the final responses as they vary with extension, errors, content, etc
         // So here we control all aspects of the output rather than deferring to the RestController
         return new ResponseEntity<String>(callUtil.buildOutput(error, output, node, call, extension),
-                                          callUtil.buildHeaders(error, extension, config),
+                                          callUtil.buildHeaders(error, extension, config, renderer),
                                           callUtil.buildStatus(error));
     }
 
