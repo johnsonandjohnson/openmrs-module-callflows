@@ -1,14 +1,18 @@
-<div id="inner-center" class="inner-center ui-layout-center ui-layout-pane ui-layout-pane-center etllite">
+<link rel="stylesheet" href="../callflows/resources/css/codemirror.css"/>
+<script type="text/javascript" src="../callflows/resources/lib/codemirror/codemirror.min.js"></script>
+
+<div id="inner-center" class="inner-center ui-layout-center ui-layout-pane ui-layout-pane-center callflows">
     <div class="header-footer-breadcrumb">
         <ul class="breadcrumb" role="navigation">
             <li><a role="menu" href=".">{{msg('server.home')}}</a></li>
-            <li class="active"><a role="menu" href="#/callflow">{{msg('callflow')}}</a></li>
+            <li class="active"><a role="menu" href="#/callflows">{{msg('callflows')}}</a></li>
         </ul>
     </div>
     <div class="header-footer">
         <ul id="content-tabs" class="nav nav-tabs">
-            <li ng-class="active('#/mappings')"><a href="#/designer" >{{msg('callflow.tab.designer')}}</a></li>
-            <li ng-class="active('#/settings')"><a href="#/settings" >{{msg('callflow.tab.settings')}}</a></li>
+            <li ng-class="active('#/designer')"><a href="#/designer" >{{msg('callflows.tab.designer')}}</a></li>
+            <li ng-class="active('#/providers')"><a href="#/providers" >{{msg('callflows.tab.providers')}}</a></li>
+            <li ng-class="active('#/renderers')"><a href="#/renderers" >{{msg('callflows.tab.renderers')}}</a></li>
         </ul>
     </div>
     <div class="ui-layout-content">

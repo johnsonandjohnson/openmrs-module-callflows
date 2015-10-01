@@ -227,7 +227,7 @@
                             <disallowIncrAndDecr>true</disallowIncrAndDecr>
                             <requireUseStrict>true</requireUseStrict>
                             <predefinedVars>
-                                $, angular, window
+                                $, angular, window, _, handleWithStackTrace, CodeMirror
                             </predefinedVars>
                             <failOnIssues>${jslint.enable}</failOnIssues>
                             <disallowInsecureCharsInRegExp>false</disallowInsecureCharsInRegExp>
