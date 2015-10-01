@@ -133,7 +133,7 @@
         };
 
         $scope.isDirty = function () {
-            if ($scope.originalConfigs === null || $scope.configs === null) {
+            if (!$scope.originalConfigs || !$scope.configs) {
                 return false;
             }
             return !angular.equals($scope.originalConfigs, $scope.configs);
