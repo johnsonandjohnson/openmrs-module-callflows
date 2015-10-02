@@ -32,11 +32,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+
+import com.google.common.collect.Sets;
 
 /**
  * Call Service Implementation
@@ -50,9 +51,9 @@ public class CallServiceImpl implements CallService {
 
     private static final String FAILURE = "failure";
 
-    public static final List<Integer> ACCEPTABLE_IVR_RESPONSE_STATUSES = Arrays.asList(HttpStatus.SC_OK,
-                                                                                       HttpStatus.SC_ACCEPTED,
-                                                                                       HttpStatus.SC_CREATED);
+    public static final Set<Integer> ACCEPTABLE_IVR_RESPONSE_STATUSES = Sets.newHashSet(HttpStatus.SC_OK,
+                                                                                        HttpStatus.SC_ACCEPTED,
+                                                                                        HttpStatus.SC_CREATED);
     @Autowired
     private CallDataService callDataService;
 
@@ -257,7 +258,7 @@ public class CallServiceImpl implements CallService {
         String startNode = flow.getNodes().get(0).getStep();
 
         // create the call
-        return this.create(config.getName(), callFlow, startNode, CallDirection.OUTGOING, actorId, actorType, context);
+        return create(config.getName(), callFlow, startNode, CallDirection.OUTGOING, actorId, actorType, context);
     }
 
     private void makeOutboundRequest(HttpUriRequest request, Call call, Map<String, Object> params) throws IOException {
