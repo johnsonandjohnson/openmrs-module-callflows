@@ -7,6 +7,14 @@ import com.janssen.connectforlife.callflows.domain.Config;
 import com.janssen.connectforlife.callflows.domain.Renderer;
 import com.janssen.connectforlife.callflows.domain.flow.Node;
 import com.janssen.connectforlife.callflows.domain.flow.UserNode;
+import com.janssen.connectforlife.callflows.domain.types.CallDirection;
+import com.janssen.connectforlife.callflows.domain.types.CallStatus;
+import com.janssen.connectforlife.callflows.event.Events;
+import com.janssen.connectforlife.callflows.repository.CallDataService;
+
+import org.motechproject.event.MotechEvent;
+import org.motechproject.scheduler.contract.RunOnceSchedulableJob;
+import org.motechproject.scheduler.service.MotechSchedulerService;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -17,24 +25,31 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.exception.VelocityException;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ClassUtils;
+import javax.naming.OperationNotSupportedException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Collection of utility methods in managing and handling calls
@@ -62,7 +77,20 @@ public class CallUtil {
 
     private static final String REPLACEMENT_PATTERN = "[%s]";
 
+    private static final String PARAM_RETRY_ATTEMPTS = "retryAttempts";
+
+    private static final String PARAM_JOB_ID = "JobID";
+
     private ObjectMapper objectMapper = new ObjectMapper();
+
+    private static final Collection<CallStatus> ACTIVE_OUTBOUND_CALL_STATUSES = Arrays
+            .asList(CallStatus.INITIATED, CallStatus.IN_PROGRESS, CallStatus.MOTECH_INITIATED);
+
+    @Autowired
+    private CallDataService callDataService;
+
+    @Autowired
+    private MotechSchedulerService schedulerService;
 
 
     /**
@@ -232,17 +260,45 @@ public class CallUtil {
     }
 
     /**
-     * Hook before a call can be made
-     * @param call object
+     * Hook before a call can be made. Checks outbound call limit and number of retries before placing the call
+     *
+     * @param call   object
      * @param config to use
      * @param params that were passed during call initiation
-     * @return true or false indicating whether call can be made
+     * @throws OperationNotSupportedException when the call can not be placed
      */
-    public boolean checkCallCanBePlaced(Call call, Config config, Map<String, Object> params) {
-        //todo:
-        return true;
-    }
+    public void checkCallCanBePlaced(Call call, Config config, Map<String, Object> params)
+            throws OperationNotSupportedException {
 
+        int retryAttempts = 0;
+        LOGGER.debug("pre-call-hook => call : {}, config: {}, params: {}", call, config, params);
+
+        // Only if outbound call limit is set, we have to worry about no of active calls, retries, etc
+        if (config.getOutboundCallLimit() > 0) {
+            // Check how many current active calls are there
+            Set<CallStatus> callStatusSet = new HashSet<>(ACTIVE_OUTBOUND_CALL_STATUSES);
+            long currentOutboundCallCount = callDataService
+                    .countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet);
+            // Do we have enough bandwidth to make this call?
+            if (currentOutboundCallCount >= config.getOutboundCallLimit()) {
+                // No we don't!
+                // So let's retry after some time and check again
+                // but before that how many retries have we made?
+                retryAttempts = (int) params.get(PARAM_RETRY_ATTEMPTS);
+                if (retryAttempts >= config.getOutboundCallRetryAttempts()) {
+                    // We have exceeded anyway , so only one thing to do
+                    if (!config.getCallAllowed()) {
+                        throw new OperationNotSupportedException("Outbound call limit is exceeded");
+                    }
+                    // otherwise we allow the call to do even though retries have been exceeded cause the configuration says so!
+                } else {
+                    // retry after some time
+                    params.put(PARAM_RETRY_ATTEMPTS, retryAttempts + 1);
+                    scheduleOutboundCall(call.getCallId(), config.getOutboundCallRetrySeconds(), params);
+                }
+            }
+        }
+    }
 
     /**
      * Builds a outbound call request for a given phone number and a created call using a specific configuration
@@ -252,7 +308,7 @@ public class CallUtil {
      * The outbound URL can also have placeholders in the form of [variable] and
      * those will be replaced from the parameters available before creating the request
      * Additionally the callId and phone can also be used as part of this syntax as [internal.callId] and [internal.phone]
-     *
+     * <p/>
      * Note: This method was inspired and adapted from the MOTECH IVR module
      *
      * @param phone  to call
@@ -312,8 +368,9 @@ public class CallUtil {
 
     /**
      * Merges a URI string by replacing params in the form [x] with actual values
+     *
      * @param uriTemplate to replace
-     * @param params to use during replace
+     * @param params      to use during replace
      * @return a replaced string
      */
     public String mergeUriAndRemoveParams(String uriTemplate, Map<String, Object> params) {
@@ -364,6 +421,14 @@ public class CallUtil {
         }
     }
 
+    private void scheduleOutboundCall(String callId, int retrySeconds, Map<String, Object> params) {
+        Map<String, Object> eventParams = new HashMap<>();
+        eventParams.putAll(params);
+        eventParams.put(PARAM_JOB_ID, callId);
+        MotechEvent motechEvent = new MotechEvent(Events.CALLFLOWS_OUTBOUND_CALL, eventParams);
+        schedulerService.scheduleRunOnceJob(
+                new RunOnceSchedulableJob(motechEvent, DateTime.now().plusSeconds(retrySeconds).toDate()));
+    }
 }
 
 

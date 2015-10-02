@@ -25,6 +25,14 @@ public class Config {
      */
     private String outgoingCallMethod;
 
+    private int outboundCallLimit;
+
+    private int outboundCallRetrySeconds;
+
+    private int outboundCallRetryAttempts;
+
+    private Boolean callAllowed;
+
     /**
      * A map of OSGI services that can be used in the callflows
      * The key is the friendly name to use in the templates and the value is the fully qualified name of the OSGI interface
@@ -62,6 +70,38 @@ public class Config {
 
     public void setOutgoingCallMethod(String outgoingCallMethod) {
         this.outgoingCallMethod = outgoingCallMethod;
+    }
+
+    public int getOutboundCallLimit() {
+        return outboundCallLimit;
+    }
+
+    public void setOutboundCallLimit(int outboundCallLimit) {
+        this.outboundCallLimit = outboundCallLimit;
+    }
+
+    public int getOutboundCallRetrySeconds() {
+        return outboundCallRetrySeconds;
+    }
+
+    public void setOutboundCallRetrySeconds(int outboundCallRetrySeconds) {
+        this.outboundCallRetrySeconds = outboundCallRetrySeconds;
+    }
+
+    public int getOutboundCallRetryAttempts() {
+        return outboundCallRetryAttempts;
+    }
+
+    public void setOutboundCallRetryAttempts(int outboundCallRetryAttempts) {
+        this.outboundCallRetryAttempts = outboundCallRetryAttempts;
+    }
+
+    public Boolean getCallAllowed() {
+        return callAllowed;
+    }
+
+    public void setCallAllowed(Boolean callAllowed) {
+        this.callAllowed = callAllowed;
     }
 
     public Map<String, String> getServicesMap() {

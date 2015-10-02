@@ -30,6 +30,12 @@
             <artifactId>motech-platform-server-config</artifactId>
         </dependency>
 
+        <!--scheduler -->
+        <dependency>
+            <groupId>${motech.groupId}</groupId>
+            <artifactId>motech-scheduler</artifactId>
+        </dependency>
+
         <!-- OSGi IT -->
         <dependency>
             <groupId>${motech.groupId}</groupId>

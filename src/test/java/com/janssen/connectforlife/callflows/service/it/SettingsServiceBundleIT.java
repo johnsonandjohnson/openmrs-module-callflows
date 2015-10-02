@@ -102,10 +102,18 @@ public class SettingsServiceBundleIT extends BasePaxIT {
         assertThat(voxeo.getName(), equalTo(Constants.CONFIG_VOXEO));
         assertThat(voxeo.getOutgoingCallMethod(), equalTo(Constants.CONFIG_VOXEO_METHOD));
         assertThat(voxeo.getOutgoingCallUriTemplate(), equalTo(Constants.CONFIG_VOXEO_OUT_TEMPLATE));
+        assertThat(voxeo.getOutboundCallLimit(), equalTo(Constants.CONFIG_VOXEO_OUTBOUND_CALL_LIMIT));
+        assertThat(voxeo.getOutboundCallRetryAttempts(), equalTo(Constants.CONFIG_VOXEO_OUTBOUND_CALL_RETRY_ATTEMPTS));
+        assertThat(voxeo.getOutboundCallRetrySeconds(), equalTo(Constants.CONFIG_VOXEO_OUTBOUND_CALL_RETRY_SECONDS));
+        assertThat(voxeo.getCallAllowed(), equalTo(Constants.CONFIG_VOXEO_CAN_PLACE_OUTBOUND_CALL));
 
         assertThat(yo.getName(), equalTo(Constants.CONFIG_YO));
         assertThat(yo.getOutgoingCallMethod(), equalTo(Constants.CONFIG_YO_METHOD));
         assertThat(yo.getOutgoingCallUriTemplate(), equalTo(Constants.CONFIG_YO_OUT_TEMPLATE));
+        assertThat(voxeo.getOutboundCallLimit(), equalTo(Constants.CONFIG_YO_OUTBOUND_CALL_LIMIT));
+        assertThat(voxeo.getOutboundCallRetryAttempts(), equalTo(Constants.CONFIG_YO_OUTBOUND_CALL_RETRY_ATTEMPTS));
+        assertThat(voxeo.getOutboundCallRetrySeconds(), equalTo(Constants.CONFIG_YO_OUTBOUND_CALL_RETRY_SECONDS));
+        assertThat(voxeo.getCallAllowed(), equalTo(Constants.CONFIG_YO_CAN_PLACE_OUTBOUND_CALL));
     }
 
     @Test
