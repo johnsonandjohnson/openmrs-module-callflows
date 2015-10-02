@@ -9,7 +9,7 @@ public final class Events {
 
     public static final String CALLFLOWS_INITIATE_CALL = "callflows-call-initiate";
 
-    public static final String CALLFLOWS_OUTBOUND_CALL = "CALLFLOWS-" + "outbound";
+    public static final String CALLFLOWS_OUTBOUND_CALL = "callflows-outbound";
 
     // private constructor
     private Events() {

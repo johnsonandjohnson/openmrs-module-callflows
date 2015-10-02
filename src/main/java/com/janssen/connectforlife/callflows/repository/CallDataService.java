@@ -8,9 +8,8 @@ import org.motechproject.mds.annotations.Lookup;
 import org.motechproject.mds.annotations.LookupField;
 import org.motechproject.mds.service.MotechDataService;
 
+import java.util.List;
 import java.util.Set;
-
-import static org.motechproject.mds.util.Constants.Operators.MATCHES;
 
 /**
  * Call Data Service
@@ -29,13 +28,24 @@ public interface CallDataService extends MotechDataService<Call> {
     Call findByCallId(@LookupField(name = "callId") String callId);
 
     /**
+     * Find the calls based on the call direction and call status
+     *
+     * @param direction A direction of a call with respect to the system
+     * @param statusSet The set of IVR Call status
+     * @return list of calls for the specified Call direction and Call status
+     */
+    @Lookup
+    List<Call> findCallsByDirectionAndStatus(@LookupField(name = "direction") CallDirection direction,
+                                             @LookupField(name = "status") Set<CallStatus> statusSet);
+
+    /**
      * Find the call count based on the call direction and call status
      *
      * @param direction A direction of a call with respect to the system
      * @param statusSet The set of IVR Call status
      * @return call count for the specified Call direction and Call status
      */
-    int findCallCountByStatus(@LookupField(name = "direction", customOperator = MATCHES) CallDirection direction,
-                              @LookupField(name = "status") Set<CallStatus> statusSet);
+    long countFindCallsByDirectionAndStatus(@LookupField(name = "direction") CallDirection direction,
+                                            @LookupField(name = "status") Set<CallStatus> statusSet);
 
 }

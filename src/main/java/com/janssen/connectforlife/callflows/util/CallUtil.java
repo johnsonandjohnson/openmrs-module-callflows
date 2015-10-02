@@ -260,10 +260,12 @@ public class CallUtil {
     }
 
     /**
+     * Hook before a call can be made. Checks outbound call limit and number of retries before placing the call
+     *
      * @param call   object
      * @param config to use
      * @param params that were passed during call initiation
-     * @throws OperationNotSupportedException
+     * @throws OperationNotSupportedException when the call can not be placed
      */
     public void checkCallCanBePlaced(Call call, Config config, Map<String, Object> params)
             throws OperationNotSupportedException {
@@ -276,7 +278,7 @@ public class CallUtil {
             // Check how many current active calls are there
             Set<CallStatus> callStatusSet = new HashSet<>(ACTIVE_OUTBOUND_CALL_STATUSES);
             long currentOutboundCallCount = callDataService
-                    .findCallCountByStatus(CallDirection.OUTGOING, callStatusSet);
+                    .countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet);
             // Do we have enough bandwidth to make this call?
             if (currentOutboundCallCount >= config.getOutboundCallLimit()) {
                 // No we don't!

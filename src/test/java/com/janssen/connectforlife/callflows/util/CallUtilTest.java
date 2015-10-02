@@ -266,7 +266,7 @@ public class CallUtilTest extends BaseTest {
 
         //Then
         verify(config, times(2)).getOutboundCallLimit();
-        verify(callDataService, times(1)).findCallCountByStatus(CallDirection.OUTGOING, callStatusSet);
+        verify(callDataService, times(1)).countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet);
         verifyZeroInteractions(schedulerService);
     }
 
@@ -275,7 +275,7 @@ public class CallUtilTest extends BaseTest {
             throws OperationNotSupportedException {
         //Given
         given(config.getOutboundCallLimit()).willReturn(5);
-        given(callDataService.findCallCountByStatus(CallDirection.OUTGOING, callStatusSet)).willReturn(10);
+        given(callDataService.countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet)).willReturn(10L);
         eventParams.put(Constants.PARAM_JOB_ID, outboundCall.getCallId());
         eventParams.put(Constants.PARAM_RETRY_ATTEMPTS, 1);
         given(config.getOutboundCallRetryAttempts()).willReturn(5);
@@ -286,7 +286,7 @@ public class CallUtilTest extends BaseTest {
 
         //Then
         verify(config, times(2)).getOutboundCallLimit();
-        verify(callDataService, times(1)).findCallCountByStatus(CallDirection.OUTGOING, callStatusSet);
+        verify(callDataService, times(1)).countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet);
         assertThat(eventParams.get(Constants.PARAM_RETRY_ATTEMPTS).toString(), equalTo("2"));
         verify(schedulerService, times(1)).scheduleRunOnceJob(new RunOnceSchedulableJob(motechEvent, DateTime.now()
                                                                                                              .plusSeconds(
@@ -299,7 +299,7 @@ public class CallUtilTest extends BaseTest {
             throws OperationNotSupportedException {
         //Given
         given(config.getOutboundCallLimit()).willReturn(5);
-        given(callDataService.findCallCountByStatus(CallDirection.OUTGOING, callStatusSet)).willReturn(10);
+        given(callDataService.countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet)).willReturn(10L);
         eventParams.put(Constants.PARAM_JOB_ID, outboundCall.getCallId());
         eventParams.put(Constants.PARAM_RETRY_ATTEMPTS, 6);
         given(config.getOutboundCallRetryAttempts()).willReturn(5);
@@ -310,7 +310,7 @@ public class CallUtilTest extends BaseTest {
 
         //Then
         verify(config, times(2)).getOutboundCallLimit();
-        verify(callDataService, times(1)).findCallCountByStatus(CallDirection.OUTGOING, callStatusSet);
+        verify(callDataService, times(1)).countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet);
         verifyZeroInteractions(schedulerService);
     }
 
@@ -319,7 +319,7 @@ public class CallUtilTest extends BaseTest {
             throws OperationNotSupportedException {
         //Given
         given(config.getOutboundCallLimit()).willReturn(5);
-        given(callDataService.findCallCountByStatus(CallDirection.OUTGOING, callStatusSet)).willReturn(10);
+        given(callDataService.countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet)).willReturn(10L);
         eventParams.put(Constants.PARAM_JOB_ID, outboundCall.getCallId());
         eventParams.put(Constants.PARAM_RETRY_ATTEMPTS, 6);
         given(config.getOutboundCallRetryAttempts()).willReturn(5);
@@ -331,7 +331,7 @@ public class CallUtilTest extends BaseTest {
 
         //Then
         verify(config, times(2)).getOutboundCallLimit();
-        verify(callDataService, times(1)).findCallCountByStatus(CallDirection.OUTGOING, callStatusSet);
+        verify(callDataService, times(1)).countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet);
         verifyZeroInteractions(schedulerService);
     }
 }
