@@ -33,4 +33,5 @@
 
     <osgi:reference id="configServiceRef" interface="org.motechproject.config.service.ConfigurationService"/>
 
+    <osgi:reference id="eventRelay" interface="org.motechproject.event.listener.EventRelay"/>
 </beans>

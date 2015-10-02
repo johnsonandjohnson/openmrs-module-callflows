@@ -130,6 +130,16 @@
             <version>1.4.9</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- Libraries -->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>com.springsource.org.apache.httpcomponents.httpcore</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>com.springsource.org.apache.httpcomponents.httpclient</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

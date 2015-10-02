@@ -3,13 +3,18 @@ package com.janssen.connectforlife.callflows.service.it;
 import com.janssen.connectforlife.callflows.Constants;
 import com.janssen.connectforlife.callflows.domain.Call;
 import com.janssen.connectforlife.callflows.domain.CallFlow;
+import com.janssen.connectforlife.callflows.domain.Config;
 import com.janssen.connectforlife.callflows.domain.types.CallDirection;
+import com.janssen.connectforlife.callflows.domain.types.CallStatus;
 import com.janssen.connectforlife.callflows.helper.CallFlowHelper;
 import com.janssen.connectforlife.callflows.helper.CallHelper;
+import com.janssen.connectforlife.callflows.helper.ConfigHelper;
 import com.janssen.connectforlife.callflows.repository.CallDataService;
 import com.janssen.connectforlife.callflows.repository.CallFlowDataService;
 import com.janssen.connectforlife.callflows.service.CallService;
+import com.janssen.connectforlife.callflows.service.SettingsService;
 import com.janssen.connectforlife.callflows.util.CallAssert;
+import com.janssen.connectforlife.callflows.util.TestUtil;
 
 import org.motechproject.testing.osgi.BasePaxIT;
 import org.motechproject.testing.osgi.container.MotechNativeTestContainerFactory;
@@ -23,9 +28,12 @@ import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerSuite;
 import javax.inject.Inject;
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import static junit.framework.Assert.assertNull;
 import static junit.framework.TestCase.assertNotNull;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -47,6 +55,9 @@ public class CallServiceBundleIT extends BasePaxIT {
     private CallDataService callDataService;
 
     @Inject
+    private SettingsService settingsService;
+
+    @Inject
     private CallFlowDataService callFlowDataService;
 
     private CallFlow mainFlow;
@@ -59,10 +70,16 @@ public class CallServiceBundleIT extends BasePaxIT {
 
     private Map<String, String> providerData;
 
+    private List<Config> configs;
+
+    private Config voxeo;
+
     @Before
-    public void setUp() {
+    public void setUp() throws IOException {
         // create a call flow
-        mainFlow = callFlowDataService.create(CallFlowHelper.createMainFlow());
+        mainFlow = CallFlowHelper.createMainFlow();
+        mainFlow.setRaw(TestUtil.loadFile("main_flow.json"));
+        mainFlow = callFlowDataService.create(mainFlow);
 
         // link the call flow to a inbound
         inboundCall = CallHelper.createInboundCall();
@@ -80,6 +97,12 @@ public class CallServiceBundleIT extends BasePaxIT {
 
         params = CallHelper.createParams();
         providerData = new HashMap<>();
+
+        // and config
+        configs = ConfigHelper.createConfigs();
+        voxeo = configs.get(0);
+        voxeo.setOutgoingCallUriTemplate("http://www.google.com");
+        settingsService.updateConfigs(configs);
     }
 
     @After
@@ -229,6 +252,81 @@ public class CallServiceBundleIT extends BasePaxIT {
         Call updatedCall = callService.update(outboundCall);
 
         // Then we expect an expection
+    }
+
+    @Test
+    public void shouldMakeCall() {
+        // Given
+        params.put("phone", "1234567890");
+        // Just need a url that returns a 200 response, for lack of imagination we point to google :)
+        voxeo.setOutgoingCallUriTemplate("http://www.google.com");
+        settingsService.updateConfigs(configs);
+        // When
+        Call call = callService.makeCall(Constants.CONFIG_VOXEO, Constants.CALLFLOW_MAIN, params);
+
+        // Then
+        assertNotNull(call);
+        assertThat(call.getStatus(), equalTo(CallStatus.MOTECH_INITIATED));
+    }
+
+    @Test
+    public void shouldNotMakeCallForNullPhone() {
+        // Given
+        params.put("phone", null);
+        // When
+        Call call = callService.makeCall(Constants.CONFIG_VOXEO, Constants.CALLFLOW_MAIN, params);
+
+        // Then
+        assertNull(call);
+    }
+
+    @Test
+    public void shouldNotMakeCallForEmptyPhone() {
+        // Given
+        params.put("phone", "");
+        // When
+        Call call = callService.makeCall(Constants.CONFIG_VOXEO, Constants.CALLFLOW_MAIN, params);
+
+        // Then
+        assertNull(call);
+
+    }
+
+    @Test
+    public void shouldNotMakeCallIfBadConfigWasProvidedInMakeCall() {
+        // Given
+        params.put("phone", "1234567890");
+        // When
+        Call call = callService.makeCall(Constants.CONFIG_VOXEO + "Bad", Constants.CALLFLOW_MAIN, params);
+
+        // Then
+        assertNull(call);
+    }
+
+    @Test
+    public void shouldNotMakeCallIfBadCallFlowWasProvidedInMakeCall() {
+        // Given
+        params.put("phone", "1234567890");
+        // When
+        Call call = callService.makeCall(Constants.CONFIG_VOXEO, Constants.CALLFLOW_MAIN + "Bad", params);
+
+        // Then
+        assertNull(call);
+    }
+
+    @Test
+    public void shouldMakeCallFailedIfHttpStatusFromProviderIsNotAcceptable() {
+        // Given
+        params.put("phone", "1234567890");
+        voxeo.setOutgoingCallUriTemplate("http://localhost/should-return-404");
+        settingsService.updateConfigs(configs);
+
+        // When
+        Call call = callService.makeCall(Constants.CONFIG_VOXEO, Constants.CALLFLOW_MAIN, params);
+
+        // Then
+        assertNotNull(call);
+        assertThat(call.getStatus(), equalTo(CallStatus.FAILED));
     }
 
 }

@@ -8,19 +8,32 @@ import com.janssen.connectforlife.callflows.domain.Renderer;
 import com.janssen.connectforlife.callflows.domain.flow.Node;
 import com.janssen.connectforlife.callflows.domain.flow.UserNode;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.exception.VelocityException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ClassUtils;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -46,6 +59,8 @@ public class CallUtil {
     private static final MediaType DEFAULT_MEDIA_TYPE = new MediaType("text", "plain", UTF8_CHARSET);
 
     private static final MediaType JSON_MEDIA_TYPE = new MediaType("application", JSON, UTF8_CHARSET);
+
+    private static final String REPLACEMENT_PATTERN = "[%s]";
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -214,6 +229,106 @@ public class CallUtil {
         }
         // The rest are all 500 errors for now
         return HttpStatus.INTERNAL_SERVER_ERROR;
+    }
+
+    /**
+     * Hook before a call can be made
+     * @param call object
+     * @param config to use
+     * @param params that were passed during call initiation
+     * @return true or false indicating whether call can be made
+     */
+    public boolean checkCallCanBePlaced(Call call, Config config, Map<String, Object> params) {
+        //todo:
+        return true;
+    }
+
+
+    /**
+     * Builds a outbound call request for a given phone number and a created call using a specific configuration
+     * The configuration's outbound URL is used to place the call, if a test user's URL is not registered
+     * If a test user's URL is registered in the IVR configuration, it over-rides the generic configuration URL
+     * <p/>
+     * The outbound URL can also have placeholders in the form of [variable] and
+     * those will be replaced from the parameters available before creating the request
+     * Additionally the callId and phone can also be used as part of this syntax as [internal.callId] and [internal.phone]
+     *
+     * Note: This method was inspired and adapted from the MOTECH IVR module
+     *
+     * @param phone  to call
+     * @param call   created
+     * @param config to use while making the call
+     * @param params that are associated with this call
+     * @return
+     */
+    public HttpUriRequest buildOutboundRequest(String phone, Call call, Config config, Map<String, Object> params)
+            throws URISyntaxException {
+        // parameters that will be used for replacement in the IVR outbound URL
+        // Just because all parameters are available doesn't mean that all should be sent
+        // Mostly only callId, jumpTo are required
+        // Use discretion accordingly while setting the outbound call url in the configuration
+        Map<String, Object> completeParams = new HashMap<>();
+
+        completeParams.putAll(params);
+        completeParams.put("internal.callId", call.getCallId());
+        completeParams.put("internal.jumpTo", call.getStartFlow().getName());
+
+        // The uri can be a test user's URI that can connect to a individual simulator
+        // or the IVR provider's actual outbound Uri set globally in the configuration
+        // If a test user is set, it will always over-ride the value set in the global configuration
+        String uri;
+        Map<String, String> testUsersMap = config.getTestUsersMap();
+
+        if (testUsersMap != null && testUsersMap.containsKey(phone)) {
+            LOGGER.debug("TestURL for user, phone = {}, url = {}", phone, testUsersMap.get(phone));
+            uri = mergeUriAndRemoveParams(config.getTestUsersMap().get(phone), completeParams);
+        } else {
+            uri = mergeUriAndRemoveParams(config.getOutgoingCallUriTemplate(), completeParams);
+        }
+        LOGGER.debug("user = {}, uri = {}", phone, uri);
+
+        HttpUriRequest request;
+        URIBuilder builder;
+        try {
+            builder = new URIBuilder(uri);
+
+            if (HttpMethod.GET.name().equals(config.getOutgoingCallMethod())) {
+                request = new HttpGet(builder.build());
+            } else {
+                List<NameValuePair> postParameters = new ArrayList<>();
+                HttpPost post = new HttpPost(uri);
+                //todo: add params
+                post.setEntity(new UrlEncodedFormEntity(postParameters));
+                request = post;
+            }
+        } catch (URISyntaxException | UnsupportedEncodingException e) {
+            throw new IllegalArgumentException("Unexpected error creating a URI", e);
+        }
+
+        LOGGER.debug("Generated {} for call {}", request.toString(), call.getCallId());
+
+        return request;
+    }
+
+    /**
+     * Merges a URI string by replacing params in the form [x] with actual values
+     * @param uriTemplate to replace
+     * @param params to use during replace
+     * @return a replaced string
+     */
+    public String mergeUriAndRemoveParams(String uriTemplate, Map<String, Object> params) {
+        String mergedURI = uriTemplate;
+
+        Iterator<Map.Entry<String, Object>> it = params.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<String, Object> entry = it.next();
+            String placeholder = String.format(REPLACEMENT_PATTERN, entry.getKey());
+            if (mergedURI.contains(placeholder)) {
+                mergedURI = mergedURI.replace(placeholder, entry.getValue().toString());
+                it.remove();
+            }
+        }
+        return mergedURI;
     }
 
     private String buildJsonResponse(Exception error, String content, Node node, Call call) throws IOException {

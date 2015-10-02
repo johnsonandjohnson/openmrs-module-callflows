@@ -135,4 +135,8 @@ public final class Constants {
     public static final String XML_OK_RESPONSE = "<?xml version=\"1.0\"?><response>OK</response>";
 
     public static final String XML_ERROR_RESPONSE = "<?xml version=\"1.0\"?><response>ERROR</response>";
+
+    public static final String TEST_PARAM = "testParam";
+
+    public static final String TEST_VALUE = "testValue";
 }

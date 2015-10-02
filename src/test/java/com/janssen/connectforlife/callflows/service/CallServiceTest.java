@@ -4,13 +4,31 @@ import com.janssen.connectforlife.callflows.BaseTest;
 import com.janssen.connectforlife.callflows.Constants;
 import com.janssen.connectforlife.callflows.domain.Call;
 import com.janssen.connectforlife.callflows.domain.CallFlow;
+import com.janssen.connectforlife.callflows.domain.Config;
+import com.janssen.connectforlife.callflows.domain.flow.Flow;
 import com.janssen.connectforlife.callflows.domain.types.CallDirection;
+import com.janssen.connectforlife.callflows.event.Events;
 import com.janssen.connectforlife.callflows.helper.CallFlowHelper;
 import com.janssen.connectforlife.callflows.helper.CallHelper;
+import com.janssen.connectforlife.callflows.helper.ConfigHelper;
+import com.janssen.connectforlife.callflows.helper.FlowHelper;
 import com.janssen.connectforlife.callflows.repository.CallDataService;
 import com.janssen.connectforlife.callflows.service.impl.CallServiceImpl;
 import com.janssen.connectforlife.callflows.util.CallAssert;
+import com.janssen.connectforlife.callflows.util.CallUtil;
+import com.janssen.connectforlife.callflows.util.TestUtil;
 
+import org.motechproject.event.MotechEvent;
+import org.motechproject.event.listener.EventRelay;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.ProtocolVersion;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.entity.BasicHttpEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicHttpResponse;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -20,21 +38,27 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import static junit.framework.Assert.assertNull;
 import static junit.framework.TestCase.assertNotNull;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 
 /**
  * Call Service Test
@@ -42,7 +66,7 @@ import static org.mockito.Mockito.verify;
  * @author bramak09
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ CallServiceImpl.class, DateTime.class, UUID.class })
+@PrepareForTest({ CallServiceImpl.class, DateTime.class, UUID.class, DefaultHttpClient.class })
 public class CallServiceTest extends BaseTest {
 
     @Mock
@@ -51,32 +75,114 @@ public class CallServiceTest extends BaseTest {
     @InjectMocks
     private CallService callService = new CallServiceImpl();
 
+    @Mock
+    private FlowService flowService;
+
+    @Mock
+    private CallFlowService callFlowService;
+
+    @Mock
+    private SettingsService settingsService;
+
+    @Spy
+    @InjectMocks
+    private CallUtil callUtil = new CallUtil();
+
     private Call inboundCall;
 
     private Call outboundCall;
 
     private CallFlow mainFlow;
 
+    private Flow flow;
+
     private Map<String, Object> params;
+
+    private Map<String, Object> errorParams;
 
     private Map<String, String> providerData;
 
+    private Config voxeo;
+
     private DateTimeFormatter formatter = DateTimeFormat.forPattern(Constants.DATE_FORMAT);
 
+    @Mock
+    private DefaultHttpClient client;
+
+    private HttpResponse okResponse;
+
+    private HttpResponse notFoundResponse;
+
+    private HttpResponse failureResponse;
+
+    private HttpResponse badResponse;
+
+    @Mock
+    private EventRelay eventRelay;
+
+    private MotechEvent callFailedEvent;
+
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
         PowerMockito.mockStatic(DateTime.class);
         PowerMockito.mockStatic(UUID.class);
+        PowerMockito.mockStatic(DefaultHttpClient.class);
 
         params = CallHelper.createParams();
+        errorParams = new HashMap<>();
         providerData = new HashMap<>();
 
         mainFlow = CallFlowHelper.createMainFlow();
+        String raw = TestUtil.loadFile("main_flow.json");
+        flow = FlowHelper.createFlow(raw);
 
         inboundCall = CallHelper.createInboundCall();
         outboundCall = CallHelper.createOutboundCall();
 
+        voxeo = ConfigHelper.createConfigs().get(0);
+
+        given(callFlowService.findByName(Constants.CALLFLOW_MAIN)).willReturn(mainFlow);
+        given(callFlowService.findByName(Constants.CALLFLOW_MAIN2)).willThrow(new IllegalArgumentException("Bad!"));
+
+        given(settingsService.getConfig(Constants.CONFIG_VOXEO)).willReturn(voxeo);
+        given(settingsService.getConfig(Constants.CONFIG_YO)).willThrow(new IllegalArgumentException("Bad!"));
+        given(flowService.load(Constants.CALLFLOW_MAIN)).willReturn(flow);
+
         given(DateTime.now()).willReturn(formatter.parseDateTime(Constants.DATE_CURRENT));
+
+        PowerMockito.whenNew(DefaultHttpClient.class).withNoArguments().thenReturn(client);
+
+        BasicHttpEntity okEntity = new BasicHttpEntity();
+        okEntity.setContent(IOUtils.toInputStream("OK"));
+        okResponse = new BasicHttpResponse(new ProtocolVersion("HTTP", 1, 1), 200, "OK");
+        okResponse.setEntity(okEntity);
+
+        BasicHttpEntity errorEntity = new BasicHttpEntity();
+        errorEntity.setContent(IOUtils.toInputStream("ERROR"));
+        notFoundResponse = new BasicHttpResponse(new ProtocolVersion("HTTP", 1, 1), 404, "ERROR");
+        notFoundResponse.setEntity(errorEntity);
+
+        BasicHttpEntity failureEntity = new BasicHttpEntity();
+        failureEntity.setContent(IOUtils.toInputStream("failure: unknown error"));
+        failureResponse = new BasicHttpResponse(new ProtocolVersion("HTTP", 1, 1), 200, "OK");
+        failureResponse.setEntity(failureEntity);
+
+        BasicHttpEntity badEntity = new BasicHttpEntity();
+        badEntity.setContent(null);
+        badResponse = new BasicHttpResponse(new ProtocolVersion("HTTP", 1, 1), 200, "OK");
+        badResponse.setEntity(badEntity);
+
+        // Given a request to make a call for a flow named MainFlow using voxeo config for a phone 1234567890
+        given(UUID.randomUUID()).willReturn(Constants.OUTBOUND_CALL_ID);
+        ArgumentCaptor<Call> callArgumentCaptor = ArgumentCaptor.forClass(Call.class);
+        ArgumentCaptor<HttpUriRequest> request = ArgumentCaptor.forClass(HttpUriRequest.class);
+        given(callDataService.create(callArgumentCaptor.capture())).willReturn(outboundCall);
+
+        errorParams.putAll(params);
+        errorParams.put("phone", null);
+        errorParams.put("callId", "UNKNOWN");
+        errorParams.put("error", "Empty Phone no while initiating a outbound call for flow MainFlow");
+        callFailedEvent = new MotechEvent(Events.CALLFLOWS_FAILED_CALL, errorParams);
     }
 
     @Test
@@ -296,4 +402,175 @@ public class CallServiceTest extends BaseTest {
         }
     }
 
+    @Test
+    public void shouldMakeCall() throws IOException, URISyntaxException {
+        // Given
+        given(client.execute(any(HttpGet.class))).willReturn(okResponse);
+        params.put("phone", "1234567890");
+
+        // When
+        Call call = callService.makeCall(Constants.CONFIG_VOXEO, Constants.CALLFLOW_MAIN, params);
+
+        // Then
+        assertNotNull(call);
+        // And callflow, config and flow must be loaded
+        assertAllLoaded();
+        // And we shouldn't have to update the call status, since we are creating it
+        verify(callDataService, never()).update(any(Call.class));
+        verify(callUtil, times(1)).buildOutboundRequest("1234567890", outboundCall, voxeo, params);
+        // And no failure , so no motech event to be sent
+        assertNoEventSent();
+    }
+
+    @Test
+    public void shouldNotMakeCallForNullPhone() throws IOException, URISyntaxException {
+        // Given
+        given(client.execute(any(HttpGet.class))).willReturn(okResponse);
+        params.put("phone", null);
+
+        // When
+        Call call = callService.makeCall(Constants.CONFIG_VOXEO, Constants.CALLFLOW_MAIN, params);
+
+        // Then
+        assertNull(call);
+        assertNoServiceInteractions();
+        assertEventSent(null, "Empty Phone no while initiating a outbound call for flow MainFlow", "UNKNOWN");
+    }
+
+    @Test
+    public void shouldNotMakeCallForEmptyPhone() throws IOException {
+        // Given
+        given(client.execute(any(HttpGet.class))).willReturn(okResponse);
+        params.put("phone", "");
+
+        // When
+        Call call = callService.makeCall(Constants.CONFIG_VOXEO, Constants.CALLFLOW_MAIN, params);
+
+        // Then
+        assertNull(call);
+        assertNoServiceInteractions();
+        assertEventSent("", "Empty Phone no while initiating a outbound call for flow MainFlow", "UNKNOWN");
+    }
+
+    @Test
+    public void shouldSendCallFailedEventIfBadConfigWasProvidedInMakeCall() throws IOException {
+        // Given
+        given(client.execute(any(HttpGet.class))).willReturn(okResponse);
+        params.put("phone", "1234567890");
+
+        // When
+        Call call = callService.makeCall(Constants.CONFIG_YO, Constants.CALLFLOW_MAIN, params);
+
+        // Then
+        assertNull(call);
+        verify(settingsService, times(1)).getConfig(Constants.CONFIG_YO);
+        verify(callFlowService, times(1)).findByName(Constants.CALLFLOW_MAIN);
+        verifyZeroInteractions(callDataService);
+        verifyZeroInteractions(flowService);
+        verifyZeroInteractions(callUtil);
+        assertEventSent("1234567890", "Bad!", "UNKNOWN");
+    }
+
+    @Test
+    public void shouldSendCallFailedEventIfBadCallFlowWasProvidedInMakeCall() throws IOException {
+        // Given
+        given(client.execute(any(HttpGet.class))).willReturn(okResponse);
+        params.put("phone", "1234567890");
+
+        // When
+        Call call = callService.makeCall(Constants.CONFIG_VOXEO, Constants.CALLFLOW_MAIN2, params);
+
+        // Then
+        assertNull(call);
+        verify(callFlowService, times(1)).findByName(Constants.CALLFLOW_MAIN2);
+        verify(settingsService, never()).getConfig(anyString());
+        verifyZeroInteractions(callDataService);
+        verifyZeroInteractions(flowService);
+        verifyZeroInteractions(callUtil);
+        assertEventSent("1234567890", "Bad!", "UNKNOWN");
+    }
+
+    @Test
+    public void shouldSendCallFailedIfHttpResponseFromProviderHasFailure() throws IOException, URISyntaxException {
+        // Given
+        given(client.execute(any(HttpGet.class))).willReturn(failureResponse);
+        params.put("phone", "1234567890");
+
+        // When
+        Call call = callService.makeCall(Constants.CONFIG_VOXEO, Constants.CALLFLOW_MAIN, params);
+
+        // Then
+        assertAllLoaded();
+        assertCallCreated();
+        verify(callDataService, times(1)).update(outboundCall);
+        verify(callUtil, times(1)).buildOutboundRequest("1234567890", outboundCall, voxeo, params);
+        assertEventSent("1234567890", "Unacceptable body: failure: unknown error", outboundCall.getCallId());
+    }
+
+    @Test
+    public void shouldSendCallFailedIfHttpStatusFromProviderIsNotAcceptable() throws IOException, URISyntaxException {
+        // Given
+        given(client.execute(any(HttpGet.class))).willReturn(notFoundResponse);
+        params.put("phone", "1234567890");
+
+        // When
+        Call call = callService.makeCall(Constants.CONFIG_VOXEO, Constants.CALLFLOW_MAIN, params);
+
+        // Then
+        assertAllLoaded();
+        assertCallCreated();
+        verify(callDataService, times(1)).update(outboundCall);
+        verify(callUtil, times(1)).buildOutboundRequest("1234567890", outboundCall, voxeo, params);
+        assertEventSent("1234567890", "Unacceptable status line: HTTP/1.1 404 ERROR", outboundCall.getCallId());
+    }
+
+    @Test
+    public void shouldSendCallFailedIfResponseFromProviderIsNotReadable() throws IOException, URISyntaxException {
+        // Given
+        given(client.execute(any(HttpGet.class))).willReturn(badResponse);
+        params.put("phone", "1234567890");
+
+        // When
+        Call call = callService.makeCall(Constants.CONFIG_VOXEO, Constants.CALLFLOW_MAIN, params);
+
+        // Then
+        assertAllLoaded();
+        verify(callDataService, times(1)).create(outboundCall);
+        verify(callDataService, times(1)).update(outboundCall);
+        verify(callUtil, times(1)).buildOutboundRequest("1234567890", outboundCall, voxeo, params);
+        assertEventSent("1234567890", "Content has not been provided", outboundCall.getCallId());
+    }
+
+    public void assertAllLoaded() {
+        verify(callFlowService, times(1)).findByName(Constants.CALLFLOW_MAIN);
+        verify(settingsService, times(1)).getConfig(Constants.CONFIG_VOXEO);
+        verify(flowService, times(1)).load(Constants.CALLFLOW_MAIN);
+    }
+
+    public void assertNoServiceInteractions() {
+        verifyZeroInteractions(callFlowService);
+        verifyZeroInteractions(settingsService);
+        verifyZeroInteractions(callDataService);
+        verifyZeroInteractions(flowService);
+        verifyZeroInteractions(callUtil);
+    }
+
+    public void assertCallCreated() {
+        verify(callDataService, times(1)).create(outboundCall);
+    }
+
+    public void assertCallNotCreated() {
+        verify(callDataService, never()).create(any(Call.class));
+    }
+
+    public void assertNoEventSent() {
+        verify(eventRelay, never()).sendEventMessage(any(MotechEvent.class));
+    }
+
+    public void assertEventSent(String phone, String reason, String callId) {
+        errorParams.put("error", reason);
+        errorParams.put("phone", phone);
+        errorParams.put("callId", callId);
+        verify(eventRelay, times(1)).sendEventMessage(callFailedEvent);
+    }
 }
