@@ -1,5 +1,6 @@
 package com.janssen.connectforlife.callflows.web;
 
+import com.janssen.connectforlife.callflows.contract.OutboundCallResponse;
 import com.janssen.connectforlife.callflows.domain.Call;
 import com.janssen.connectforlife.callflows.domain.CallFlow;
 import com.janssen.connectforlife.callflows.domain.Config;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
@@ -311,11 +313,28 @@ public class CallController extends RestController {
         return buildOutput(error, output, currentNode, call, extension, config);
     }
 
-    private ResponseEntity buildOutput(Exception error,
-                                       String output,
-                                       Node node,
-                                       Call call,
-                                       String extension,
+    /**
+     * REST API to initiate a outbound call
+     * This is used only for adhoc testing purposes, and is not intended to be used otherwise
+     *
+     * @param configName to use
+     * @param name       of the flow to invoke
+     * @param extension  to invoke
+     * @param params     a entry with key phone is required at the minimum
+     * @return an empty string if call could not be created or a json with callId, status and statusText for debugging purposes
+     */
+    @RequestMapping(value = "/out/{configName}/flows/{name}.{extension}", method = RequestMethod.GET)
+    @ResponseBody
+    public OutboundCallResponse handleOutgoing(@PathVariable String configName, @PathVariable String name,
+                                               @PathVariable String extension,
+                                               @RequestParam Map<String, Object> params) {
+        LOGGER.debug("handleOutgoing(config={}, name = {}, extension={}, params={}", configName, name, extension,
+                     params);
+        Call call = callService.makeCall(configName, name, params);
+        return call != null ? new OutboundCallResponse(call) : null;
+    }
+
+    private ResponseEntity buildOutput(Exception error, String output, Node node, Call call, String extension,
                                        Config config) {
         Renderer renderer = null;
         if (settingsService.hasRenderer(extension)) {

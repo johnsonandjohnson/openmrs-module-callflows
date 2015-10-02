@@ -631,6 +631,38 @@ public class CallControllerTest extends BaseTest {
         assertRendererForJson();
     }
 
+    /* Outbound Calls Test */
+    @Test
+    public void shouldReturnTheCallIdIfHandleOutboundCallWasSuccessful() throws Exception {
+        // Given
+        given(callService.makeCall(eq(Constants.CONFIG_VOXEO), eq(Constants.CALLFLOW_MAIN), any(Map.class))).willReturn(
+                outboundCall);
+
+        // When we make a outbound call request
+        mockMvc.perform(customGet("/out/voxeo/flows/MainFlow.vxml", "phone", "1234567890"))
+               .andExpect(status().is(HttpStatus.OK.value()))
+               .andExpect(content().string("{\"callId\":\"5c8f6f83-567c-4586-a3b6-368397d5aba8\",\"status\":\"MOTECH_INITIATED\",\"reason\":null}"));
+
+        // Then we should have tried to use the callService to initiate a call
+        verify(callService, times(1)).makeCall(eq(Constants.CONFIG_VOXEO), eq(Constants.CALLFLOW_MAIN), any(Map.class));
+
+    }
+
+    @Test
+    public void shouldReturnBlankIfHandleOutboundCallWasUnsuccessful() throws Exception {
+        // Given no mock, so callService.makeCall will return null
+
+        // When we make a outbound call request
+        mockMvc.perform(customGet("/out/voxeo/flows/MainFlow.vxml"))
+               .andExpect(status().is(HttpStatus.OK.value()))
+               .andExpect(content().string(""));
+
+        // Then we should have tried to use the callService to initiate a call
+        verify(callService, times(1)).makeCall(eq(Constants.CONFIG_VOXEO), eq(Constants.CALLFLOW_MAIN), any(Map.class));
+
+    }
+
+
     private void assertContext(VelocityContext context, String callId, String nextURL) {
         assertNotNull(context);
         assertTrue(context.containsKey("internal"));
