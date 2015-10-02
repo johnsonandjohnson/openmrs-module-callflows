@@ -1,7 +1,11 @@
 package com.janssen.connectforlife.callflows;
 
+import com.janssen.connectforlife.callflows.domain.types.CallStatus;
+
 import org.springframework.http.MediaType;
 import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.UUID;
 
 /**
@@ -46,6 +50,8 @@ public final class Constants {
 
     public static final String CALLFLOW_INVALID_PREFIX = "Xu";
 
+    public static final Collection<CallStatus> ACTIVE_OUTBOUND_CALL_STATUSES = Arrays
+            .asList(CallStatus.INITIATED, CallStatus.IN_PROGRESS, CallStatus.MOTECH_INITIATED);
     public static final String UPDATED = "-updated";
 
     public static final String VELOCITY = "velocity";
@@ -71,6 +77,22 @@ public final class Constants {
     public static final String CONFIG_VOXEO_USER_URL = "http://some-api-server/?phone=1111111111";
 
     public static final String CONFIG_YO_USER_URL = "http://some-other-api-server/?phone=2222222222";
+
+    public static final int CONFIG_VOXEO_OUTBOUND_CALL_LIMIT = 5;
+
+    public static final int CONFIG_VOXEO_OUTBOUND_CALL_RETRY_ATTEMPTS = 5;
+
+    public static final int CONFIG_VOXEO_OUTBOUND_CALL_RETRY_SECONDS = 60;
+
+    public static final boolean CONFIG_VOXEO_CAN_PLACE_OUTBOUND_CALL = false;
+
+    public static final int CONFIG_YO_OUTBOUND_CALL_LIMIT = 7;
+
+    public static final int CONFIG_YO_OUTBOUND_CALL_RETRY_ATTEMPTS = 7;
+
+    public static final int CONFIG_YO_OUTBOUND_CALL_RETRY_SECONDS = 30;
+
+    public static final boolean CONFIG_YO_CAN_PLACE_OUTBOUND_CALL = false;
 
     public static final String CONFIG_SRVC_CALL = "callSrvc";
 
@@ -116,6 +138,12 @@ public final class Constants {
 
     public static final String PARAM_INTERNAL = "internal";
 
+    public static final String PARAM_FLOW_NAME = "flowName";
+
+    public static final String PARAM_CONFIG = "config";
+
+    public static final String PARAM_JOB_ID = "JobID";
+
     public static final String NEXT_URL_JSON = "http://localhost/motech-platform-server/modules/callflows/calls/6acafc03-3818-4e36-b40a-8881fe5ac71b.json";
 
     public static final String NEXT_URL_VXML = "http://localhost/motech-platform-server/modules/callflows/calls/6acafc03-3818-4e36-b40a-8881fe5ac71b.vxml";
@@ -139,4 +167,7 @@ public final class Constants {
     public static final String TEST_PARAM = "testParam";
 
     public static final String TEST_VALUE = "testValue";
+
+    public static final String PARAM_RETRY_ATTEMPTS = "retryAttempts";
+
 }
