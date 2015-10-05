@@ -141,7 +141,7 @@
                 </div>
             </div>
             <div>&nbsp;</div>
-            <div class="form-inline" ng-show="isDirty()">
+            <div class="form-inline">
                 <button class="btn btn-default" ng-click="reset()">{{msg('callflows.btn.cancel')}}</button>
                 <button class="btn btn-primary" ng-disabled="!form.$valid || anyDuplicateNames()" ng-click="submit()">
                     {{msg('callflows.btn.save')}}

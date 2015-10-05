@@ -138,6 +138,8 @@ public class CallControllerTest extends BaseTest {
 
     private String inboundNextURLVxml;
 
+    private String baseURL = "http://localhost/motech-platform-server/modules";
+
     private String inboundNextURLJson;
 
     private Call outboundCall;
@@ -260,7 +262,7 @@ public class CallControllerTest extends BaseTest {
         // And we also expect a update to the call, so that the context is saved
         verify(callService, times(1)).update(inboundCall);
         // And let's look at what got persisted with the call data is what we wanted to do
-        assertContext(velocityContextCaptor.getValue(), inboundCall.getCallId(), inboundNextURLVxml);
+        assertContext(velocityContextCaptor.getValue(), inboundCall, inboundNextURLVxml);
         // Assert that the renderer is used appropriately
         assertRenderer(Constants.CONFIG_RENDERER_VXML);
     }
@@ -285,7 +287,7 @@ public class CallControllerTest extends BaseTest {
         // And we also expect a update to the call, so that the context is saved
         verify(callService, times(1)).update(inboundCall);
         // And let's look at what got persisted with the call data is what we wanted to do
-        assertContext(velocityContextCaptor.getValue(), inboundCall.getCallId(), inboundNextURLJson);
+        assertContext(velocityContextCaptor.getValue(), inboundCall, inboundNextURLJson);
         // Assert that the renderer is used appropriately
         assertRendererForJson();
     }
@@ -312,7 +314,7 @@ public class CallControllerTest extends BaseTest {
         // And we also expect a update to the call, so that the context is saved
         verify(callService, times(1)).update(outboundCall);
         // And let's look at what got persisted with the call data is what we wanted to do
-        assertContext(velocityContextCaptor.getValue(), outboundCall.getCallId(), outboundNextURLVxml);
+        assertContext(velocityContextCaptor.getValue(), outboundCall, outboundNextURLVxml);
         assertRenderer(Constants.CONFIG_RENDERER_VXML);
     }
 
@@ -338,7 +340,7 @@ public class CallControllerTest extends BaseTest {
         // And we also expect a update to the call, so that the context is saved
         verify(callService, times(1)).update(outboundCall);
         // And let's look at what got persisted with the call data is what we wanted to do
-        assertContext(velocityContextCaptor.getValue(), outboundCall.getCallId(), outboundNextURLJson);
+        assertContext(velocityContextCaptor.getValue(), outboundCall, outboundNextURLJson);
         // Assert that the renderer is used appropriately
         assertRendererForJson();
     }
@@ -663,14 +665,15 @@ public class CallControllerTest extends BaseTest {
     }
 
 
-    private void assertContext(VelocityContext context, String callId, String nextURL) {
+    private void assertContext(VelocityContext context, Call call, String nextURL) {
         assertNotNull(context);
         assertTrue(context.containsKey("internal"));
         Map<String, Object> internalContext = (Map<String, Object>) context.get("internal");
-        assertThat(internalContext.size(), equalTo(2));
-        assertThat((String) internalContext.get("callId"), equalTo(callId));
+        assertThat(internalContext.size(), equalTo(4));
+        assertThat((String) internalContext.get("callId"), equalTo(call.getCallId()));
         assertThat((String) internalContext.get("nextURL"), equalTo(nextURL));
-
+        assertThat((String) internalContext.get("baseURL"), equalTo(baseURL));
+        assertThat((String) internalContext.get("callDirection"), equalTo(call.getDirection().name()));
     }
 
     private void assertCallConfigFlowLoaded(Call call, String config, String callflow) {

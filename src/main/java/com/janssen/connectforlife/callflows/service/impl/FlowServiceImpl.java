@@ -94,6 +94,8 @@ public class FlowServiceImpl implements FlowService {
         Flow currentFlow = startFlow;
         Node currentNode = startNode;
 
+        LOGGER.debug("evalNode:[START] {} of flow {} ", startNode, startFlow);
+
         // Idea is to keep evaluating until we arrive at a user node, cause at the time of confronting a user-node
         // we have to communicate to the user and hence stop processing
         int jumpNo = 0;
@@ -108,7 +110,9 @@ public class FlowServiceImpl implements FlowService {
                                                                   buildVisited(visited)));
                 }
                 visited.add(currentNode);
+                LOGGER.debug("evalNode:[LOOP] {} of flow {} ", currentNode, currentFlow);
                 output = flowUtil.evalNode(currentFlow, currentNode, context, VELOCITY);
+                LOGGER.debug("evalNode:[LOOP] {} --> {} ", currentNode, output);
                 FlowStep flowStep = parse(output, currentFlow);
 
                 currentFlow = flowStep.getFlow();
@@ -118,6 +122,7 @@ public class FlowServiceImpl implements FlowService {
             LOGGER.error(e.getMessage(), e);
             return buildFlowPosition(startFlow, currentFlow, startNode, currentNode, visited, output, true);
         }
+        LOGGER.debug("evalNode:[END] {} of flow {} ", currentNode, currentFlow);
         return buildFlowPosition(startFlow, currentFlow, startNode, currentNode, visited, output, false);
     }
 

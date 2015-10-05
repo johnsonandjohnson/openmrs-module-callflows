@@ -80,11 +80,15 @@ public class CallController extends RestController {
     private static final String KEY_NEXT_URL = "nextURL";
 
     /**
-     * The call ID request parameter.
-     * Accessible in templates as $internal.callId
-     * It needs to be sent in request parameters as internal.callId
+     * The key under which the base URL will be available. This can for instance be used to construct other known URLS like
+     * the call continuation URL, CMS-Lite URL, etc
      */
-    private static final String INTERNAL_CALL_ID = KEY_INTERNAL + "." + KEY_CALL_ID;
+    private static final String KEY_BASE_URL = "baseURL";
+
+    /**
+     * The key under which the call direction is indicated, either of OUTGOING or INCOMING
+     */
+    private static final String KEY_DIRECTION = "callDirection";
 
     @Autowired
     private SettingsService settingsService;
@@ -149,7 +153,7 @@ public class CallController extends RestController {
         // Typically we won't get this parameter for inbound calls,
         // but when the system makes a outbound call, it creates a call record and then enters here with a callId
         // Since this is the entry point for both inbound and outbound calls, we try to read this parameter here
-        String callId = params.get(INTERNAL_CALL_ID);
+        String callId = params.get(KEY_CALL_ID);
 
         // The requested configuration from the URL
         Config config = null;
@@ -200,6 +204,8 @@ public class CallController extends RestController {
             // Link the nextURL to submit the conversation to
             setInInternalContext(context, KEY_NEXT_URL, callUtil.buildContinuationUrl(request, call, extension));
             setInInternalContext(context, KEY_CALL_ID, call.getCallId());
+            setInInternalContext(context, KEY_BASE_URL, callUtil.buildBaseUrl(request));
+            setInInternalContext(context, KEY_DIRECTION, call.getDirection().name());
 
             // eval the template
             output = flowUtil.evalNode(flow, currentNode, context, extension);
@@ -211,6 +217,11 @@ public class CallController extends RestController {
             // We add status even though it will be updated via a CCXML status handler in order to update status
             // if someone doesn't use the CCXML handler
             call.setStatus(CallStatus.IN_PROGRESS);
+            // When-ever we come to the entry point, we have to reset the the end flow and the end-node to where we are
+            // This might be important for cases where we created the call elsewhere, but the entry point is a different point
+            // and hence we need to continue from here again
+            call.setEndFlow(startCallFlow);
+            call.setEndNode(currentNode.getStep());
 
             // By default we don't persist the params in the database, as that's coming from the user
             // and that's all potentially PII (Personally Identifiable) data
@@ -238,9 +249,8 @@ public class CallController extends RestController {
      * @param headers   a map of headers that are passed along with the request
      * @return
      */
-    @RequestMapping(value = "/calls/{callId}.{extension}", method = RequestMethod.GET)
-    public ResponseEntity<String> handleContinuation(HttpServletRequest request,
-                                                     @PathVariable String callId,
+    @RequestMapping(value = "/calls/{callId}.{extension}")
+    public ResponseEntity<String> handleContinuation(HttpServletRequest request, @PathVariable String callId,
                                                      @PathVariable String extension,
                                                      @RequestParam Map<String, String> params,
                                                      @RequestHeader Map<String, String> headers) {

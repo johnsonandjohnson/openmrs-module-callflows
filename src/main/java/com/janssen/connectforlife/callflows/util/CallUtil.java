@@ -81,6 +81,10 @@ public class CallUtil {
 
     private static final String PARAM_JOB_ID = "JobID";
 
+    private static final String ACTOR_ID = "actorId";
+
+    private static final String INTERNAL = "internal";
+
     private ObjectMapper objectMapper = new ObjectMapper();
 
     private static final Collection<CallStatus> ACTIVE_OUTBOUND_CALL_STATUSES = Arrays
@@ -116,11 +120,14 @@ public class CallUtil {
     public void mergeContextWithCall(VelocityContext context, Call call) {
         // capture back into call
         Map<String, Object> callContext = call.getContext();
+        String actorId;
+        String keyString;
         for (Object key : context.getKeys()) {
-            Object val = context.get((String) key);
+            keyString = (String) key;
+            Object val = context.get(keyString);
             // we are not going to capture domain objects or other complex objects, just simple objects
             if (val != null) {
-                if (val instanceof String ||
+                if (isAllowedToPersist(keyString, val) ||
                         ClassUtils.isPrimitiveOrWrapper(val.getClass()) ||
                         ClassUtils.isPrimitiveArray(val.getClass()) ||
                         ClassUtils.isPrimitiveWrapperArray(val.getClass())) {
@@ -128,6 +135,16 @@ public class CallUtil {
                 }
             }
         }
+        Map<String, String> internalCtx = (Map<String, String>) context.get(INTERNAL);
+        actorId = internalCtx.get(ACTOR_ID);
+        if (null != actorId) {
+            call.setActorId(actorId);
+            call.setActorType(internalCtx.get("actorType"));
+        }
+    }
+
+    private boolean isAllowedToPersist(String key, Object val) {
+        return key.equals(INTERNAL) || val instanceof String;
     }
 
     /**
@@ -147,6 +164,21 @@ public class CallUtil {
         url.append("/callflows/calls/");
         url.append(call.getCallId());
         url.append(DOT).append(extension);
+        return url.toString();
+    }
+
+    /**
+     * Builds a base link to the server until the context path
+     *
+     * @param request HttpServletRequest
+     * @return a partial url string until the context path
+     */
+    public String buildBaseUrl(HttpServletRequest request) {
+        StringBuilder url = new StringBuilder();
+        url.append(request.getScheme());
+        url.append("://");
+        url.append(request.getHeader("Host"));
+        url.append(request.getContextPath());
         return url.toString();
     }
 
@@ -192,6 +224,7 @@ public class CallUtil {
             LOGGER.error(e.toString(), e);
             return ERROR_RESPONSE_JSON;
         }
+        LOGGER.debug("callId={}, content={}", call.getCallId(), content);
         return content;
     }
 

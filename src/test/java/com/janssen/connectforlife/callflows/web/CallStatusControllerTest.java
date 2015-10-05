@@ -55,7 +55,7 @@ public class CallStatusControllerTest extends BaseTest {
 
         //When && Then
         mockMvc.perform(
-                get("/status/" + Constants.INBOUND_CALL_ID.toString() + "?status = ANSWERED & reason = call answered"))
+                get("/status/" + Constants.INBOUND_CALL_ID.toString() + "?status=ANSWERED&reason=call answered"))
 
                .andExpect(status().is(HttpStatus.OK.value())).andExpect(content().string(Constants.XML_OK_RESPONSE));
 

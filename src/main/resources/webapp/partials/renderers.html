@@ -13,6 +13,7 @@
             <div data-html="true" data-toggle="tooltip" data-placement="top" data-trigger="hover"
                  bs-popover="{{msg('callflows.field.rendererName.tooltip')}}">
                 <input type="text" class="form-control" name="rendererName" ng-pattern="/^[a-zA-Z][a-zA-Z0-9]*$/" required
+                       autocomplete="off"
                        ng-model="rendererName" ng-trim="true" ng-minlength="3" ng-maxlength="10" />
                 <span class="form-hint form-hint-bottom" ng-show="form.rendererName.$dirty && form.rendererName.$error.required">{{msg('callflows.error.required')}}</span>
                 <span class="form-hint form-hint-bottom" ng-show="form.rendererName.$error.pattern">{{msg('callflows.error.rendererPattern')}}</span>

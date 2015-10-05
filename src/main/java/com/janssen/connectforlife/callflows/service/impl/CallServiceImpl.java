@@ -112,7 +112,7 @@ public class CallServiceImpl implements CallService {
         call.setActorType(actorType);
 
         // Parameters we were passed
-        call.setContext(params);
+        call.setContext(params == null ? new HashMap<String, Object>() : params);
 
         // No of steps that have happened so far, none to start with
         call.setSteps(0L);
@@ -180,7 +180,6 @@ public class CallServiceImpl implements CallService {
     }
 
     @Override
-    @Transactional
     public Call makeCall(String configName, String flowName, Map<String, Object> params) {
         Call call = null;
         CallFlow callFlow = null;

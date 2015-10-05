@@ -4,7 +4,8 @@ import com.janssen.connectforlife.callflows.domain.Call;
 import com.janssen.connectforlife.callflows.domain.types.CallStatus;
 import com.janssen.connectforlife.callflows.service.CallService;
 
-import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -22,6 +23,8 @@ import java.util.Map;
  */
 @Controller
 public class CallStatusController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CallStatusController.class);
 
     private static final String XML_OK_RESPONSE = "<?xml version=\"1.0\"?><response>OK</response>";
 
@@ -45,17 +48,15 @@ public class CallStatusController {
     @RequestMapping(value = "/status/{callId}")
     @ResponseBody
     public String handleStatus(@PathVariable String callId, @RequestParam Map<String, String> params) {
+        LOGGER.debug("handleStatus(callId={}, params={}", callId, params);
         Call call = callService.findByCallId(callId);
         if (null == call) {
             return XML_ERROR_RESPONSE;
         }
-        if (params.containsKey(PARAM_STATUS) && StringUtils.isNotEmpty(params.get(PARAM_STATUS))) {
-            call.setStatus(CallStatus.valueOf(params.get(PARAM_STATUS)));
-        }
-
-        if (params.containsKey(PARAM_REASON) && StringUtils.isNotEmpty(params.get(PARAM_REASON))) {
-            call.setStatusText(params.get(PARAM_REASON));
-        }
+        // When ever we update the status, we always have to update the reason as well
+        CallStatus status = CallStatus.valueOf(params.get(PARAM_STATUS));
+        call.setStatus(status);
+        call.setStatusText(params.get(PARAM_REASON));
         callService.update(call);
         return XML_OK_RESPONSE;
     }

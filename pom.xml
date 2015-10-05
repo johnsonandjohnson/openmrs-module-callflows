@@ -167,6 +167,7 @@
                             org.springframework.transaction,
                             org.motechproject.osgi.web;version=${motech.version},
                             org.motechproject.mds.service;version=${motech.version},
+                            org.motechproject.scheduler.service;version=${motech.version},
                             org.motechproject.config.service;version=${motech.version},
                             org.motechproject.security.service;version=${motech.version},
                             org.motechproject.security.model;version=${motech.version},
