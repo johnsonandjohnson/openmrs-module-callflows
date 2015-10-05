@@ -296,7 +296,7 @@ public class CallControllerTest extends BaseTest {
     public void shouldHandleIncomingWithCallIdParamAndUseExistingOutboundCall() throws Exception {
 
         // When we make a inbound call with vxml extension
-        mockMvc.perform(customGet("/in/voxeo/flows/MainFlow.vxml?internal.callId=" + outboundCall.getCallId()))
+        mockMvc.perform(customGet("/in/voxeo/flows/MainFlow.vxml?callId=" + outboundCall.getCallId()))
                .andExpect(status().is(HttpStatus.OK.value()))
                .andExpect(content().type(Constants.APPLICATION_VXML))
                .andExpect(content().string(sameAsFile("main_flow_entry_outbound.vxml")));
@@ -322,7 +322,7 @@ public class CallControllerTest extends BaseTest {
     public void shouldHandleIncomingWithJsonExtensionAndCallIdParamAndUseExistingOutboundCall() throws Exception {
 
         // When we make a inbound call with vxml extension
-        mockMvc.perform(customGet("/in/voxeo/flows/MainFlow.json?internal.callId=" + outboundCall.getCallId()))
+        mockMvc.perform(customGet("/in/voxeo/flows/MainFlow.json?callId=" + outboundCall.getCallId()))
                .andExpect(status().is(HttpStatus.OK.value()))
                .andExpect(content().type(Constants.APPLICATION_JSON_UTF8))
                .andExpect(content().string(sameAsFile("main_flow_entry_outbound_with_body.json")));
