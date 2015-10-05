@@ -83,6 +83,8 @@ public class CallUtil {
 
     private static final String ACTOR_ID = "actorId";
 
+    private static final String ACTOR_TYPE = "actorType";
+
     private static final String INTERNAL = "internal";
 
     private ObjectMapper objectMapper = new ObjectMapper();
@@ -139,7 +141,7 @@ public class CallUtil {
         actorId = internalCtx.get(ACTOR_ID);
         if (null != actorId) {
             call.setActorId(actorId);
-            call.setActorType(internalCtx.get("actorType"));
+            call.setActorType(internalCtx.get(ACTOR_TYPE));
         }
     }
 
