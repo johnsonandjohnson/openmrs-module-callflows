@@ -79,7 +79,7 @@
                 if (scope.editor) {
                     if (scope.selection && instance.somethingSelected()) {
                         scope.$apply(function() {
-                            scope.editor(editor);
+                            scope.editor(editor, scope.target);
                         });
                     }
                 }
@@ -101,7 +101,8 @@
             require: '?ngModel',
             scope: {
                 selection: '=',
-                editor: '='
+                editor: '=',
+                target: '@'
             },
             compile: function compile() {
 

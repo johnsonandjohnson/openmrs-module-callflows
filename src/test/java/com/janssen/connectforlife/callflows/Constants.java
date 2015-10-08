@@ -20,12 +20,10 @@ public final class Constants {
 
     }
 
-    public static final MediaType APPLICATION_JSON_UTF8 = new MediaType("application",
-                                                                        "json",
+    public static final MediaType APPLICATION_JSON_UTF8 = new MediaType("application", "json",
                                                                         Charset.forName("UTF-8"));
 
-    public static final MediaType APPLICATION_VXML = new MediaType("application",
-                                                                   "voicexml+xml",
+    public static final MediaType APPLICATION_VXML = new MediaType("application", "voicexml+xml",
                                                                    Charset.forName("UTF-8"));
 
     public static final MediaType PLAIN_TEXT = new MediaType("text", "plain", Charset.forName("UTF-8"));

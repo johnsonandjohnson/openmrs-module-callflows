@@ -45,6 +45,10 @@ public class ConfigContractBuilderTest extends BaseTest {
         assertThat(voxeoContract.getName(), equalTo(voxeo.getName()));
         assertThat(voxeoContract.getOutgoingCallMethod(), equalTo(voxeo.getOutgoingCallMethod()));
         assertThat(voxeoContract.getOutgoingCallUriTemplate(), equalTo(voxeo.getOutgoingCallUriTemplate()));
+        assertThat(voxeoContract.getOutboundCallLimit(), equalTo(voxeo.getOutboundCallLimit()));
+        assertThat(voxeoContract.getOutboundCallRetryAttempts(), equalTo(voxeo.getOutboundCallRetryAttempts()));
+        assertThat(voxeoContract.getOutboundCallRetrySeconds(), equalTo(voxeo.getOutboundCallRetrySeconds()));
+        assertThat(voxeoContract.isCallAllowed(), equalTo(voxeo.getCallAllowed()));
 
         assertThat(voxeoContract.getTestUsersMap().size(), equalTo(voxeo.getTestUsersMap().size()));
         assertThat(voxeoContract.getTestUsersMap(), equalTo(voxeo.getTestUsersMap()));

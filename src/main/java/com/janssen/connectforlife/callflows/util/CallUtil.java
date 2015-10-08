@@ -146,7 +146,18 @@ public class CallUtil {
     }
 
     private boolean isAllowedToPersist(String key, Object val) {
-        return key.equals(INTERNAL) || val instanceof String;
+        return key.equals(INTERNAL) || val instanceof String || val instanceof String[] ||
+                isCollectionOfStringOrPrimitive(val);
+    }
+
+    private boolean isCollectionOfStringOrPrimitive(Object val) {
+        if (val instanceof Collection) {
+            Collection collection = (Collection) val;
+            for (Object obj : collection) {
+                return obj instanceof String || ClassUtils.isPrimitiveOrWrapper(obj.getClass());
+            }
+        }
+        return false;
     }
 
     /**

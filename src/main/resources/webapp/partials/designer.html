@@ -1,3 +1,377 @@
 <div class="row">
     <h4 class="frame-title">{{msg('callflows.tab.designer')}}</h4>
+
+    <div class="inside">
+        <div class="row margin-before2">
+            <form class="form-horizontal" name="flow_form">
+                <div class="col-sm-12 col-md-12 col-lg-12 form-group"
+                     ng-class="{'has-error' : flow_form.flowName.$invalid && flow_form.flowName.$dirty}">
+                    <div class="form-inline col-md-10 col-sm-9" ng-show="flows.current">
+                        <label class="control-label">{{msg('callflows.field.name')}}<span class="text-danger">*</span>
+                        </label>
+                        <input class="input-xlarge-fluid form-control input-auto" type="text"
+                               ng-pattern="/^[a-zA-Z0-9]*$/" ng-model="flows.current.name" id="flowName" name="flowName"
+                               ng-required="true">
+                        <span class="form-hint" ng-show="flow_form.flowName.$dirty && flow_form.flowName.$invalid">
+                            <div ng-show="flow_form.flowName.$error.required ">
+                                {{msg('callflows.error.flow.required')}}
+                            </div>
+                            <div ng-show="flow_form.flowName.$error.pattern ">{{msg('callflows.error.flow.pattern')}}
+                            </div>
+                        </span>
+                    </div>
+                    <div class="col-md-2">
+                        <button ng-click="addFlow();" type="button" class="btn btn-success">
+                            <i class="icon-plus icon-white"></i>
+                            {{msg('callflows.btn.addFlow')}}
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="row margin-before2" ng-show="flows.current">
+            <div class="col-md-12">
+                <div class="btn-group">
+                    <a class="btn btn-default" ng-click="addInteraction();">
+                        <i class="icon-plus icon-white"></i> {{msg('callflows.btn.interaction')}}
+                    </a>
+                    <a class="btn btn-default" ng-click="expandNodes();">
+                        <i class="icon-chevron-down icon-white"></i> {{msg('callflows.btn.expandAll')}}
+                    </a>
+                    <a class="btn btn-default" ng-click="collapseNodes();">
+                        <i class="icon-chevron-right icon-white"></i> {{msg('callflows.btn.collapseAll')}}
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- errors -->
+        <div ng-show="errors.length > 0">
+            <div class="alert alert-error alert-block" ng-repeat="error in errors" ng-cloak>
+                {{error}}
+            </div>
+        </div>
+
+        <!-- messages -->
+        <div ng-repeat="message in messages" class="alert alert-success alert-block animate-repeat">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            {{message}}
+        </div>
+
+        <div class="row">
+            <div class="inside">
+                <form name="form" class="form-horizontal inside">
+                    <div class="row">
+                        <div class="panel-group">
+                            <div class="panel panel-default flows-template {{node.nodeType}}"
+                                 ng-repeat="node in flows.current.raw.nodes">
+                                <!-- user - node panel heading -->
+                                <div class="panel-heading" ng-click="togglePanel(node, $index);"
+                                     ng-if="node.nodeType === 'user'">
+                                    <i ng-class="{'icon-chevron-down': accordions[$index], 'icon-chevron-left': !accordions[$index]}"
+                                       class="pointer"></i>
+                                    <span class="label label-info">{{node.step}}</span>
+                                    <span ng-if="node.var">({{node.var}})</span>
+                                    <!-- show a delete feature if open -->
+                                    <span class="pull-right" ng-click="deleteNode(node, $index);">
+                                        <i ng-attr-title="msg('callflows.btn.delete')"
+                                           class="icon-trash icon-large"
+                                           ng-if="accordions[$index]"></i>
+                                    </span>
+                                </div>
+
+                                <!-- system - node panel heading -->
+                                <div class="panel-heading" ng-click="togglePanel(node, $index);"
+                                     ng-if="node.nodeType === 'system'">
+                                    <span class="label label-warning">{{node.step}}</span>
+                                    <i ng-class="{'icon-chevron-down': accordions[$index], 'icon-chevron-right': !accordions[$index]}"
+                                       class="pointer"></i>
+                                </div>
+
+                                <div id="panel{{$index}}" class="panel-collapse collapse"
+                                     ng-class="{true:'in', false:''}[accordions[$index]]">
+
+                                    <!-- start of user block -->
+                                    <div class="form-group margin-before2 margin-after2"
+                                         ng-if="node.nodeType == 'user'">
+                                        <!-- step and controls -->
+                                        <div class="row">
+                                            <div class="col-md-1">
+                                            </div>
+                                            <div class="col-md-4 pull-left">
+                                                <div class="input-group">
+                                                    <span class="input-group-addon"> {{callflows.field.step}}</span>
+                                                    <input type="text" class="form-control" ng-model="node.step"
+                                                           placeholder="name"/>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <input class="node-continue" type="checkbox"
+                                                       ng-model="node.continueNode"
+                                                       title="Check if this if you want to submit to the server even if no fields are configured"/>
+
+                                                <div class="btn-group btn-group-sm">
+                                                    <a class="btn btn-default" ng-click="addBlock(node, 'form');"><i
+                                                            class="icon-plus"></i> {{msg('callflows.field.form')}}</a>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3" style="text-align: right;">
+                                                <div class="btn-group btn-group-sm"
+                                                     ng-if="node.currentBlock && node.currentBlock.type === 'form'">
+                                                    <a class="btn btn-default" ng-click="addElement(node, 'field');"><i
+                                                            class="icon-plus"></i> {{msg('callflows.field.field')}}</a>
+                                                    <a class="btn btn-default" ng-click="addElement(node, 'txt');"><i
+                                                            class="icon-plus"></i> {{msg('callflows.field.tts')}}</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- breadcrumbs -->
+                                        <div class="row">
+                                            <div class="col-md-10 col-md-offset-1">
+                                                <ul class="breadcrumb modeller">
+                                                    <li><a><i class="icon-home"></i></a></li>
+                                                    <!-- If there is a current block -->
+                                                    <li ng-if="node.currentBlock">
+                                                        <div class="dropdown">
+                                                            <a class="dropdown-toggle" type="button"
+                                                               id="dropdown-blocks" data-toggle="dropdown"
+                                                               aria-expanded="true">
+                                                                {{node.currentBlock.name}}
+                                                                <span class="badge"
+                                                                      ng-if="node.blocks.length > 1">{{node.blocks.length}}
+                                                                </span>
+                                                                <span class="caret"></span>
+                                                            </a>
+                                                            <ul class="dropdown-menu" role="menu"
+                                                                aria-labelledby="dropdown-blocks">
+                                                                <li ng-repeat="b in node.blocks">
+                                                                    <a ng-click="showBlock(node, $index);">
+                                                                        &nbsp; {{b.name}}
+                                                                        <i class="icon-remove"
+                                                                           ng-click="deleteBlock(node, $index);"></i>
+                                                                    </a>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </li>
+                                                    <!-- If there is a current element -->
+                                                    <li ng-if="node.currentElement">
+                                                        <div class="dropdown">
+                                                            <a class="dropdown-toggle" type="button"
+                                                               id="dropdown-elements" data-toggle="dropdown"
+                                                               aria-expanded="true">
+                                                                {{node.currentElement.name}}
+                                                                <span class="badge"
+                                                                      ng-if="node.currentBlock.elements.length > 1">
+                                                                    {{node.currentBlock.elements.length}}
+                                                                </span>
+                                                                <span class="caret"></span>
+                                                            </a>
+                                                            <ul class="dropdown-menu" role="menu"
+                                                                aria-labelledby="dropdown-elements">
+                                                                <li ng-repeat="e in node.currentBlock.elements">
+                                                                    <a ng-click="showElement(node, node.currentBlock, $index);">
+                                                                        &nbsp; {{e.name}}
+                                                                        <i class="icon-remove"
+                                                                           ng-click="deleteElement(node, node.currentBlock, $index);">
+                                                                        </i>
+                                                                    </a>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <!-- Regular Basic Prompt (Hello World Example) -->
+                                        <div class="row"
+                                             ng-if="node.currentElement && node.currentElement.type === 'txt'">
+                                            <div class="col-md-10 col-md-offset-1">
+                                                <div class="active" id="cfl-tts">
+                                                    <div code-editor theme="tts" syntax="velocity"
+                                                         refresh="accordions[$index]" selection="selectedText"
+                                                         editor="editorHandler" ng-model="node.currentElement.txt"
+                                                         target="{{getTarget(node, node.currentElement, 'txt')}}"
+                                                         ng-change="runRender(node);"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- FieldElement Definition -->
+                                        <div class="row"
+                                             ng-if="node.currentElement && node.currentElement.type === 'field'">
+                                            <div class="col-md-5 col-md-offset-1">
+                                                <!--<span class="input-group-addon">Field</span>-->
+                                                <div class="row">
+                                                    <div class="col-md-8">
+                                                        <input type="text" ng-change="runRender(node);"
+                                                               class="form-control" ng-model="node.currentElement.name"
+                                                               placeholder="name"/>
+                                                    </div>
+                                                    <div class="col-md-4 dropdown">
+                                                        <a class="btn dropdown-toggle" id="field1"
+                                                           data-toggle="dropdown" aria-expanded="true">
+                                                            {{node.currentElement.fieldType}}
+                                                            <span class="caret"></span>
+                                                        </a>
+                                                        <ul class="dropdown-menu" role="menu" aria-labelledby="field1">
+                                                            <li ng-repeat="ft in fieldTypes">
+                                                                <a ng-click="setFieldType(node.currentElement, ft);runRender(node);">{{ft}}</a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                                <div class="margin-before2">
+                                                    <a class="btn"
+                                                       ng-click="toggle(node, node.currentElement, 'bargeIn');"><span
+                                                            class="glyphicon"
+                                                            ng-class="{'glyphicon-remove' : !node.currentElement.bargeIn, 'glyphicon-ok' : node.currentElement.bargeIn}"></span>
+                                                        {{msg('callflows.field.barge')}}</a>
+                                                    <a class="btn"
+                                                       ng-click="toggle(node, node.currentElement, 'dtmf');"><span
+                                                            class="glyphicon"
+                                                            ng-class="{'glyphicon-remove' : !node.currentElement.dtmf, 'glyphicon-ok' : node.currentElement.dtmf}"></span>
+                                                        {{msg('callflows.field.dtmf')}}</a>
+                                                    <a class="btn"
+                                                       ng-click="toggle(node, node.currentElement, 'voice');"><span
+                                                            class="glyphicon"
+                                                            ng-class="{'glyphicon-remove' : !node.currentElement.voice, 'glyphicon-ok' : node.currentElement.voice}"></span>
+                                                        {{msg('callflows.field.voice')}}</a>
+                                                </div>
+                                                <div>
+                                                    <div code-editor theme="field" syntax="velocity"
+                                                         refresh="accordions[$index]" selection="selectedText"
+                                                         editor="editorHandler" ng-model="node.currentElement.txt"
+                                                         target="{{getTarget(node, node.currentElement, 'txt')}}"
+                                                         ng-change="runRender(node);"></div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-5">
+                                                <ul class="field">
+                                                    <li class="row">
+                                                        <div class="col-md-7">
+                                                            <div class="input-group"
+                                                                 ng-show="node.currentElement.fieldType === 'digits'">
+                                                                <span title="x..y or x or ..y or x.."
+                                                                      class="input-group-addon">x..y</span>
+                                                                <input class="form-control" type="text"
+                                                                       placeholder="range"
+                                                                       ng-model="node.currentElement.meta"
+                                                                       ng-change="runRender(node);"/>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-5">
+                                                            <div class="input-group">
+                                                                <span ng-attr-title="{{msg('callflows.field.reprompt')}}"
+                                                                      class="input-group-addon"><i
+                                                                        class="icon-repeat"></i></span>
+                                                                <input type="text" class="form-control"
+                                                                       ng-model="node.currentElement.reprompt"
+                                                                       ng-change="runRender(node);"/>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                                <div class="margin-before2">
+                                                    <ul class="nav nav-tabs">
+                                                        <li ng-class="{'active' : (! currentProperty || currentProperty === 'noInput')}">
+                                                            <a ng-click="setProperty('noInput');">
+                                                                {{msg('callflows.field.noInput')}}
+                                                            </a>
+                                                        </li>
+                                                        <li ng-class="{'active' : (currentProperty === 'noMatch')}">
+                                                            <a ng-click="setProperty('noMatch');">
+                                                                {{msg('callflows.field.noMatch')}}
+                                                            </a>
+                                                        </li>
+                                                        <li ng-class="{'active' : (currentProperty === 'exit')}">
+                                                            <a ng-click="setProperty('exit');">
+                                                                {{msg('callflows.field.exit')}}
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <div>
+                                                    <div code-editor theme="field" syntax="velocity"
+                                                         selection="selectedText" editor="editorHandler"
+                                                         target-position="{{getTargetPosition()}}"
+                                                         target="{{getTarget(node, node.currentElement, currentProperty || 'noInput')}}"
+                                                         refresh="accordions[$index]"
+                                                         ng-model="node.currentElement[currentProperty || 'noInput']"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <hr/>
+                                        <!-- Renderers Block -->
+                                        {{flows.renderers}}
+                                        <div class="row margin-before2">
+                                            <div class="col-md-10 col-md-offset-1">
+                                                <div class="row">
+                                                    <div class="col-md-12 btn-toolbar">
+                                                        <ul class="nav nav-tabs">
+                                                            <li class="renderer"
+                                                                ng-repeat="renderer in settings.renderers"
+                                                                ng-class="{'active' : (currentRenderer.name === renderer.name)}">
+                                                                <a data-toggle="tab"
+                                                                   ng-click="setRenderer(renderer, node);">
+                                                                    {{renderer.name}}&nbsp;
+                                                                    <i ng-click="toggleDirty($event, node.templates[renderer.name]);"
+                                                                       ng-attr-title="{{getRendererTitle(node.templates[renderer.name])}}"
+                                                                       ng-class="{'icon-star-empty' : !node.templates[renderer.name].dirty ,
+                                                                                  'icon-star' : node.templates[renderer.name].dirty}"></i>
+                                                                </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <div code-editor syntax="xml" refresh="accordions[$index]"
+                                                             ng-model="node.templates[currentRenderer.name].content"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- end of user block -->
+
+                                    <!-- start of system block -->
+                                    <div class="form-group margin-before2 margin-after2"
+                                         ng-if="node.nodeType == 'system'">
+                                        <div class="row">
+                                            <div class="col-md-10 col-md-offset-1">
+                                                <div class="row">
+                                                    <div class="col-md-12 pull-left">
+                                                        <div class="input-group">
+                                                            <span class="input-group-addon">{{msg('callflows.field.step')}}</span>
+                                                            <input type="text" class="form-control" ng-model="node.step"
+                                                                   ng-attr-placeholder="{{msg('callflows.field.step')}}"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row margin-after2">
+                                                    <div class="col-md-12">
+                                                        <div code-editor theme="script" syntax="velocity"
+                                                             refresh="accordions[$index]"
+                                                             ng-model="node.templates.velocity.content"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- end of system block -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="form-group margin-before2" ng-show="flows.current">
+                    <div class="col-sm-12">
+                        <button type="button" class="btn btn-primary" ng-disabled="flow_form.flowName.$invalid"
+                                ng-click="saveFlow();">{{msg('callflows.btn.save')}}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

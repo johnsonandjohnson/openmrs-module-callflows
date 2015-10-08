@@ -77,6 +77,41 @@
                     </div>
 
                     <div class="form-group">
+                        <label class="col-md-3 control-label">{{msg('callflows.field.outboundQueue')}}</label>
+
+                        <div class="col-md-8">
+                            <div class="row form-horizontal">
+                                <div class="col-md-3 control-label">
+                                    <label>{{msg('callflows.field.callLimit')}}</label>
+                                </div>
+                                <div class="col-md-3 control-label">
+                                    <label>{{msg('callflows.field.retrySeconds')}}</label>
+                                </div>
+                                <div class="col-md-4 control-label">
+                                    <label>{{msg('callflows.field.retryAttempts')}}</label>
+                                </div>
+                                <div class="col-md-2 control-label">
+                                    <label>{{msg('callflows.field.placeCall')}}</label>
+                                </div>
+                            </div>
+                            <div class="row form-horizontal">
+                                <div class="col-md-3">
+                                    <input class="form-control" ng-model="conf.outboundCallLimit" type="text" name="outboundCallLimit" />
+                                </div>
+                                <div class="col-md-3">
+                                    <input class="form-control" ng-model="conf.outboundCallRetrySeconds" type="text" name="outboundCallRetrySeconds" />
+                                </div>
+                                <div class="col-md-4">
+                                    <input class="form-control" ng-model="conf.outboundCallRetryAttempts" type="text" name="outboundCallRetryAttempts" />
+                                </div>
+                                <div class="col-md-2">
+                                    <input class="form-control" ng-model="conf.callAllowed" type="checkbox" name="callAllowed" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
                         <label class="col-md-3 control-label" for="servicesMap{{$index}}">{{msg('callflows.field.servicesMap')}}</label>
 
                         <div class="col-md-8" data-toggle="tooltip" data-html="true" data-placement="top" data-trigger="hover"

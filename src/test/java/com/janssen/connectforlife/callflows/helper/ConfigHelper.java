@@ -60,6 +60,10 @@ public final class ConfigHelper {
         voxeo.setName(Constants.CONFIG_VOXEO);
         voxeo.setOutgoingCallUriTemplate(Constants.CONFIG_VOXEO_OUT_TEMPLATE);
         voxeo.setOutgoingCallMethod(Constants.CONFIG_VOXEO_METHOD);
+        voxeo.setOutboundCallLimit(Constants.CONFIG_VOXEO_OUTBOUND_CALL_LIMIT);
+        voxeo.setOutboundCallRetryAttempts(Constants.CONFIG_VOXEO_OUTBOUND_CALL_RETRY_ATTEMPTS);
+        voxeo.setOutboundCallRetrySeconds(Constants.CONFIG_VOXEO_OUTBOUND_CALL_RETRY_SECONDS);
+        voxeo.setCallAllowed(Constants.CONFIG_VOXEO_CAN_PLACE_OUTBOUND_CALL);
         voxeo.setServicesMap(GenericHelper.buildServicesMap());
         voxeo.setTestUsersMap(GenericHelper.buildTestUsersMap(Constants.CONFIG_VOXEO_USER,
                                                               Constants.CONFIG_VOXEO_USER_URL));
@@ -68,6 +72,10 @@ public final class ConfigHelper {
         yo.setName(Constants.CONFIG_YO);
         yo.setOutgoingCallUriTemplate(Constants.CONFIG_YO_OUT_TEMPLATE);
         yo.setOutgoingCallMethod(Constants.CONFIG_YO_METHOD);
+        voxeo.setOutboundCallLimit(Constants.CONFIG_YO_OUTBOUND_CALL_LIMIT);
+        voxeo.setOutboundCallRetryAttempts(Constants.CONFIG_YO_OUTBOUND_CALL_RETRY_ATTEMPTS);
+        voxeo.setOutboundCallRetrySeconds(Constants.CONFIG_YO_OUTBOUND_CALL_RETRY_SECONDS);
+        voxeo.setCallAllowed(Constants.CONFIG_YO_CAN_PLACE_OUTBOUND_CALL);
         yo.setServicesMap(GenericHelper.buildServicesMap());
         yo.setTestUsersMap(GenericHelper.buildTestUsersMap(Constants.CONFIG_YO_USER, Constants.CONFIG_YO_USER_URL));
 

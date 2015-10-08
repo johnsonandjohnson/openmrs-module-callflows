@@ -3,8 +3,8 @@
 
     /* App Module */
 
-    angular.module('callflows',  [
-    'motech-dashboard', 'callflows.controllers', 'callflows.directives', 'callflows.services', 'ngCookies'
+    var callflows = angular.module('callflows',  [
+    'motech-dashboard', 'callflows.controllers', 'callflows.directives', 'callflows.services', 'ngCookies', 'ngFileUpload'
     ])
     .config(['$routeProvider', function ($routeProvider) {
         $routeProvider

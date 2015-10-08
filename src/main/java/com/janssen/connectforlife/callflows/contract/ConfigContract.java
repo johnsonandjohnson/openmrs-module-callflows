@@ -36,6 +36,27 @@ public class ConfigContract {
     private Map<String, String> servicesMap = new HashMap<>();
 
     /**
+     * The number of calls that are allowed concurrently as per the contract with the IVR provider.
+     * It is in business benefit to not exceed this or atleast make best efforts to not exceed
+     */
+    private int outboundCallLimit;
+
+    /**
+     * The number of times to retry if the outbound call limit is hit
+     */
+    private int outboundCallRetryAttempts;
+
+    /**
+     * The retry wait seconds before a retry is made when the outbound call limit is hit
+     */
+    private int outboundCallRetrySeconds;
+
+    /**
+     * Indicates whether the call can be placed if the retry attempts have been exceeded and we are still above the outbound call limit
+     */
+    private Boolean callAllowed;
+
+    /**
      * A map of test users
      * The key is a phone number and the value is a URL that can respond to a specific call request
      * This can be used to over-ride the outbound URL used for a given user and like in outgoingCallUriTemplate, this can also
@@ -74,6 +95,38 @@ public class ConfigContract {
 
     public void setServicesMap(Map<String, String> servicesMap) {
         this.servicesMap = servicesMap;
+    }
+
+    public int getOutboundCallLimit() {
+        return outboundCallLimit;
+    }
+
+    public void setOutboundCallLimit(int outboundCallLimit) {
+        this.outboundCallLimit = outboundCallLimit;
+    }
+
+    public int getOutboundCallRetryAttempts() {
+        return outboundCallRetryAttempts;
+    }
+
+    public void setOutboundCallRetryAttempts(int outboundCallRetryAttempts) {
+        this.outboundCallRetryAttempts = outboundCallRetryAttempts;
+    }
+
+    public int getOutboundCallRetrySeconds() {
+        return outboundCallRetrySeconds;
+    }
+
+    public void setOutboundCallRetrySeconds(int outboundCallRetrySeconds) {
+        this.outboundCallRetrySeconds = outboundCallRetrySeconds;
+    }
+
+    public Boolean isCallAllowed() {
+        return callAllowed;
+    }
+
+    public void setCallAllowed(Boolean callAllowed) {
+        this.callAllowed = callAllowed;
     }
 
     public Map<String, String> getTestUsersMap() {

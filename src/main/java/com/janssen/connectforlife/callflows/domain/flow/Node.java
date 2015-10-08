@@ -45,9 +45,19 @@ public class Node {
     private Block currentBlock;
 
     /**
+     * An index to the current block, useful when tracking where we are currently trying to perform audio mappings
+     */
+    private int currentBlockId;
+
+    /**
      * The current element in the current block that is active in this node
      */
     private Element currentElement;
+
+    /**
+     * An index to the current element, useful when tracking where we are currently trying to perform audio mappings
+      */
+    private int currentElementId;
 
     public String getStep() {
         return step;
@@ -89,6 +99,21 @@ public class Node {
         this.currentElement = currentElement;
     }
 
+    public int getCurrentBlockId() {
+        return currentBlockId;
+    }
+
+    public void setCurrentBlockId(int currentBlockId) {
+        this.currentBlockId = currentBlockId;
+    }
+
+    public int getCurrentElementId() {
+        return currentElementId;
+    }
+
+    public void setCurrentElementId(int currentElementId) {
+        this.currentElementId = currentElementId;
+    }
 
     @Override
     public boolean equals(Object o) {

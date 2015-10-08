@@ -1,7 +1,7 @@
 <link rel="stylesheet" href="../callflows/resources/css/codemirror.css"/>
 <script type="text/javascript" src="../callflows/resources/lib/codemirror/codemirror.min.js"></script>
 
-<div id="inner-center" class="inner-center ui-layout-center ui-layout-pane ui-layout-pane-center callflows">
+<div id="inner-center" class="inner-center ui-layout-center ui-layout-pane ui-layout-pane-center flows">
     <div class="header-footer-breadcrumb">
         <ul class="breadcrumb" role="navigation">
             <li><a role="menu" href=".">{{msg('server.home')}}</a></li>
@@ -19,6 +19,147 @@
         <div class="tab-content" id="tab-content">
             <div id="main-content" class="tab-pane active">
                 <div ng-view></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="inner-east" class="inner-east ui-layout-pane ui-layout-pane-east">
+    <div class="header-toolbar header-footer"></div>
+    <div class="ui-layout-content">
+        <div ng-controller="FlowRunnerController">
+            <ul class="nav nav-tabs">
+                <li><a data-toggle="tab" data-target="#cfl-search"><i class="icon-search"></i></a></li>
+                <li ng-disabled="! flows.current"><a ng-click="runFlow();" data-toggle="tab" data-target="#cfl-run">{{msg('callflows.tab.test')}}</a>
+                </li>
+                <li ng-disabled="! flows.current"><a data-toggle="tab" data-target="#cfl-audio"><i
+                        class="icon-music"></i></a></li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane" id="cfl-search" ng-controller="SearchController">
+                    <div class="inside">
+                        <fieldset class="inside">
+                            <legend>{{msg('callflows.field.search')}}</legend>
+                            <div class="form-group">
+                                <input type="hidden" ui-select2="SELECT_FLOWS_CONFIG" ng-model="selectedFlow"
+                                       ng-change="selectFlow();" id="selectFlow" class="select-entity">
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+                <!-- TEST RUNNER -->
+                <div class="tab-pane" id="cfl-run">
+                    <div class="chat-container">
+                        <div class="chat-messages">
+                            <div class="chat" ng-repeat="chat in chats">
+                                <div ng-class="chat.type">
+                                    <div ng-class="{'error' : chat.error, 'msg' : true}">{{chat.body}}</div>
+                                    <div class="chat-meta">
+                                        <span class="node"><a>{{chat.node}}</a></span>
+                                        <span class="time">{{chat.time | date:'H:m:s'}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" ng-disabled="terminated" ng-model="userResponse"
+                                   class="chat-input form-control" placeholder="{{msg('callflows.field.chatResponse')}}"
+                                   ng-keypress="$event.which === 13 ? sendDataToFlow(userResponse) : 0"/>
+                        </div>
+                    </div>
+                </div>
+                <!-- AUDIO -->
+                <div class="tab-pane" id="cfl-audio">
+                    <div class="inside" ng-controller="DesignerController">
+                        <fieldset class="inside">
+                            <legend>Text
+                                <a ng-click="audio.revealOn = !audio.revealOn;" class="btn"
+                                   ng-attr-title="{{getRevealTitle()}}">
+                                    <i ng-class="{'icon-eye-open' : ! audio.revealOn, 'icon-eye-close' : audio.revealOn}"></i>
+                                </a>
+                                <a ng-click="toggleGenerateName();" class="btn"
+                                   ng-attr-title="{{getGenerateNameTitle()}}">
+                                    <i ng-class="{'icon-ok' : audio.generateName, 'icon-remove' : ! audio.generateName}"></i>
+                                </a>
+                            </legend>
+                            <div class="form-group">
+                                <div class="audio-from-text audio-meta">{{audio.current}}</div>
+                                <textarea class="audio-to-text form-control" type="text" ng-model="audio.text">
+                                </textarea>
+                                <input class="form-control locale pull-right" ng-minlength="2" ng-maxlength="5"
+                                       type="text" value="en"
+                                       ng-model="audio.language"/>
+                            </div>
+                        </fieldset>
+                        <!-- revealMappings -->
+                        <fieldset class="inside" ng-show="audio.revealOn">
+                            <legend>{{msg('callflows.text.text')}} <i class="icon-arrow-right"></i> {{msg('callflows.text.audio')}}
+                                <a ng-attr-title="{{msg('callflows.btn.deleteAllMappings.tooltip')}}"
+                                   ng-click="deleteAllMappings();"><i class="icon-trash"></i>
+                                </a>
+                            </legend>
+                            <div class="form-group" ng-repeat="(text, mappings) in flows.current.raw.audio">
+                                <div class="audio-meta">{{text}}</div>
+                                <div class="mapping" ng-repeat="mapping in mappings">
+                                    <div>
+                                        <span title="{{mapping.target}}" class="label label-success">{{getNode(mapping.target)}}</span>
+                                        <a ng-click="deleteMapping(text, $index);">
+                                            <i ng-attr-title="{{msg('callflows.btn.deleteMapping.tooltip')}}" class="icon-trash"></i></a>
+                                        &nbsp;
+                                        <i class="icon-tags"></i>
+                                        <span class="audio-mapping">{{mapping.mapping}}</span>
+                                        <audio preload="none" controls>
+                                            <source src="{{buildUrl(audio.language, mapping);}}" />
+                                        </audio>
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset class="inside" ng-show="! audio.revealOn">
+                            <legend>Audio</legend>
+                            <div class="form-group" ng-show="files.length">
+                                <span title="No of files" class="label label-default" ng-bind="files.length"></span>
+                                <span title="successful" class="label label-success" ng-bind="uploadSuccess"></span>
+                                <span title="failed" class="label label-danger" ng-bind="uploadFailed"></span>
+                                <a
+                                        ng-attr-title="{{msg('callflows.btn.uploadAll.tooltip')}}"
+                                        class="btn upload-icon"
+                                        ng-click="uploadAllToServer(audio.language, files);">
+                                    <span class="label label-primary"><i class="icon-arrow-up"></i> {{msg('callflows.btn.upload')}}</span>
+                                </a>
+                            </div>
+                            <div class="form-group">
+                                <form name="uploadForm">
+                                    <div accept="audio/*" ngf-select ngf-multiple="true" ngf-drop ng-model="files"
+                                         class="drop-box">
+                                        {{msg('callflows.field.drop')}}
+                                    </div>
+                                    <div ng-repeat="file in files">
+                                        <div class="audio row">
+                                            <div class="col-md-9">
+                                                <audio controls ngf-src="file"></audio>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="btn-group">
+                                                    <a class="btn upload-btn"
+                                                       ng-attr-title="{{msg('callflows.btn.upload.tooltip')}}"
+                                                       ng-click="mapTextToAudio(audio.current, audio.text, audio.language, file)">
+                                                        <span class="label label-default"
+                                                              ng-class="{'label-info' : file.uploadSuccess}">{{msg('callflows.btn.cms')}}</span>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            <span class="pull-right audio-meta"><span
+                                                    ng-attr-title="{{file.uploadError}}"
+                                                    ng-class="{'label-danger' : file.uploadError}">{{file.name}}</span> - {{file.size}}B
+                                            </span>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

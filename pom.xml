@@ -230,27 +230,35 @@
                 </executions>
             </plugin>
 
+            <!-- Using jshint instead of jslint, as for one it provides exclude options, so that we can exclude vendor libs
+                 which are also currently in the same js folder as the rest of our code in order for MOTECH to load properly
+                 A second advantage is jshint is better updated than jslint and well more stricter :-s
+             -->
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>jslint-maven-plugin</artifactId>
-                <version>${maven.jslint.version}</version>
+                <groupId>com.cj.jshintmojo</groupId>
+                <artifactId>jshint-maven-plugin</artifactId>
                 <executions>
                     <execution>
                         <goals>
-                            <goal>jslint</goal>
+                            <goal>lint</goal>
                         </goals>
-                        <configuration>
-                            <sourceJsFolder>${basedir}/src/main/resources/webapp/js</sourceJsFolder>
-                            <disallowIncrAndDecr>true</disallowIncrAndDecr>
-                            <requireUseStrict>true</requireUseStrict>
-                            <predefinedVars>
-                                $, angular, window, _, handleWithStackTrace, CodeMirror
-                            </predefinedVars>
-                            <failOnIssues>${jslint.enable}</failOnIssues>
-                            <disallowInsecureCharsInRegExp>false</disallowInsecureCharsInRegExp>
-                        </configuration>
                     </execution>
                 </executions>
+                <configuration>
+                    <version>2.4.3</version>
+                    <options>indent,camelcase,eqeqeq,forin,immed,latedef,noarg,noempty,nonew</options>
+                    <globals>$, angular, window, _, handleWithStackTrace, CodeMirror</globals>
+                    <configFile>src/main/resources/jshint.conf.js</configFile>
+                    <directories>
+                        <directory>src/main/resources/webapp/js</directory>
+                    </directories>
+                    <excludes>
+                        <exclude>src/main/resources/webapp/js/ng-file-upload.js</exclude>
+                    </excludes>
+                    <reporter>jslint</reporter>
+                    <reportFile>target/jshint.xml</reportFile>
+                    <failOnError>${jslint.enable}</failOnError>
+                </configuration>
             </plugin>
         </plugins>
     </build>

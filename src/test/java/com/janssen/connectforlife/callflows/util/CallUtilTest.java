@@ -14,12 +14,14 @@ import com.janssen.connectforlife.callflows.helper.CallHelper;
 import com.janssen.connectforlife.callflows.helper.ConfigHelper;
 import com.janssen.connectforlife.callflows.helper.FlowHelper;
 import com.janssen.connectforlife.callflows.repository.CallDataService;
+import com.janssen.connectforlife.callflows.service.impl.CallServiceImpl;
 
 import org.motechproject.event.MotechEvent;
 import org.motechproject.scheduler.contract.RunOnceSchedulableJob;
 import org.motechproject.scheduler.service.MotechSchedulerService;
 
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.velocity.VelocityContext;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,13 +37,17 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import static junit.framework.TestCase.assertNotNull;
+import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
@@ -275,7 +281,8 @@ public class CallUtilTest extends BaseTest {
             throws OperationNotSupportedException {
         //Given
         given(config.getOutboundCallLimit()).willReturn(5);
-        given(callDataService.countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet)).willReturn(10L);
+        given(callDataService.countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet))
+                .willReturn(10L);
         eventParams.put(Constants.PARAM_JOB_ID, outboundCall.getCallId());
         eventParams.put(Constants.PARAM_RETRY_ATTEMPTS, 1);
         given(config.getOutboundCallRetryAttempts()).willReturn(5);
@@ -299,7 +306,8 @@ public class CallUtilTest extends BaseTest {
             throws OperationNotSupportedException {
         //Given
         given(config.getOutboundCallLimit()).willReturn(5);
-        given(callDataService.countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet)).willReturn(10L);
+        given(callDataService.countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet))
+                .willReturn(10L);
         eventParams.put(Constants.PARAM_JOB_ID, outboundCall.getCallId());
         eventParams.put(Constants.PARAM_RETRY_ATTEMPTS, 6);
         given(config.getOutboundCallRetryAttempts()).willReturn(5);
@@ -319,7 +327,8 @@ public class CallUtilTest extends BaseTest {
             throws OperationNotSupportedException {
         //Given
         given(config.getOutboundCallLimit()).willReturn(5);
-        given(callDataService.countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet)).willReturn(10L);
+        given(callDataService.countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet))
+                .willReturn(10L);
         eventParams.put(Constants.PARAM_JOB_ID, outboundCall.getCallId());
         eventParams.put(Constants.PARAM_RETRY_ATTEMPTS, 6);
         given(config.getOutboundCallRetryAttempts()).willReturn(5);
@@ -334,4 +343,59 @@ public class CallUtilTest extends BaseTest {
         verify(callDataService, times(1)).countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet);
         verifyZeroInteractions(schedulerService);
     }
+
+    @Test
+    public void shouldMergeContextWithCallForAVarietyOfClassTypes() {
+        // Given
+        VelocityContext context = new VelocityContext();
+        outboundCall.getContext().clear();
+        int integerValue = 1;
+        long longValue = 10L;
+        Integer integerWrapperValue = new Integer(integerValue);
+        Long longWrapperValue = new Long(longValue);
+        int[] arrayOfInt = { 1, 2, 3, 4 };
+        long[] arrayOfLong = { 1L, 2L, 3L, 4L };
+        float[] arrayOfFloat = { 1.1f, 2.2f, 3.3f };
+        List<Integer> listOfInteger = Arrays.asList(1, 2, 3, 4);
+        List<String> listOfString = Arrays.asList("One", "Two", "Three");
+        String[] arrayOfString = { "One", "Two", "Three" };
+        Map<String, String> internalMap = new HashMap<String, String>();
+        internalMap.put("test", "test");
+
+        context.put("string", "am a string");
+        context.put("integer", integerValue);
+        context.put("integerWrapper", integerWrapperValue);
+        context.put("long", longValue);
+        context.put("longWrapper", longWrapperValue);
+        context.put("arrayOfInt", arrayOfInt);
+        context.put("arrayOfFloat", arrayOfFloat);
+        context.put("arrayOfLong", arrayOfLong);
+        context.put("arrayOfString", arrayOfString);
+        context.put("listOfInteger", listOfInteger);
+        context.put("listOfString", listOfString);
+        context.put("internal", internalMap);
+        context.put("complex", new Call());
+        context.put("service", new CallServiceImpl());
+
+        // When
+        callUtil.mergeContextWithCall(context, outboundCall);
+
+        // Then
+        assertTrue(outboundCall.getContext().containsKey("string"));
+        assertTrue(outboundCall.getContext().containsKey("integer"));
+        assertTrue(outboundCall.getContext().containsKey("integerWrapper"));
+        assertTrue(outboundCall.getContext().containsKey("long"));
+        assertTrue(outboundCall.getContext().containsKey("longWrapper"));
+        assertTrue(outboundCall.getContext().containsKey("arrayOfInt"));
+        assertTrue(outboundCall.getContext().containsKey("arrayOfFloat"));
+        assertTrue(outboundCall.getContext().containsKey("arrayOfLong"));
+        assertTrue(outboundCall.getContext().containsKey("arrayOfString"));
+        assertTrue(outboundCall.getContext().containsKey("internal"));
+        // And we are not storing that one complex object
+        assertFalse(outboundCall.getContext().containsKey("complex"));
+        assertFalse(outboundCall.getContext().containsKey("service"));
+        assertThat(outboundCall.getContext().size(), equalTo(context.getKeys().length - 2));
+
+    }
+
 }

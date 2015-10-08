@@ -1,6 +1,7 @@
 package com.janssen.connectforlife.callflows.domain.flow;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -26,6 +27,15 @@ public class Flow {
      */
     private List<Node> nodes;
 
+    /**
+     * Audio map indicating in this flow, what strings are mapped to what audio files
+     * The same text can be mapped in multiple points to different files. This is possible, though not recommended.
+     * It's useful if a certain text always links to the same audio. Some places exceptions might be required, for instance
+     * Hello in one place might be Hello, whereas Hello in an entry node can link to a signature music, as even if the signature music is not
+     * present, then the text to speech can still say something useful
+      */
+    private Map<String, List<AudioMapping>> audio;
+
     public String getName() {
         return name;
     }
@@ -48,6 +58,14 @@ public class Flow {
 
     public void setNodes(List<Node> nodes) {
         this.nodes = nodes;
+    }
+
+    public Map<String, List<AudioMapping>> getAudio() {
+        return audio;
+    }
+
+    public void setAudio(Map<String, List<AudioMapping>> audio) {
+        this.audio = audio;
     }
 
     @Override

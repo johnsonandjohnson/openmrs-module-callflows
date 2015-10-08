@@ -26,6 +26,10 @@ public class ConfigBuilder {
         config.setName(configContract.getName());
         config.setOutgoingCallMethod(configContract.getOutgoingCallMethod());
         config.setOutgoingCallUriTemplate(configContract.getOutgoingCallUriTemplate());
+        config.setOutboundCallLimit(configContract.getOutboundCallLimit());
+        config.setOutboundCallRetryAttempts(configContract.getOutboundCallRetryAttempts());
+        config.setOutboundCallRetrySeconds(configContract.getOutboundCallRetrySeconds());
+        config.setCallAllowed(configContract.isCallAllowed());
 
         Map<String, String> testUsersMap = new LinkedHashMap<>();
         testUsersMap.putAll(configContract.getTestUsersMap());
