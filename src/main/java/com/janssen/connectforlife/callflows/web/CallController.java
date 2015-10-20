@@ -22,6 +22,7 @@ import org.motechproject.mds.util.ServiceUtil;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.runtime.log.Log4JLogChute;
+import org.joda.time.DateTime;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -141,10 +142,8 @@ public class CallController extends RestController {
      * @return
      */
     @RequestMapping(value = "/in/{conf}/flows/{flowName}.{extension}", method = RequestMethod.GET)
-    public ResponseEntity<String> handleIncoming(HttpServletRequest request,
-                                                 @PathVariable String conf,
-                                                 @PathVariable String flowName,
-                                                 @PathVariable String extension,
+    public ResponseEntity<String> handleIncoming(HttpServletRequest request, @PathVariable String conf,
+                                                 @PathVariable String flowName, @PathVariable String extension,
                                                  @RequestParam Map<String, String> params,
                                                  @RequestHeader Map<String, String> headers) {
 
@@ -372,6 +371,17 @@ public class CallController extends RestController {
         // The internal keyword is reserved in all velocity templates for the app's use
         // The rest of the namespace is free for the callflow designer to use as desired
         context.put(KEY_INTERNAL, new HashMap<String, String>());
+
+        // Some classes have very useful static methods that are useful when designing callflows
+        // These are included here in upper case as variables will predominantly be in lower case
+        // These are included only for convenience
+        context.put("String", String.class);
+        context.put("Integer", Integer.class);
+        context.put("Long", Long.class);
+        context.put("Float", Float.class);
+        context.put("Double", Double.class);
+        context.put("DateTime", DateTime.class);
+        context.put("Math", Math.class);
 
         loadParams(context, params);
         loadBundles(context, config.getServicesMap());
