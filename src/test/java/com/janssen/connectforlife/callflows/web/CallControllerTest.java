@@ -26,7 +26,7 @@ import com.janssen.connectforlife.callflows.util.CallUtil;
 import com.janssen.connectforlife.callflows.util.FlowUtil;
 import com.janssen.connectforlife.callflows.util.TestUtil;
 
-import org.motechproject.mds.util.ServiceUtil;
+import org.motechproject.mds.service.ServiceUtil;
 
 import org.apache.velocity.VelocityContext;
 import org.junit.Before;
