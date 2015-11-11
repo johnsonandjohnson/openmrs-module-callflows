@@ -23,6 +23,9 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.runtime.log.Log4JLogChute;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -380,7 +383,10 @@ public class CallController extends RestController {
         context.put("Long", Long.class);
         context.put("Float", Float.class);
         context.put("Double", Double.class);
+        context.put("LocalDate", LocalDate.class);
         context.put("DateTime", DateTime.class);
+        context.put("DateTimeFormat", DateTimeFormat.class);
+        context.put("DateTimeFormatter", DateTimeFormatter.class);
         context.put("Math", Math.class);
 
         loadParams(context, params);
