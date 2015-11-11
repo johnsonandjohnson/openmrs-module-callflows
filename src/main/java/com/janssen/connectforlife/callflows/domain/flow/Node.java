@@ -59,6 +59,16 @@ public class Node {
       */
     private int currentElementId;
 
+    /**
+     * The X position of this node in a visualization of this node
+     */
+    private int xpos;
+
+    /**
+     * The Y position of this node in a visualization of this node
+     */
+    private int ypos;
+
     public String getStep() {
         return step;
     }
@@ -113,6 +123,22 @@ public class Node {
 
     public void setCurrentElementId(int currentElementId) {
         this.currentElementId = currentElementId;
+    }
+
+    public int getXpos() {
+        return xpos;
+    }
+
+    public void setXpos(int xpos) {
+        this.xpos = xpos;
+    }
+
+    public int getYpos() {
+        return ypos;
+    }
+
+    public void setYpos(int ypos) {
+        this.ypos = ypos;
     }
 
     @Override

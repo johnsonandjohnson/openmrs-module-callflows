@@ -36,6 +36,13 @@ public class Flow {
       */
     private Map<String, List<AudioMapping>> audio;
 
+    /**
+     * Stores  meta information about the flow. Currently this is used to store a serialized form of the visualization data
+     * This is a string field to promote re-usability, as additional meta fields can continue to be stored here simply by changing
+     * the front-end interface
+     */
+    private String meta;
+
     public String getName() {
         return name;
     }
@@ -66,6 +73,14 @@ public class Flow {
 
     public void setAudio(Map<String, List<AudioMapping>> audio) {
         this.audio = audio;
+    }
+
+    public String getMeta() {
+        return meta;
+    }
+
+    public void setMeta(String meta) {
+        this.meta = meta;
     }
 
     @Override

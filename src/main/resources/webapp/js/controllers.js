@@ -2,7 +2,15 @@
     'use strict';
 
     /* Controllers */
-    var controllers = angular.module('callflows.controllers', []);
+    var controllers = angular.module('callflows.controllers', []),
+        makeLayout = function(view) {
+            if (view === 'narrow') {
+                innerLayout({ 'spacing_closed': 30, 'east__minSize': 200, 'east__maxSize': 650 }, { show: true });
+            } else {
+                // initialize innerLayout to wider angle
+                innerLayout({ 'spacing_closed': 30, 'east__minSize': 850, 'east__maxSize': 1400 }, { show: true });
+            }
+        };
 
     /* Search Controller */
     controllers.controller('SearchController', ['$scope', '$http', '$log', 'callflows', 'REST_API', 'CONFIG', 'settingsService',
@@ -50,31 +58,10 @@
         // select the flow that we searched for and set it in the service for other controllers to use
         $scope.selectFlow = function() {
             // when we get the flow from the server, the raw is a property with value as string
-            // so we use angular to convert that back to a JS obj
-            var raw, name, id, flow, i, j, nodes, status;
+            // so we need to deserialize it
+            var raw, flow;
             if ($scope.selectedFlow) {
-                id = $scope.selectedFlow.id;
-                name = $scope.selectedFlow.name;
-                status = $scope.selectedFlow.status;
-                raw = angular.fromJson($scope.selectedFlow.raw);
-                flow = {
-                    id          : id,
-                    name        : name,
-                    description : null,
-                    raw         : raw,
-                    status      : status
-                };
-                // We got the flow, we got back the object from the raw node, but each node also has it's own
-                // currentBlock and currentElement which also have to be re-initialized
-                nodes = flow.raw.nodes;
-                for (i = 0; i < nodes.length; i+=1) {
-                    if (nodes[i].nodeType === 'user') {
-                        // we reset to null, cause using json parse above would have created a brand new object,
-                        // ideally we need a reference to an existing object
-                        nodes[i].currentBlock = null;
-                        nodes[i].currentElement = null;
-                    }
-                }
+                flow = callflows.deserialize($scope.selectedFlow);
                 // make this available in the service
                 callflows.setCurrent(flow);
             }
@@ -109,7 +96,6 @@
         $scope.errors = [];
         // a bunch of messages that's not errors
         $scope.messages = [];
-
 
         $scope.codeMirrorLoaded = function(_editor) {
             _editor.focus();
@@ -154,14 +140,6 @@
             $scope.uploadFailed = 0;
         },
         init = function() {
-            // initialize east side layout when this controller loads
-            innerLayout({
-                'spacing_closed': 30,
-                'east__minSize': 200,
-                'east__maxSize': 650
-            }, {
-                show: true
-            });
             // initialize accordions
             // setAccordions($scope.flow);
             // Whether mappings must be revealed
@@ -296,6 +274,7 @@
 
         $scope.saveFlow = function() {
             var flow = callflows.current;
+
             $log.log(flow);
             // proceed to save
             callflows.saveFlow(
@@ -416,7 +395,6 @@
                 if (! flow.raw.audio[text]) {
                     flow.raw.audio[text] = [];
                 }
-                $log.log('doing mapping for ' + text + ' as ' + mapping + ' with ' + file.name + ' in language ' + language);
                 // store mapping against each text
                 // since the same text can be mapped to different audio files at different points, we use an array
                 // We expect that the mapping is same across different languages, as it's easier to work with uploading
@@ -431,8 +409,6 @@
                 // we use backquote for pure aesthetics, it conveys special meaning plus is not very jarring when read alongside text
                 if ($scope.currentEditor) {
                     selections = $scope.currentEditor.getSelections();
-                    // todo: if selection already has `` then what to do?
-                    // todo: use getRange and replaceRange
                     if (selections.length && selections[0] && selections[0].length) {
                         $scope.currentEditor.replaceSelections($scope.currentEditor.getSelections().map(function(text) {
                             // people are interesting, they will try all sorts of things :)
@@ -599,9 +575,20 @@
             }
         }
 
+        $scope.$watch('flows.current.mode', function(mode) {
+            var newView = mode === 'visualize' ? 'wide' : (!mode && callflows.menuView) ? callflows.menuView : 'narrow';
+            callflows.mode = mode;
+            if (callflows.menuView !== newView) {
+                callflows.menuView = newView;
+                makeLayout(newView);
+            }
+        });
+
         // running a flow
         $scope.runFlow = function() {
             var flow = callflows.current;
+            // set current mode
+            $scope.flows.current.mode = 'test';
             // reset chats
             $scope.chats = [];
             // current properties
@@ -664,7 +651,362 @@
         };
     });
 
+    /* Controller to visualize callflows */
+    controllers.controller('VisualizeController', ['$scope', '$http', 'callflows', '$timeout', '$log',
+    function($scope, $http, callflows, $timeout, $log) {
+        var stepRegex = /^\s*\|\s*([-a-zA-Z0-9.]+)\s*\|\s*$/, instance, buildCondition, buildConditionPath, buildValue, buildOperator;
 
+        $scope.$watch('flows.current.mode', function(newMode) {
+            if (newMode === 'visualize') {
+                $scope.visualize();
+            }
+        });
+
+        $scope.$watch('flows.refreshed', function(state) {
+            $scope.visualize();
+        });
+
+        $scope.loadFlow = function(name) {
+            callflows.loadFlow(name.replace(/\..*$/, ''));
+        };
+
+        buildValue = function(node) {
+            var output = '';
+            if (node.type === "string") {
+                output = '"' + node.value + '"';
+            } else if (node.type === "integer" || node.type === "decimal") {
+                // simple value
+                output = node.value;
+            } else if (node.type === "references") {
+                // referenced value
+                if (node.id) {
+                    output = node.id;
+                }
+                if (node.path && node.path.length) {
+                    output += ".";
+                    output = node.path[0].id;
+                }
+            } else if (node.type === "math") {
+                // complex conditional
+                if (node.operator === "parenthesis") {
+                    output = "(" + buildCondition(node.expression[0], output) + ')';
+                } else {
+                    output = buildCondition(node);
+                }
+            }
+            return output;
+        };
+
+        buildOperator = function(op) {
+            switch(op) {
+                case "not" : return "not ";
+                case "||" : return " or ";
+                case "&&" : return " and ";
+                case "==" : return " = ";
+                case "!=" : return " not = ";
+                default: return ' ' + op + ' ';
+            }
+        };
+
+        buildCondition = function(condition, output) {
+            var expr = condition.expression,
+            operator = condition.operator;
+            output = output || '';
+
+            if (expr) {
+                if (operator === 'not') {
+                    output = buildOperator(operator) + buildValue(expr[0]);
+                } else {
+                    output = buildValue(expr[0]) + buildOperator(operator) + buildValue(expr[1]);
+                }
+            }
+            return output;
+        };
+
+        buildConditionPath = function(condition, conditions) {
+            var output = '',
+                delimiter = "/";
+            if (conditions.length > 1) {
+                for (var i = 0; i < conditions.length; i++) {
+                    output += conditions[i];
+                    output += delimiter;
+                }
+            }
+            output += condition;
+            return output;
+        };
+
+
+        /* parse a velocity template string using the JISON generated parser
+           look for targets matching the correct step regex */
+		$scope.parse = function(input) {
+            var internal = [], // internal targets - jumps to points in same flow
+                external = [], // external targets - jumps to points in another flow
+                output = {input : input, internal: internal, external : external},
+                i, parsed, condition, conditions = [], path, level, conditionText;
+
+            if (input) {
+                parsed = velocity.parse(input);
+                // tracks nested levels
+                level = 0;
+                for (i = 0; i < parsed.length; i++) {
+                    if (typeof(parsed[i]) === "string") {
+                        if (stepRegex.test(parsed[i])) {
+                            path = buildConditionPath(condition, conditions);
+                            if (parsed[i].indexOf('.') === -1) {
+                                internal.push({step: parsed[i].match(stepRegex)[1], condition: condition});
+                            } else {
+                                external.push({step: parsed[i].match(stepRegex)[1], condition: condition});
+                            }
+                        }
+                    } else if (typeof[parsed[i]] === "object") {
+                        if (parsed[i].type === "if") {
+                            condition = buildCondition(parsed[i].condition);
+                            // we are tracking nested conditions using this array
+                            conditions.push(condition);
+                            level += 1;
+                        } else if (parsed[i].type === "elseif") {
+                            condition = buildCondition(parsed[i].condition);
+                        } else if (parsed[i].type === "else") {
+                            condition = "default";  // default makes more sense visually than an else
+                        } else if (parsed[i].type === "end") {
+                            condition = null;
+                            // end of condition
+                            conditions.pop(condition);
+                            level -= 1;
+                        }
+                    }
+                }
+            }
+            return output;
+        };
+
+        $scope.useLines = function() {
+            if ($scope.model) {
+                $scope.model.meta.graphType = "Flowchart";
+            }
+            $scope.connect();
+        };
+
+        $scope.useCurves = function() {
+            if ($scope.model) {
+                $scope.model.meta.graphType = "StateMachine";
+            }
+            $scope.connect();
+        };
+
+        /* connect nodes using jsplumb
+           There are three types of connections, connections from user-system nodes, system-system nodes and system-user nodes */
+        $scope.connect = function() {
+
+            var userToSystem = { anchor: "Continuous", paintStyle: {strokeStyle: 'red', lineWidth: 1} },
+                systemToSystem = { anchor: "Continuous", paintStyle: {strokeStyle: '#073863', lineWidth: 2, dashstyle: '2 2 0 2'} },
+                systemToUser = { anchor: "Continuous", paintStyle: {strokeStyle: '#073863', lineWidth: 1} },
+                systemToExternal = { anchor: "Continuous", paintStyle: {strokeStyle: '#419641', lineWidth: 1} },
+                defaults = {
+                    Endpoint: ["Blank", {}],
+                    Connector: [$scope.model.meta.graphType, {curviness: 40}],
+                    HoverPaintStyle: {strokeStyle: "#1e8151", lineWidth: 1},
+                    ConnectionOverlays: [
+                        [ "Arrow", { width: 6, location: 1, id: "arrow", length: 12, foldback: 0.8 }]
+                    ]
+                },
+                linkToSameFlow = function(srcIndex, target, instance) {
+                    // same flow
+                    var targetNode = $scope.findNode(target.step);
+                    if (targetNode.node) {
+                        if (targetNode.node.nodeType === 'system') {
+                            // we are connecting a system node to another system node
+                            // so ideally it should be right to right using a dotted pattern
+                            instance.connect({ source: 'node' + srcIndex, target: 'node' + targetNode.index}, systemToSystem);
+                        } else {
+                            // we are connecting a system node to a user node again
+                            // to differentiate, we go from bottom to right
+                            instance.connect({
+                                source: 'node' + srcIndex,
+                                target: 'node' + targetNode.index,
+                                label: target.condition ? target.condition : null
+                            }, systemToUser);
+                        }
+                    }
+                },
+                linkToAnotherFlow = function(srcIndex, target, instance) {
+                    // another flow
+                    var targetNode = {};
+                    $timeout(function() {
+                        _.find($scope.external , function(item, index) {
+                            if (item.step === target.step) {
+                                targetNode.index = index;
+                                targetNode.node = item;
+                                return true;
+                            }
+                        });
+                        // connect to external flow
+                        instance.connect({
+                            source: 'node' + srcIndex,
+                            target: 'external-node' + targetNode.index,
+                            label: target.condition ? target.condition : null
+                        }, systemToExternal);
+                    });
+                },
+                processExternalNode = function(id, externalTargets) {
+                    var j;
+                    // make the new external nodes draggable
+                    $timeout(function() {
+                        instance.draggable($('.external-node'), {
+                            drag: function(event) {
+                                var el = event.el,
+                                    pos = event.pos,
+                                    re = /^external-node(\d+)$/,
+                                    index = el.id.match(re)[1],
+                                    step = $scope.external[index].step;
+
+                                $scope.$apply(function() {
+                                    $scope.external[index].xpos = pos[0];
+                                    $scope.external[index].ypos = pos[1];
+                                    $scope.model.meta.positions[step] = {xpos: pos[0], ypos: pos[1]};
+                                });
+                            }
+                        });
+                        for (j = 0; j < externalTargets.length; j++) {
+                            linkToAnotherFlow(id, externalTargets[j], instance);
+                        }
+                    });
+                };
+
+            jsPlumb.ready(function() {
+                var i, j, nodes, target, targetNode, index, obj;
+                nodes = $scope.model.nodes;
+                // get the same instance if available to avoid leaving a trail of instances around each with their own connections!
+                instance = instance || jsPlumb.getInstance();
+                instance.importDefaults(defaults);
+                // first remove every connection
+                instance.detachEveryConnection();
+                instance.deleteEveryEndpoint();
+                instance.repaintEverything();
+
+                instance.registerConnectionType("basic", { anchor:"Continuous", connector: $scope.model.meta.graphType });
+                // make all node objects draggable
+                instance.draggable($('.node'), {
+                    drag: function(event) {
+                        var el = event.el,
+                            pos = event.pos,
+                            re = /^node(\d+)$/,
+                            index = el.id.match(re)[1];
+
+                        $scope.$apply(function() {
+                            $scope.model.nodes[index].xpos = pos[0];
+                            $scope.model.nodes[index].ypos = pos[1];
+                        });
+                    }
+                });
+                // maintain a list of external flows linked to from all the nodes of this flow
+                $scope.external = [];
+                // now we have access to both internal and external nodes in order to link them
+                for (i = 0; i < nodes.length; i++) {
+                    // we want odd nodes here - i.e. system nodes
+                    if (i % 2 !== 0) {
+                        if ($scope.isNodeShown(nodes[i])) {
+                            target = $scope.parse(nodes[i].templates.velocity.content);
+                            for (j = 0; j < target.internal.length; j++) {
+                                linkToSameFlow(i, target.internal[j], instance);
+                            }
+                            // set up the external nodes first, as we want to link to them
+                            for (j = 0; j < target.external.length; j++) {
+                                if (! _.findWhere($scope.external, {step: target.external[j]})) {
+                                    obj = angular.extend({}, target.external[j], {index: $scope.external.length});
+                                    if ($scope.model.meta.positions[target.external[j].step]) {
+                                        obj.xpos = $scope.model.meta.positions[target.external[j].step].xpos;
+                                        obj.ypos = $scope.model.meta.positions[target.external[j].step].ypos;
+                                    }
+                                    $scope.external.push(obj);
+                                }
+                            }
+                            if (target.external.length) {
+                                processExternalNode(i, target.external);
+                            }
+                        }
+                    } else {
+                        // if server node is a valid enough node to be shown, then connect the user node with it's server node
+                        if ($scope.isNodeShown(nodes[i+1])) {
+                            // user nodes always link to the corresponding server node
+                            // this can therefore by default link user-node:right to system-node:left
+                            instance.connect({ source: 'node' + i, target: 'node' + (i+1) }, userToSystem);
+                        }
+                    }
+                }
+            });
+        };
+
+        $scope.isNodeShown = function(node) {
+            if (node.nodeType === 'system') {
+                return node.step && node.templates.velocity && node.templates.velocity.content;
+            }
+            return true;
+        };
+        $scope.findNode = function(name) {
+            var i, node;
+            for (i = 0; i < $scope.model.nodes.length; i++) {
+                node = $scope.model.nodes[i];
+                if (node.step === name) {
+                    return {node: node, index: i};
+                }
+            }
+            return {node: null, index: -1};
+        };
+
+        $scope.findFields = function(node) {
+            var fields = [], i, j;
+            if (node.nodeType === 'user') {
+                for (i = 0; i < node.blocks.length; i++) {
+                    for (j = 0; j < node.blocks[i].elements.length; j++) {
+                        if (node.blocks[i].elements[j].type === 'field') {
+                            fields.push(node.blocks[i].elements[j]);
+                        }
+                    }
+                }
+            }
+            return fields;
+        };
+
+        $scope.exportDiagram = function() {
+            var flow = $scope.model.name;
+            domtoimage.toBlob(document.getElementById('callflowDiagram'))
+                .then(function(blob) {
+                    window.saveAs(blob, flow + '.png');
+                });
+        };
+
+        $scope.visualize = function() {
+            var nodes, i;
+            if (callflows.current) {
+                $scope.model = callflows.current.raw;
+                // include meta object if not present
+                if (! $scope.model.meta) {
+                    $scope.model.meta = {};
+                }
+                if (! $scope.model.meta.positions) {
+                    $scope.model.meta.positions = {};
+                }
+                nodes = $scope.model.nodes;
+                for (i = 0; i < nodes.length; i++) {
+                    // If currently there are no x and y positions, set some sensible defaults
+                    if (! nodes[i].xpos && ! nodes[i].ypos) {
+                        nodes[i].ypos = (i * 25) + 40;
+                        nodes[i].xpos = nodes[i].nodeType === 'user' ? 100 : 420;
+                    }
+                }
+                // and make the connections
+                // This needs to be in a timeout cause we want the previous digest to complete and the DOM to be ready
+                // otherwise jsplumb won't be able to find the DOM nodes to connect
+                $timeout(function() {
+                    $scope.model.meta.graphType = $scope.model.meta.graphType || "StateMachine";
+                    $scope.connect();
+                }, 1);
+            }
+        };
+
+    }]);
 
     /* Provider Controller for managing IVR provider data */
     controllers.controller('ProviderController', [

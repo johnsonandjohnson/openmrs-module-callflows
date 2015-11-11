@@ -1,5 +1,10 @@
 <link rel="stylesheet" href="../callflows/resources/css/codemirror.css"/>
 <script type="text/javascript" src="../callflows/resources/lib/codemirror/codemirror.min.js"></script>
+<script type="text/javascript" src="../callflows/resources/lib/velocity.min.js"></script>
+<script type="text/javascript" src="../callflows/resources/lib/jsplumb/jsplumb-2.0.4.min.js"></script>
+<script type="text/javascript" src="../callflows/resources/lib/saveas/Blob.min.js"></script>
+<script type="text/javascript" src="../callflows/resources/lib/saveas/FileSaver.min.js"></script>
+<script type="text/javascript" src="../callflows/resources/lib/saveas/dom-to-image.min.js"></script>
 
 <div id="inner-center" class="inner-center ui-layout-center ui-layout-pane ui-layout-pane-center flows">
     <div class="header-footer-breadcrumb">
@@ -29,11 +34,15 @@
     <div class="ui-layout-content">
         <div ng-controller="FlowRunnerController">
             <ul class="nav nav-tabs">
-                <li><a data-toggle="tab" data-target="#cfl-search"><i class="icon-search"></i></a></li>
+                <li><a data-toggle="tab" data-target="#cfl-search" ng-click="flows.current.mode = 'search';"><i class="icon-search"></i></a></li>
                 <li ng-disabled="! flows.current"><a ng-click="runFlow();" data-toggle="tab" data-target="#cfl-run">{{msg('callflows.tab.test')}}</a>
                 </li>
-                <li ng-disabled="! flows.current"><a data-toggle="tab" data-target="#cfl-audio"><i
-                        class="icon-music"></i></a></li>
+                <li ng-disabled="! flows.current">
+                    <a data-toggle="tab" data-target="#cfl-audio" ng-click="flows.current.mode = 'audio';"><i class="icon-music"></i></a>
+                </li>
+                <li ng-disabled="! flows.current">
+                    <a data-toggle="tab" data-target="#cfl-visualize" ng-click="flows.current.mode = 'visualize';"><i class="icon-picture"></i></a>
+                </li>
             </ul>
             <div class="tab-content">
                 <div class="tab-pane" id="cfl-search" ng-controller="SearchController">
@@ -55,7 +64,7 @@
                                 <div ng-class="chat.type">
                                     <div ng-class="{'error' : chat.error, 'msg' : true}">{{chat.body}}</div>
                                     <div class="chat-meta">
-                                        <span class="node"><a>{{chat.node}}</a></span>
+                                        <span class="chat-node"><a>{{chat.node}}</a></span>
                                         <span class="time">{{chat.time | date:'H:m:s'}}</span>
                                     </div>
                                 </div>
@@ -65,6 +74,57 @@
                             <input type="text" ng-disabled="terminated" ng-model="userResponse"
                                    class="chat-input form-control" placeholder="{{msg('callflows.field.chatResponse')}}"
                                    ng-keypress="$event.which === 13 ? sendDataToFlow(userResponse) : 0"/>
+                        </div>
+                    </div>
+                </div>
+                <!-- VISUALIZATION -->
+                <div class="tab-pane" id="cfl-visualize" ng-controller="VisualizeController">
+                    <div class="btn-group">
+                        <a class="btn btn-default" ng-click="visualize();"><i class="icon-refresh"></i> {{msg('callflows.btn.refresh')}}</a>
+                        <a class="btn btn-default" ng-click="exportDiagram();"><i class="icon-download"></i> {{msg('callflows.btn.download')}}</a>
+                    </div>
+                    <div class="btn-group">
+                        <a class="btn btn-default" ng-class="{'active' : model.meta.graphType === 'Flowchart'}"
+                           ng-click="useLines();"> {{msg('callflows.btn.lines')}}</a>
+                        <a class="btn btn-default" ng-class="{'active' : model.meta.graphType === 'StateMachine'}"
+                           ng-click="useCurves();"> {{msg('callflows.btn.curves')}}</a>
+                    </div>
+                    <div class="diagram" ng-show="model">
+                        <div id="callflowDiagram">
+                            <h4 class="frame-title">{{model.name}} {{msg('callflows.text.visualize')}}</h4>
+                            <hr/>
+                            <div class="diagram-container">
+                                <div ng-repeat="node in model.nodes">
+                                    <div ng-show="isNodeShown(node);" class="node" ng-attr-id="node{{$index}}"
+                                         ng-class-odd="'user'" ng-class-even="'system'"
+                                         style="left:{{node.xpos}}px; top:{{node.ypos}}px;">
+                                        <div>
+                                            <span ng-show="$index === 0">
+                                                <i class="icon-phone"></i>
+                                            </span>
+                                            <span ng-show="node.nodeType === 'system'">
+                                                <i class="icon-cog"></i>
+                                            </span>
+                                            {{ node.step }}
+                                            <span ng-show="node.nodeType === 'user' && ! isNodeShown(model.nodes[$index+1])">
+                                                <i class="icon-stop"></i>
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <span class="diagram-field" ng-repeat="field in findFields(node)">{{field.name}} </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div ng-repeat="externalNode in external">
+                                   <div class="node external-node" ng-attr-id="external-node{{externalNode.index}}"
+                                        style="left:{{externalNode.xpos}}px; top:{{externalNode.ypos}}px">
+                                      <div>
+                                            <i ng-click="loadFlow(externalNode.step);" class="icon-arrow-right"></i>
+                                            {{externalNode.step}}
+                                      </div>
+                                   </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -93,7 +153,8 @@
                         </fieldset>
                         <!-- revealMappings -->
                         <fieldset class="inside" ng-show="audio.revealOn">
-                            <legend>{{msg('callflows.text.text')}} <i class="icon-arrow-right"></i> {{msg('callflows.text.audio')}}
+                            <legend>{{msg('callflows.text.text')}} <i class="icon-arrow-right"></i>
+                                {{msg('callflows.text.audio')}}
                                 <a ng-attr-title="{{msg('callflows.btn.deleteAllMappings.tooltip')}}"
                                    ng-click="deleteAllMappings();"><i class="icon-trash"></i>
                                 </a>
@@ -104,12 +165,13 @@
                                     <div>
                                         <span title="{{mapping.target}}" class="label label-success">{{getNode(mapping.target)}}</span>
                                         <a ng-click="deleteMapping(text, $index);">
-                                            <i ng-attr-title="{{msg('callflows.btn.deleteMapping.tooltip')}}" class="icon-trash"></i></a>
+                                            <i ng-attr-title="{{msg('callflows.btn.deleteMapping.tooltip')}}"
+                                               class="icon-trash"></i></a>
                                         &nbsp;
                                         <i class="icon-tags"></i>
                                         <span class="audio-mapping">{{mapping.mapping}}</span>
                                         <audio preload="none" controls>
-                                            <source src="{{buildUrl(audio.language, mapping);}}" />
+                                            <source src="{{buildUrl(audio.language, mapping);}}"/>
                                         </audio>
                                     </div>
                                 </div>

@@ -4,10 +4,11 @@
     var services = angular.module('callflows.services', ['ngResource']);
 
     services.constant('REST_API', {
-        'CALLFLOW'      : '../callflows/flows',
-        'INBOUND_FLOW'  : '../callflows/in/{0}/flows/{1}.json',
-        'CONFIG'        : '../callflows/configs',
-        'RENDERER'      : '../callflows/renderers'
+        'CALLFLOW'          : '../callflows/flows',
+        'CALLFLOW_BY_NAME'  : '../callflows/flows?lookup=By Name&term={0}',
+        'INBOUND_FLOW'      : '../callflows/in/{0}/flows/{1}.json',
+        'CONFIG'            : '../callflows/configs',
+        'RENDERER'          : '../callflows/renderers'
     });
 
     services.constant('CONFIG', {
@@ -31,6 +32,42 @@
 
         // Track the current flow here
         flows.current = null;
+
+        flows.loadFlow = function(flow) {
+            $http.get(REST_API.CALLFLOW_BY_NAME.replace('{0}', flow))
+                .success(function(response) {
+                    if (response.results && response.results.length) {
+                        flows.setCurrent(flows.deserialize(response.results[0]));
+                        flows.refreshed = new Date();
+                    }
+                });
+        };
+
+        flows.deserialize = function(flow) {
+            var raw = angular.fromJson(flow.raw),
+                loadedFlow, nodes, i;
+            // deserialize the meta field, which is provided for extensibility and hence a string
+            raw.meta = angular.fromJson(raw.meta);
+            loadedFlow = {
+                id          : flow.id,
+                name        : flow.name,
+                description : null,
+                raw         : raw,
+                status      : flow.status
+            };
+            // We got the flow, we got back the object from the raw node, but each node also has it's own
+            // currentBlock and currentElement which also have to be re-initialized
+            nodes = loadedFlow.raw.nodes;
+            for (i = 0; i < nodes.length; i+=1) {
+                if (nodes[i].nodeType === 'user') {
+                    // we reset to null, cause using json parse above would have created a brand new object,
+                    // ideally we need a reference to an existing object
+                    nodes[i].currentBlock = null;
+                    nodes[i].currentElement = null;
+                }
+            }
+            return loadedFlow;
+        };
 
         flows.setCurrent = function(flow) {
             var renderers = settings.renderers, i, j, node;
@@ -132,7 +169,8 @@
         };
 
         flows.serialize = function() {
-            var flow = flows.current;
+            var flow = angular.copy(flows.current);
+            flow.raw.meta = angular.toJson(flow.raw.meta);
             // pack the name within the JSON as well for easy use
             flow.raw.name = flow.name;
             return {
@@ -204,7 +242,8 @@
 
         flows.run = function(successCallback, errorCallback) {
             var flow = flows.current,
-                url = REST_API.INBOUND_FLOW.replace('{0}', 'voxeo').replace('{1}', flow.name);
+                config = settings.configs[0].name,
+                url = REST_API.INBOUND_FLOW.replace('{0}', config).replace('{1}', flow.name);
             // Call runner URL
             $http({
                 method: 'GET',
