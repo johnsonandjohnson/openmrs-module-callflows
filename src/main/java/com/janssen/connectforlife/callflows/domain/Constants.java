@@ -21,6 +21,12 @@ public final class Constants {
 
     public static final String PARAM_ACTOR_TYPE = "actorType";
 
+    public static final String PARAM_REASON = "reason";
+
+    public static final String PARAM_STATUS = "status";
+
+    public static final String PARAM_PARAMS = "params";
+
     // private constructor
     private Constants() {
 

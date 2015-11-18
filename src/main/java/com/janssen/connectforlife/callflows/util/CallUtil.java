@@ -4,6 +4,7 @@ import com.janssen.connectforlife.callflows.contract.JsonExecutionResponse;
 import com.janssen.connectforlife.callflows.domain.Call;
 import com.janssen.connectforlife.callflows.domain.CallFlow;
 import com.janssen.connectforlife.callflows.domain.Config;
+import com.janssen.connectforlife.callflows.domain.Constants;
 import com.janssen.connectforlife.callflows.domain.Renderer;
 import com.janssen.connectforlife.callflows.domain.flow.Node;
 import com.janssen.connectforlife.callflows.domain.flow.UserNode;
@@ -13,6 +14,7 @@ import com.janssen.connectforlife.callflows.event.Events;
 import com.janssen.connectforlife.callflows.repository.CallDataService;
 
 import org.motechproject.event.MotechEvent;
+import org.motechproject.event.listener.EventRelay;
 import org.motechproject.scheduler.contract.RunOnceSchedulableJob;
 import org.motechproject.scheduler.service.MotechSchedulerService;
 
@@ -97,6 +99,9 @@ public class CallUtil {
 
     @Autowired
     private MotechSchedulerService schedulerService;
+
+    @Autowired
+    private EventRelay eventRelay;
 
 
     /**
@@ -432,6 +437,48 @@ public class CallUtil {
             }
         }
         return mergedURI;
+    }
+
+    /**
+     * Responsible for sending the call status of a call via the MOTECH event system
+     *
+     * @param call   that is the current call
+     * @param status to send
+     * @param reason to send
+     */
+    public void sendStatusEvent(Call call) {
+        Map<String, Object> data = new HashMap<>();
+
+        if (null != call) {
+            LOGGER.debug("Triggering call status changed event for call={}, status={}, reason={}", call.getCallId(),
+                         call.getStatus(), call.getStatusText());
+            data.put(Constants.PARAM_CALL_ID, call.getCallId());
+            // We are sending status to clients, to whom we shouldn't expose our domain objects
+            data.put(Constants.PARAM_STATUS, call.getStatus().name());
+            data.put(Constants.PARAM_REASON, call.getStatusText());
+            data.put(Constants.PARAM_PARAMS, call.getContext());
+            MotechEvent statusChangedEvent = new MotechEvent(Events.CALLFLOWS_CALL_STATUS, data);
+            eventRelay.sendEventMessage(statusChangedEvent);
+        }
+    }
+
+    /**
+     * Responsible for sending a call status event for a call that could not be initialized properly
+     * The callId would be sent as unknown by this method.
+     *
+     * @param status to send
+     * @param reason to send
+     * @param params to send, typically the initial params used to trigger the call needs to be sent back
+     */
+    public void sendStatusEvent(CallStatus status, String reason, Map<String, Object> params) {
+        Map<String, Object> data = new HashMap<>();
+
+        data.put(Constants.PARAM_CALL_ID, "unknown");
+        data.put(Constants.PARAM_STATUS, status);
+        data.put(Constants.PARAM_REASON, reason);
+        data.put(Constants.PARAM_PARAMS, params);
+        MotechEvent statusChangedEvent = new MotechEvent(Events.CALLFLOWS_CALL_STATUS, data);
+        eventRelay.sendEventMessage(statusChangedEvent);
     }
 
     private String buildJsonResponse(Exception error, String content, Node node, Call call) throws IOException {

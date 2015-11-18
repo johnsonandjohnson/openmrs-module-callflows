@@ -158,9 +158,9 @@ public final class Constants {
 
     public static final String ERROR_CONFIG = "error:BAD_INPUT:" + ERROR_YO;
 
-    public static final String XML_OK_RESPONSE = "<?xml version=\"1.0\"?><response>OK</response>";
+    public static final String OK_RESPONSE = "";
 
-    public static final String XML_ERROR_RESPONSE = "<?xml version=\"1.0\"?><response>ERROR</response>";
+    public static final String ERROR_RESPONSE = "error";
 
     public static final String TEST_PARAM = "testParam";
 

@@ -7,6 +7,7 @@ import com.janssen.connectforlife.callflows.domain.CallFlow;
 import com.janssen.connectforlife.callflows.domain.Config;
 import com.janssen.connectforlife.callflows.domain.flow.Flow;
 import com.janssen.connectforlife.callflows.domain.types.CallDirection;
+import com.janssen.connectforlife.callflows.domain.types.CallStatus;
 import com.janssen.connectforlife.callflows.event.Events;
 import com.janssen.connectforlife.callflows.helper.CallFlowHelper;
 import com.janssen.connectforlife.callflows.helper.CallHelper;
@@ -178,11 +179,11 @@ public class CallServiceTest extends BaseTest {
         ArgumentCaptor<HttpUriRequest> request = ArgumentCaptor.forClass(HttpUriRequest.class);
         given(callDataService.create(callArgumentCaptor.capture())).willReturn(outboundCall);
 
-        errorParams.putAll(params);
-        errorParams.put("phone", null);
-        errorParams.put("callId", "UNKNOWN");
-        errorParams.put("error", "Empty Phone no while initiating a outbound call for flow MainFlow");
-        callFailedEvent = new MotechEvent(Events.CALLFLOWS_FAILED_CALL, errorParams);
+        errorParams.put("callId", "unknown");
+        errorParams.put("status", CallStatus.FAILED);
+        errorParams.put("params", params);
+        errorParams.put("reason", "Empty Phone no while initiating a outbound call for flow MainFlow");
+        callFailedEvent = new MotechEvent(Events.CALLFLOWS_CALL_STATUS, errorParams);
     }
 
     @Test
@@ -434,7 +435,7 @@ public class CallServiceTest extends BaseTest {
         // Then
         assertNull(call);
         assertNoServiceInteractions();
-        assertEventSent(null, "Empty Phone no while initiating a outbound call for flow MainFlow", "UNKNOWN");
+        assertEventSent(null, "Empty Phone no while initiating a outbound call for flow MainFlow", "unknown");
     }
 
     @Test
@@ -449,7 +450,7 @@ public class CallServiceTest extends BaseTest {
         // Then
         assertNull(call);
         assertNoServiceInteractions();
-        assertEventSent("", "Empty Phone no while initiating a outbound call for flow MainFlow", "UNKNOWN");
+        assertEventSent("", "Empty Phone no while initiating a outbound call for flow MainFlow", "unknown");
     }
 
     @Test
@@ -467,8 +468,7 @@ public class CallServiceTest extends BaseTest {
         verify(callFlowService, times(1)).findByName(Constants.CALLFLOW_MAIN);
         verifyZeroInteractions(callDataService);
         verifyZeroInteractions(flowService);
-        verifyZeroInteractions(callUtil);
-        assertEventSent("1234567890", "Bad!", "UNKNOWN");
+        assertEventSent("1234567890", "Bad!", "unknown");
     }
 
     @Test
@@ -486,8 +486,7 @@ public class CallServiceTest extends BaseTest {
         verify(settingsService, never()).getConfig(anyString());
         verifyZeroInteractions(callDataService);
         verifyZeroInteractions(flowService);
-        verifyZeroInteractions(callUtil);
-        assertEventSent("1234567890", "Bad!", "UNKNOWN");
+        assertEventSent("1234567890", "Bad!", "unknown");
     }
 
     @Test
@@ -504,7 +503,8 @@ public class CallServiceTest extends BaseTest {
         assertCallCreated();
         verify(callDataService, times(1)).update(outboundCall);
         verify(callUtil, times(1)).buildOutboundRequest("1234567890", outboundCall, voxeo, params);
-        assertEventSent("1234567890", "Unacceptable body: failure: unknown error", outboundCall.getCallId());
+        // Since phone and config are fine, we have a valid call object which we'll use for error reporting
+        assertEventSent(outboundCall);
     }
 
     @Test
@@ -521,7 +521,7 @@ public class CallServiceTest extends BaseTest {
         assertCallCreated();
         verify(callDataService, times(1)).update(outboundCall);
         verify(callUtil, times(1)).buildOutboundRequest("1234567890", outboundCall, voxeo, params);
-        assertEventSent("1234567890", "Unacceptable status line: HTTP/1.1 404 ERROR", outboundCall.getCallId());
+        assertEventSent(outboundCall);
     }
 
     @Test
@@ -538,7 +538,7 @@ public class CallServiceTest extends BaseTest {
         verify(callDataService, times(1)).create(outboundCall);
         verify(callDataService, times(1)).update(outboundCall);
         verify(callUtil, times(1)).buildOutboundRequest("1234567890", outboundCall, voxeo, params);
-        assertEventSent("1234567890", "Content has not been provided", outboundCall.getCallId());
+        assertEventSent(outboundCall);
     }
 
     public void assertAllLoaded() {
@@ -552,7 +552,6 @@ public class CallServiceTest extends BaseTest {
         verifyZeroInteractions(settingsService);
         verifyZeroInteractions(callDataService);
         verifyZeroInteractions(flowService);
-        verifyZeroInteractions(callUtil);
     }
 
     public void assertCallCreated() {
@@ -568,9 +567,13 @@ public class CallServiceTest extends BaseTest {
     }
 
     public void assertEventSent(String phone, String reason, String callId) {
-        errorParams.put("error", reason);
-        errorParams.put("phone", phone);
+        errorParams.put("reason", reason);
         errorParams.put("callId", callId);
+        verify(callUtil, times(1)).sendStatusEvent(CallStatus.FAILED, reason, params);
         verify(eventRelay, times(1)).sendEventMessage(callFailedEvent);
+    }
+
+    public void assertEventSent(Call call) {
+        verify(callUtil, times(1)).sendStatusEvent(call);
     }
 }

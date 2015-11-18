@@ -5,6 +5,7 @@ import com.janssen.connectforlife.callflows.Constants;
 import com.janssen.connectforlife.callflows.domain.Call;
 import com.janssen.connectforlife.callflows.helper.CallHelper;
 import com.janssen.connectforlife.callflows.service.CallService;
+import com.janssen.connectforlife.callflows.util.CallUtil;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -17,6 +18,7 @@ import org.springframework.test.web.server.MockMvc;
 import org.springframework.test.web.server.setup.MockMvcBuilders;
 
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -42,6 +44,9 @@ public class CallStatusControllerTest extends BaseTest {
     @Mock
     private CallService callService;
 
+    @Mock
+    private CallUtil callUtil;
+
     @Before
     public void setup() {
         mockMvc = MockMvcBuilders.standaloneSetup(callStatusController).build();
@@ -49,7 +54,7 @@ public class CallStatusControllerTest extends BaseTest {
     }
 
     @Test
-    public void shouldReturnXMLOkIfTheCallStatusUpdateIsSuccessful() throws Exception {
+    public void shouldReturnOkIfTheCallStatusUpdateIsSuccessful() throws Exception {
         //Given
         given(callService.findByCallId(Constants.INBOUND_CALL_ID.toString())).willReturn(call);
 
@@ -57,14 +62,15 @@ public class CallStatusControllerTest extends BaseTest {
         mockMvc.perform(
                 get("/status/" + Constants.INBOUND_CALL_ID.toString() + "?status=ANSWERED&reason=call answered"))
 
-               .andExpect(status().is(HttpStatus.OK.value())).andExpect(content().string(Constants.XML_OK_RESPONSE));
+               .andExpect(status().is(HttpStatus.OK.value())).andExpect(content().string(Constants.OK_RESPONSE));
 
         verify(callService, times(1)).findByCallId(Constants.INBOUND_CALL_ID.toString());
         verify(callService, times(1)).update(call);
+        verify(callUtil, times(1)).sendStatusEvent(call);
     }
 
     @Test
-    public void shouldReturnXMLErrorIfTheCallIsNotFoundInDatabase() throws Exception {
+    public void shouldReturnErrorIfTheCallIsNotFoundInDatabase() throws Exception {
 
         //Given
         given(callService.findByCallId(Constants.INBOUND_CALL_ID.toString())).willReturn(null);
@@ -73,9 +79,10 @@ public class CallStatusControllerTest extends BaseTest {
         mockMvc.perform(
                 get("/status/" + Constants.INBOUND_CALL_ID.toString() + "?status = ANSWERED & reason = call answered"))
 
-               .andExpect(status().is(HttpStatus.OK.value())).andExpect(content().string(Constants.XML_ERROR_RESPONSE));
+               .andExpect(status().is(HttpStatus.OK.value())).andExpect(content().string(Constants.ERROR_RESPONSE));
 
         verify(callService, times(1)).findByCallId(Constants.INBOUND_CALL_ID.toString());
         verify(callService, never()).update(call);
+        verify(callUtil, never()).sendStatusEvent(any(Call.class));
     }
 }

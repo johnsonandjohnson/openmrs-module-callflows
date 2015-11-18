@@ -7,16 +7,12 @@ import com.janssen.connectforlife.callflows.domain.Constants;
 import com.janssen.connectforlife.callflows.domain.flow.Flow;
 import com.janssen.connectforlife.callflows.domain.types.CallDirection;
 import com.janssen.connectforlife.callflows.domain.types.CallStatus;
-import com.janssen.connectforlife.callflows.event.Events;
 import com.janssen.connectforlife.callflows.repository.CallDataService;
 import com.janssen.connectforlife.callflows.service.CallFlowService;
 import com.janssen.connectforlife.callflows.service.CallService;
 import com.janssen.connectforlife.callflows.service.FlowService;
 import com.janssen.connectforlife.callflows.service.SettingsService;
 import com.janssen.connectforlife.callflows.util.CallUtil;
-
-import org.motechproject.event.MotechEvent;
-import org.motechproject.event.listener.EventRelay;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.io.IOUtils;
@@ -30,7 +26,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import javax.naming.OperationNotSupportedException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -66,9 +61,6 @@ public class CallServiceImpl implements CallService {
 
     @Autowired
     private SettingsService settingsService;
-
-    @Autowired
-    private EventRelay eventRelay;
 
     @Autowired
     private CallUtil callUtil;
@@ -157,6 +149,8 @@ public class CallServiceImpl implements CallService {
 
         // The status
         currentCall.setStatus(call.getStatus());
+        // Update status every time, we update status
+        currentCall.setStatusText(call.getStatusText());
 
         // The provider data, cause we didn't have it at the time of creation
         currentCall.setProviderData(call.getProviderData());
@@ -207,9 +201,6 @@ public class CallServiceImpl implements CallService {
             HttpUriRequest request = callUtil.buildOutboundRequest(phone, call, config, params);
             makeOutboundRequest(request, call, params);
 
-        } catch (OperationNotSupportedException e) {
-            sendCallFailedEvent(call.getCallId(), e.getMessage(), params);
-
         } catch (Exception e) {
             LOGGER.error("Outbound call not made for flow: {}, config: {}, phone: {}", flowName, configName, phone, e);
             handleError(call, e.getMessage(), params);
@@ -218,30 +209,21 @@ public class CallServiceImpl implements CallService {
     }
 
     private void handleError(Call call, String reason, Map<String, Object> params) {
-        String callId = "UNKNOWN";
         LOGGER.error("call {} failed with reason {}", call, reason);
         // update call failed status
         if (call != null) {
+            // Since this is an error, the status is always FAILED
             call.setStatus(CallStatus.FAILED);
             call.setStatusText(reason);
             callDataService.update(call);
-            callId = call.getCallId();
+            // send a motech event with all params as received, so that the module that called this
+            // could inspect the error and retry if so desired
+            callUtil.sendStatusEvent(call);
+        } else {
+            // We don't have a valid call, but there was still some error making the call,
+            // so we send out an event with whatever information we have
+            callUtil.sendStatusEvent(CallStatus.FAILED, reason, params);
         }
-        // send a motech event with all params as received, so that the module that called this
-        // could inspect the error and retry if so desired
-        sendCallFailedEvent(callId, reason, params);
-    }
-
-    private void sendCallFailedEvent(String callId, String reason, Map<String, Object> params) {
-        Map<String, Object> data = new HashMap<>();
-        data.putAll(params);
-
-        data.put(Constants.PARAM_CALL_ID, callId);
-        data.put(Constants.PARAM_ERROR, reason);
-
-        LOGGER.debug("Triggering call failed event for call {}, params {}", callId, data);
-        MotechEvent callFailedEvent = new MotechEvent(Events.CALLFLOWS_FAILED_CALL, data);
-        eventRelay.sendEventMessage(callFailedEvent);
     }
 
     private Call prepareCall(String phone, CallFlow callFlow, Flow flow, Config config, Map<String, Object> params) {
