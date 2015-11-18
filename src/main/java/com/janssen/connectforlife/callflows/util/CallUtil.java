@@ -474,7 +474,7 @@ public class CallUtil {
         Map<String, Object> data = new HashMap<>();
 
         data.put(Constants.PARAM_CALL_ID, "unknown");
-        data.put(Constants.PARAM_STATUS, status);
+        data.put(Constants.PARAM_STATUS, status.name());
         data.put(Constants.PARAM_REASON, reason);
         data.put(Constants.PARAM_PARAMS, params);
         MotechEvent statusChangedEvent = new MotechEvent(Events.CALLFLOWS_CALL_STATUS, data);

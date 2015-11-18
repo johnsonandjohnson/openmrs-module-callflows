@@ -180,7 +180,7 @@ public class CallServiceTest extends BaseTest {
         given(callDataService.create(callArgumentCaptor.capture())).willReturn(outboundCall);
 
         errorParams.put("callId", "unknown");
-        errorParams.put("status", CallStatus.FAILED);
+        errorParams.put("status", CallStatus.FAILED.name());
         errorParams.put("params", params);
         errorParams.put("reason", "Empty Phone no while initiating a outbound call for flow MainFlow");
         callFailedEvent = new MotechEvent(Events.CALLFLOWS_CALL_STATUS, errorParams);

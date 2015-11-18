@@ -17,6 +17,7 @@ import com.janssen.connectforlife.callflows.repository.CallDataService;
 import com.janssen.connectforlife.callflows.service.impl.CallServiceImpl;
 
 import org.motechproject.event.MotechEvent;
+import org.motechproject.event.listener.EventRelay;
 import org.motechproject.scheduler.contract.RunOnceSchedulableJob;
 import org.motechproject.scheduler.service.MotechSchedulerService;
 
@@ -26,6 +27,7 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -94,6 +96,9 @@ public class CallUtilTest extends BaseTest {
 
     @Mock
     private MotechSchedulerService schedulerService;
+
+    @Mock
+    private EventRelay eventRelay;
 
     @Mock
     private Config config;
@@ -396,6 +401,59 @@ public class CallUtilTest extends BaseTest {
         assertFalse(outboundCall.getContext().containsKey("service"));
         assertThat(outboundCall.getContext().size(), equalTo(context.getKeys().length - 2));
 
+    }
+
+    @Test
+    public void shouldSendCallStatusEventForValidCall() {
+        // Given a call with status and statusText as follows
+        outboundCall.setStatus(CallStatus.BUSY);
+        outboundCall.setStatusText(Constants.STATUS_TEXT);
+        outboundCall.setContext(callParams);
+        ArgumentCaptor<MotechEvent> motechEventArgumentCaptor = ArgumentCaptor.forClass(MotechEvent.class);
+
+        // When
+        callUtil.sendStatusEvent(outboundCall);
+
+        // Then
+        verify(eventRelay, times(1)).sendEventMessage(motechEventArgumentCaptor.capture());
+        MotechEvent capturedEvent = motechEventArgumentCaptor.getValue();
+        assertThat((String) capturedEvent.getParameters().get(Constants.PARAM_CALL_ID),
+                   equalTo(outboundCall.getCallId()));
+        assertCallStatusEvent(capturedEvent);
+    }
+
+    @Test
+    public void shouldNotSendCallStatusEventForInvalidCall() {
+        // Given a null call
+        Call badCall = null;
+
+        // When
+        callUtil.sendStatusEvent(badCall);
+
+        // Then
+        verifyZeroInteractions(eventRelay);
+    }
+
+    @Test
+    public void shouldSendStatusEventForArgumentsPassed() {
+        // Given, When
+        callUtil.sendStatusEvent(CallStatus.BUSY, Constants.STATUS_TEXT, callParams);
+        ArgumentCaptor<MotechEvent> motechEventArgumentCaptor = ArgumentCaptor.forClass(MotechEvent.class);
+
+        // Then
+        verify(eventRelay, times(1)).sendEventMessage(motechEventArgumentCaptor.capture());
+        MotechEvent capturedEvent = motechEventArgumentCaptor.getValue();
+        // Since we are sending this event without a call object being created, the call ID should be unknown
+        assertThat((String) capturedEvent.getParameters().get(Constants.PARAM_CALL_ID), equalTo("unknown"));
+        assertCallStatusEvent(capturedEvent);
+    }
+
+    private void assertCallStatusEvent(MotechEvent event) {
+        assertThat(event.getSubject(), equalTo(Events.CALLFLOWS_CALL_STATUS));
+        Map<String, Object> eventParameters = event.getParameters();
+        assertThat((String) eventParameters.get(Constants.PARAM_STATUS), equalTo(CallStatus.BUSY.name()));
+        assertThat((String) eventParameters.get(Constants.PARAM_REASON), equalTo(Constants.STATUS_TEXT));
+        assertThat((Map<String, Object>) eventParameters.get(Constants.PARAM_PARAMS), equalTo(callParams));
     }
 
 }
