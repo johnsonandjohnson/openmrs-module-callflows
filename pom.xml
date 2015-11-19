@@ -4,7 +4,7 @@
     <parent>
         <artifactId>modules</artifactId>
         <groupId>com.janssen.connectforlife</groupId>
-        <version>0.2.2</version>
+        <version>0.2.3</version>
         <relativePath>../..</relativePath>
     </parent>
 
@@ -245,7 +245,6 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <version>2.4.3</version>
                     <options>indent,camelcase,eqeqeq,forin,immed,latedef,noarg,noempty,nonew</options>
                     <globals>$, angular, window, _, handleWithStackTrace, CodeMirror</globals>
                     <configFile>src/main/resources/jshint.conf.js</configFile>
