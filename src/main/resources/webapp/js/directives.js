@@ -59,8 +59,12 @@
             ngModel.$render = function() {
                 //Code mirror expects a string so make sure it gets one
                 //Although the formatter have already done this, it can be possible that another formatter returns undefined (for example the required directive)
-                var safeViewValue = ngModel.$viewValue || '';
+                var safeViewValue = ngModel.$viewValue || '',
+                    scrollPos = editor.getScrollInfo();
+
                 editor.setValue(safeViewValue);
+                // set scroll position again
+                editor.scrollTo(scrollPos.left, scrollPos.top);
             };
 
             // Keep the ngModel in sync with changes from CodeMirror
