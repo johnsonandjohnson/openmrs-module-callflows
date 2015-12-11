@@ -3,7 +3,7 @@
 
     var services = angular.module('callflows.services', ['ngResource']);
 
-    services.constant('REST_API', {
+    services.constant('CALLFLOW_API', {
         'CALLFLOW'          : '../callflows/flows',
         'CALLFLOW_BY_NAME'  : '../callflows/flows?lookup=By Name&term={0}',
         'INBOUND_FLOW'      : '../callflows/in/{0}/flows/{1}.json',
@@ -25,7 +25,7 @@
     });
 
     /* Call flow Service */
-    services.factory('callflows', ['$http', '$log', 'REST_API', 'CONFIG', 'settingsService', function($http, $log, REST_API, CONFIG, settingsService) {
+    services.factory('callflows', ['$http', '$log', 'CALLFLOW_API', 'CONFIG', 'settingsService', function($http, $log, CALLFLOW_API, CONFIG, settingsService) {
         // container
         var flows = {},
             settings = settingsService;
@@ -34,7 +34,7 @@
         flows.current = null;
 
         flows.loadFlow = function(flow) {
-            $http.get(REST_API.CALLFLOW_BY_NAME.replace('{0}', flow))
+            $http.get(CALLFLOW_API.CALLFLOW_BY_NAME.replace('{0}', flow))
                 .success(function(response) {
                     if (response.results && response.results.length) {
                         flows.setCurrent(flows.deserialize(response.results[0]));
@@ -215,7 +215,7 @@
             // At the time of save, we need to run all the renderers
             flows.runRenderers(flow);
 
-            $http.post(REST_API.CALLFLOW, flows.serialize())
+            $http.post(CALLFLOW_API.CALLFLOW, flows.serialize())
                 .success(function(response) {
                     // Set the id to the saved object, so that next time we can do update
                     flow.id = response.id;
@@ -231,7 +231,7 @@
             // At the time of save, we need to run all the renderers
             flows.runRenderers(flow);
 
-            $http.put(REST_API.CALLFLOW + '/' + flow.id, flows.serialize())
+            $http.put(CALLFLOW_API.CALLFLOW + '/' + flow.id, flows.serialize())
                 .success(function(response) {
                     successCallback();
                 })
@@ -243,7 +243,7 @@
         flows.run = function(successCallback, errorCallback) {
             var flow = flows.current,
                 config = settings.configs[0].name,
-                url = REST_API.INBOUND_FLOW.replace('{0}', config).replace('{1}', flow.name);
+                url = CALLFLOW_API.INBOUND_FLOW.replace('{0}', config).replace('{1}', flow.name);
             // Call runner URL
             $http({
                 method: 'GET',
@@ -302,7 +302,7 @@
     }]);
 
     // Settings Service - to manage both IVR configurations as well as renderers
-    services.factory('settingsService', function($http, $log, REST_API, CONFIG) {
+    services.factory('settingsService', function($http, $log, CALLFLOW_API, CONFIG) {
         // settings = container object. This object is the service and methods set on this container are exposed
         // The rest of the functions are internal
         var settings        = {
@@ -338,7 +338,7 @@
                 }
             },
             loadSettings    = function(restApiKey, success, error) {
-                $http.get(REST_API[restApiKey])
+                $http.get(CALLFLOW_API[restApiKey])
                     .success(function(response) {
                         if (restApiKey === 'CONFIG') {
                             settings.configs = response;
@@ -447,7 +447,7 @@
 
         settings.saveConfigs = function(success, error) {
             var configs = prepareConfigs(settings.configs);
-            $http.post(REST_API.CONFIG, configs)
+            $http.post(CALLFLOW_API.CONFIG, configs)
                 .success(function(response) {
                     if (success) { success(response);}
                 })
@@ -461,7 +461,7 @@
             return settings.renderers;
         };
         settings.saveRenderers = function(success, error) {
-            $http.post(REST_API.RENDERER, settings.renderers)
+            $http.post(CALLFLOW_API.RENDERER, settings.renderers)
                 .success(function(response) {
                     if (success) { success(response);}
                 })
@@ -483,7 +483,7 @@
 
 
     /* Audio Service */
-    services.factory('audioService', ['$http', '$log', 'REST_API', 'CONFIG', function($http, $log, REST_API, CONFIG) {
+    services.factory('audioService', ['$http', '$log', 'CALLFLOW_API', 'CONFIG', function($http, $log, CALLFLOW_API, CONFIG) {
         var audio = {
             language: 'en'
         };

@@ -13,47 +13,47 @@
         };
 
     /* Search Controller */
-    controllers.controller('SearchController', ['$scope', '$http', '$log', 'callflows', 'REST_API', 'CONFIG', 'settingsService',
-    function($scope, $http, $log, callflows, REST_API, CONFIG, settingsService) {
+    controllers.controller('SearchController', ['$scope', '$http', '$log', 'callflows', 'CALLFLOW_API', 'CONFIG', 'settingsService',
+    function($scope, $http, $log, callflows, CALLFLOW_API, CONFIG, settingsService) {
 
-        var renderers = settingsService.renderers;
-
-        // This is the configuration required for the directive ui-select2 to work
-        $scope.SELECT_FLOWS_CONFIG = {
-            ajax: {
-                url: REST_API.CALLFLOW,
-                dataType: 'json',
-                quietMillis: 100,
-                data: function (term, page) {
-                    return {
-                        lookup: 'By Name',
-                        term: term,
-                        pageLimit: 5,
-                        page: page
-                    };
+        var renderers = settingsService.renderers,
+            selectConfig = {
+                ajax: {
+                    url: CALLFLOW_API.CALLFLOW,
+                    dataType: 'json',
+                    quietMillis: 100,
+                    data: function (term, page) {
+                        return {
+                            lookup: 'By Name',
+                            term: term,
+                            pageLimit: 5,
+                            page: page
+                        };
+                    },
+                    results: function (data) {
+                        return data;
+                    },
+                    minimumInputLength: CONFIG.MIN_SEARCH_LEN
                 },
-                results: function (data) {
-                    return data;
+                formatSelection: function (flow) {
+                    var name = flow && flow.name ? flow.name : '';
+
+                    return name ? name : $scope.msg('mds.error');
+                },
+                formatResult: function (flow) {
+                    var result = (flow && flow.name) ? angular.element('<strong>').text(flow.name) : undefined;
+
+                    return result || $scope.msg('mds.error');
+                },
+                containerCssClass: "form-control-select2",
+                escapeMarkup: function (markup) {
+                    return markup;
                 },
                 minimumInputLength: CONFIG.MIN_SEARCH_LEN
-            },
-            formatSelection: function (flow) {
-                var name = flow && flow.name ? flow.name : '';
+            };
 
-                return name ? name : $scope.msg('mds.error');
-            },
-            formatResult: function (flow) {
-                var result = (flow && flow.name) ? angular.element('<strong>').text(flow.name) : undefined;
-
-                return result || $scope.msg('mds.error');
-            },
-            containerCssClass: "form-control-select2",
-            escapeMarkup: function (markup) {
-                return markup;
-            },
-            minimumInputLength: CONFIG.MIN_SEARCH_LEN
-
-        };
+        // This is the configuration required for the directive ui-select2 to work
+        $scope.SELECT_FLOWS_CONFIG = selectConfig;
 
         // select the flow that we searched for and set it in the service for other controllers to use
         $scope.selectFlow = function() {
@@ -146,6 +146,8 @@
             audioService.revealOn = false;
             // Whether mapping names must be auto-generated
             audioService.generateName = true;
+            // initialize the narrow forcibly
+            makeLayout('narrow');
         };
 
         // open a node
@@ -979,7 +981,7 @@
 
         $scope.visualize = function() {
             var nodes, i;
-            if (callflows.current) {
+            if (callflows.current && callflows.current.raw) {
                 $scope.model = callflows.current.raw;
                 // include meta object if not present
                 if (! $scope.model.meta) {
@@ -1010,8 +1012,8 @@
 
     /* Provider Controller for managing IVR provider data */
     controllers.controller('ProviderController', [
-        '$scope', '$http', '$log', '$timeout', 'settingsService', 'REST_API', function(
-        $scope, $http, $log, $timeout, settingsService, REST_API) {
+        '$scope', '$http', '$log', '$timeout', 'settingsService', 'CALLFLOW_API', function(
+        $scope, $http, $log, $timeout, settingsService, CALLFLOW_API) {
 
         var hideMsgLater = function(index) {
                 return $timeout(function() {

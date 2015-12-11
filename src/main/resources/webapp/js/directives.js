@@ -8,7 +8,6 @@
     directives.directive('codeEditor', function($timeout, $log) {
         function postLink(scope, element, attrs, ngModel) {
             var syntax = attrs.syntax || 'velocity',
-                refresh = attrs.refresh,
                 theme = 'default ' + (attrs.theme || ''),
                 template = attrs.template,
                 fullscreenOn = function(cm) {
@@ -85,8 +84,8 @@
                 }
             });
 
-            if (refresh) {
-                unregister = scope.$watch(refresh, function(newValue, oldValue) {
+            if (scope.refresh) {
+                unregister = scope.$watch(scope.refresh, function(newValue, oldValue) {
                     if (newValue !== oldValue) {
                         init();
                     }
@@ -102,6 +101,7 @@
             scope: {
                 selection: '=',
                 editor: '=',
+                refresh: '&',
                 target: '@'
             },
             compile: function compile() {

@@ -104,8 +104,9 @@
                                 <div class="col-md-4">
                                     <input class="form-control" ng-model="conf.outboundCallRetryAttempts" type="text" name="outboundCallRetryAttempts" />
                                 </div>
-                                <div class="col-md-2">
-                                    <input class="form-control" ng-model="conf.callAllowed" type="checkbox" name="callAllowed" />
+                                <div class="col-md-2 center-all">
+                                    <button class="btn btn-default" ng-click="conf.callAllowed = ! conf.callAllowed"
+                                            type="checkbox" name="callAllowed" >{{conf.callAllowed ? "Yes" : "No"}}</button>
                                 </div>
                             </div>
                         </div>

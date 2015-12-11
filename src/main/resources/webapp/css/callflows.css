@@ -214,7 +214,17 @@ table.table-lite td {
 .chat-messages .error {
   color: red;
 }
-
+/* We make this z-index, cause we want code-mirror full screen to be on top */
+#outer-center, #inner-center {
+    z-index: 4 !important;
+}
+.toggle-dirty {
+    cursor: pointer;
+}
+.CodeMirror-fullscreen.cm-s-tts, .CodeMirror-fullscreen.cm-s-script,
+.CodeMirror.fullscreen.cm-s-field, .CodeMirror-fullscreen.cm-s-renderer {
+    height: auto !important;
+}
 /* code mirror */
 .cm-s-tts {
   height: 140px !important;
@@ -263,7 +273,7 @@ audio {
   text-align: center;
 }
 .audio-to-text {
-  height: 30px !important;
+  max-height: 90px !important;
 }
 .audio-meta, .audio-mapping, .audio-node {
   font-family: Consolas;sans-serif;

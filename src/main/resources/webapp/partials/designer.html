@@ -1,6 +1,5 @@
 <div class="row">
     <h4 class="frame-title">{{msg('callflows.tab.designer')}}</h4>
-
     <div class="inside">
         <div class="row margin-before2">
             <form class="form-horizontal" name="flow_form">
@@ -191,6 +190,7 @@
                                                     <div code-editor theme="tts" syntax="velocity"
                                                          refresh="accordions[$index]" selection="selectedText"
                                                          editor="editorHandler" ng-model="node.currentElement.txt"
+                                                         fullscreen="true"
                                                          target="{{getTarget(node, node.currentElement, 'txt')}}"
                                                          ng-change="runRender(node);"></div>
                                                 </div>
@@ -283,8 +283,8 @@
                                                                 {{msg('callflows.field.noMatch')}}
                                                             </a>
                                                         </li>
-                                                        <li ng-class="{'active' : (currentProperty === 'exit')}">
-                                                            <a ng-click="setProperty('exit');">
+                                                        <li ng-class="{'active' : (currentProperty === 'goodBye')}">
+                                                            <a ng-click="setProperty('goodBye');">
                                                                 {{msg('callflows.field.exit')}}
                                                             </a>
                                                         </li>
@@ -296,6 +296,7 @@
                                                          target-position="{{getTargetPosition()}}"
                                                          target="{{getTarget(node, node.currentElement, currentProperty || 'noInput')}}"
                                                          refresh="accordions[$index]"
+                                                         ng-change="runRender(node);"
                                                          ng-model="node.currentElement[currentProperty || 'noInput']"></div>
                                                 </div>
                                             </div>
@@ -324,6 +325,7 @@
                                                     </div>
                                                     <div class="col-md-12">
                                                         <div code-editor syntax="xml" refresh="accordions[$index]"
+                                                             fullscreen="true"
                                                              ng-model="node.templates[currentRenderer.name].content"></div>
                                                     </div>
                                                 </div>
@@ -352,6 +354,7 @@
                                                     <div class="col-md-12">
                                                         <div code-editor theme="script" syntax="velocity"
                                                              refresh="accordions[$index]"
+                                                             fullscreen="true"
                                                              ng-model="node.templates.velocity.content"></div>
                                                     </div>
                                                 </div>
