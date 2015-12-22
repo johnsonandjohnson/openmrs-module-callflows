@@ -291,7 +291,7 @@ public class CallUtilTest extends BaseTest {
         eventParams.put(Constants.PARAM_JOB_ID, outboundCall.getCallId());
         eventParams.put(Constants.PARAM_RETRY_ATTEMPTS, 1);
         given(config.getOutboundCallRetryAttempts()).willReturn(5);
-        motechEvent = new MotechEvent(Events.CALLFLOWS_OUTBOUND_CALL, eventParams);
+        motechEvent = new MotechEvent(Events.CALLFLOWS_INITIATE_CALL, eventParams);
 
         //When
         callUtil.checkCallCanBePlaced(outboundCall, config, eventParams);
@@ -337,7 +337,7 @@ public class CallUtilTest extends BaseTest {
         eventParams.put(Constants.PARAM_JOB_ID, outboundCall.getCallId());
         eventParams.put(Constants.PARAM_RETRY_ATTEMPTS, 6);
         given(config.getOutboundCallRetryAttempts()).willReturn(5);
-        motechEvent = new MotechEvent(Events.CALLFLOWS_OUTBOUND_CALL, eventParams);
+        motechEvent = new MotechEvent(Events.CALLFLOWS_INITIATE_CALL, eventParams);
         given(config.getCallAllowed()).willReturn(true);
 
         //When
@@ -446,6 +446,30 @@ public class CallUtilTest extends BaseTest {
         // Since we are sending this event without a call object being created, the call ID should be unknown
         assertThat((String) capturedEvent.getParameters().get(Constants.PARAM_CALL_ID), equalTo("unknown"));
         assertCallStatusEvent(capturedEvent);
+    }
+
+    @Test
+    public void shouldSetCallRetryLimitToOneIfRetryAttemptIsNull() throws OperationNotSupportedException {
+        //Given
+        given(config.getOutboundCallLimit()).willReturn(5);
+        given(callDataService.countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet))
+                .willReturn(10L);
+        eventParams.put(Constants.PARAM_JOB_ID, outboundCall.getCallId());
+        eventParams.put(Constants.PARAM_RETRY_ATTEMPTS, null);
+        given(config.getOutboundCallRetryAttempts()).willReturn(5);
+        motechEvent = new MotechEvent(Events.CALLFLOWS_INITIATE_CALL, eventParams);
+
+        //When
+        callUtil.checkCallCanBePlaced(outboundCall, config, eventParams);
+
+        //Then
+        verify(config, times(2)).getOutboundCallLimit();
+        verify(callDataService, times(1)).countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet);
+        assertThat(eventParams.get(Constants.PARAM_RETRY_ATTEMPTS).toString(), equalTo("1"));
+        verify(schedulerService, times(1)).scheduleRunOnceJob(new RunOnceSchedulableJob(motechEvent, DateTime.now()
+                                                                                                             .plusSeconds(
+                                                                                                                     Constants.CONFIG_VOXEO_OUTBOUND_CALL_RETRY_SECONDS)
+                                                                                                             .toDate()));
     }
 
     private void assertCallStatusEvent(MotechEvent event) {

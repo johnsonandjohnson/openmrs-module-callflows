@@ -27,6 +27,10 @@ public final class Constants {
 
     public static final String PARAM_PARAMS = "params";
 
+    public static final String PARAM_CONFIG = "config";
+
+    public static final String PARAM_FLOW_NAME = "flowName";
+
     // private constructor
     private Constants() {
 
