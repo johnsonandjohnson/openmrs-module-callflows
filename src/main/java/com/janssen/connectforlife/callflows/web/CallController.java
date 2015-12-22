@@ -4,6 +4,7 @@ import com.janssen.connectforlife.callflows.contract.OutboundCallResponse;
 import com.janssen.connectforlife.callflows.domain.Call;
 import com.janssen.connectforlife.callflows.domain.CallFlow;
 import com.janssen.connectforlife.callflows.domain.Config;
+import com.janssen.connectforlife.callflows.domain.Constants;
 import com.janssen.connectforlife.callflows.domain.FlowPosition;
 import com.janssen.connectforlife.callflows.domain.Renderer;
 import com.janssen.connectforlife.callflows.domain.flow.Flow;
@@ -19,6 +20,7 @@ import com.janssen.connectforlife.callflows.util.FlowUtil;
 
 import org.motechproject.mds.service.ServiceUtil;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.runtime.log.Log4JLogChute;
@@ -292,8 +294,15 @@ public class CallController extends RestController {
             // Load flow object
             Flow flow = flowService.load(call.getEndFlow().getName());
 
-            // Go to next node of where control last terminated, this would be a system node since nodes are in pairs
-            currentNode = flowUtil.getNextNodeByStep(flow, call.getEndNode());
+            String jumpTo = params.get(Constants.PARAM_JUMP_TO);
+            if (! StringUtils.isBlank(jumpTo)) {
+                // See if there is some jump to some other flow
+                flow = flowService.load(jumpTo);
+                currentNode = flow.getNodes().get(0);
+            } else {
+                // Go to next node of where control last terminated, this would be a system node since nodes are in pairs
+                currentNode = flowUtil.getNextNodeByStep(flow, call.getEndNode());
+            }
 
             // evaluate node sequentially across jumps to arrive at a position
             // The position we arrived at will be a userNode or a systemNode

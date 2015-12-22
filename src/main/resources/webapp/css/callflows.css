@@ -376,4 +376,8 @@ audio {
     z-index: 999;
     max-width: 120px !important;
 }
+.demarcator {
+    margin: 10px 15px 12px;
+    border-width: 1.5px;
+}
 

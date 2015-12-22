@@ -244,6 +244,9 @@
                                                          target="{{getTarget(node, node.currentElement, 'txt')}}"
                                                          ng-change="runRender(node);"></div>
                                                 </div>
+                                                <div ng-show="node.currentElement.fieldType === 'digits'" class="">
+                                                    <input ng-change="runRender(node);" ng-model="node.currentElement.dtmfGrammar" type="text" class="form-control" placeholder="DTMF Grammar" />
+                                                </div>
                                             </div>
                                             <div class="col-md-5">
                                                 <ul class="field">
@@ -299,9 +302,12 @@
                                                          ng-change="runRender(node);"
                                                          ng-model="node.currentElement[currentProperty || 'noInput']"></div>
                                                 </div>
+                                                <div ng-show="node.currentElement.fieldType === 'digits'" class="">
+                                                    <input ng-change="runRender(node);" type="text" ng-model="node.currentElement.voiceGrammar" class="form-control" placeholder="voice grammar" />
+                                                </div>
                                             </div>
                                         </div>
-                                        <hr/>
+                                        <hr class="demarcator" />
                                         <!-- Renderers Block -->
                                         {{flows.renderers}}
                                         <div class="row margin-before2">

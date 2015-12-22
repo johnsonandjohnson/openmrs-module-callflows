@@ -60,6 +60,16 @@ public class FieldElement extends Element {
      */
     private int reprompt;
 
+    /**
+     * DTMF Grammar, a comma separated list of allowed key presses for this field
+     */
+    private String dtmfGrammar;
+
+    /**
+     * Voice Grammar, a comma seperated list of allowed utterances that can be used for this field
+     */
+    private String voiceGrammar;
+
     public String getFieldType() {
         return fieldType;
     }
@@ -138,5 +148,21 @@ public class FieldElement extends Element {
 
     public void setFieldMeta(String fieldMeta) {
         this.fieldMeta = fieldMeta;
+    }
+
+    public String getDtmfGrammar() {
+        return dtmfGrammar;
+    }
+
+    public void setDtmfGrammar(String dtmfGrammar) {
+        this.dtmfGrammar = dtmfGrammar;
+    }
+
+    public String getVoiceGrammar() {
+        return voiceGrammar;
+    }
+
+    public void setVoiceGrammar(String voiceGrammar) {
+        this.voiceGrammar = voiceGrammar;
     }
 }
