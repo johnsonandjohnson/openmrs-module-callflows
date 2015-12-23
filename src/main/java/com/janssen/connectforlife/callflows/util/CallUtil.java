@@ -331,7 +331,7 @@ public class CallUtil {
             long currentOutboundCallCount = callDataService
                     .countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet);
             // Do we have enough bandwidth to make this call?
-            if (currentOutboundCallCount >= config.getOutboundCallLimit()) {
+            if (currentOutboundCallCount > config.getOutboundCallLimit()) {
                 // No we don't!
                 // So let's retry after some time and check again
                 // but before that how many retries have we made?
@@ -347,6 +347,9 @@ public class CallUtil {
                     // retry after some time
                     params.put(PARAM_RETRY_ATTEMPTS, retryAttempts + 1);
                     scheduleOutboundCall(call.getCallId(), config, params);
+                    // Exception is thrown at this point in time to avoid placing of call directly and
+                    // to place the call only at the recall time set for call queuing
+                    throw new OperationNotSupportedException("Outbound call limit is exceeded");
                 }
             }
         }

@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import javax.naming.OperationNotSupportedException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -201,6 +202,17 @@ public class CallServiceImpl implements CallService {
             HttpUriRequest request = callUtil.buildOutboundRequest(phone, call, config, params);
             makeOutboundRequest(request, call, params);
 
+        } catch (OperationNotSupportedException ose) {
+            LOGGER.error(
+                    "Outbound call not made for flow: {}, config: {}, phone: {} as the call queuing limit has been exceeded at this point in time",
+                    flowName, configName, phone, ose);
+
+            if (call != null) {
+                // Since this is an error, the status is always FAILED
+                call.setStatus(CallStatus.FAILED);
+                call.setStatusText(ose.getMessage());
+                callDataService.update(call);
+            }
         } catch (Exception e) {
             LOGGER.error("Outbound call not made for flow: {}, config: {}, phone: {}", flowName, configName, phone, e);
             handleError(call, e.getMessage(), params);

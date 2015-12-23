@@ -43,6 +43,7 @@ import org.mockito.Spy;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import javax.naming.OperationNotSupportedException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -56,6 +57,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -505,6 +507,24 @@ public class CallServiceTest extends BaseTest {
         verify(callUtil, times(1)).buildOutboundRequest("1234567890", outboundCall, voxeo, params);
         // Since phone and config are fine, we have a valid call object which we'll use for error reporting
         assertEventSent(outboundCall);
+    }
+
+    @Test
+    public void shouldUpdateCallStatusToFailedIfCallQueuingResultsInOperationsNotSupportedException()
+            throws IOException, URISyntaxException, OperationNotSupportedException {
+        // Given
+        given(client.execute(any(HttpGet.class))).willReturn(okResponse);
+        doThrow(new OperationNotSupportedException()).when(callUtil).checkCallCanBePlaced(outboundCall, voxeo, params);
+        params.put("phone", "1234567890");
+
+        // When
+        callService.makeCall(Constants.CONFIG_VOXEO, Constants.CALLFLOW_MAIN, params);
+
+        // Then
+        assertAllLoaded();
+        assertCallCreated();
+        verify(callDataService, times(1)).update(outboundCall);
+        verify(callUtil, never()).buildOutboundRequest("1234567890", outboundCall, voxeo, params);
     }
 
     @Test

@@ -281,7 +281,7 @@ public class CallUtilTest extends BaseTest {
         verifyZeroInteractions(schedulerService);
     }
 
-    @Test
+    @Test(expected = OperationNotSupportedException.class)
     public void shouldRetryIfCurrentActiveCallCountIsGreaterThanOutboundCallLimitAndCurrentRetriesIsLessThanRetryLimit()
             throws OperationNotSupportedException {
         //Given
@@ -448,7 +448,7 @@ public class CallUtilTest extends BaseTest {
         assertCallStatusEvent(capturedEvent);
     }
 
-    @Test
+    @Test(expected = OperationNotSupportedException.class)
     public void shouldSetCallRetryLimitToOneIfRetryAttemptIsNull() throws OperationNotSupportedException {
         //Given
         given(config.getOutboundCallLimit()).willReturn(5);
