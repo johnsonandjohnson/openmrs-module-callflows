@@ -298,6 +298,22 @@ public class CallControllerBundleIT extends RESTControllerPaxIT {
     }
 
     @Test
+    public void shouldHandleCallContinuationWhenJumpToIsSpecified() throws Exception {
+
+        CallFlow testFlow = CallFlowHelper.createTestFlow();
+        testFlow.setRaw(TestUtil.loadFile("test_flow.json"));
+        callFlowService.create(testFlow);
+
+        // When we make a call continuation request for a created call with JumpTo specified
+        HttpGet httpGet = buildGetRequest("/callflows/calls/" + outboundCall.getCallId() + ".json", "jumpTo",
+                                          "TestFlow");
+        HttpResponse response = getHttpClient().execute(httpGet);
+
+        // Then
+        assertResponseToBe(response, HttpStatus.SC_OK, Constants.APPLICATION_JSON_UTF8);
+    }
+
+    @Test
     public void shouldTerminateCallInHandleCallContinuationIfNotAbleToGetToAUserNode() throws Exception {
         // Given
         givenABadJumpFromASystemNodeThatLeadsToNowhere();

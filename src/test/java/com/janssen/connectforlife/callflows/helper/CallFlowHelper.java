@@ -31,4 +31,12 @@ public final class CallFlowHelper {
         return callFlow;
 
     }
+
+    public static CallFlow createTestFlow() {
+        CallFlow callFlow = new CallFlow("TestFlow",
+                                         "This is the Test Flow",
+                                         CallFlowStatus.DRAFT,
+                                         "{}");
+        return callFlow;
+    }
 }

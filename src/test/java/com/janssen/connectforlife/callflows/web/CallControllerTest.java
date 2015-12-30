@@ -548,6 +548,37 @@ public class CallControllerTest extends BaseTest {
     }
 
     @Test
+    public void shouldHandleCallContinuationWhenJumpToIsSpecified() throws Exception {
+        // When we make a call continuation request for a call where jumpTo is specified
+        //Given
+
+        String rawTest = TestUtil.loadFile("test_flow.json");
+        Flow testflow = FlowHelper.createFlow(rawTest);
+        entryHandlerNode = testflow.getNodes().get(0);
+
+        String flowName = "TestFlow";
+        given(flowService.load(flowName)).willReturn(testflow);
+        given(flowService.evalNode(eq(testflow), eq(entryHandlerNode), any(VelocityContext.class)))
+                .willReturn(flowPosition);
+
+        //When
+        mockMvc.perform(customGet("/calls/" + inboundCall.getCallId() + ".json" + "?jumpTo=" + flowName))
+               .andExpect(status().is(HttpStatus.OK.value())).andExpect(content().type(Constants.APPLICATION_JSON_UTF8))
+               .andExpect(content().string(sameAsFile("main_flow_inactive_with_body.json")));
+
+        // Then we should have tried to load the call first and then config and then flow
+        assertCallConfigFlowLoaded(inboundCall, Constants.CONFIG_VOXEO, mainFlow.getName());
+
+        verify(flowService, times(1)).evalNode(testflow, entryHandlerNode, velocityContextCaptor.getValue());
+        verify(flowService, times(1)).load(flowName);
+
+        // And we must have updated the call eventually by incrementing the steps and status to as set
+        assertCallUpdatedWithIncrementedSteps(CallStatus.IN_PROGRESS);
+        // Assert that the renderer is used appropriately
+        assertRendererForJson();
+    }
+
+    @Test
     public void shouldTerminateCallInHandleCallContinuationIfNotAbleToGetToAUserNode() throws Exception {
         // Given
         flowPosition.setTerminated(true);
