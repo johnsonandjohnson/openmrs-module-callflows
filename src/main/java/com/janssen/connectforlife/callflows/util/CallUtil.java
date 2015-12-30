@@ -321,7 +321,7 @@ public class CallUtil {
     public void checkCallCanBePlaced(Call call, Config config, Map<String, Object> params)
             throws OperationNotSupportedException {
 
-        int retryAttempts = 0;
+        Integer retryAttempts = 0;
         LOGGER.debug("pre-call-hook => call : {}, config: {}, params: {}", call, config, params);
 
         // Only if outbound call limit is set, we have to worry about no of active calls, retries, etc
@@ -331,11 +331,12 @@ public class CallUtil {
             long currentOutboundCallCount = callDataService
                     .countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet);
             // Do we have enough bandwidth to make this call?
-            if (currentOutboundCallCount >= config.getOutboundCallLimit()) {
+            if (currentOutboundCallCount > config.getOutboundCallLimit()) {
                 // No we don't!
                 // So let's retry after some time and check again
                 // but before that how many retries have we made?
-                retryAttempts = (int) params.get(PARAM_RETRY_ATTEMPTS);
+                retryAttempts =
+                        null != params.get(PARAM_RETRY_ATTEMPTS) ? (Integer) params.get(PARAM_RETRY_ATTEMPTS) : 0;
                 if (retryAttempts >= config.getOutboundCallRetryAttempts()) {
                     // We have exceeded anyway , so only one thing to do
                     if (!config.getCallAllowed()) {
@@ -345,7 +346,10 @@ public class CallUtil {
                 } else {
                     // retry after some time
                     params.put(PARAM_RETRY_ATTEMPTS, retryAttempts + 1);
-                    scheduleOutboundCall(call.getCallId(), config.getOutboundCallRetrySeconds(), params);
+                    scheduleOutboundCall(call.getCallId(), config, params);
+                    // Exception is thrown at this point in time to avoid placing of call directly and
+                    // to place the call only at the recall time set for call queuing
+                    throw new OperationNotSupportedException("Outbound call limit is exceeded");
                 }
             }
         }
@@ -442,9 +446,7 @@ public class CallUtil {
     /**
      * Responsible for sending the call status of a call via the MOTECH event system
      *
-     * @param call   that is the current call
-     * @param status to send
-     * @param reason to send
+     * @param call that is the current call
      */
     public void sendStatusEvent(Call call) {
         Map<String, Object> data = new HashMap<>();
@@ -514,13 +516,18 @@ public class CallUtil {
         }
     }
 
-    private void scheduleOutboundCall(String callId, int retrySeconds, Map<String, Object> params) {
+    private void scheduleOutboundCall(String callId, Config config, Map<String, Object> params) {
         Map<String, Object> eventParams = new HashMap<>();
-        eventParams.putAll(params);
+        // set the flow name to be invoked
+        eventParams.put(Constants.PARAM_FLOW_NAME, (String) params.get(Constants.PARAM_FLOW_NAME));
+        // set the config name to place the call
+        eventParams.put(Constants.PARAM_CONFIG, config.getName());
+        //set the params
+        eventParams.put(Constants.PARAM_PARAMS, params);
         eventParams.put(PARAM_JOB_ID, callId);
-        MotechEvent motechEvent = new MotechEvent(Events.CALLFLOWS_OUTBOUND_CALL, eventParams);
-        schedulerService.scheduleRunOnceJob(
-                new RunOnceSchedulableJob(motechEvent, DateTime.now().plusSeconds(retrySeconds).toDate()));
+        MotechEvent motechEvent = new MotechEvent(Events.CALLFLOWS_INITIATE_CALL, eventParams);
+        schedulerService.scheduleRunOnceJob(new RunOnceSchedulableJob(motechEvent, DateTime.now().plusSeconds(
+                config.getOutboundCallRetrySeconds()).toDate()));
     }
 }
 
