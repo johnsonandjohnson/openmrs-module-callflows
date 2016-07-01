@@ -469,7 +469,7 @@
             // one by one upload
             if (files && files.length) {
                 angular.forEach(files, function(file) {
-                    name = $scope.prettifyFileName(file.name);
+                    name = $scope.audio.generateName ? $scope.prettifyFileName(file.name) : file.name.replace(/\.[^.]*$/, '');
                     $scope.uploadToServer(name, language, file);
                 });
             }
