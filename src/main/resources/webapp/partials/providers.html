@@ -51,7 +51,8 @@
                     <div class="form-group">
                         <label class="col-md-3 control-label" for="outgoingCallUriTemplate{{$index}}">{{msg('callflows.field.outgoingCallUriTemplate')}}</label>
 
-                        <div class="col-md-8" data-toggle="tooltip" data-placement="top" data-trigger="hover" data-html="true"
+                        <div class="col-md-8" data-toggle="tooltip" data-placement="top" data-trigger="hover"
+                             data-html="true"
                              bs-popover="{{msg('callflows.field.outgoingCallUriTemplate.tooltip')}}">
                             <textarea spellcheck="false" class="form-control" id="outgoingCallUriTemplate{{$index}}"
                                       type="text" ng-model="conf.outgoingCallUriTemplate" rows="2"></textarea>
@@ -76,6 +77,36 @@
                         </div>
                     </div>
 
+                    <div class="form-group" ng-show="conf.outgoingCallMethod == 'POST'">
+                        <label class="col-md-3 control-label" for="outgoingCallPostHeadersMap{{$index}}">{{msg('callflows.field.outgoingCallPostHeaders')}}</label>
+
+                        <div class="col-md-8" data-toggle="tooltip" data-placement="top" data-trigger="hover"
+                             data-html="true"
+                             bs-popover="{{msg('callflows.field.outgoingCallPostHeaders.tooltip')}}">
+                            <ng-form name="outgoingCallPostHeadersMap{{$index}}">
+                                <textarea spellcheck="false" class="form-control"
+                                          id="outgoingCallPostHeadersMap{{$index}}"
+                                          name="outgoingCallPostHeaders"
+                                          rows="3"
+                                          ng-model="conf.outgoingCallPostHeadersMapString">
+                                </textarea>
+                                <span class="form-hint form-hint-bottom"
+                                      ng-show="outgoingCallPostHeadersMap{{$index}}.outgoingCallPostHeaders.$dirty && outgoingCallPostHeadersMap{{$index}}.outgoingCallPostHeaders.$error.pattern">{{msg('callflows.error.badOutgoingCallPostHeaders')}}</span>
+                            </ng-form>
+                        </div>
+                    </div>
+
+                    <div class="form-group" ng-show="conf.outgoingCallMethod == 'POST'">
+                        <label class="col-md-3 control-label" for="outgoingCallPostParams{{$index}}">{{msg('callflows.field.outgoingCallPostParams')}}</label>
+
+                        <div class="col-md-8" data-toggle="tooltip" data-placement="top" data-trigger="hover"
+                             data-html="true"
+                             bs-popover="{{msg('callflows.field.outgoingCallPostParams.tooltip')}}">
+                            <textarea spellcheck="false" class="form-control" id="outgoingCallPostParams{{$index}}"
+                                      type="text" ng-model="conf.outgoingCallPostParams" rows="2"></textarea>
+                        </div>
+                    </div>
+
                     <div class="form-group">
                         <label class="col-md-3 control-label">{{msg('callflows.field.outboundQueue')}}</label>
 
@@ -96,17 +127,21 @@
                             </div>
                             <div class="row form-horizontal">
                                 <div class="col-md-3">
-                                    <input class="form-control" ng-model="conf.outboundCallLimit" type="text" name="outboundCallLimit" />
+                                    <input class="form-control" ng-model="conf.outboundCallLimit" type="text"
+                                           name="outboundCallLimit"/>
                                 </div>
                                 <div class="col-md-3">
-                                    <input class="form-control" ng-model="conf.outboundCallRetrySeconds" type="text" name="outboundCallRetrySeconds" />
+                                    <input class="form-control" ng-model="conf.outboundCallRetrySeconds" type="text"
+                                           name="outboundCallRetrySeconds"/>
                                 </div>
                                 <div class="col-md-4">
-                                    <input class="form-control" ng-model="conf.outboundCallRetryAttempts" type="text" name="outboundCallRetryAttempts" />
+                                    <input class="form-control" ng-model="conf.outboundCallRetryAttempts" type="text"
+                                           name="outboundCallRetryAttempts"/>
                                 </div>
                                 <div class="col-md-2 center-all">
                                     <button class="btn btn-default" ng-click="conf.callAllowed = ! conf.callAllowed"
-                                            type="checkbox" name="callAllowed" >{{conf.callAllowed ? "Yes" : "No"}}</button>
+                                            type="checkbox" name="callAllowed">{{conf.callAllowed ? "Yes" : "No"}}
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -115,16 +150,18 @@
                     <div class="form-group">
                         <label class="col-md-3 control-label" for="servicesMap{{$index}}">{{msg('callflows.field.servicesMap')}}</label>
 
-                        <div class="col-md-8" data-toggle="tooltip" data-html="true" data-placement="top" data-trigger="hover"
+                        <div class="col-md-8" data-toggle="tooltip" data-html="true" data-placement="top"
+                             data-trigger="hover"
                              bs-popover="{{msg('callflows.field.servicesMap.tooltip')}}">
                             <ng-form name="servicesMap{{$index}}">
                                 <textarea spellcheck="false" class="form-control" id="servicesMap{{$index}}"
-                                       name="services"
+                                          name="services"
                                           rows="3"
                                           ng-pattern="/^(\s*\w*\s*:\s*[\w\.]+\s*)?(,\s*\w*\s*:\s*[\w\.]+\s*)*$/"
-                                          ng-model="conf.servicesMapString" >
+                                          ng-model="conf.servicesMapString">
                                 </textarea>
-                                <span class="form-hint form-hint-bottom" ng-show="servicesMap{{$index}}.services.$dirty && servicesMap{{$index}}.services.$error.pattern">{{msg('callflows.error.badServices')}}</span>
+                                <span class="form-hint form-hint-bottom"
+                                      ng-show="servicesMap{{$index}}.services.$dirty && servicesMap{{$index}}.services.$error.pattern">{{msg('callflows.error.badServices')}}</span>
                             </ng-form>
                         </div>
                     </div>
@@ -186,4 +223,3 @@
         </div>
     </div>
 </form>
-

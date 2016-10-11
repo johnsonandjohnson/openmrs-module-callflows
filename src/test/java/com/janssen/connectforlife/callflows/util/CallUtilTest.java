@@ -52,9 +52,9 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 /**
  * Call Helper Test Cases
@@ -74,6 +74,8 @@ public class CallUtilTest extends BaseTest {
     private Call inboundCall;
 
     private Config voxeo;
+
+    private Config imiMobile;
 
     private Call outboundCall;
 
@@ -123,6 +125,7 @@ public class CallUtilTest extends BaseTest {
         inboundCall = CallHelper.createInboundCall();
         outboundCall = CallHelper.createOutboundCall();
         voxeo = ConfigHelper.createConfigs().get(0);
+        imiMobile = ConfigHelper.createConfigs().get(2);
 
         callParams = new HashMap<>();
         callParams.put(Constants.TEST_PARAM, Constants.TEST_VALUE);
@@ -224,6 +227,19 @@ public class CallUtilTest extends BaseTest {
                    equalTo(new URI("http://i-should-override-everything?callId=" + inboundCall.getCallId() +
                                            "&myParam=testValue")));
 
+    }
+
+    @Test
+    public void shouldBuildOutboundRequestUrlForTestUserCorrectlyIMI() throws URISyntaxException {
+        // When
+        HttpUriRequest uriRequest = callUtil.buildOutboundRequest("1234567890", inboundCall, imiMobile, callParams);
+
+        // Then
+        assertNotNull(uriRequest);
+        assertThat(uriRequest.getMethod(), equalTo("POST"));
+        assertThat(uriRequest.getURI(), equalTo(new URI(imiMobile.getOutgoingCallUriTemplate())));
+        assertThat((uriRequest.getHeaders("Key")[0]).getValue(), equalTo("ccb2b7b2-3205-44ba-9e06-4844be3c298f"));
+        assertThat((uriRequest.getHeaders("Content-Type")[0]).getValue(), equalTo("application/x-www-form-urlencoded"));
     }
 
     @Test(expected = IllegalArgumentException.class)

@@ -21,6 +21,16 @@ public class Config {
     private String outgoingCallUriTemplate;
 
     /**
+     * HTTP POST headers.
+     */
+    private Map<String, String> outgoingCallPostHeadersMap = new HashMap<>();
+
+    /**
+     * HTTP POST params.
+     */
+    private String outgoingCallPostParams;
+
+    /**
      * The request method that is used when connecting to the IVR provider
      */
     private String outgoingCallMethod;
@@ -120,6 +130,22 @@ public class Config {
         this.testUsersMap = testUsersMap;
     }
 
+    public Map<String, String> getOutgoingCallPostHeadersMap() {
+        return outgoingCallPostHeadersMap;
+    }
+
+    public void setOutgoingCallPostHeadersMap(Map<String, String> outgoingCallPostHeadersMap) {
+        this.outgoingCallPostHeadersMap = outgoingCallPostHeadersMap;
+    }
+
+    public String getOutgoingCallPostParams() {
+        return outgoingCallPostParams;
+    }
+
+    public void setOutgoingCallPostParams(String outgoingCallPostParams) {
+        this.outgoingCallPostParams = outgoingCallPostParams;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -137,4 +163,3 @@ public class Config {
         return Objects.hash(name);
     }
 }
-

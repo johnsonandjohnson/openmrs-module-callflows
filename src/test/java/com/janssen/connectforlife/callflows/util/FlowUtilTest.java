@@ -383,6 +383,7 @@ public class FlowUtilTest extends BaseTest {
         internalCtx.put(property, val);
         ctx.put(Constants.PARAM_INTERNAL, internalCtx);
     }
+
     private void assertFlowStep(String[] flowAndStep, String expectedFlow, String expectedStep) {
         assertNotNull(flowAndStep);
         assertThat(flowAndStep.length, equalTo(2));

@@ -47,7 +47,7 @@ public class RestController {
      * @param e the exception throw
      * @return a error response
      */
-   @ExceptionHandler(CallFlowAlreadyExistsException.class)
+    @ExceptionHandler(CallFlowAlreadyExistsException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     @ResponseBody
     public ErrorResponse handleException(CallFlowAlreadyExistsException e) {

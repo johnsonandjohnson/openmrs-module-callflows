@@ -24,6 +24,16 @@ public class ConfigContract {
     private String outgoingCallMethod;
 
     /**
+     * HTTP POST headers.
+     */
+    private Map<String, String> outgoingCallPostHeadersMap = new HashMap<>();
+
+    /**
+     * HTTP POST params.
+     */
+    private String outgoingCallPostParams;
+
+    /**
      * The url to use when connecting to the IVR provider.
      * This is IVR provider specific. Use [xxx], [yyy] to denote placeholders that will be substituted at runtime
      */
@@ -79,6 +89,22 @@ public class ConfigContract {
 
     public void setOutgoingCallMethod(String outgoingCallMethod) {
         this.outgoingCallMethod = outgoingCallMethod;
+    }
+
+    public Map<String, String> getOutgoingCallPostHeadersMap() {
+        return outgoingCallPostHeadersMap;
+    }
+
+    public void setOutgoingCallPostHeadersMap(Map<String, String> outgoingCallPostHeadersMap) {
+        this.outgoingCallPostHeadersMap = outgoingCallPostHeadersMap;
+    }
+
+    public String getOutgoingCallPostParams() {
+        return outgoingCallPostParams;
+    }
+
+    public void setOutgoingCallPostParams(String outgoingCallPostParams) {
+        this.outgoingCallPostParams = outgoingCallPostParams;
     }
 
     public String getOutgoingCallUriTemplate() {
@@ -154,4 +180,3 @@ public class ConfigContract {
         return Objects.hash(name);
     }
 }
-

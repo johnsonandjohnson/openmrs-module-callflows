@@ -58,23 +58,33 @@ public final class Constants {
 
     public static final String CONFIG_YO = "yo";
 
+    public static final String CONFIG_IMI_MOBILE = "imiMobile";
+
     public static final String INVALID = "invalid";
 
     public static final String CONFIG_VOXEO_OUT_TEMPLATE = "http://some-api-server/?flow=[flow]&callid=[callid]";
 
     public static final String CONFIG_YO_OUT_TEMPLATE = "http://some-other-api-server/?flow=[flow]&callid=[callid]";
 
+    public static final String CONFIG_IMI_OUT_TEMPLATE = "http://api-openhouse.imimobile.com/1/obd/thirdpartycall/callSessions";
+
     public static final String CONFIG_VOXEO_METHOD = "GET";
 
     public static final String CONFIG_YO_METHOD = "POST";
+
+    public static final String CONFIG_IMI_METHOD = "POST";
 
     public static final String CONFIG_VOXEO_USER = "1111111111";
 
     public static final String CONFIG_YO_USER = "2222222222";
 
+    public static final String CONFIG_IMI_USER = "2222222222";
+
     public static final String CONFIG_VOXEO_USER_URL = "http://some-api-server/?phone=1111111111";
 
     public static final String CONFIG_YO_USER_URL = "http://some-other-api-server/?phone=2222222222";
+
+    public static final String CONFIG_IMI_USER_URL = "http://some-other-api-server/?phone=2222222222";
 
     public static final int CONFIG_VOXEO_OUTBOUND_CALL_LIMIT = 5;
 
@@ -91,6 +101,14 @@ public final class Constants {
     public static final int CONFIG_YO_OUTBOUND_CALL_RETRY_SECONDS = 30;
 
     public static final boolean CONFIG_YO_CAN_PLACE_OUTBOUND_CALL = false;
+
+    public static final int CONFIG_IMI_OUTBOUND_CALL_LIMIT = 5;
+
+    public static final int CONFIG_IMI_OUTBOUND_CALL_RETRY_ATTEMPTS = 5;
+
+    public static final int CONFIG_IMI_OUTBOUND_CALL_RETRY_SECONDS = 60;
+
+    public static final boolean CONFIG_IMI_CAN_PLACE_OUTBOUND_CALL = false;
 
     public static final String CONFIG_SRVC_CALL = "callSrvc";
 

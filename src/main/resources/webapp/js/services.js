@@ -316,16 +316,24 @@
                     angular.forEach(data, function(config) {
                         var testUsersMap = angular.fromJson(config.testUsersMap),
                             servicesMap = angular.fromJson(config.servicesMap),
-                            services = [];
+                            services = [],
+                            outgoingCallPostHeadersMap = angular.fromJson(config.outgoingCallPostHeadersMap),
+                            outgoingCallPostHeaders = [];
 
                         config.testUsers = [];
                         angular.forEach(testUsersMap, function(outbound, phone) {
                             config.testUsers.push({phone: phone, outbound: outbound});
                         });
+
                         angular.forEach(servicesMap, function(val, key) {
                             services.push(key + ':' + val);
                         });
                         config.servicesMapString = services.join(',');
+
+                        angular.forEach(outgoingCallPostHeadersMap, function(val, key) {
+                            outgoingCallPostHeaders.push(key + ':' + val);
+                        });
+                        config.outgoingCallPostHeadersMapString = outgoingCallPostHeaders.join(',');
                     });
                 },
                 'RENDERER' : function(data) {
@@ -361,6 +369,14 @@
                     out[keyVal[0]] = keyVal[1];
                 });
                 return out;
+            }, parseOutgoingCallPostHeadersMapString = function(str) {
+                var outgoingCallPostHeaders = str.split(/\s*,\s*/),
+                    out = {};
+                angular.forEach(outgoingCallPostHeaders, function(header) {
+                    var keyVal = header.split(/\s*:\s*/);
+                    out[keyVal[0]] = keyVal[1];
+                });
+                return out;
             }, buildTestUsersMap = function(testUsers) {
                 var testUsersMap = {};
                 angular.forEach(testUsers, function(testUser) {
@@ -370,21 +386,25 @@
             }, prepareConfigs = function(data) {
                 var out = [],
                     servicesMap = {},
+                    outgoingCallPostHeadersMap = {},
                     testUsersMap = {},
-                    i, services;
+                    i, services, outgoingCallPostHeaders;
 
                 for (i = 0; i < data.length; i+=1) {
                     servicesMap = parseServicesMapString(data[i].servicesMapString);
+                    outgoingCallPostHeadersMap = parseOutgoingCallPostHeadersMapString(data[i].outgoingCallPostHeadersMapString);
                     testUsersMap = buildTestUsersMap(data[i].testUsers);
                     out.push({
                         name: data[i].name,
                         outgoingCallUriTemplate : data[i].outgoingCallUriTemplate,
                         outgoingCallMethod : data[i].outgoingCallMethod,
+                        outgoingCallPostParams : data[i].outgoingCallPostParams,
                         outboundCallLimit : data[i].outboundCallLimit,
                         outboundCallRetryAttempts : data[i].outboundCallRetryAttempts,
                         outboundCallRetrySeconds : data[i].outboundCallRetrySeconds,
                         callAllowed : data[i].callAllowed,
                         servicesMap : servicesMap,
+                        outgoingCallPostHeadersMap : outgoingCallPostHeadersMap,
                         testUsersMap : testUsersMap
                     });
                 }
@@ -406,6 +426,8 @@
                 'outgoingCallUriTemplate'   :'',
                 'outgoingCallMethod'        :'GET',
                 'ignoredStatusFields'       :[],
+                'outgoingCallPostHeadersString' :'',
+                'outgoingCallPostParams'    :'',
                 'statusFieldMapString'      :'',
                 'servicesMapString'         :'',
                 'outboundCallLimit'         :0,

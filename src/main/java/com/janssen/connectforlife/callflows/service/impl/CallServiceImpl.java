@@ -48,9 +48,8 @@ public class CallServiceImpl implements CallService {
 
     private static final String FAILURE = "failure";
 
-    public static final Set<Integer> ACCEPTABLE_IVR_RESPONSE_STATUSES = Sets.newHashSet(HttpStatus.SC_OK,
-                                                                                        HttpStatus.SC_ACCEPTED,
-                                                                                        HttpStatus.SC_CREATED);
+    public static final Set<Integer> ACCEPTABLE_IVR_RESPONSE_STATUSES = Sets
+            .newHashSet(HttpStatus.SC_OK, HttpStatus.SC_ACCEPTED, HttpStatus.SC_CREATED);
     @Autowired
     private CallDataService callDataService;
 
@@ -68,13 +67,8 @@ public class CallServiceImpl implements CallService {
 
     @Override
     @Transactional
-    public Call create(String config,
-                       CallFlow start,
-                       String startNode,
-                       CallDirection direction,
-                       String actorId,
-                       String actorType,
-                       Map<String, Object> params) {
+    public Call create(String config, CallFlow start, String startNode, CallDirection direction, String actorId,
+                       String actorType, Map<String, Object> params) {
 
         // Create a new call
         Call call = new Call();
@@ -117,10 +111,7 @@ public class CallServiceImpl implements CallService {
 
     @Override
     @Transactional
-    public Call create(String config,
-                       CallFlow start,
-                       String startNode,
-                       CallDirection direction,
+    public Call create(String config, CallFlow start, String startNode, CallDirection direction,
                        Map<String, Object> params) {
         return create(config, start, startNode, direction, null, null, params);
     }

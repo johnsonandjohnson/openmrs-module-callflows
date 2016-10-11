@@ -18,12 +18,12 @@ import org.motechproject.event.listener.EventRelay;
 import org.motechproject.scheduler.contract.RunOnceSchedulableJob;
 import org.motechproject.scheduler.service.MotechSchedulerService;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.message.BasicHeader;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.exception.VelocityException;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -43,15 +43,14 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 
 /**
  * Collection of utility methods in managing and handling calls
@@ -406,10 +405,18 @@ public class CallUtil {
             if (HttpMethod.GET.name().equals(config.getOutgoingCallMethod())) {
                 request = new HttpGet(builder.build());
             } else {
-                List<NameValuePair> postParameters = new ArrayList<>();
                 HttpPost post = new HttpPost(uri);
-                //todo: add params
-                post.setEntity(new UrlEncodedFormEntity(postParameters));
+
+                for (Map.Entry<String, String> entry : config.getOutgoingCallPostHeadersMap().entrySet()) {
+                    // Set headers
+                    post.setHeader(entry.getKey(), entry.getValue() == null ? "" : entry.getValue().toString());
+                }
+
+                StringEntity entity = new StringEntity(mergeUriAndRemoveParams(config.getOutgoingCallPostParams(), completeParams));
+                entity.setContentType(new BasicHeader("Content-Type",
+                                                      "application/x-www-form-urlencoded"));
+                post.setEntity(entity);
+
                 request = post;
             }
         } catch (URISyntaxException | UnsupportedEncodingException e) {
@@ -524,11 +531,10 @@ public class CallUtil {
         eventParams.put(Constants.PARAM_CONFIG, config.getName());
         //set the params
         eventParams.put(Constants.PARAM_PARAMS, params);
+        eventParams.put(Constants.PARAM_HEADERS, config.getOutgoingCallPostHeadersMap());
         eventParams.put(PARAM_JOB_ID, callId);
         MotechEvent motechEvent = new MotechEvent(Events.CALLFLOWS_INITIATE_CALL, eventParams);
         schedulerService.scheduleRunOnceJob(new RunOnceSchedulableJob(motechEvent, DateTime.now().plusSeconds(
                 config.getOutboundCallRetrySeconds()).toDate()));
     }
 }
-
-

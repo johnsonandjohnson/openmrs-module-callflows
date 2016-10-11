@@ -51,7 +51,6 @@ public interface CallFlowService {
      * @param name to search by
      * @return the callflow corresponding to the passed name
      * @throws IllegalArgumentException if the callflow cannot be found with the given name
-     *
      */
     CallFlow findByName(String name);
 
@@ -63,4 +62,3 @@ public interface CallFlowService {
      */
     void delete(Long id);
 }
-

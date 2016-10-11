@@ -25,6 +25,12 @@ public class ConfigBuilder {
         Config config = new Config();
         config.setName(configContract.getName());
         config.setOutgoingCallMethod(configContract.getOutgoingCallMethod());
+        config.setOutgoingCallPostParams(configContract.getOutgoingCallPostParams());
+
+        Map<String, String> headersMap = new LinkedHashMap<>();
+        headersMap.putAll(configContract.getOutgoingCallPostHeadersMap());
+        config.setOutgoingCallPostHeadersMap(headersMap);
+
         config.setOutgoingCallUriTemplate(configContract.getOutgoingCallUriTemplate());
         config.setOutboundCallLimit(configContract.getOutboundCallLimit());
         config.setOutboundCallRetryAttempts(configContract.getOutboundCallRetryAttempts());
@@ -42,4 +48,3 @@ public class ConfigBuilder {
         return config;
     }
 }
-

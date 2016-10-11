@@ -74,6 +74,8 @@ public class SettingsControllerTest extends BaseTest {
 
     private Config yo;
 
+    private Config imiMobile;
+
     private Renderer vxml;
 
     private Renderer txt;
@@ -81,6 +83,8 @@ public class SettingsControllerTest extends BaseTest {
     private ConfigContract voxeoContract;
 
     private ConfigContract yoContract;
+
+    private ConfigContract imiMobileContract;
 
     private List<Config> configs;
 
@@ -108,12 +112,14 @@ public class SettingsControllerTest extends BaseTest {
 
         voxeo = configs.get(0);
         yo = configs.get(1);
+        imiMobile = configs.get(2);
 
         vxml = renderers.get(0);
         txt = renderers.get(1);
 
         voxeoContract = configContracts.get(0);
         yoContract = configContracts.get(1);
+        imiMobileContract = configContracts.get(2);
 
         vxmlContract = rendererContracts.get(0);
         txtContract = rendererContracts.get(1);
@@ -125,6 +131,7 @@ public class SettingsControllerTest extends BaseTest {
         // Given
         given(configContractBuilder.createFrom(voxeo)).willReturn(voxeoContract);
         given(configContractBuilder.createFrom(yo)).willReturn(yoContract);
+        given(configContractBuilder.createFrom(imiMobile)).willReturn(imiMobileContract);
         // And
         given(settingsService.allConfigs()).willReturn(configs);
 
@@ -139,7 +146,7 @@ public class SettingsControllerTest extends BaseTest {
         // And one service call
         verify(settingsService, times(1)).allConfigs();
         // And two response builders
-        verify(configContractBuilder, times(2)).createFrom(any(Config.class));
+        verify(configContractBuilder, times(3)).createFrom(any(Config.class));
     }
 
     @Test
@@ -147,9 +154,11 @@ public class SettingsControllerTest extends BaseTest {
         // Given
         given(configBuilder.createFrom(voxeoContract)).willReturn(voxeo);
         given(configBuilder.createFrom(yoContract)).willReturn(yo);
+        given(configBuilder.createFrom(imiMobileContract)).willReturn(imiMobile);
         // And
         given(configContractBuilder.createFrom(voxeo)).willReturn(voxeoContract);
         given(configContractBuilder.createFrom(yo)).willReturn(yoContract);
+        given(configContractBuilder.createFrom(imiMobile)).willReturn(imiMobileContract);
         // And
         given(settingsService.allConfigs()).willReturn(configs);
 
@@ -160,13 +169,13 @@ public class SettingsControllerTest extends BaseTest {
                .andExpect(content().string(json(configContracts)));
 
         // Then two builders for request
-        verify(configBuilder, times(2)).createFrom(any(ConfigContract.class));
+        verify(configBuilder, times(3)).createFrom(any(ConfigContract.class));
         // And must update once with correct data
         verify(settingsService, times(1)).updateConfigs(configs);
         // and must retrieve again to return back
         verify(settingsService, times(1)).allConfigs();
         // And must call response builder twice
-        verify(configContractBuilder, times(2)).createFrom(any(Config.class));
+        verify(configContractBuilder, times(3)).createFrom(any(Config.class));
     }
 
 

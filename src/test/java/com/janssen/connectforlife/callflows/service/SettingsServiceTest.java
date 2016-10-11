@@ -89,7 +89,7 @@ public class SettingsServiceTest extends BaseTest {
         List<Config> allConfigs = settingsService.allConfigs();
         // Then
         assertNotNull(allConfigs);
-        assertThat(allConfigs.size(), equalTo(2));
+        assertThat(allConfigs.size(), equalTo(3));
         Config voxeo = allConfigs.get(0);
         Config yo = allConfigs.get(1);
 

@@ -189,7 +189,8 @@ public class CallFlowServiceTest extends BaseTest {
     }
 
     @Test
-    public void shouldThrowIllegalArgumentIfCallFlowNameIsNewButIdIsInvalidDuringUpdate() throws CallFlowAlreadyExistsException {
+    public void shouldThrowIllegalArgumentIfCallFlowNameIsNewButIdIsInvalidDuringUpdate()
+            throws CallFlowAlreadyExistsException {
         expectException(IllegalArgumentException.class);
 
         // Given a Main Flow exists
@@ -212,6 +213,7 @@ public class CallFlowServiceTest extends BaseTest {
             verify(callFlowDataService, never()).update(any(CallFlow.class));
         }
     }
+
     @Test
     public void shouldThrowIllegalArgumentIfCallFlowNameDoesNotHaveAlphanumericCharactersDuringUpdate()
             throws CallFlowAlreadyExistsException {
