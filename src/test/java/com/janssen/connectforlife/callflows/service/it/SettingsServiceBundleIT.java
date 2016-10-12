@@ -95,9 +95,10 @@ public class SettingsServiceBundleIT extends BasePaxIT {
         List<Config> allConfigs = settingsService.allConfigs();
         // Then
         assertNotNull(allConfigs);
-        assertThat(allConfigs.size(), equalTo(2));
+        assertThat(allConfigs.size(), equalTo(3));
         Config voxeo = allConfigs.get(0);
         Config yo = allConfigs.get(1);
+        Config imiMobile = allConfigs.get(2);
 
         assertThat(voxeo.getName(), equalTo(Constants.CONFIG_VOXEO));
         assertThat(voxeo.getOutgoingCallMethod(), equalTo(Constants.CONFIG_VOXEO_METHOD));
@@ -114,6 +115,14 @@ public class SettingsServiceBundleIT extends BasePaxIT {
         assertThat(yo.getOutboundCallRetryAttempts(), equalTo(Constants.CONFIG_YO_OUTBOUND_CALL_RETRY_ATTEMPTS));
         assertThat(yo.getOutboundCallRetrySeconds(), equalTo(Constants.CONFIG_YO_OUTBOUND_CALL_RETRY_SECONDS));
         assertThat(yo.getCallAllowed(), equalTo(Constants.CONFIG_YO_CAN_PLACE_OUTBOUND_CALL));
+
+        assertThat(imiMobile.getName(), equalTo(Constants.CONFIG_IMI_MOBILE));
+        assertThat(imiMobile.getOutgoingCallMethod(), equalTo(Constants.CONFIG_IMI_METHOD));
+        assertThat(imiMobile.getOutgoingCallUriTemplate(), equalTo(Constants.CONFIG_IMI_OUT_TEMPLATE));
+        assertThat(imiMobile.getOutboundCallLimit(), equalTo(Constants.CONFIG_IMI_OUTBOUND_CALL_LIMIT));
+        assertThat(imiMobile.getOutboundCallRetryAttempts(), equalTo(Constants.CONFIG_IMI_OUTBOUND_CALL_RETRY_ATTEMPTS));
+        assertThat(imiMobile.getOutboundCallRetrySeconds(), equalTo(Constants.CONFIG_IMI_OUTBOUND_CALL_RETRY_SECONDS));
+        assertThat(imiMobile.getCallAllowed(), equalTo(Constants.CONFIG_IMI_CAN_PLACE_OUTBOUND_CALL));
     }
 
     @Test
