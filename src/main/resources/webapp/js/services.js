@@ -426,7 +426,7 @@
                 'outgoingCallUriTemplate'   :'',
                 'outgoingCallMethod'        :'GET',
                 'ignoredStatusFields'       :[],
-                'outgoingCallPostHeadersString' :'',
+                'outgoingCallPostHeadersMapString' :'',
                 'outgoingCallPostParams'    :'',
                 'statusFieldMapString'      :'',
                 'servicesMapString'         :'',
