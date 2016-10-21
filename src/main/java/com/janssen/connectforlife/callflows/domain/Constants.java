@@ -21,6 +21,12 @@ public final class Constants {
 
     public static final String PARAM_ACTOR_TYPE = "actorType";
 
+    public static final String PARAM_EXTERNAL_ID = "externalId";
+
+    public static final String PARAM_EXTERNAL_TYPE = "externalType";
+
+    public static final String PARAM_PLAYED_MESSAGES = "playedMessages";
+
     public static final String PARAM_REASON = "reason";
 
     public static final String PARAM_STATUS = "status";

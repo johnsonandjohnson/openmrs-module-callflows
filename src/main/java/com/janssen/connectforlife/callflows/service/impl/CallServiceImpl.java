@@ -68,7 +68,8 @@ public class CallServiceImpl implements CallService {
     @Override
     @Transactional
     public Call create(String config, CallFlow start, String startNode, CallDirection direction, String actorId,
-                       String actorType, Map<String, Object> params) {
+                       String actorType, String externalId, String externalType, String playedMessages,
+                       Map<String, Object> params) {
 
         // Create a new call
         Call call = new Call();
@@ -98,6 +99,11 @@ public class CallServiceImpl implements CallService {
         call.setActorId(actorId);
         call.setActorType(actorType);
 
+        // External-provider related information and Message files played in the call
+        call.setExternalId(externalId);
+        call.setExternalType(externalType);
+        call.setPlayedMessages(playedMessages);
+
         // Parameters we were passed
         call.setContext(params == null ? new HashMap<String, Object>() : params);
 
@@ -113,7 +119,7 @@ public class CallServiceImpl implements CallService {
     @Transactional
     public Call create(String config, CallFlow start, String startNode, CallDirection direction,
                        Map<String, Object> params) {
-        return create(config, start, startNode, direction, null, null, params);
+        return create(config, start, startNode, direction, null, null, null, null, null, params);
     }
 
     @Override
@@ -154,6 +160,11 @@ public class CallServiceImpl implements CallService {
             currentCall.setActorId(call.getActorId());
             currentCall.setActorType(call.getActorType());
         }
+
+        //update the external provider information and messages played
+        currentCall.setExternalId(call.getExternalId());
+        currentCall.setExternalType(call.getExternalType());
+        currentCall.setPlayedMessages(call.getPlayedMessages());
 
         // update in the database
         return callDataService.update(currentCall);
@@ -245,8 +256,14 @@ public class CallServiceImpl implements CallService {
 
         String startNode = flow.getNodes().get(0).getStep();
 
+        // Set the external provider information and messages played, if any.
+        String externalId = (String) params.get(Constants.PARAM_EXTERNAL_ID);
+        String externalType = (String) params.get(Constants.PARAM_EXTERNAL_TYPE);
+        String playedMessages = (String) params.get(Constants.PARAM_PLAYED_MESSAGES);
+
         // create the call
-        return create(config.getName(), callFlow, startNode, CallDirection.OUTGOING, actorId, actorType, context);
+        return create(config.getName(), callFlow, startNode, CallDirection.OUTGOING, actorId, actorType, externalId,
+                      externalType, playedMessages, context);
     }
 
     private void makeOutboundRequest(HttpUriRequest request, Call call, Map<String, Object> params) throws IOException {

@@ -74,6 +74,10 @@ public final class CallHelper {
         call.setActorId(Constants.ACTOR_ID);
         call.setActorType(Constants.ACTOR_TYPE);
 
+        call.setExternalId(Constants.EXTERNAL_ID);
+        call.setExternalType(Constants.EXTERNAL_TYPE);
+        call.setPlayedMessages(Constants.PLAYED_MESSAGES);
+
         return call;
     }
 
@@ -104,6 +108,11 @@ public final class CallHelper {
 
         call.setActorId(Constants.ACTOR_ID + Constants.UPDATED);
         call.setActorType(Constants.ACTOR_TYPE + Constants.UPDATED);
+
+        call.setExternalId(Constants.EXTERNAL_ID + Constants.UPDATED);
+        call.setExternalType(Constants.EXTERNAL_TYPE + Constants.UPDATED);
+
+        call.setPlayedMessages(Constants.PLAYED_MESSAGES + Constants.UPDATED);
 
         call.setStatus(CallStatus.IN_PROGRESS);
         call.setDirection(CallDirection.INCOMING);

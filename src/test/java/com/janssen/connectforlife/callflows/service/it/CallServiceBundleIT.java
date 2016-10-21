@@ -120,18 +120,17 @@ public class CallServiceBundleIT extends BasePaxIT {
     public void shouldCreateInboundCallWithActor() {
 
         // When
-        Call newCall = callService.create(Constants.CONFIG_VOXEO,
-                                          mainFlow,
-                                          Constants.CALLFLOW_MAIN_ENTRY,
-                                          CallDirection.INCOMING,
-                                          Constants.ACTOR_ID,
-                                          Constants.ACTOR_TYPE,
-                                          params);
+        Call newCall = callService
+                .create(Constants.CONFIG_VOXEO, mainFlow, Constants.CALLFLOW_MAIN_ENTRY, CallDirection.INCOMING,
+                        Constants.ACTOR_ID, Constants.ACTOR_TYPE, Constants.EXTERNAL_ID, Constants.EXTERNAL_TYPE,
+                        Constants.PLAYED_MESSAGES, params);
 
         // Then
         CallAssert.assertBasicFields(newCall);
         CallAssert.assertIncomingCall(newCall);
         CallAssert.assertActor(newCall);
+        CallAssert.assertExternal(newCall);
+        CallAssert.assertPlayedMessages(newCall);
         CallAssert.assertTimestamps(newCall);
     }
 
@@ -139,13 +138,9 @@ public class CallServiceBundleIT extends BasePaxIT {
     public void shouldCreateOutboundCallWithActor() {
 
         // When
-        Call newCall = callService.create(Constants.CONFIG_VOXEO,
-                                          mainFlow,
-                                          Constants.CALLFLOW_MAIN_ENTRY,
-                                          CallDirection.OUTGOING,
-                                          Constants.ACTOR_ID,
-                                          Constants.ACTOR_TYPE,
-                                          params);
+        Call newCall = callService
+                .create(Constants.CONFIG_VOXEO, mainFlow, Constants.CALLFLOW_MAIN_ENTRY, CallDirection.OUTGOING,
+                        Constants.ACTOR_ID, Constants.ACTOR_TYPE, null, null, null, params);
 
         // Then
         CallAssert.assertBasicFields(newCall);
@@ -158,11 +153,9 @@ public class CallServiceBundleIT extends BasePaxIT {
     public void shouldCreateInboundCallWithoutActor() {
 
         // When
-        Call newCall = callService.create(Constants.CONFIG_VOXEO,
-                                          mainFlow,
-                                          Constants.CALLFLOW_MAIN_ENTRY,
-                                          CallDirection.INCOMING,
-                                          params);
+        Call newCall = callService
+                .create(Constants.CONFIG_VOXEO, mainFlow, Constants.CALLFLOW_MAIN_ENTRY, CallDirection.INCOMING,
+                        params);
 
         // Then
         CallAssert.assertBasicFields(newCall);
@@ -175,11 +168,9 @@ public class CallServiceBundleIT extends BasePaxIT {
     public void shouldCreateOutboundCallWithoutActor() {
 
         // When
-        Call newCall = callService.create(Constants.CONFIG_VOXEO,
-                                          mainFlow,
-                                          Constants.CALLFLOW_MAIN_ENTRY,
-                                          CallDirection.OUTGOING,
-                                          params);
+        Call newCall = callService
+                .create(Constants.CONFIG_VOXEO, mainFlow, Constants.CALLFLOW_MAIN_ENTRY, CallDirection.OUTGOING,
+                        params);
         // Then
         CallAssert.assertBasicFields(newCall);
         CallAssert.assertOutgoingCall(newCall);
@@ -217,7 +208,8 @@ public class CallServiceBundleIT extends BasePaxIT {
                                                        outboundCall.getStartTime());
         CallAssert.assertChangeToChangeableFields(returnedCall, outboundCall.getEndTime());
         CallAssert.assertActorUpdated(returnedCall);
-
+        CallAssert.assertExternalUpdated(returnedCall);
+        CallAssert.assertPlayedMessagesUpdated(returnedCall);
     }
 
     @Test

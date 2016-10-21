@@ -132,6 +132,12 @@ public final class Constants {
 
     public static final String ACTOR_TYPE = "Patient";
 
+    public static final String EXTERNAL_ID = "EXT_1234";
+
+    public static final String EXTERNAL_TYPE = "EXT_TYPE";
+
+    public static final String PLAYED_MESSAGES = "message1|message2|";
+
     public static final String KEY_GREETING = "greeting";
 
     public static final String KEY_PIN = "pid";

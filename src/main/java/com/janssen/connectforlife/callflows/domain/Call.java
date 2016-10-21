@@ -143,6 +143,31 @@ public class Call {
     private String statusText;
 
     /**
+     * Identifies the unique id/ UUID used by other service providers in the call
+     * For inbound calls, the callflow designer can update this information via the entry point flow
+     * Do not store the phone number or other PII data in this field, if you have clear security requirements against storing them.
+     * Instead store the primary key of your patient / doctor tables, which can uniquely identify a patient.
+     * Applications can join their tables with this table directly via this column for reporting purposes
+     */
+    @Field
+    @UIDisplayable(position = UIPositions.COLUMN_10)
+    private String externalId;
+
+    /**
+     * The type of service provider ids being used/stored in the call,
+     * For eg, if separate UUID is being used from IMI provider, then this field can be used to store type like 'IMI_UUID'
+     * and externalId can be used to store UUID. The value of this field is application dependent
+     */
+    @Field
+    private String externalType;
+
+    /**
+     * This field will store information of messages played eg., voice files names
+     */
+    @Field(type = "text")
+    private String playedMessages;
+
+    /**
      * The current context of this call
      * Context variables are as set in the various templates of the callflow and contain information to continue handling the call
      * Typically params from the caller are short-lived per single request and are not stored here for security reasons,
@@ -291,6 +316,30 @@ public class Call {
 
     public void setStatusText(String statusText) {
         this.statusText = statusText;
+    }
+
+    public String getExternalId() {
+        return externalId;
+    }
+
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
+    }
+
+    public String getExternalType() {
+        return externalType;
+    }
+
+    public void setExternalType(String externalType) {
+        this.externalType = externalType;
+    }
+
+    public String getPlayedMessages() {
+        return playedMessages;
+    }
+
+    public void setPlayedMessages(String playedMessages) {
+        this.playedMessages = playedMessages;
     }
 
     public Map<String, Object> getContext() {

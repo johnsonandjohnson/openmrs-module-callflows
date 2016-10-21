@@ -398,6 +398,10 @@ public class CallUtilTest extends BaseTest {
         context.put("complex", new Call());
         context.put("service", new CallServiceImpl());
 
+        context.put("externalId", Constants.EXTERNAL_ID);
+        context.put("externalType", Constants.EXTERNAL_TYPE);
+        context.put("playedMessages", Constants.PLAYED_MESSAGES);
+
         // When
         callUtil.mergeContextWithCall(context, outboundCall);
 
@@ -417,6 +421,9 @@ public class CallUtilTest extends BaseTest {
         assertFalse(outboundCall.getContext().containsKey("service"));
         assertThat(outboundCall.getContext().size(), equalTo(context.getKeys().length - 2));
 
+        assertTrue(outboundCall.getContext().containsKey("externalId"));
+        assertTrue(outboundCall.getContext().containsKey("externalType"));
+        assertTrue(outboundCall.getContext().containsKey("playedMessages"));
     }
 
     @Test

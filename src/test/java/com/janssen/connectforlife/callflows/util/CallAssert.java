@@ -101,6 +101,24 @@ public final class CallAssert {
         assertThat(call.getActorType(), equalTo(Constants.ACTOR_TYPE + Constants.UPDATED));
     }
 
+    public static void assertExternal(Call call) {
+        assertThat(call.getExternalId(), equalTo(Constants.EXTERNAL_ID));
+        assertThat(call.getExternalType(), equalTo(Constants.EXTERNAL_TYPE));
+    }
+
+    public static void assertExternalUpdated(Call call) {
+        assertThat(call.getExternalId(), equalTo(Constants.EXTERNAL_ID + Constants.UPDATED));
+        assertThat(call.getExternalType(), equalTo(Constants.EXTERNAL_TYPE + Constants.UPDATED));
+    }
+
+    public static void assertPlayedMessages(Call call) {
+        assertThat(call.getPlayedMessages(), equalTo(Constants.PLAYED_MESSAGES));
+    }
+
+    public static void assertPlayedMessagesUpdated(Call call) {
+        assertThat(call.getPlayedMessages(), equalTo(Constants.PLAYED_MESSAGES + Constants.UPDATED));
+    }
+
     public static void assertNullActor(Call call) {
         assertNull(call.getActorId());
         assertNull(call.getActorType());

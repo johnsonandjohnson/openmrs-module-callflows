@@ -189,7 +189,7 @@ public class CallServiceTest extends BaseTest {
     }
 
     @Test
-    public void shouldCreateInboundCallWithActor() {
+    public void shouldCreateInboundCallWithActorAndExternalData() {
 
         // Given
         ArgumentCaptor<Call> callFlowArgumentCaptor = ArgumentCaptor.forClass(Call.class);
@@ -197,13 +197,10 @@ public class CallServiceTest extends BaseTest {
         given(UUID.randomUUID()).willReturn(Constants.INBOUND_CALL_ID);
 
         // When
-        Call newCall = callService.create(Constants.CONFIG_VOXEO,
-                                          mainFlow,
-                                          Constants.CALLFLOW_MAIN_ENTRY,
-                                          CallDirection.INCOMING,
-                                          Constants.ACTOR_ID,
-                                          Constants.ACTOR_TYPE,
-                                          params);
+        Call newCall = callService
+                .create(Constants.CONFIG_VOXEO, mainFlow, Constants.CALLFLOW_MAIN_ENTRY, CallDirection.INCOMING,
+                        Constants.ACTOR_ID, Constants.ACTOR_TYPE, Constants.EXTERNAL_ID, Constants.EXTERNAL_TYPE,
+                        Constants.PLAYED_MESSAGES, params);
 
         // Then
         verify(callDataService, times(1)).create(inboundCall);
@@ -213,6 +210,8 @@ public class CallServiceTest extends BaseTest {
         assertThat(newCall.getCallId(), equalTo(Constants.INBOUND_CALL_ID.toString()));
         CallAssert.assertIncomingCall(newCall);
         CallAssert.assertActor(newCall);
+        CallAssert.assertExternal(newCall);
+        CallAssert.assertPlayedMessages(newCall);
         CallAssert.assertMockedTimestamps(newCall);
     }
 
@@ -224,13 +223,9 @@ public class CallServiceTest extends BaseTest {
         given(UUID.randomUUID()).willReturn(Constants.OUTBOUND_CALL_ID);
 
         // When
-        Call newCall = callService.create(Constants.CONFIG_VOXEO,
-                                          mainFlow,
-                                          Constants.CALLFLOW_MAIN_ENTRY,
-                                          CallDirection.OUTGOING,
-                                          Constants.ACTOR_ID,
-                                          Constants.ACTOR_TYPE,
-                                          params);
+        Call newCall = callService
+                .create(Constants.CONFIG_VOXEO, mainFlow, Constants.CALLFLOW_MAIN_ENTRY, CallDirection.OUTGOING,
+                        Constants.ACTOR_ID, Constants.ACTOR_TYPE, null, null, null, params);
 
         // Then
         verify(callDataService, times(1)).create(outboundCall);
@@ -253,11 +248,8 @@ public class CallServiceTest extends BaseTest {
         given(UUID.randomUUID()).willReturn(Constants.INBOUND_CALL_ID);
 
         // When
-        Call newCall = callService.create(Constants.CONFIG_VOXEO,
-                                          mainFlow,
-                                          Constants.CALLFLOW_MAIN_ENTRY,
-                                          CallDirection.INCOMING,
-                                          params);
+        Call newCall = callService
+                .create(Constants.CONFIG_VOXEO, mainFlow, Constants.CALLFLOW_MAIN_ENTRY, CallDirection.INCOMING, params);
 
         // Then
         verify(callDataService, times(1)).create(inboundCall);
@@ -280,11 +272,8 @@ public class CallServiceTest extends BaseTest {
         given(UUID.randomUUID()).willReturn(Constants.OUTBOUND_CALL_ID);
 
         // When
-        Call newCall = callService.create(Constants.CONFIG_VOXEO,
-                                          mainFlow,
-                                          Constants.CALLFLOW_MAIN_ENTRY,
-                                          CallDirection.OUTGOING,
-                                          params);
+        Call newCall = callService
+                .create(Constants.CONFIG_VOXEO, mainFlow, Constants.CALLFLOW_MAIN_ENTRY, CallDirection.OUTGOING, params);
 
         // Then
         verify(callDataService, times(1)).create(outboundCall);
@@ -318,6 +307,10 @@ public class CallServiceTest extends BaseTest {
         outboundCall.setId(1L);
         outboundCall.setActorId(null);
         outboundCall.setActorType(null);
+        outboundCall.setExternalId(Constants.EXTERNAL_ID);
+        outboundCall.setExternalType(Constants.EXTERNAL_TYPE);
+        outboundCall.setPlayedMessages(Constants.PLAYED_MESSAGES);
+
         DateTime oldEndTime = outboundCall.getEndTime();
         // And we update all properties
         Call updatedCall = CallHelper.updateAllPropertiesInOutboundCall(outboundCall);
@@ -348,6 +341,10 @@ public class CallServiceTest extends BaseTest {
 
         // And we are supposed to update the actor
         CallAssert.assertActorUpdated(returnedCall);
+
+        //And we are supposed to update the external id, external type and playedMessages
+        CallAssert.assertExternalUpdated(returnedCall);
+        CallAssert.assertPlayedMessagesUpdated(returnedCall);
     }
 
     @Test
