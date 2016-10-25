@@ -164,7 +164,15 @@ public class CallServiceImpl implements CallService {
         //update the external provider information and messages played
         currentCall.setExternalId(call.getExternalId());
         currentCall.setExternalType(call.getExternalType());
-        currentCall.setPlayedMessages(call.getPlayedMessages());
+
+        //Update the messages played
+        String playedMessages = currentCall.getPlayedMessages();
+        if (null != playedMessages) {
+            playedMessages = playedMessages.concat(call.getPlayedMessages());
+        } else {
+            playedMessages = call.getPlayedMessages();
+        }
+        currentCall.setPlayedMessages(playedMessages);
 
         // update in the database
         return callDataService.update(currentCall);

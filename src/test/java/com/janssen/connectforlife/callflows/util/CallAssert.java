@@ -116,7 +116,7 @@ public final class CallAssert {
     }
 
     public static void assertPlayedMessagesUpdated(Call call) {
-        assertThat(call.getPlayedMessages(), equalTo(Constants.PLAYED_MESSAGES + Constants.UPDATED));
+        assertThat(call.getPlayedMessages(), equalTo(Constants.PLAYED_MESSAGES +Constants.PLAYED_MESSAGES + Constants.UPDATED));
     }
 
     public static void assertNullActor(Call call) {
