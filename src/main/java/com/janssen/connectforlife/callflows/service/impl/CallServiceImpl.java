@@ -278,7 +278,9 @@ public class CallServiceImpl implements CallService {
 
         HttpResponse response = new DefaultHttpClient().execute(request);
 
-        LOGGER.debug("Response for call {} -> {}", call.getCallId(), response.getStatusLine().toString());
+        LOGGER.debug("Response for call {} -> {}  headers : {}  ", call.getCallId(),
+                     response.getStatusLine().toString(), response.getAllHeaders());
+
 
         // check status code for any possible issues
         if (!ACCEPTABLE_IVR_RESPONSE_STATUSES.contains(response.getStatusLine().getStatusCode())) {
@@ -287,6 +289,8 @@ public class CallServiceImpl implements CallService {
             // check content for possible issues, cause some IVR providers might return 200 and return a error body
             try (InputStream is = response.getEntity().getContent()) {
                 String content = IOUtils.toString(is);
+
+                LOGGER.debug("response : {} ", content);
 
                 if (content.indexOf(FAILURE) != -1) {
                     handleError(call, "Unacceptable body: " + content, params);
