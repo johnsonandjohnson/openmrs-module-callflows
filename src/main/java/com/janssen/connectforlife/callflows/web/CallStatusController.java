@@ -64,6 +64,8 @@ public class CallStatusController {
         // When ever we update the status, we always have to update the reason as well
         CallStatus status = CallStatus.valueOf(params.get(PARAM_STATUS));
         call.setStatus(status);
+        // When updating call status, there wont be any played messages
+        call.setPlayedMessages("");
         call.setStatusText(params.get(PARAM_REASON));
         callService.update(call);
         // There is a status change in the call, broadcast that across the system
