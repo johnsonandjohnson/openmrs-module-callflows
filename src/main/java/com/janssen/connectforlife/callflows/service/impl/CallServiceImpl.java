@@ -48,6 +48,8 @@ public class CallServiceImpl implements CallService {
 
     private static final String FAILURE = "failure";
 
+    private static final String SYMBOL_PIPE = "|";
+
     public static final Set<Integer> ACCEPTABLE_IVR_RESPONSE_STATUSES = Sets
             .newHashSet(HttpStatus.SC_OK, HttpStatus.SC_ACCEPTED, HttpStatus.SC_CREATED);
     @Autowired
@@ -173,9 +175,12 @@ public class CallServiceImpl implements CallService {
 
         //Update the messages played, include the '|' symbol in the code, to provide flexibility to submit the data after each node
         String playedMessages = currentCall.getPlayedMessages();
-        currentCall.setPlayedMessages(StringUtils.isNotBlank(playedMessages) ?
-                                              playedMessages.concat("|").concat(call.getPlayedMessages()) :
-                                              call.getPlayedMessages());
+        //Update the played messages only when call record contains data for this field
+        if (StringUtils.isNotBlank(call.getPlayedMessages())) {
+            currentCall.setPlayedMessages(StringUtils.isNotBlank(playedMessages) ?
+                                                  playedMessages.concat(SYMBOL_PIPE).concat(call.getPlayedMessages()) :
+                                                  call.getPlayedMessages());
+        }
 
         // update in the database
         return callDataService.update(currentCall);
