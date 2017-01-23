@@ -80,14 +80,10 @@ public class CallServiceImpl implements CallService {
         // with these start properties
         call.setStartFlow(start);
         call.setStartNode(startNode);
-        // at this time
-        DateTime now = DateTime.now();
-        call.setStartTime(now);
 
         // and since we are creating a new call, our start and end properties are very similar
         call.setEndFlow(start);
         call.setEndNode(startNode);
-        call.setEndTime(now);
 
         // The call direction
         call.setDirection(direction);
@@ -136,7 +132,7 @@ public class CallServiceImpl implements CallService {
         // We can update the end properties
         currentCall.setEndFlow(call.getEndFlow());
         currentCall.setEndNode(call.getEndNode());
-        currentCall.setEndTime(DateTime.now());
+
 
         // AND parameters we were passed
         currentCall.setContext(call.getContext());
@@ -161,18 +157,25 @@ public class CallServiceImpl implements CallService {
             currentCall.setActorType(call.getActorType());
         }
 
+        //Update the start time when the call is picked/answered
+        if (CallStatus.IN_PROGRESS == call.getStatus() && call.getSteps() == 1) {
+            // at this time
+            currentCall.setStartTime(DateTime.now());
+        }
+        //Update end time only once the call is answered.
+        if (call.getSteps() >= 1) {
+            currentCall.setEndTime(DateTime.now());
+        }
+
         //update the external provider information and messages played
         currentCall.setExternalId(call.getExternalId());
         currentCall.setExternalType(call.getExternalType());
 
-        //Update the messages played
+        //Update the messages played, include the '|' symbol in the code, to provide flexibility to submit the data after each node
         String playedMessages = currentCall.getPlayedMessages();
-        if (null != playedMessages) {
-            playedMessages = playedMessages.concat(call.getPlayedMessages());
-        } else {
-            playedMessages = call.getPlayedMessages();
-        }
-        currentCall.setPlayedMessages(playedMessages);
+        currentCall.setPlayedMessages(StringUtils.isNotBlank(playedMessages) ?
+                                              playedMessages.concat("|").concat(call.getPlayedMessages()) :
+                                              call.getPlayedMessages());
 
         // update in the database
         return callDataService.update(currentCall);

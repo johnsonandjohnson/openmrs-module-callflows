@@ -61,11 +61,9 @@ public final class CallHelper {
         CallFlow mainFlow = CallFlowHelper.createMainFlow();
         call.setStartFlow(mainFlow);
         call.setStartNode(Constants.CALLFLOW_MAIN_ENTRY);
-        call.setStartTime(formatter.parseDateTime(Constants.DATE_CURRENT));
 
         call.setEndFlow(mainFlow);
         call.setEndNode(Constants.CALLFLOW_MAIN_ENTRY);
-        call.setEndTime(formatter.parseDateTime(Constants.DATE_CURRENT));
 
         call.setSteps(0L);
         call.setContext(createParams());
@@ -91,11 +89,9 @@ public final class CallHelper {
         mainFlow.setName(Constants.CALLFLOW_MAIN2);
         call.setStartFlow(mainFlow);
         call.setStartNode(Constants.CALLFLOW_MAIN_ENTRY + Constants.UPDATED);
-        call.setStartTime(formatter.parseDateTime(Constants.DATE_NEXT_DAY));
 
         call.setEndFlow(mainFlow);
         call.setEndNode(Constants.CALLFLOW_MAIN_ENTRY + Constants.UPDATED);
-        call.setEndTime(formatter.parseDateTime(Constants.DATE_NEXT_DAY));
 
         call.setSteps(1L);
 

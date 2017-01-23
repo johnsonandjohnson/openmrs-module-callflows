@@ -74,7 +74,6 @@ public class Call {
     /**
      * The time we started the call at. Doesn't change once set
      */
-    @Field(required = true)
     @UIDisplayable(position = UIPositions.COLUMN_5)
     private DateTime startTime;
 
@@ -94,7 +93,6 @@ public class Call {
     /**
      * The end time prone to revision as the call continues further
      */
-    @Field(required = true)
     @UIDisplayable(position = UIPositions.COLUMN_7)
     private DateTime endTime;
 

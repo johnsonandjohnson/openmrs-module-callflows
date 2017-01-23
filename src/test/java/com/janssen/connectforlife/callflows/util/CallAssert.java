@@ -17,7 +17,9 @@ import java.util.Map;
 import static junit.framework.Assert.assertNull;
 import static junit.framework.TestCase.assertNotNull;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -80,7 +82,6 @@ public final class CallAssert {
         mainFlow.setName(Constants.CALLFLOW_MAIN2);
         assertThat(call.getEndFlow(), equalTo(mainFlow));
         assertThat(call.getEndNode(), equalTo(Constants.CALLFLOW_MAIN_ENTRY + Constants.UPDATED));
-        assertThat(call.getEndTime(), not(equalTo(oldEndTime)));
 
         assertThat(call.getSteps(), equalTo(1L));
 
@@ -116,7 +117,13 @@ public final class CallAssert {
     }
 
     public static void assertPlayedMessagesUpdated(Call call) {
-        assertThat(call.getPlayedMessages(), equalTo(Constants.PLAYED_MESSAGES +Constants.PLAYED_MESSAGES + Constants.UPDATED));
+        assertThat(call.getPlayedMessages(),
+                   equalTo(Constants.PLAYED_MESSAGES + "|" + Constants.PLAYED_MESSAGES + Constants.UPDATED));
+    }
+
+    public static void assertStartAndEndTimeAreUpdated(Call call) {
+        assertThat(call.getStartTime(), is(notNullValue()));
+        assertThat(call.getEndTime(), is(notNullValue()));
     }
 
     public static void assertNullActor(Call call) {
@@ -135,8 +142,8 @@ public final class CallAssert {
     }
 
     public static void assertMockedTimestamps(Call call) {
-        assertThat(call.getStartTime(), equalTo(formatter.parseDateTime(Constants.DATE_CURRENT)));
-        assertThat(call.getEndTime(), equalTo(call.getStartTime()));
+        assertThat(call.getStartTime(), is(nullValue()));
+        assertThat(call.getEndTime(), is(nullValue()));
     }
 
     public static void assertTimestamps(Call call) {

@@ -345,6 +345,9 @@ public class CallServiceTest extends BaseTest {
         //And we are supposed to update the external id, external type and playedMessages
         CallAssert.assertExternalUpdated(returnedCall);
         CallAssert.assertPlayedMessagesUpdated(returnedCall);
+
+        //Assert Start time is updated
+        CallAssert.assertStartAndEndTimeAreUpdated(returnedCall);
     }
 
     @Test
