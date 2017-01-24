@@ -48,7 +48,7 @@ public class CallServiceImpl implements CallService {
 
     private static final String FAILURE = "failure";
 
-    private static final String SYMBOL_PIPE = "|";
+    private static final String SEPERATOR_MESSAGE = "|";
 
     public static final Set<Integer> ACCEPTABLE_IVR_RESPONSE_STATUSES = Sets
             .newHashSet(HttpStatus.SC_OK, HttpStatus.SC_ACCEPTED, HttpStatus.SC_CREATED);
@@ -178,7 +178,7 @@ public class CallServiceImpl implements CallService {
         //Update the played messages only when call record contains data for this field
         if (StringUtils.isNotBlank(call.getPlayedMessages())) {
             currentCall.setPlayedMessages(StringUtils.isNotBlank(playedMessages) ?
-                                                  playedMessages.concat(SYMBOL_PIPE).concat(call.getPlayedMessages()) :
+                                                  playedMessages.concat(SEPERATOR_MESSAGE).concat(call.getPlayedMessages()) :
                                                   call.getPlayedMessages());
         }
 

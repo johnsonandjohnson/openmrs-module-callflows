@@ -344,10 +344,44 @@ public class CallServiceTest extends BaseTest {
 
         //And we are supposed to update the external id, external type and playedMessages
         CallAssert.assertExternalUpdated(returnedCall);
+
+        //Updates played messages when there is any passed as part of the call entity to be updated
         CallAssert.assertPlayedMessagesUpdated(returnedCall);
 
         //Assert Start time is updated
         CallAssert.assertStartAndEndTimeAreUpdated(returnedCall);
+    }
+
+    @Test
+    public void ShouldNotUpdatePlayedMessagesFieldWhenItIsNotPassed() {
+
+        // Given a outbound call without an actor yet
+        outboundCall.setId(1L);
+        outboundCall.setPlayedMessages(Constants.PLAYED_MESSAGES);
+
+        // And we update all properties
+        Call updatedCall = CallHelper.updateAllPropertiesInOutboundCall(outboundCall);
+        //Set the played messages field to be empty
+        updatedCall.setPlayedMessages("");
+
+        ArgumentCaptor<Call> callArgumentCaptor = ArgumentCaptor.forClass(Call.class);
+        given(callDataService.findById(1L)).willReturn(outboundCall);
+
+        // Given for create we returned DATE_CURRENT, And for update we return DATE_NEXT_DAY
+        given(DateTime.now()).willReturn(formatter.parseDateTime(Constants.DATE_NEXT_DAY));
+
+        // When
+        callService.update(updatedCall);
+
+        // Then
+        verify(callDataService, times(1)).update(callArgumentCaptor.capture());
+
+        // And let's see what gets sent to the database
+        Call returnedCall = callArgumentCaptor.getValue();
+        assertNotNull(returnedCall);
+
+        //Check the contents of playedMessages
+        assertThat(returnedCall.getPlayedMessages(), equalTo(Constants.PLAYED_MESSAGES));
     }
 
     @Test
@@ -376,8 +410,7 @@ public class CallServiceTest extends BaseTest {
         assertNotNull(returnedCall);
 
         // And we are ** not ** supposed to update the following properties
-        CallAssert.assertNoChangeToNonChangeableFields(returnedCall,
-                                                       outboundCall.getCallId(),
+        CallAssert.assertNoChangeToNonChangeableFields(returnedCall, outboundCall.getCallId(),
                                                        outboundCall.getStartTime());
 
         // AND we are ** not ** supposed to update the actor now
