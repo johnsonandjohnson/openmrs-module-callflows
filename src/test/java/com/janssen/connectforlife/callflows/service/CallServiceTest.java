@@ -353,7 +353,7 @@ public class CallServiceTest extends BaseTest {
     }
 
     @Test
-    public void ShouldNotUpdatePlayedMessagesFieldWhenItIsNotPassed() {
+    public void shouldNotUpdatePlayedMessagesFieldWhenItIsNotPassed() {
 
         // Given a outbound call without an actor yet
         outboundCall.setId(1L);
