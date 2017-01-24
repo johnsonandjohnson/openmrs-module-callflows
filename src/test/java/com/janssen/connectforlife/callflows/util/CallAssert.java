@@ -8,7 +8,6 @@ import com.janssen.connectforlife.callflows.domain.types.CallStatus;
 import com.janssen.connectforlife.callflows.helper.CallFlowHelper;
 import com.janssen.connectforlife.callflows.helper.CallHelper;
 
-import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -65,7 +64,7 @@ public final class CallAssert {
         assertThat(newCall.getSteps(), equalTo(0L));
     }
 
-    public static void assertNoChangeToNonChangeableFields(Call call, String oldCallId, DateTime oldStartTime) {
+    public static void assertNoChangeToNonChangeableFields(Call call, String oldCallId) {
         assertThat(call.getCallId(), equalTo(oldCallId));
         assertThat(call.getConfig(), equalTo(Constants.CONFIG_VOXEO));
         assertThat(call.getDirection(), equalTo(CallDirection.OUTGOING));
@@ -74,10 +73,9 @@ public final class CallAssert {
         assertThat(call.getStartFlow(), equalTo(mainFlow));
 
         assertThat(call.getStartNode(), equalTo(Constants.CALLFLOW_MAIN_ENTRY));
-        assertThat(call.getStartTime(), equalTo(oldStartTime));
     }
 
-    public static void assertChangeToChangeableFields(Call call, DateTime oldEndTime) {
+    public static void assertChangeToChangeableFields(Call call) {
         CallFlow mainFlow = CallFlowHelper.createMainFlow();
         mainFlow.setName(Constants.CALLFLOW_MAIN2);
         assertThat(call.getEndFlow(), equalTo(mainFlow));
@@ -147,7 +145,7 @@ public final class CallAssert {
     }
 
     public static void assertTimestamps(Call call) {
-        assertNotNull(call.getStartTime());
+        assertNull(call.getStartTime());
         assertThat(call.getEndTime(), equalTo(call.getStartTime()));
     }
 }

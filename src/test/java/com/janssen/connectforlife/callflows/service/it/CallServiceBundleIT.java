@@ -204,9 +204,8 @@ public class CallServiceBundleIT extends BasePaxIT {
 
         // Then
         CallAssert.assertNoChangeToNonChangeableFields(returnedCall,
-                                                       outboundCall.getCallId(),
-                                                       outboundCall.getStartTime());
-        CallAssert.assertChangeToChangeableFields(returnedCall, outboundCall.getEndTime());
+                                                       outboundCall.getCallId());
+        CallAssert.assertChangeToChangeableFields(returnedCall);
         CallAssert.assertActorUpdated(returnedCall);
         CallAssert.assertExternalUpdated(returnedCall);
         CallAssert.assertPlayedMessagesUpdated(returnedCall);
@@ -228,9 +227,8 @@ public class CallServiceBundleIT extends BasePaxIT {
         // Then
         assertNotNull(returnedCall);
         CallAssert.assertNoChangeToNonChangeableFields(returnedCall,
-                                                       outboundCall.getCallId(),
-                                                       outboundCall.getStartTime());
-        CallAssert.assertChangeToChangeableFields(returnedCall, outboundCall.getEndTime());
+                                                       outboundCall.getCallId());
+        CallAssert.assertChangeToChangeableFields(returnedCall);
         CallAssert.assertActor(returnedCall);
     }
 

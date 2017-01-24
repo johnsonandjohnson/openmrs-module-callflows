@@ -333,11 +333,10 @@ public class CallServiceTest extends BaseTest {
 
         // And we are ** not ** supposed to update the following properties
         CallAssert.assertNoChangeToNonChangeableFields(returnedCall,
-                                                       outboundCall.getCallId(),
-                                                       outboundCall.getStartTime());
+                                                       outboundCall.getCallId());
 
         // And we are supposed to update the following
-        CallAssert.assertChangeToChangeableFields(returnedCall, oldEndTime);
+        CallAssert.assertChangeToChangeableFields(returnedCall);
 
         // And we are supposed to update the actor
         CallAssert.assertActorUpdated(returnedCall);
@@ -410,14 +409,13 @@ public class CallServiceTest extends BaseTest {
         assertNotNull(returnedCall);
 
         // And we are ** not ** supposed to update the following properties
-        CallAssert.assertNoChangeToNonChangeableFields(returnedCall, outboundCall.getCallId(),
-                                                       outboundCall.getStartTime());
+        CallAssert.assertNoChangeToNonChangeableFields(returnedCall, outboundCall.getCallId());
 
         // AND we are ** not ** supposed to update the actor now
         CallAssert.assertActor(returnedCall);
 
         // And we are supposed to update the following
-        CallAssert.assertChangeToChangeableFields(returnedCall, oldEndTime);
+        CallAssert.assertChangeToChangeableFields(returnedCall);
     }
 
     @Test(expected = IllegalArgumentException.class)
