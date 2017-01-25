@@ -90,8 +90,6 @@ public class CallUtil {
 
     private static final String EXTERNAL_TYPE = "externalType";
 
-    private static final String PLAYED_MESSAGES = "playedMessages";
-
     private static final String INTERNAL = "internal";
 
     private ObjectMapper objectMapper = new ObjectMapper();
@@ -134,7 +132,6 @@ public class CallUtil {
         Map<String, Object> callContext = call.getContext();
         String actorId;
         String externalId;
-        String playedMessages;
         String keyString;
         for (Object key : context.getKeys()) {
             keyString = (String) key;
@@ -161,11 +158,6 @@ public class CallUtil {
         if (null != externalId) {
             call.setExternalId(externalId);
             call.setExternalType(internalCtx.get(EXTERNAL_TYPE));
-        }
-
-        playedMessages = internalCtx.get(PLAYED_MESSAGES);
-        if (null != playedMessages) {
-            call.setPlayedMessages(playedMessages);
         }
     }
 

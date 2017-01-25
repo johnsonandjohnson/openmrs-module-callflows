@@ -579,6 +579,35 @@ public class CallControllerTest extends BaseTest {
     }
 
     @Test
+    public void shouldHandleCallContinuationWhenPlayedMessagesIsSpecified() throws Exception {
+        // When we make a call continuation request for a call where jumpTo is specified
+        //Given
+
+        String rawTest = TestUtil.loadFile("test_flow.json");
+        Flow testflow = FlowHelper.createFlow(rawTest);
+        entryHandlerNode = testflow.getNodes().get(0);
+
+        String messages = "message1|message2";
+        given(flowService.evalNode(eq(testflow), eq(entryHandlerNode), any(VelocityContext.class)))
+                .willReturn(flowPosition);
+
+        //When
+        mockMvc.perform(customGet("/calls/" + inboundCall.getCallId() + ".json" + "?playedMessages=" + messages))
+               .andExpect(status().is(HttpStatus.OK.value())).andExpect(content().type(Constants.APPLICATION_JSON_UTF8))
+               .andExpect(content().string(sameAsFile("main_flow_inactive_with_body.json")));
+
+        // Then we should have tried to load the call first and then config and then flow
+        assertCallConfigFlowLoaded(inboundCall, Constants.CONFIG_VOXEO, mainFlow.getName());
+
+        verify(callService, times(1)).update(callCaptor.capture());
+        // And we expect the steps to be incremented in that
+        Call updatedCall = callCaptor.getValue();
+        assertThat(updatedCall.getPlayedMessages(), equalTo("message1|message2"));
+        // Assert that the renderer is used appropriately
+        assertRendererForJson();
+    }
+
+    @Test
     public void shouldTerminateCallInHandleCallContinuationIfNotAbleToGetToAUserNode() throws Exception {
         // Given
         flowPosition.setTerminated(true);

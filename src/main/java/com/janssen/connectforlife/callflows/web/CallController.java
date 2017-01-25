@@ -315,6 +315,9 @@ public class CallController extends RestController {
             call.setEndFlow(callFlowService.findByName(position.getEndFlow().getName()));
             call.setEndNode(currentNode.getStep());
 
+            call.setPlayedMessages(params.get(Constants.PARAM_PLAYED_MESSAGES));
+            LOGGER.debug("\nSetting playedMessages : " + params.get(Constants.PARAM_PLAYED_MESSAGES));
+
             if (!position.isTerminated()) {
                 // We are now back at a user node, so evaluate that again
                 output = flowUtil.evalNode(flow, currentNode, context, extension);
