@@ -48,7 +48,7 @@ public class CallServiceImpl implements CallService {
 
     private static final String FAILURE = "failure";
 
-    private static final String SEPERATOR_MESSAGE = "|";
+
 
     public static final Set<Integer> ACCEPTABLE_IVR_RESPONSE_STATUSES = Sets
             .newHashSet(HttpStatus.SC_OK, HttpStatus.SC_ACCEPTED, HttpStatus.SC_CREATED);
@@ -173,14 +173,8 @@ public class CallServiceImpl implements CallService {
         currentCall.setExternalId(call.getExternalId());
         currentCall.setExternalType(call.getExternalType());
 
-        //Update the messages played, include the '|' symbol in the code, to provide flexibility to submit the data after each node
-        String playedMessages = currentCall.getPlayedMessages();
-        //Update the played messages only when call record contains data for this field
-        if (StringUtils.isNotBlank(call.getPlayedMessages())) {
-            currentCall.setPlayedMessages(StringUtils.isNotBlank(playedMessages) ?
-                                                  playedMessages.concat(SEPERATOR_MESSAGE).concat(call.getPlayedMessages()) :
-                                                  call.getPlayedMessages());
-        }
+        //update played messages
+        currentCall.setPlayedMessages(call.getPlayedMessages());
 
         // update in the database
         return callDataService.update(currentCall);

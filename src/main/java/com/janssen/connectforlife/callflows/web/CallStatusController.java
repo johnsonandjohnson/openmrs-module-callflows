@@ -1,10 +1,12 @@
 package com.janssen.connectforlife.callflows.web;
 
 import com.janssen.connectforlife.callflows.domain.Call;
+import com.janssen.connectforlife.callflows.domain.Constants;
 import com.janssen.connectforlife.callflows.domain.types.CallStatus;
 import com.janssen.connectforlife.callflows.service.CallService;
 import com.janssen.connectforlife.callflows.util.CallUtil;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,12 +66,24 @@ public class CallStatusController {
         // When ever we update the status, we always have to update the reason as well
         CallStatus status = CallStatus.valueOf(params.get(PARAM_STATUS));
         call.setStatus(status);
-        // When updating call status, there wont be any played messages
-        call.setPlayedMessages("");
+
         call.setStatusText(params.get(PARAM_REASON));
+        // The Provider specific id and type, if passed then updated for this call record
+        if (validateExternalIdToUpdateCall(call.getExternalId(), params.get(Constants.PARAM_EXTERNAL_ID),
+                                           params.get(Constants.PARAM_EXTERNAL_TYPE))) {
+            call.setExternalId(params.get(Constants.PARAM_EXTERNAL_ID));
+            call.setExternalType(params.get(Constants.PARAM_EXTERNAL_TYPE));
+        }
+
+        // Update the call record with all the details
         callService.update(call);
         // There is a status change in the call, broadcast that across the system
         callUtil.sendStatusEvent(call);
         return OK_RESPONSE;
     }
+
+    private boolean validateExternalIdToUpdateCall(String dbExtId, String extId, String extType) {
+        return StringUtils.isBlank(dbExtId) && (StringUtils.isNotBlank(extId) && StringUtils.isNotBlank(extType));
+    }
+
 }

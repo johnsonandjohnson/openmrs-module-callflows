@@ -602,7 +602,7 @@ public class CallControllerTest extends BaseTest {
         verify(callService, times(1)).update(callCaptor.capture());
         // And we expect the steps to be incremented in that
         Call updatedCall = callCaptor.getValue();
-        assertThat(updatedCall.getPlayedMessages(), equalTo("message1|message2"));
+        assertThat(updatedCall.getPlayedMessages(), equalTo("message1|message2|message1|message2"));
         // Assert that the renderer is used appropriately
         assertRendererForJson();
     }

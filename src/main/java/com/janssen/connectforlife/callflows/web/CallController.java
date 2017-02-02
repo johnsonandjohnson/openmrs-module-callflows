@@ -96,6 +96,11 @@ public class CallController extends RestController {
      */
     private static final String KEY_DIRECTION = "callDirection";
 
+    /**
+     * Separator which will be used for played messages
+     */
+    private static final String SEPERATOR_MESSAGE = "|";
+
     @Autowired
     private SettingsService settingsService;
 
@@ -315,8 +320,18 @@ public class CallController extends RestController {
             call.setEndFlow(callFlowService.findByName(position.getEndFlow().getName()));
             call.setEndNode(currentNode.getStep());
 
-            call.setPlayedMessages(params.get(Constants.PARAM_PLAYED_MESSAGES));
-            LOGGER.debug("\nSetting playedMessages : " + params.get(Constants.PARAM_PLAYED_MESSAGES));
+            //retrieve existing played messages
+            String playedMessages = call.getPlayedMessages();
+
+            //update the messages played, include the '|' symbol in the code, to provide flexibility to submit the data after each node
+            //update the played messages only when the data coming in as part of params
+            if (StringUtils.isNotBlank(params.get(Constants.PARAM_PLAYED_MESSAGES))) {
+                call.setPlayedMessages(StringUtils.isNotBlank(playedMessages) ?
+                                               playedMessages.concat(SEPERATOR_MESSAGE).concat(params.get(Constants.PARAM_PLAYED_MESSAGES)) :
+                                               params.get(Constants.PARAM_PLAYED_MESSAGES));
+            }
+
+            LOGGER.debug("\nOn Setting playedMessages : " + call.getPlayedMessages());
 
             if (!position.isTerminated()) {
                 // We are now back at a user node, so evaluate that again

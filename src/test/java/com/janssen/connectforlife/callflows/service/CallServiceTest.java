@@ -380,7 +380,7 @@ public class CallServiceTest extends BaseTest {
         assertNotNull(returnedCall);
 
         //Check the contents of playedMessages
-        assertThat(returnedCall.getPlayedMessages(), equalTo(Constants.PLAYED_MESSAGES));
+        assertThat(returnedCall.getPlayedMessages(), equalTo(""));
     }
 
     @Test

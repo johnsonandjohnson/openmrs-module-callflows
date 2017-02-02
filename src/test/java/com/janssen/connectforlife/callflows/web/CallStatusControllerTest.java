@@ -85,4 +85,23 @@ public class CallStatusControllerTest extends BaseTest {
         verify(callService, never()).update(call);
         verify(callUtil, never()).sendStatusEvent(any(Call.class));
     }
+
+    @Test
+    public void shouldReturnOkIfTheCallStatusUpdateIsSuccessfulWhenExternalProviderDetailsArePassed() throws Exception {
+        //Given
+        call.setExternalId(null);
+        given(callService.findByCallId(Constants.INBOUND_CALL_ID.toString())).willReturn(call);
+
+        //When
+        mockMvc.perform(
+                get("/status/" + Constants.INBOUND_CALL_ID.toString() + "?status=ANSWERED&reason=call answered&externalId=1234&externalType=extType"))
+
+               .andExpect(status().is(HttpStatus.OK.value())).andExpect(content().string(Constants.OK_RESPONSE));
+
+        //Then
+        verify(callService, times(1)).findByCallId(Constants.INBOUND_CALL_ID.toString());
+        verify(callService, times(1)).update(call);
+        verify(callUtil, times(1)).sendStatusEvent(call);
+    }
+
 }
