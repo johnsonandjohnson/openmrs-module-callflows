@@ -52,7 +52,7 @@ public class CallFlowServiceImpl implements CallFlowService {
         // Second we can check whether the id of this call flow matches the one we are trying to update
         // If the second condition fails, it means that the call flow name is being changed to another callflow's name
         CallFlow existingFlow = callFlowDataService.findByName(callflow.getName());
-        if (null != existingFlow && existingFlow.getId() != callflow.getId()) {
+        if (null != existingFlow && !existingFlow.getId().equals(callflow.getId())) {
             throw new CallFlowAlreadyExistsException(
                     "Callflow name is already used by another flow :" + callflow.getName());
         }

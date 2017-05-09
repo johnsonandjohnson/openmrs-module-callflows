@@ -48,10 +48,9 @@ public class CallServiceImpl implements CallService {
 
     private static final String FAILURE = "failure";
 
-
-
-    public static final Set<Integer> ACCEPTABLE_IVR_RESPONSE_STATUSES = Sets
+    private static final Set<Integer> ACCEPTABLE_IVR_RESPONSE_STATUSES = Sets
             .newHashSet(HttpStatus.SC_OK, HttpStatus.SC_ACCEPTED, HttpStatus.SC_CREATED);
+
     @Autowired
     private CallDataService callDataService;
 
