@@ -53,31 +53,27 @@
 
         <!-- Spring -->
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>org.springframework.core</artifactId>
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>org.apache.servicemix.bundles.spring-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>org.springframework.beans</artifactId>
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>org.apache.servicemix.bundles.spring-beans</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>org.springframework.context</artifactId>
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>org.apache.servicemix.bundles.spring-context</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>org.springframework.context.support</artifactId>
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>org.apache.servicemix.bundles.spring-context-support</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>org.springframework.aop</artifactId>
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>org.apache.servicemix.bundles.spring-aop</artifactId>
         </dependency>
 
         <!-- HTTP -->
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>org.springframework.web.servlet</artifactId>
-        </dependency>
         <dependency>
             <groupId>${motech.groupId}</groupId>
             <artifactId>motech-platform-osgi-web-util</artifactId>
@@ -165,10 +161,12 @@
                             org.springframework.aop,
                             org.springframework.aop.framework,
                             org.springframework.transaction,
+                            org.springframework.validation.beanvalidation,
                             org.motechproject.osgi.web;version=${motech.version},
                             org.motechproject.mds.service;version=${motech.version},
                             org.motechproject.scheduler.service;version=${motech.version},
                             org.motechproject.config.service;version=${motech.version},
+                            org.motechproject.config;version=${motech.version},
                             org.motechproject.security.service;version=${motech.version},
                             org.motechproject.security.model;version=${motech.version},
                             *

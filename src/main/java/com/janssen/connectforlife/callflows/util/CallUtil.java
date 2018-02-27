@@ -547,6 +547,6 @@ public class CallUtil {
         eventParams.put(PARAM_JOB_ID, callId);
         MotechEvent motechEvent = new MotechEvent(Events.CALLFLOWS_INITIATE_CALL, eventParams);
         schedulerService.scheduleRunOnceJob(new RunOnceSchedulableJob(motechEvent, DateTime.now().plusSeconds(
-                config.getOutboundCallRetrySeconds()).toDate()));
+                config.getOutboundCallRetrySeconds())));
     }
 }
