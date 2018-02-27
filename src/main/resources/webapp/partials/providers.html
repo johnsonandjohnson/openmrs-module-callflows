@@ -18,7 +18,7 @@
 </div>
 
 <div class="form-group">
-    <button type="button" class="btn btn-success" ng-click="addConfig();"><i class="icon-plus icon-white"></i>
+    <button type="button" class="btn btn-success" ng-click="addConfig();"><i class="fa fa-plus fa-inverse"></i>
         {{msg('callflows.btn.addConfig')}}
     </button>
 </div>
@@ -29,8 +29,8 @@
             <div class="panel panel-default ivr-config" ng-repeat="conf in configs">
                 <div class="panel-heading" ng-click="accordions[$index] = !accordions[$index]">
                     {{conf.name}}
-                    <i ng-class="{'icon-chevron-down': accordions[$index], 'icon-chevron-right': !accordions[$index]}"
-                       class="icon-fixed-width icon-large pointer"></i>
+                    <i ng-class="{'fa fa-chevron-down': accordions[$index], 'fa fa-chevron-right': !accordions[$index]}"
+                       class="fa-fw fa-lg pointer"></i>
                 </div>
                 <div id="panel{{$index}}" class="panel-collapse collapse"
                      ng-class="{true:'in', false:''}[accordions[$index]]">
@@ -190,7 +190,7 @@
                                     </div>
                                     <div class="col-md-2">
                                         <button class="btn btn-sm btn-danger" ng-click="deleteTestUser(conf, $index);">
-                                            <i class="icon-trash"></i>
+                                            <i class="fa fa-lg fa-trash-o"></i>
                                         </button>
                                     </div>
                                 </div>
@@ -201,13 +201,13 @@
                     <div class="form-group">
                         <div class="col-md-offset-3 col-md-9">
                             <button class="btn btn-sm btn-primary" ng-click="addTestUser(conf);">
-                                <i class="icon-plus icon-white"></i> {{msg('callflows.btn.addUser')}}
+                                <i class="fa fa-plus fa-inverse"></i> {{msg('callflows.btn.addUser')}}
                             </button>
                             <button class="btn btn-sm btn-success" ng-click="deleteTestUsers(conf);">
-                                <i class="icon-plus icon-white"></i> {{msg('callflows.btn.deleteUsers')}}
+                                <i class="fa fa-plus fa-inverse"></i> {{msg('callflows.btn.deleteUsers')}}
                             </button>
                             <button class="btn btn-sm btn-danger" ng-click="deleteConfig($index)"><i
-                                    class="icon-trash"></i> {{msg('callflows.btn.deleteConfig')}}
+                                    class="fa fa-lg fa-trash-o"></i> {{msg('callflows.btn.deleteConfig')}}
                             </button>
                         </div>
                     </div>

@@ -21,7 +21,7 @@
                     </div>
                     <div class="col-md-2">
                         <button ng-click="addFlow();" type="button" class="btn btn-success">
-                            <i class="icon-plus icon-white"></i>
+                            <i class="fa fa-plus fa-inverse"></i>
                             {{msg('callflows.btn.addFlow')}}
                         </button>
                     </div>
@@ -32,13 +32,13 @@
             <div class="col-md-12">
                 <div class="btn-group">
                     <a class="btn btn-default" ng-click="addInteraction();">
-                        <i class="icon-plus icon-white"></i> {{msg('callflows.btn.interaction')}}
+                        <i class="fa fa-plus fa-inverse"></i> {{msg('callflows.btn.interaction')}}
                     </a>
                     <a class="btn btn-default" ng-click="expandNodes();">
-                        <i class="icon-chevron-down icon-white"></i> {{msg('callflows.btn.expandAll')}}
+                        <i class="fa fa-chevron-down fa-inverse"></i> {{msg('callflows.btn.expandAll')}}
                     </a>
                     <a class="btn btn-default" ng-click="collapseNodes();">
-                        <i class="icon-chevron-right icon-white"></i> {{msg('callflows.btn.collapseAll')}}
+                        <i class="fa fa-chevron-right fa-inverse"></i> {{msg('callflows.btn.collapseAll')}}
                     </a>
                 </div>
             </div>
@@ -67,14 +67,14 @@
                                 <!-- user - node panel heading -->
                                 <div class="panel-heading" ng-click="togglePanel(node, $index);"
                                      ng-if="node.nodeType === 'user'">
-                                    <i ng-class="{'icon-chevron-down': accordions[$index], 'icon-chevron-left': !accordions[$index]}"
+                                    <i ng-class="{'fa fa-chevron-down': accordions[$index], 'fa fa-chevron-left': !accordions[$index]}"
                                        class="pointer"></i>
                                     <span class="label label-info">{{node.step}}</span>
                                     <span ng-if="node.var">({{node.var}})</span>
                                     <!-- show a delete feature if open -->
                                     <span class="pull-right" ng-click="deleteNode(node, $index);">
                                         <i ng-attr-title="msg('callflows.btn.delete')"
-                                           class="icon-trash icon-large"
+                                           class="fa fa-trash-o fa-lg"
                                            ng-if="accordions[$index]"></i>
                                     </span>
                                 </div>
@@ -83,7 +83,7 @@
                                 <div class="panel-heading" ng-click="togglePanel(node, $index);"
                                      ng-if="node.nodeType === 'system'">
                                     <span class="label label-warning">{{node.step}}</span>
-                                    <i ng-class="{'icon-chevron-down': accordions[$index], 'icon-chevron-right': !accordions[$index]}"
+                                    <i ng-class="{'fa fa-chevron-down': accordions[$index], 'fa fa-chevron-right': !accordions[$index]}"
                                        class="pointer"></i>
                                 </div>
 
@@ -111,16 +111,16 @@
 
                                                 <div class="btn-group btn-group-sm">
                                                     <a class="btn btn-default" ng-click="addBlock(node, 'form');"><i
-                                                            class="icon-plus"></i> {{msg('callflows.field.form')}}</a>
+                                                            class="fa fa-plus"></i> {{msg('callflows.field.form')}}</a>
                                                 </div>
                                             </div>
                                             <div class="col-md-3" style="text-align: right;">
                                                 <div class="btn-group btn-group-sm"
                                                      ng-if="node.currentBlock && node.currentBlock.type === 'form'">
                                                     <a class="btn btn-default" ng-click="addElement(node, 'field');"><i
-                                                            class="icon-plus"></i> {{msg('callflows.field.field')}}</a>
+                                                            class="fa fa-plus"></i> {{msg('callflows.field.field')}}</a>
                                                     <a class="btn btn-default" ng-click="addElement(node, 'txt');"><i
-                                                            class="icon-plus"></i> {{msg('callflows.field.tts')}}</a>
+                                                            class="fa fa-plus"></i> {{msg('callflows.field.tts')}}</a>
                                                 </div>
                                             </div>
                                         </div>
@@ -128,7 +128,7 @@
                                         <div class="row">
                                             <div class="col-md-10 col-md-offset-1">
                                                 <ul class="breadcrumb modeller">
-                                                    <li><a><i class="icon-home"></i></a></li>
+                                                    <li><a><i class="fa fa-home"></i></a></li>
                                                     <!-- If there is a current block -->
                                                     <li ng-if="node.currentBlock">
                                                         <div class="dropdown">
@@ -146,7 +146,7 @@
                                                                 <li ng-repeat="b in node.blocks">
                                                                     <a ng-click="showBlock(node, $index);">
                                                                         &nbsp; {{b.name}}
-                                                                        <i class="icon-remove"
+                                                                        <i class="fa fa-times"
                                                                            ng-click="deleteBlock(node, $index);"></i>
                                                                     </a>
                                                                 </li>
@@ -171,7 +171,7 @@
                                                                 <li ng-repeat="e in node.currentBlock.elements">
                                                                     <a ng-click="showElement(node, node.currentBlock, $index);">
                                                                         &nbsp; {{e.name}}
-                                                                        <i class="icon-remove"
+                                                                        <i class="fa fa-times"
                                                                            ng-click="deleteElement(node, node.currentBlock, $index);">
                                                                         </i>
                                                                     </a>
@@ -266,7 +266,7 @@
                                                             <div class="input-group">
                                                                 <span ng-attr-title="{{msg('callflows.field.reprompt')}}"
                                                                       class="input-group-addon"><i
-                                                                        class="icon-repeat"></i></span>
+                                                                        class="fa fa-repeat"></i></span>
                                                                 <input type="text" class="form-control"
                                                                        ng-model="node.currentElement.reprompt"
                                                                        ng-change="runRender(node);"/>
@@ -323,8 +323,8 @@
                                                                     {{renderer.name}}&nbsp;
                                                                     <i ng-click="toggleDirty($event, node.templates[renderer.name]);"
                                                                        ng-attr-title="{{getRendererTitle(node.templates[renderer.name])}}"
-                                                                       ng-class="{'icon-star-empty' : !node.templates[renderer.name].dirty ,
-                                                                                  'icon-star' : node.templates[renderer.name].dirty}"></i>
+                                                                       ng-class="{'fa fa-star-o' : !node.templates[renderer.name].dirty ,
+                                                                                  'fa fa-star' : node.templates[renderer.name].dirty}"></i>
                                                                 </a>
                                                             </li>
                                                         </ul>

@@ -6,19 +6,46 @@
     var callflows = angular.module('callflows',  [
     'motech-dashboard', 'callflows.controllers', 'callflows.directives', 'callflows.services', 'ngCookies', 'ngFileUpload'
     ])
-    .config(['$routeProvider', function ($routeProvider) {
-        $routeProvider
-            .when('/designer', {
-                templateUrl: '../callflows/resources/partials/designer.html',
-                controller: 'DesignerController'
+    .config(['$stateProvider', function ($stateProvider) {
+        $stateProvider
+            .state('callflows', {
+                url: "/callflows",
+                abstract: true,
+                views: {
+                    "moduleToLoad": {
+                        templateUrl: '../callflows/resources/index.html'
+                    }
+                }
             })
-            .when('/providers', {
-                templateUrl: '../callflows/resources/partials/providers.html',
-                controller: 'ProviderController'
+            .state('callflows.designer', {
+                url: "/designer",
+                parent: "callflows",
+                views: {
+                    "callflowsView": {
+                        templateUrl: '../callflows/resources/partials/designer.html',
+                        controller: 'DesignerController'
+                    }
+                }
             })
-            .when('/renderers', {
-                templateUrl: '../callflows/resources/partials/renderers.html',
-                controller: 'RendererController'
+            .state('callflows.providers', {
+                url: "/providers",
+                parent: "callflows",
+                views: {
+                    "callflowsView": {
+                        templateUrl: '../callflows/resources/partials/providers.html',
+                        controller: 'ProviderController'
+                    }
+                }
+            })
+            .state('callflows.renderers', {
+                url: "/renderers",
+                parent: "callflows",
+                views: {
+                    "callflowsView": {
+                        templateUrl: '../callflows/resources/partials/renderers.html',
+                        controller: 'RendererController'
+                    }
+                }
             });
     }]);
 

@@ -24,7 +24,7 @@
         <div class="col-md-3">
             <button type="button" ng-disabled="form.rendererName.$invalid" class="btn btn-success"
                     ng-click="addRenderer(rendererName);"><i
-                    class="icon-plus icon-white"></i>
+                    class="fa fa-plus fa-inverse"></i>
                 {{msg('callflows.btn.addRenderer')}}
             </button>
         </div>
@@ -54,7 +54,7 @@
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <button class="btn btn-danger" ng-disabled="!currentRenderer" ng-click="del(currentRenderer.name);"><i class="icon-trash"></i> {{msg('callflows.btn.delete')}}</button>
+                        <button class="btn btn-danger" ng-disabled="!currentRenderer" ng-click="del(currentRenderer.name);"><i class="fa fa-lg fa-trash-o"></i> {{msg('callflows.btn.delete')}}</button>
                     </div>
                 </div>
             </div>

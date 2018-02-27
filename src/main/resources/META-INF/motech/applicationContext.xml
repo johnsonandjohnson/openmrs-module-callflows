@@ -33,7 +33,7 @@
                 <entry key="messages" value="../callflows/resources/messages/" />
             </map>
         </constructor-arg>
-        <property name="defaultURL" value="/designer" />
+        <property name="defaultURL" value="callflows/designer" />
     </bean>
 
 </beans>

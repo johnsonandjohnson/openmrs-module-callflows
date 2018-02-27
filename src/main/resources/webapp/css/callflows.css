@@ -338,7 +338,7 @@ audio {
     width: 90%;
 }
 /* links for external nodes to point instead of the move icon */
-.diagram-container .icon-arrow-right {
+.diagram-container .fa fa-arrow-right {
     cursor: pointer;
 }
 .node {

@@ -15,15 +15,15 @@
     </div>
     <div class="header-footer">
         <ul id="content-tabs" class="nav nav-tabs">
-            <li ng-class="active('#/designer')"><a href="#/designer" >{{msg('callflows.tab.designer')}}</a></li>
-            <li ng-class="active('#/providers')"><a href="#/providers" >{{msg('callflows.tab.providers')}}</a></li>
-            <li ng-class="active('#/renderers')"><a href="#/renderers" >{{msg('callflows.tab.renderers')}}</a></li>
+            <li ng-class="active('#/callflows/designer')"><a href="#/callflows/designer" >{{msg('callflows.tab.designer')}}</a></li>
+            <li ng-class="active('#/callflows/providers')"><a href="#/callflows/providers" >{{msg('callflows.tab.providers')}}</a></li>
+            <li ng-class="active('#/callflows/renderers')"><a href="#/callflows/renderers" >{{msg('callflows.tab.renderers')}}</a></li>
         </ul>
     </div>
     <div class="ui-layout-content">
         <div class="tab-content" id="tab-content">
             <div id="main-content" class="tab-pane active">
-                <div ng-view></div>
+                <div ui-view="callflowsView"></div>
             </div>
         </div>
     </div>
@@ -34,14 +34,14 @@
     <div class="ui-layout-content">
         <div ng-controller="FlowRunnerController">
             <ul class="nav nav-tabs">
-                <li><a data-toggle="tab" data-target="#cfl-search" ng-click="flows.current.mode = 'search';"><i class="icon-search"></i></a></li>
+                <li><a data-toggle="tab" data-target="#cfl-search" ng-click="flows.current.mode = 'search';"><i class="fa fa-search"></i></a></li>
                 <li ng-disabled="! flows.current"><a ng-click="runFlow();" data-toggle="tab" data-target="#cfl-run">{{msg('callflows.tab.test')}}</a>
                 </li>
                 <li ng-disabled="! flows.current">
-                    <a data-toggle="tab" data-target="#cfl-audio" ng-click="flows.current.mode = 'audio';"><i class="icon-music"></i></a>
+                    <a data-toggle="tab" data-target="#cfl-audio" ng-click="flows.current.mode = 'audio';"><i class="fa fa-music"></i></a>
                 </li>
                 <li ng-disabled="! flows.current">
-                    <a data-toggle="tab" data-target="#cfl-visualize" ng-click="flows.current.mode = 'visualize';"><i class="icon-picture"></i></a>
+                    <a data-toggle="tab" data-target="#cfl-visualize" ng-click="flows.current.mode = 'visualize';"><i class="fa fa-picture-o"></i></a>
                 </li>
             </ul>
             <div class="tab-content">
@@ -80,8 +80,8 @@
                 <!-- VISUALIZATION -->
                 <div class="tab-pane" id="cfl-visualize" ng-controller="VisualizeController">
                     <div class="btn-group">
-                        <a class="btn btn-default" ng-click="visualize();"><i class="icon-refresh"></i> {{msg('callflows.btn.refresh')}}</a>
-                        <a class="btn btn-default" ng-click="exportDiagram();"><i class="icon-download"></i> {{msg('callflows.btn.download')}}</a>
+                        <a class="btn btn-default" ng-click="visualize();"><i class="fa fa-refresh"></i> {{msg('callflows.btn.refresh')}}</a>
+                        <a class="btn btn-default" ng-click="exportDiagram();"><i class="fa fa-arrow-circle-o-down"></i> {{msg('callflows.btn.download')}}</a>
                     </div>
                     <div class="btn-group">
                         <a class="btn btn-default" ng-class="{'active' : model.meta.graphType === 'Flowchart'}"
@@ -100,14 +100,14 @@
                                          style="left:{{node.xpos}}px; top:{{node.ypos}}px;">
                                         <div>
                                             <span ng-show="$index === 0">
-                                                <i class="icon-phone"></i>
+                                                <i class="fa fa-phone"></i>
                                             </span>
                                             <span ng-show="node.nodeType === 'system'">
-                                                <i class="icon-cog"></i>
+                                                <i class="fa fa-cog"></i>
                                             </span>
                                             {{ node.step }}
                                             <span ng-show="node.nodeType === 'user' && ! isNodeShown(model.nodes[$index+1])">
-                                                <i class="icon-stop"></i>
+                                                <i class="fa fa-stop"></i>
                                             </span>
                                         </div>
                                         <div>
@@ -119,7 +119,7 @@
                                    <div class="node external-node" ng-attr-id="external-node{{externalNode.index}}"
                                         style="left:{{externalNode.xpos}}px; top:{{externalNode.ypos}}px">
                                       <div>
-                                            <i ng-click="loadFlow(externalNode.step);" class="icon-arrow-right"></i>
+                                            <i ng-click="loadFlow(externalNode.step);" class="fa fa-arrow-right"></i>
                                             {{externalNode.step}}
                                       </div>
                                    </div>
@@ -135,11 +135,11 @@
                             <legend>Text
                                 <a ng-click="audio.revealOn = !audio.revealOn;" class="btn"
                                    ng-attr-title="{{getRevealTitle()}}">
-                                    <i ng-class="{'icon-eye-open' : ! audio.revealOn, 'icon-eye-close' : audio.revealOn}"></i>
+                                    <i ng-class="{'fa fa-eye' : ! audio.revealOn, 'fa fa-eye-slash' : audio.revealOn}"></i>
                                 </a>
                                 <a ng-click="toggleGenerateName();" class="btn"
                                    ng-attr-title="{{getGenerateNameTitle()}}">
-                                    <i ng-class="{'icon-ok' : audio.generateName, 'icon-remove' : ! audio.generateName}"></i>
+                                    <i ng-class="{'fa fa-check' : audio.generateName, 'fa fa-times' : ! audio.generateName}"></i>
                                 </a>
                             </legend>
                             <div class="form-group">
@@ -153,10 +153,10 @@
                         </fieldset>
                         <!-- revealMappings -->
                         <fieldset class="inside" ng-show="audio.revealOn">
-                            <legend>{{msg('callflows.text.text')}} <i class="icon-arrow-right"></i>
+                            <legend>{{msg('callflows.text.text')}} <i class="fa fa-arrow-right"></i>
                                 {{msg('callflows.text.audio')}}
                                 <a ng-attr-title="{{msg('callflows.btn.deleteAllMappings.tooltip')}}"
-                                   ng-click="deleteAllMappings();"><i class="icon-trash"></i>
+                                   ng-click="deleteAllMappings();"><i class="fa fa-lg fa-trash-o"></i>
                                 </a>
                             </legend>
                             <div class="form-group" ng-repeat="(text, mappings) in flows.current.raw.audio">
@@ -166,9 +166,9 @@
                                         <span title="{{mapping.target}}" class="label label-success">{{getNode(mapping.target)}}</span>
                                         <a ng-click="deleteMapping(text, $index);">
                                             <i ng-attr-title="{{msg('callflows.btn.deleteMapping.tooltip')}}"
-                                               class="icon-trash"></i></a>
+                                               class="fa fa-lg fa-trash-o"></i></a>
                                         &nbsp;
-                                        <i class="icon-tags"></i>
+                                        <i class="fa fa-tags"></i>
                                         <span class="audio-mapping">{{mapping.mapping}}</span>
                                         <audio preload="none" controls>
                                             <source src="{{buildUrl(audio.language, mapping);}}"/>
@@ -187,7 +187,7 @@
                                         ng-attr-title="{{msg('callflows.btn.uploadAll.tooltip')}}"
                                         class="btn upload-icon"
                                         ng-click="uploadAllToServer(audio.language, files);">
-                                    <span class="label label-primary"><i class="icon-arrow-up"></i> {{msg('callflows.btn.upload')}}</span>
+                                    <span class="label label-primary"><i class="fa fa-arrow-up"></i> {{msg('callflows.btn.upload')}}</span>
                                 </a>
                             </div>
                             <div class="form-group">
