@@ -1,12 +1,5 @@
 package com.janssen.connectforlife.callflows.web.it;
 
-import org.motechproject.security.repository.MotechUsersDataService;
-import org.motechproject.security.service.MotechRoleService;
-import org.motechproject.security.service.MotechUserService;
-import org.motechproject.testing.osgi.BasePaxIT;
-import org.motechproject.testing.osgi.TestContext;
-import org.motechproject.testing.osgi.container.MotechNativeTestContainerFactory;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpDelete;
@@ -20,22 +13,29 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.motechproject.security.mds.MotechUsersDataService;
+import org.motechproject.security.service.MotechRoleService;
+import org.motechproject.security.service.MotechUserService;
+import org.motechproject.testing.osgi.BasePaxIT;
+import org.motechproject.testing.osgi.container.MotechNativeTestContainerFactory;
+import org.motechproject.testing.utils.TestContext;
 import org.ops4j.pax.exam.ExamFactory;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerSuite;
 import org.springframework.http.MediaType;
+
 import javax.inject.Inject;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.Locale;
 
 import static junit.framework.TestCase.assertNotNull;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 /**
  * The base class for REST Controller integration tests running with Pax Exam.
@@ -74,11 +74,9 @@ public class RESTControllerPaxIT extends BasePaxIT {
     public void setup() throws Exception {
 
         //Create a User using Motech User Service and assign roles to the user
-        motechUserService.register(CFL_TEST_USER_NAME,
+        motechUserService.registerMotechAdmin(CFL_TEST_USER_NAME,
                                    CFL_TEST_USER_PASSWORD,
                                    "test@test.com",
-                                   "",
-                                   new ArrayList<String>(),
                                    Locale.ENGLISH);
         login();
     }
@@ -226,6 +224,6 @@ public class RESTControllerPaxIT extends BasePaxIT {
     protected void assertResponseToBe(HttpResponse response, int status, MediaType mediaType) {
         assertNotNull(response);
         assertThat(response.getStatusLine().getStatusCode(), equalTo(status));
-        assertThat(response.getEntity().getContentType().getValue(), equalTo(mediaType.toString()));
+        assertTrue(MediaType.valueOf(response.getEntity().getContentType().getValue()).toString().equalsIgnoreCase(mediaType.toString()));
     }
 }

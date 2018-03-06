@@ -7,16 +7,15 @@ import com.janssen.connectforlife.callflows.domain.Renderer;
 import com.janssen.connectforlife.callflows.domain.Settings;
 import com.janssen.connectforlife.callflows.helper.GenericHelper;
 import com.janssen.connectforlife.callflows.service.impl.SettingsServiceImpl;
-
-import org.motechproject.server.config.SettingsFacade;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.motechproject.config.SettingsFacade;
 import org.springframework.core.io.ByteArrayResource;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;

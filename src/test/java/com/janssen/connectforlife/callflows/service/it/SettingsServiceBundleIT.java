@@ -6,19 +6,17 @@ import com.janssen.connectforlife.callflows.domain.Renderer;
 import com.janssen.connectforlife.callflows.helper.ConfigHelper;
 import com.janssen.connectforlife.callflows.helper.RendererHelper;
 import com.janssen.connectforlife.callflows.service.SettingsService;
-
-import org.motechproject.server.config.SettingsFacade;
-import org.motechproject.testing.osgi.BasePaxIT;
-import org.motechproject.testing.osgi.container.MotechNativeTestContainerFactory;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.motechproject.testing.osgi.BasePaxIT;
+import org.motechproject.testing.osgi.container.MotechNativeTestContainerFactory;
 import org.ops4j.pax.exam.ExamFactory;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerSuite;
+
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,9 +38,6 @@ public class SettingsServiceBundleIT extends BasePaxIT {
 
     @Inject
     private SettingsService settingsService;
-
-    @Inject
-    private SettingsFacade settingsFacade;
 
     private List<Config> configs;
 

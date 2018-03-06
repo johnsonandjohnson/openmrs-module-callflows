@@ -318,8 +318,7 @@ public class CallUtilTest extends BaseTest {
         assertThat(eventParams.get(Constants.PARAM_RETRY_ATTEMPTS).toString(), equalTo("2"));
         verify(schedulerService, times(1)).scheduleRunOnceJob(new RunOnceSchedulableJob(motechEvent, DateTime.now()
                                                                                                              .plusSeconds(
-                                                                                                                     Constants.CONFIG_VOXEO_OUTBOUND_CALL_RETRY_SECONDS)
-                                                                                                             .toDate()));
+                                                                                                                     Constants.CONFIG_VOXEO_OUTBOUND_CALL_RETRY_SECONDS)));
     }
 
     @Test(expected = OperationNotSupportedException.class)
@@ -491,16 +490,15 @@ public class CallUtilTest extends BaseTest {
         assertThat(eventParams.get(Constants.PARAM_RETRY_ATTEMPTS).toString(), equalTo("1"));
         verify(schedulerService, times(1)).scheduleRunOnceJob(new RunOnceSchedulableJob(motechEvent, DateTime.now()
                                                                                                              .plusSeconds(
-                                                                                                                     Constants.CONFIG_VOXEO_OUTBOUND_CALL_RETRY_SECONDS)
-                                                                                                             .toDate()));
+                                                                                                                     Constants.CONFIG_VOXEO_OUTBOUND_CALL_RETRY_SECONDS)));
     }
 
     private void assertCallStatusEvent(MotechEvent event) {
         assertThat(event.getSubject(), equalTo(Events.CALLFLOWS_CALL_STATUS));
         Map<String, Object> eventParameters = event.getParameters();
-        assertThat((String) eventParameters.get(Constants.PARAM_STATUS), equalTo(CallStatus.BUSY.name()));
-        assertThat((String) eventParameters.get(Constants.PARAM_REASON), equalTo(Constants.STATUS_TEXT));
-        assertThat((Map<String, Object>) eventParameters.get(Constants.PARAM_PARAMS), equalTo(callParams));
+        assertThat(eventParameters.get(Constants.PARAM_STATUS), equalTo(CallStatus.BUSY.name()));
+        assertThat(eventParameters.get(Constants.PARAM_REASON), equalTo(Constants.STATUS_TEXT));
+        assertThat(eventParameters.get(Constants.PARAM_PARAMS), equalTo(callParams));
     }
 
 }

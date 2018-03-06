@@ -73,6 +73,7 @@ public class CallFlowControllerBundleIT extends RESTControllerPaxIT {
 
     @After
     public void tearDown() {
+        super.tearDown();
         callFlowDataService.deleteAll();
     }
 

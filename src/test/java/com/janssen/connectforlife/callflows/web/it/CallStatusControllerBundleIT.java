@@ -67,6 +67,7 @@ public class CallStatusControllerBundleIT extends RESTControllerPaxIT {
 
     @After
     public void tearDown() {
+        super.tearDown();
         callDataService.deleteAll();
         callFlowDataService.deleteAll();
     }

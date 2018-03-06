@@ -12,14 +12,12 @@ import com.janssen.connectforlife.callflows.exception.CallFlowAlreadyExistsExcep
 import com.janssen.connectforlife.callflows.helper.CallFlowContractHelper;
 import com.janssen.connectforlife.callflows.helper.CallFlowHelper;
 import com.janssen.connectforlife.callflows.service.CallFlowService;
-
-import org.motechproject.mds.util.SecurityUtil;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.motechproject.mds.util.SecurityUtil;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -27,6 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.server.MockMvc;
 import org.springframework.test.web.server.setup.MockMvcBuilders;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -192,11 +191,12 @@ public class CallFlowControllerTest extends BaseTest {
         given(callFlowResponseBuilder.createFrom(flow2)).willReturn(CallFlowContractHelper.createFlow2Response());
 
         // When we search for the same term, Then
-        mockMvc.perform(get("/flows?lookup=By Name&term=" + Constants.CALLFLOW_MAIN_PREFIX))
-               .andExpect(status().is(HttpStatus.OK.value()))
-               .andExpect(content().type(Constants.APPLICATION_JSON_UTF8))
-               .andExpect(content().string(json(new SearchResponse(searchedFlows))));
-
+        mockMvc.perform(get("/flows")
+                .param("lookup", "By Name")
+                .param("term", Constants.CALLFLOW_MAIN_PREFIX))
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(content().type(Constants.APPLICATION_JSON_UTF8))
+                .andExpect(content().string(json(new SearchResponse(searchedFlows))));
     }
 
     @Test

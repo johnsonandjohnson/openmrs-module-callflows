@@ -120,6 +120,7 @@ public class CallControllerBundleIT extends RESTControllerPaxIT {
 
     @After
     public void tearDown() {
+        super.tearDown();
         settingsService.updateConfigs(new ArrayList());
         callDataService.deleteAll();
         callFlowDataService.deleteAll();

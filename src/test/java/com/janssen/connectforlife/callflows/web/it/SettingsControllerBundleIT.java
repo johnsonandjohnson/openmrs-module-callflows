@@ -66,6 +66,7 @@ public class SettingsControllerBundleIT extends RESTControllerPaxIT {
 
     @After
     public void tearDown() {
+        super.tearDown();
         configs = new ArrayList<>();
         settingsService.updateConfigs(configs);
 

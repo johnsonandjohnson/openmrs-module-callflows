@@ -18,18 +18,13 @@ import com.janssen.connectforlife.callflows.service.impl.CallServiceImpl;
 import com.janssen.connectforlife.callflows.util.CallAssert;
 import com.janssen.connectforlife.callflows.util.CallUtil;
 import com.janssen.connectforlife.callflows.util.TestUtil;
-
-import org.motechproject.event.MotechEvent;
-import org.motechproject.event.listener.EventRelay;
-
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.ProtocolVersion;
+import org.apache.http.HttpEntity;
+import org.apache.http.StatusLine;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicHttpResponse;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -40,9 +35,12 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
+import org.motechproject.event.MotechEvent;
+import org.motechproject.event.listener.EventRelay;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+
 import javax.naming.OperationNotSupportedException;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -58,6 +56,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -112,13 +111,17 @@ public class CallServiceTest extends BaseTest {
     @Mock
     private DefaultHttpClient client;
 
-    private HttpResponse okResponse;
+    @Mock
+    private CloseableHttpResponse okResponse;
 
-    private HttpResponse notFoundResponse;
+    @Mock
+    private CloseableHttpResponse notFoundResponse;
 
-    private HttpResponse failureResponse;
+    @Mock
+    private CloseableHttpResponse failureResponse;
 
-    private HttpResponse badResponse;
+    @Mock
+    private CloseableHttpResponse badResponse;
 
     @Mock
     private EventRelay eventRelay;
@@ -155,25 +158,37 @@ public class CallServiceTest extends BaseTest {
 
         PowerMockito.whenNew(DefaultHttpClient.class).withNoArguments().thenReturn(client);
 
-        BasicHttpEntity okEntity = new BasicHttpEntity();
-        okEntity.setContent(IOUtils.toInputStream("OK"));
-        okResponse = new BasicHttpResponse(new ProtocolVersion("HTTP", 1, 1), 200, "OK");
-        okResponse.setEntity(okEntity);
+        HttpEntity okEntity = mock(HttpEntity.class);
+        given(okEntity.getContent()).willReturn(IOUtils.toInputStream("OK"));
+        given(okResponse.getEntity()).willReturn(okEntity);
 
-        BasicHttpEntity errorEntity = new BasicHttpEntity();
-        errorEntity.setContent(IOUtils.toInputStream("ERROR"));
-        notFoundResponse = new BasicHttpResponse(new ProtocolVersion("HTTP", 1, 1), 404, "ERROR");
-        notFoundResponse.setEntity(errorEntity);
+        StatusLine okStatusLine = mock(StatusLine.class);
+        given(okResponse.getStatusLine()).willReturn(okStatusLine);
+        given(okStatusLine.getStatusCode()).willReturn(200);
 
-        BasicHttpEntity failureEntity = new BasicHttpEntity();
-        failureEntity.setContent(IOUtils.toInputStream("failure: unknown error"));
-        failureResponse = new BasicHttpResponse(new ProtocolVersion("HTTP", 1, 1), 200, "OK");
-        failureResponse.setEntity(failureEntity);
+        HttpEntity errorEntity = mock(HttpEntity.class);
+        given(errorEntity.getContent()).willReturn(IOUtils.toInputStream("ERROR"));
+        given(notFoundResponse.getEntity()).willReturn(errorEntity);
 
-        BasicHttpEntity badEntity = new BasicHttpEntity();
-        badEntity.setContent(null);
-        badResponse = new BasicHttpResponse(new ProtocolVersion("HTTP", 1, 1), 200, "OK");
-        badResponse.setEntity(badEntity);
+        StatusLine errorStatusLine = mock(StatusLine.class);
+        given(notFoundResponse.getStatusLine()).willReturn(errorStatusLine);
+        given(errorStatusLine.getStatusCode()).willReturn(404);
+
+        HttpEntity failureEntity = mock(HttpEntity.class);
+        given(failureEntity.getContent()).willReturn(IOUtils.toInputStream("failure: unknown error"));
+        given(failureResponse.getEntity()).willReturn(failureEntity);
+
+        StatusLine failureStatusLine = mock(StatusLine.class);
+        given(failureResponse.getStatusLine()).willReturn(failureStatusLine);
+        given(failureStatusLine.getStatusCode()).willReturn(200);
+
+        HttpEntity badEntity = mock(HttpEntity.class);
+        given(badEntity.getContent()).willReturn(null);
+        given(badResponse.getEntity()).willReturn(badEntity);
+
+        StatusLine badStatusLine = mock(StatusLine.class);
+        given(badResponse.getStatusLine()).willReturn(badStatusLine);
+        given(badStatusLine.getStatusCode()).willReturn(200);
 
         // Given a request to make a call for a flow named MainFlow using voxeo config for a phone 1234567890
         given(UUID.randomUUID()).willReturn(Constants.OUTBOUND_CALL_ID);

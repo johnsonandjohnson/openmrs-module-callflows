@@ -25,9 +25,6 @@ import com.janssen.connectforlife.callflows.service.SettingsService;
 import com.janssen.connectforlife.callflows.util.CallUtil;
 import com.janssen.connectforlife.callflows.util.FlowUtil;
 import com.janssen.connectforlife.callflows.util.TestUtil;
-
-import org.motechproject.mds.service.ServiceUtil;
-
 import org.apache.velocity.VelocityContext;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,6 +33,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
+import org.motechproject.mds.service.ServiceUtil;
 import org.osgi.framework.BundleContext;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -44,6 +42,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.web.server.MockMvc;
 import org.springframework.test.web.server.request.DefaultRequestBuilder;
 import org.springframework.test.web.server.setup.MockMvcBuilders;
+
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.HashMap;
@@ -592,9 +591,10 @@ public class CallControllerTest extends BaseTest {
                 .willReturn(flowPosition);
 
         //When
-        mockMvc.perform(customGet("/calls/" + inboundCall.getCallId() + ".json" + "?playedMessages=" + messages))
-               .andExpect(status().is(HttpStatus.OK.value())).andExpect(content().type(Constants.APPLICATION_JSON_UTF8))
-               .andExpect(content().string(sameAsFile("main_flow_inactive_with_body.json")));
+        mockMvc.perform(get("/calls/" + inboundCall.getCallId() + ".json")
+                .param("playedMessages", messages))
+                .andExpect(status().is(HttpStatus.OK.value())).andExpect(content().type(Constants.APPLICATION_JSON_UTF8))
+                .andExpect(content().string(sameAsFile("main_flow_inactive_with_body.json")));
 
         // Then we should have tried to load the call first and then config and then flow
         assertCallConfigFlowLoaded(inboundCall, Constants.CONFIG_VOXEO, mainFlow.getName());
