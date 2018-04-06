@@ -402,6 +402,8 @@ public class CallUtilTest extends BaseTest {
         context.put("externalType", Constants.EXTERNAL_TYPE);
         context.put("playedMessages", Constants.PLAYED_MESSAGES);
 
+        context.put("refKey", Constants.REF_KEY);
+
         // When
         callUtil.mergeContextWithCall(context, outboundCall);
 
@@ -424,6 +426,8 @@ public class CallUtilTest extends BaseTest {
         assertTrue(outboundCall.getContext().containsKey("externalId"));
         assertTrue(outboundCall.getContext().containsKey("externalType"));
         assertTrue(outboundCall.getContext().containsKey("playedMessages"));
+
+        assertTrue(outboundCall.getContext().containsKey("refKey"));
     }
 
     @Test

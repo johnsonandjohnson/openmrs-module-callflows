@@ -138,6 +138,8 @@ public final class Constants {
 
     public static final String PLAYED_MESSAGES = "message1|message2";
 
+    public static final String REF_KEY = "321-180320180530";
+
     public static final String KEY_GREETING = "greeting";
 
     public static final String KEY_PIN = "pid";

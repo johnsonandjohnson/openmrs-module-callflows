@@ -25,11 +25,12 @@ public interface CallService {
      * @param externalId     the externalId of the provider, if any, associated with this call
      * @param externalType   type of the provider id, if any, associated with this call
      * @param playedMessages information of any message being played
+     * @param refKey         reference information to link with different integrated systems
      * @param params         the initial params for the flow to function
      * @return a new call object with a generated call ID
      */
     Call create(String config, CallFlow start, String startNode, CallDirection direction, String actorId,
-                String actorType, String externalId, String externalType, String playedMessages,
+                String actorType, String externalId, String externalType, String playedMessages, String refKey,
                 Map<String, Object> params);
 
     /**

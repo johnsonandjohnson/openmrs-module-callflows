@@ -166,6 +166,13 @@ public class Call {
     private String playedMessages;
 
     /**
+     * A reference passed by different systems integrated with callflow module,
+     * to identify the relation with calls, may be for reporting as well
+     */
+    @Field(type = "text")
+    private String refKey;
+
+    /**
      * The current context of this call
      * Context variables are as set in the various templates of the callflow and contain information to continue handling the call
      * Typically params from the caller are short-lived per single request and are not stored here for security reasons,
@@ -338,6 +345,14 @@ public class Call {
 
     public void setPlayedMessages(String playedMessages) {
         this.playedMessages = playedMessages;
+    }
+
+    public String getRefKey() {
+        return refKey;
+    }
+
+    public void setRefKey(String refKey) {
+        this.refKey = refKey;
     }
 
     public Map<String, Object> getContext() {

@@ -69,7 +69,7 @@ public class CallServiceImpl implements CallService {
     @Override
     @Transactional
     public Call create(String config, CallFlow start, String startNode, CallDirection direction, String actorId,
-                       String actorType, String externalId, String externalType, String playedMessages,
+                       String actorType, String externalId, String externalType, String playedMessages, String refKey,
                        Map<String, Object> params) {
 
         // Create a new call
@@ -101,6 +101,9 @@ public class CallServiceImpl implements CallService {
         call.setExternalType(externalType);
         call.setPlayedMessages(playedMessages);
 
+        //External integrated system reference information
+        call.setRefKey(refKey);
+
         // Parameters we were passed
         call.setContext(params == null ? new HashMap<String, Object>() : params);
 
@@ -116,7 +119,7 @@ public class CallServiceImpl implements CallService {
     @Transactional
     public Call create(String config, CallFlow start, String startNode, CallDirection direction,
                        Map<String, Object> params) {
-        return create(config, start, startNode, direction, null, null, null, null, null, params);
+        return create(config, start, startNode, direction, null, null, null, null, null, null, params);
     }
 
     @Override
@@ -156,6 +159,11 @@ public class CallServiceImpl implements CallService {
         if (null == currentCall.getActorId()) {
             currentCall.setActorId(call.getActorId());
             currentCall.setActorType(call.getActorType());
+        }
+
+        //We can update external reference information, if it wasn't set earlier
+        if (null == currentCall.getRefKey()) {
+            currentCall.setRefKey(call.getRefKey());
         }
 
         //Update the start time when the call is picked/answered
@@ -265,14 +273,17 @@ public class CallServiceImpl implements CallService {
 
         String startNode = flow.getNodes().get(0).getStep();
 
-        // Set the external provider information and messages played, if any.
+        // Set the external provider information and messages played, if any
         String externalId = (String) params.get(Constants.PARAM_EXTERNAL_ID);
         String externalType = (String) params.get(Constants.PARAM_EXTERNAL_TYPE);
         String playedMessages = (String) params.get(Constants.PARAM_PLAYED_MESSAGES);
 
+        // Set external reference information, if any
+        String refKey = (String) params.get(Constants.PARAM_REF_KEY);
+
         // create the call
         return create(config.getName(), callFlow, startNode, CallDirection.OUTGOING, actorId, actorType, externalId,
-                      externalType, playedMessages, context);
+                      externalType, playedMessages, refKey, context);
     }
 
     private void makeOutboundRequest(HttpUriRequest request, Call call, Map<String, Object> params) throws IOException {

@@ -27,6 +27,8 @@ public final class Constants {
 
     public static final String PARAM_PLAYED_MESSAGES = "playedMessages";
 
+    public static final String PARAM_REF_KEY = "refKey";
+
     public static final String PARAM_REASON = "reason";
 
     public static final String PARAM_STATUS = "status";

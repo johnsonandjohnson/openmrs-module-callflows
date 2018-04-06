@@ -200,7 +200,7 @@ public class CallServiceTest extends BaseTest {
         Call newCall = callService
                 .create(Constants.CONFIG_VOXEO, mainFlow, Constants.CALLFLOW_MAIN_ENTRY, CallDirection.INCOMING,
                         Constants.ACTOR_ID, Constants.ACTOR_TYPE, Constants.EXTERNAL_ID, Constants.EXTERNAL_TYPE,
-                        Constants.PLAYED_MESSAGES, params);
+                        Constants.PLAYED_MESSAGES, null, params);
 
         // Then
         verify(callDataService, times(1)).create(inboundCall);
@@ -225,7 +225,7 @@ public class CallServiceTest extends BaseTest {
         // When
         Call newCall = callService
                 .create(Constants.CONFIG_VOXEO, mainFlow, Constants.CALLFLOW_MAIN_ENTRY, CallDirection.OUTGOING,
-                        Constants.ACTOR_ID, Constants.ACTOR_TYPE, null, null, null, params);
+                        Constants.ACTOR_ID, Constants.ACTOR_TYPE, null, null, null, Constants.REF_KEY, params);
 
         // Then
         verify(callDataService, times(1)).create(outboundCall);
@@ -235,6 +235,7 @@ public class CallServiceTest extends BaseTest {
         assertThat(newCall.getCallId(), equalTo(Constants.OUTBOUND_CALL_ID.toString()));
         CallAssert.assertOutgoingCall(newCall);
         CallAssert.assertActor(newCall);
+        CallAssert.assertRefKey(newCall);
         CallAssert.assertMockedTimestamps(newCall);
     }
 
