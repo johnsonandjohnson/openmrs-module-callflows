@@ -164,7 +164,7 @@ public class CallUtil {
         }
 
         refKey = internalCtx.get(REF_KEY);
-        if (null != actorId) {
+        if (null != refKey) {
             call.setRefKey(refKey);
         }
     }
