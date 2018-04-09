@@ -169,7 +169,7 @@ public class Call {
      * A reference passed by different systems integrated with callflow module,
      * to identify the relation with calls, may be for reporting as well
      */
-    @Field(type = "text")
+    @Field
     private String refKey;
 
     /**
