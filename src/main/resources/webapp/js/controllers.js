@@ -486,17 +486,15 @@
                 createUrl = '/motech-platform-server/module/cmsliteapi/resource?type=stream&language=' + language + '&name=' + name,
                 params = {
                     method: 'POST',
-                    file: {'contentFile': file}
+                    file: {'file': file}
                 };
             $http.get(url)
                 .then(function(response) {
                     file.upload = Upload.upload(angular.extend(params, {'url' : url}));
                     $scope.doUpload(file, callback);
                 }, function(errResponse) {
-                    if (errResponse.status === 404) {
-                        file.upload = Upload.upload(angular.extend(params, {'url' : createUrl}));
-                        $scope.doUpload(file, callback);
-                    }
+                    file.upload = Upload.upload(angular.extend(params, {'url' : createUrl}));
+                    $scope.doUpload(file, callback);
                 });
         };
 
