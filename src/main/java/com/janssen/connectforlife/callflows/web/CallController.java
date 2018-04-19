@@ -258,7 +258,7 @@ public class CallController extends RestController {
      * @param headers   a map of headers that are passed along with the request
      * @return
      */
-    @RequestMapping(value = "/calls/{callId}.{extension}")
+    @RequestMapping(value = "/calls/{callId}.{extension}", method = RequestMethod.GET)
     public ResponseEntity<String> handleContinuation(HttpServletRequest request, @PathVariable String callId,
                                                      @PathVariable String extension,
                                                      @RequestParam Map<String, String> params,

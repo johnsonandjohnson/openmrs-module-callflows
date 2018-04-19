@@ -629,10 +629,9 @@
                 return;
             }
             $http({
-                method: 'post',
+                method: 'get',
                 url: url,
-                transformRequest: transformRequestToFormPost,
-                data: $scope.userInput
+                params: $scope.userInput
             })
             .success(function(response) {
                 $scope.current.node = response.node;
