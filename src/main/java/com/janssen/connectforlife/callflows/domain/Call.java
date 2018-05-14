@@ -187,6 +187,16 @@ public class Call {
     @Field
     private Map<String, String> providerData = new HashMap<>();
 
+    private DateTime creationDate;
+
+    public DateTime getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(DateTime creationDate) {
+        this.creationDate = creationDate;
+    }
+
     public Long getId() {
         return id;
     }
@@ -390,19 +400,9 @@ public class Call {
 
     @Override
     public String toString() {
-        return "Call{" +
-                "id=" + id +
-                ", callId='" + callId + '\'' +
-                ", direction=" + direction +
-                ", status=" + status +
-                ", start='" + startFlow + '.' + startNode + '\'' +
-                ", startTime=" + startTime +
-                ", end='" + endFlow + '.' + endNode + '\'' +
-                ", endTime='" + endTime + '\'' +
-                ", config='" + config + '\'' +
-                ", actorId='" + actorId + '\'' +
-                ", actorType='" + actorType + '\'' +
-                ", steps=" + steps +
-                '}';
+        return "Call{" + "id=" + id + ", callId='" + callId + '\'' + ", direction=" + direction + ", status=" + status +
+                ", start='" + startFlow + '.' + startNode + '\'' + ", startTime=" + startTime + ", end='" + endFlow +
+                '.' + endNode + '\'' + ", endTime='" + endTime + '\'' + ", config='" + config + '\'' + ", actorId='" +
+                actorId + '\'' + ", actorType='" + actorType + '\'' + ", steps=" + steps + '}';
     }
 }

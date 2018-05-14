@@ -14,12 +14,15 @@ import com.janssen.connectforlife.callflows.domain.types.CallStatus;
 import com.janssen.connectforlife.callflows.service.CallFlowService;
 import com.janssen.connectforlife.callflows.service.CallService;
 import com.janssen.connectforlife.callflows.service.FlowService;
+import com.janssen.connectforlife.callflows.service.ReportService;
 import com.janssen.connectforlife.callflows.service.SettingsService;
 import com.janssen.connectforlife.callflows.util.CallUtil;
 import com.janssen.connectforlife.callflows.util.FlowUtil;
 
+import org.motechproject.mds.query.QueryParams;
 import org.motechproject.mds.service.ServiceUtil;
 
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
@@ -40,11 +43,31 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.supercsv.io.CsvMapWriter;
+import org.supercsv.prefs.CsvPreference;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+import static org.apache.commons.lang.CharEncoding.UTF_8;
 
 /**
  * Call Controller
@@ -100,6 +123,18 @@ public class CallController extends RestController {
      * Separator which will be used for played messages
      */
     private static final String SEPERATOR_MESSAGE = "|";
+    private static final String UPDATE_CFL_CALLS_SET_REFKEY = "update cfl_calls set refkey='";
+    private static final String UNDER_SCORE = "_";
+    private static final String ACTOR_ID = "actorId=";
+    private static final String WHITE_SPACE_CHAR = " ";
+    private static final String SINGLE_QUOTE = "'";
+    private static final String FILE_NAME_INITIALS = "cfl_calls_";
+    private static final String WHERE_ACTOR_TYPE_PATIENT = "WHERE actorType='PATIENT'";
+    private static final String DIRECTION_OUTGOING = "direction='OUTGOING';";
+    private static final String AND = "and";
+    private static final String CALL_ID = "callId=";
+    private static final String MESSAGE_KEY = "messageKey";
+    private static final String CSV = ".csv";
 
     @Autowired
     private SettingsService settingsService;
@@ -121,6 +156,9 @@ public class CallController extends RestController {
 
     @Autowired
     private CallUtil callUtil;
+
+    @Autowired
+    private ReportService reportService;
 
     @PostConstruct
     public void initialize() {
@@ -300,7 +338,7 @@ public class CallController extends RestController {
             Flow flow = flowService.load(call.getEndFlow().getName());
 
             String jumpTo = params.get(Constants.PARAM_JUMP_TO);
-            if (! StringUtils.isBlank(jumpTo)) {
+            if (!StringUtils.isBlank(jumpTo)) {
                 // See if there is some jump to some other flow
                 flow = flowService.load(jumpTo);
                 currentNode = flow.getNodes().get(0);
@@ -371,6 +409,167 @@ public class CallController extends RestController {
                      params);
         Call call = callService.makeCall(configName, name, params);
         return call != null ? new OutboundCallResponse(call) : null;
+    }
+
+    @RequestMapping(value = "/config/export-details", method = RequestMethod.GET)
+    @ResponseBody
+    public Map<String, Object> exportCallsDetails(@RequestParam(defaultValue = "1") Integer set,
+                                                  HttpServletResponse response) throws IOException {
+
+        response.setHeader("Content-Disposition", "attachment; filename=" + "calls_reference" + ".zip");
+        response.addHeader("Content-Type", "application/octet-stream");
+        response.setContentType("application/octet-stream");
+        response.setCharacterEncoding(UTF_8);
+
+        final int defaultFetchSize = 10000;
+        int numberOfTenKFiles = 5;
+
+        // Logic: Fetching of data is divided into sets of 50,000 records, which should be downloaded as 'cfl_references.zip' file.
+        // Every zip contains 5 .csv files with 10,000 records each.
+        long totalNumberOfRecords = reportService.retrieveCount();
+        long allowedNumberOfSets = (totalNumberOfRecords / (numberOfTenKFiles * defaultFetchSize)) + 1;
+        QueryParams queryParams = null;
+        List<Call> outboundCalls = null;
+        final String[] headers = { "id", "actorId", "phone", "actorType", "callId", "direction", "creationDate",
+                "callReference", "status", "statusText", "startTime", "endTime", "updateQuery" };
+        Path tempFiles = Files.createTempDirectory(null);
+        String tempDir = tempFiles.toString();
+
+        Map<String, String> fileNames = new HashedMap(5);
+        String currentFileName = null;
+        if (0 < set && set <= allowedNumberOfSets) {
+            for (int i = 1; i <= numberOfTenKFiles; i++) {
+                queryParams = new QueryParams(i + (5 * (set - 1)), defaultFetchSize);
+                outboundCalls = reportService.findCalls(queryParams);
+                if (null != outboundCalls && outboundCalls.size() > 0) {
+                    currentFileName = FILE_NAME_INITIALS + i;
+                    fileNames.put(currentFileName, generateFileName(tempDir, i));
+                    processCalls(currentFileName, fileNames, headers, outboundCalls);
+                }
+            }
+        }
+        createZip(response, fileNames);
+        deleteTempFile(tempDir, fileNames);
+        return null;
+    }
+
+    private void deleteTempFile(String tempDir, Map<String, String> fileNames) throws IOException {
+
+        for (String fileName : fileNames.keySet()) {
+            Files.delete(Paths.get(fileNames.get(fileName)));
+        }
+        Files.delete(Paths.get(tempDir));
+    }
+
+    private void processCalls(String currentFile, Map<String, String> fileNames, String[] headers,
+                              List<Call> outboundCalls) throws IOException {
+        if (null != outboundCalls && outboundCalls.size() > 0) {
+            DateTimeFormatter fromFormatter = DateTimeFormat.forPattern("MM/dd/yyyy HH:mm:ss");
+            DateTimeFormatter toFormatter = DateTimeFormat.forPattern("yyMMddHHmm");
+
+            try (Writer writer = new BufferedWriter(
+                    new OutputStreamWriter(new FileOutputStream(fileNames.get(currentFile)), Charset.forName(UTF_8)))) {
+                try (CsvMapWriter csvMapWriter = new CsvMapWriter(writer, CsvPreference.STANDARD_PREFERENCE)) {
+                    csvMapWriter.writeHeader(headers);
+                    final LinkedHashMap<String, Object> callMap = new LinkedHashMap<>(headers.length);
+                    String messageKey;
+                    DateTime dateTimeMessageKey;
+                    for (Call call : outboundCalls) {
+                        try {
+                            callMap.clear();
+
+                            initializeCallMap(callMap, call, headers, toFormatter);
+
+                            if (null != call.getContext() && null != call.getContext().get(MESSAGE_KEY) &&
+                                    StringUtils.isNotEmpty(call.getContext().get(MESSAGE_KEY).toString())) {
+                                messageKey = call.getContext().get(MESSAGE_KEY).toString();
+                                try {
+                                    dateTimeMessageKey = fromFormatter.parseDateTime(messageKey);
+                                    callMap.put(headers[7], dateTimeMessageKey.toString(toFormatter));
+                                } catch (IllegalArgumentException e) {
+                                    LOGGER.error(
+                                            "Invalid input format to parse messageKey to dateTime for calls record having id: {} with messageKey value: {}",
+                                            call.getId(), call.getContext().get(MESSAGE_KEY));
+                                    callMap.put(headers[7], null);
+                                }
+                            } else {
+                                callMap.put(headers[7], null);
+                            }
+
+                            callMap.put(headers[12], createUpdateQuery(call, headers, callMap));
+
+                            if (null != callMap) {
+                                csvMapWriter.write(callMap, headers);
+                            }
+                        } catch (Exception e) {
+                            LOGGER.error("Exception occurred for call record having id:{} with exception message: {}",
+                                         call.getId(), e.getMessage());
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+
+    private String generateFileName(String tempDir, int fileNumber) {
+
+        return new StringBuilder(tempDir).append(File.separator).append(FILE_NAME_INITIALS).append(fileNumber)
+                                         .append(CSV).toString();
+    }
+
+    private void initializeCallMap(Map<String, Object> callMap, Call call, String[] headers,
+                                   DateTimeFormatter toFormatter) {
+        callMap.put(headers[0], call.getId());
+        callMap.put(headers[1], call.getActorId());
+        callMap.put(headers[2], (null != call.getContext()) ? call.getContext().get("phone") : null);
+        callMap.put(headers[3], call.getActorType());
+        callMap.put(headers[4], call.getCallId());
+        callMap.put(headers[5], call.getDirection());
+        callMap.put(headers[6], call.getCreationDate().toString(toFormatter));
+        callMap.put(headers[8], call.getStatus());
+        callMap.put(headers[9], call.getStatusText());
+        callMap.put(headers[10], call.getStartTime());
+        callMap.put(headers[11], call.getEndTime());
+    }
+
+    private void createZip(HttpServletResponse response, Map<String, String> fileNames) throws IOException {
+        int length = 0;
+        try (ZipOutputStream zipOutputStream = new ZipOutputStream(response.getOutputStream())) {
+            for (String currentFileName : fileNames.keySet()) {
+                try (FileInputStream is = new FileInputStream(fileNames.get(currentFileName))) {
+                    ZipEntry zipEntry = new ZipEntry(currentFileName + CSV);
+                    zipOutputStream.putNextEntry(zipEntry);
+                    byte[] b = new byte[1024];
+                    while ((length = is.read(b)) != -1) {
+                        zipOutputStream.write(b, 0, length);
+                    }
+                } catch (Exception e) {
+                    LOGGER.error("Error in creating zip entry for file: {} with error message: {}",
+                                 currentFileName + CSV, e.getMessage());
+                }
+            }
+        }
+    }
+
+    private String createUpdateQuery(Call call, String[] headers, Map<String, Object> callMap) {
+        StringBuilder updateQuery = new StringBuilder(UPDATE_CFL_CALLS_SET_REFKEY);
+        updateQuery.append(call.getActorId());
+        updateQuery.append(UNDER_SCORE);
+        if (null != callMap.get(headers[7])) {
+            updateQuery.append(callMap.get(headers[7]) + SINGLE_QUOTE);
+        } else {
+            updateQuery.append(callMap.get(headers[6]) + SINGLE_QUOTE);
+        }
+        updateQuery.append(WHITE_SPACE_CHAR + WHERE_ACTOR_TYPE_PATIENT + WHITE_SPACE_CHAR + AND + WHITE_SPACE_CHAR +
+                                   ACTOR_ID);
+        updateQuery.append(SINGLE_QUOTE + call.getActorId() + SINGLE_QUOTE);
+        updateQuery
+                .append(WHITE_SPACE_CHAR + AND + WHITE_SPACE_CHAR + CALL_ID + SINGLE_QUOTE + callMap.get(headers[4]) +
+                                SINGLE_QUOTE);
+        updateQuery.append(WHITE_SPACE_CHAR + AND + WHITE_SPACE_CHAR + DIRECTION_OUTGOING);
+
+        return updateQuery.toString();
     }
 
     private ResponseEntity buildOutput(Exception error, String output, Node node, Call call, String extension,
