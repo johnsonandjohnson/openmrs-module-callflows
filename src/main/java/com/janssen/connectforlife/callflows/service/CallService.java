@@ -4,6 +4,9 @@ import com.janssen.connectforlife.callflows.domain.Call;
 import com.janssen.connectforlife.callflows.domain.CallFlow;
 import com.janssen.connectforlife.callflows.domain.types.CallDirection;
 
+import org.motechproject.mds.query.QueryParams;
+
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -106,4 +109,21 @@ public interface CallService {
      * @return the call created
      */
     Call makeCall(String configName, String flowName, Map<String, Object> params);
+
+
+    /**
+     * Fetch call details based on query params by utilizing motech data service 'retrieveAll' function
+     * Limitation of 'retrieveAll()' - Throws heap memory issue for 25000 records, but works fine with 20000 records at a time.
+     *
+     * @param queryParams
+     * @return list of calls
+     */
+    List<Call> findCalls(QueryParams queryParams);
+
+    /**
+     * Fetch the count of call records present in db
+     *
+     * @return total number of call records present in db
+     */
+    long retrieveCount();
 }

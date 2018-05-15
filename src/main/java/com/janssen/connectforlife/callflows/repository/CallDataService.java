@@ -6,6 +6,7 @@ import com.janssen.connectforlife.callflows.domain.types.CallStatus;
 
 import org.motechproject.mds.annotations.Lookup;
 import org.motechproject.mds.annotations.LookupField;
+import org.motechproject.mds.query.QueryParams;
 import org.motechproject.mds.service.MotechDataService;
 
 import java.util.List;
@@ -47,5 +48,21 @@ public interface CallDataService extends MotechDataService<Call> {
      */
     long countFindCallsByDirectionAndStatus(@LookupField(name = "direction") CallDirection direction,
                                             @LookupField(name = "status") Set<CallStatus> statusSet);
+
+    /**
+     * Fetch call details based on query params by utilizing motech data service 'retrieveAll' function
+     * Limitation of 'retrieveAll()' - Throws heap memory issue for 25000 records, but works fine with 20000 records at a time.
+     *
+     * @param queryParams
+     * @return list of calls
+     */
+    List<Call> findCalls(QueryParams queryParams);
+
+    /**
+     * Fetch the count of call records present in db
+     *
+     * @return total number of call records present in db
+     */
+    long retrieveCount();
 
 }

@@ -14,6 +14,8 @@ import com.janssen.connectforlife.callflows.service.FlowService;
 import com.janssen.connectforlife.callflows.service.SettingsService;
 import com.janssen.connectforlife.callflows.util.CallUtil;
 
+import org.motechproject.mds.query.QueryParams;
+
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -30,6 +32,7 @@ import javax.naming.OperationNotSupportedException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -237,6 +240,16 @@ public class CallServiceImpl implements CallService {
             handleError(call, e.getMessage(), params);
         }
         return call;
+    }
+
+    @Override
+    public List<Call> findCalls(QueryParams queryParams) {
+        return callDataService.retrieveAll(queryParams);
+    }
+
+    @Override
+    public long retrieveCount() {
+        return callDataService.count();
     }
 
     private void handleError(Call call, String reason, Map<String, Object> params) {
