@@ -124,7 +124,7 @@ public class CallUtil {
     private static final String FILE_NAME_INITIALS = "cfl_calls_";
 
     private final String[] headers = { "id", "actorId", "phone", "actorType", "callId", "direction", "creationDate",
-            "callReference", "status", "statusText", "startTime", "endTime"};
+            "callReference", "status", "statusText", "startTime", "endTime" };
 
     private static DateTimeFormatter fromFormatter = DateTimeFormat.forPattern("MM/dd/yyyy HH:mm:ss");
     private static DateTimeFormatter toFormatter = DateTimeFormat.forPattern("yyMMddHHmm");
@@ -539,6 +539,13 @@ public class CallUtil {
         eventRelay.sendEventMessage(statusChangedEvent);
     }
 
+    /**
+     * Generate csv report out of the list of calls with pre-configured headers
+     *
+     * @param currentFilePath absolute path of the file where file will be generated
+     * @param calls           list of call to traverse for report generation
+     * @throws IOException
+     */
     public void generateReports(String currentFilePath, List<Call> calls) throws IOException {
 
         try (Writer writer = new BufferedWriter(
@@ -563,36 +570,6 @@ public class CallUtil {
         }
     }
 
-    private void initializeCallMap(Map<String, Object> callMap, Call call) {
-
-        callMap.put(headers[0], call.getId());
-        callMap.put(headers[1], call.getActorId());
-        callMap.put(headers[2], (null != call.getContext()) ? call.getContext().get("phone") : null);
-        callMap.put(headers[3], call.getActorType());
-        callMap.put(headers[4], call.getCallId());
-        callMap.put(headers[5], call.getDirection());
-        callMap.put(headers[6], call.getCreationDate().toString(toFormatter));
-
-        if (null != call.getContext() && null != call.getContext().get(MESSAGE_KEY) &&
-                StringUtils.isNotEmpty(call.getContext().get(MESSAGE_KEY).toString())) {
-            try {
-                DateTime dateTimeMessageKey = fromFormatter
-                        .parseDateTime(call.getContext().get(MESSAGE_KEY).toString());
-                callMap.put(headers[7], dateTimeMessageKey.toString(toFormatter));
-            } catch (IllegalArgumentException e) {
-                LOGGER.error(
-                        "Invalid input format to parse messageKey to dateTime for calls record having id: {} with messageKey value: {}",
-                        call.getId(), call.getContext().get(MESSAGE_KEY));
-                callMap.put(headers[7], null);
-            }
-        } else {
-            callMap.put(headers[7], null);
-        }
-        callMap.put(headers[8], call.getStatus());
-        callMap.put(headers[9], call.getStatusText());
-        callMap.put(headers[10], call.getStartTime());
-        callMap.put(headers[11], call.getEndTime());
-    }
 
     public void deleteTempFile(String tempDir, Map<String, String> fileNames) throws IOException {
 
@@ -625,6 +602,37 @@ public class CallUtil {
                 }
             }
         }
+    }
+
+    private void initializeCallMap(Map<String, Object> callMap, Call call) {
+
+        callMap.put(headers[0], call.getId());
+        callMap.put(headers[1], call.getActorId());
+        callMap.put(headers[2], (null != call.getContext()) ? call.getContext().get("phone") : null);
+        callMap.put(headers[3], call.getActorType());
+        callMap.put(headers[4], call.getCallId());
+        callMap.put(headers[5], call.getDirection());
+        callMap.put(headers[6], null != call.getCreationDate() ? call.getCreationDate().toString(toFormatter) : null);
+
+        if (null != call.getContext() && null != call.getContext().get(MESSAGE_KEY) &&
+                StringUtils.isNotEmpty(call.getContext().get(MESSAGE_KEY).toString())) {
+            try {
+                DateTime dateTimeMessageKey = fromFormatter
+                        .parseDateTime(call.getContext().get(MESSAGE_KEY).toString());
+                callMap.put(headers[7], dateTimeMessageKey.toString(toFormatter));
+            } catch (IllegalArgumentException e) {
+                LOGGER.error(
+                        "Invalid input format to parse messageKey to dateTime for calls record having id: {} with messageKey value: {}",
+                        call.getId(), call.getContext().get(MESSAGE_KEY));
+                callMap.put(headers[7], null);
+            }
+        } else {
+            callMap.put(headers[7], null);
+        }
+        callMap.put(headers[8], call.getStatus());
+        callMap.put(headers[9], call.getStatusText());
+        callMap.put(headers[10], call.getStartTime());
+        callMap.put(headers[11], call.getEndTime());
     }
 
     private String buildJsonResponse(Exception error, String content, Node node, Call call) throws IOException {

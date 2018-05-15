@@ -34,6 +34,7 @@ import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -46,14 +47,13 @@ import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-
-import static org.apache.commons.lang.CharEncoding.UTF_8;
 
 /**
  * Call Controller
@@ -115,7 +115,6 @@ public class CallController extends RestController {
     private static final String EXTENSION_ZIP = ".zip";
     private static final String ZIP_FILENAME = "calls_reference";
     private static final String HEADER_CONTENT_TYPE = "Content-Type";
-    private static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
     private static final int DEFAULT_FETCH_SIZE = 10000;
     private static final int NUMBER_OF_TEN_K_FILES = 5;
 
@@ -318,7 +317,7 @@ public class CallController extends RestController {
             Flow flow = flowService.load(call.getEndFlow().getName());
 
             String jumpTo = params.get(Constants.PARAM_JUMP_TO);
-            if (!StringUtils.isBlank(jumpTo)) {
+            if (! StringUtils.isBlank(jumpTo)) {
                 // See if there is some jump to some other flow
                 flow = flowService.load(jumpTo);
                 currentNode = flow.getNodes().get(0);
@@ -345,8 +344,7 @@ public class CallController extends RestController {
             //update the played messages only when the data coming in as part of params
             if (StringUtils.isNotBlank(params.get(Constants.PARAM_PLAYED_MESSAGES))) {
                 call.setPlayedMessages(StringUtils.isNotBlank(playedMessages) ?
-                                               playedMessages.concat(SEPERATOR_MESSAGE)
-                                                             .concat(params.get(Constants.PARAM_PLAYED_MESSAGES)) :
+                                               playedMessages.concat(SEPERATOR_MESSAGE).concat(params.get(Constants.PARAM_PLAYED_MESSAGES)) :
                                                params.get(Constants.PARAM_PLAYED_MESSAGES));
             }
 
@@ -398,9 +396,9 @@ public class CallController extends RestController {
                                                   HttpServletResponse response) throws IOException {
 
         response.setHeader(HEADER_CONTENT_DISPOSITION, ATTACHMENT_FILENAME + ZIP_FILENAME + EXTENSION_ZIP);
-        response.addHeader(HEADER_CONTENT_TYPE, APPLICATION_OCTET_STREAM);
-        response.setContentType(APPLICATION_OCTET_STREAM);
-        response.setCharacterEncoding(UTF_8);
+        response.addHeader(HEADER_CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
         // Logic: Fetching of data is divided into sets of 50,000 records, which should be downloaded as 'cfl_references.zip' file.
         // Every zip contains 5 .csv files with 10,000 records each.
@@ -414,19 +412,22 @@ public class CallController extends RestController {
 
         Map<String, String> fileNames = new HashedMap(5);
         String currentFileName = null;
-        if (0 < set && set <= allowedNumberOfSets) {
+        if (0 < set && set <= allowedNumberOfSets && totalNumberOfRecords > 0) {
             for (int i = 1; i <= NUMBER_OF_TEN_K_FILES; i++) {
                 queryParams = new QueryParams(i + (5 * (set - 1)), DEFAULT_FETCH_SIZE);
-                outboundCalls = callService.findCalls(queryParams);
+                outboundCalls = callService.findAll(queryParams);
                 if (!outboundCalls.isEmpty()) {
                     currentFileName = FILE_NAME_INITIALS + i;
                     fileNames.put(currentFileName, callUtil.generateFileName(tempDir, i));
                     callUtil.generateReports(fileNames.get(currentFileName), outboundCalls);
                 }
             }
+            if (! fileNames.isEmpty()) {
+                callUtil.createZip(response, fileNames);
+                callUtil.deleteTempFile(tempDir, fileNames);
+            }
         }
-        callUtil.createZip(response, fileNames);
-        callUtil.deleteTempFile(tempDir, fileNames);
+
         return null;
     }
 

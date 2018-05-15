@@ -243,7 +243,7 @@ public class CallServiceImpl implements CallService {
     }
 
     @Override
-    public List<Call> findCalls(QueryParams queryParams) {
+    public List<Call> findAll(QueryParams queryParams) {
         return callDataService.retrieveAll(queryParams);
     }
 
