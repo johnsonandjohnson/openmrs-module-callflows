@@ -14,6 +14,8 @@ import com.janssen.connectforlife.callflows.service.FlowService;
 import com.janssen.connectforlife.callflows.service.SettingsService;
 import com.janssen.connectforlife.callflows.util.CallUtil;
 
+import org.motechproject.mds.query.QueryParams;
+
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -30,6 +32,7 @@ import javax.naming.OperationNotSupportedException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -69,7 +72,7 @@ public class CallServiceImpl implements CallService {
     @Override
     @Transactional
     public Call create(String config, CallFlow start, String startNode, CallDirection direction, String actorId,
-                       String actorType, String externalId, String externalType, String playedMessages,
+                       String actorType, String externalId, String externalType, String playedMessages, String refKey,
                        Map<String, Object> params) {
 
         // Create a new call
@@ -101,6 +104,9 @@ public class CallServiceImpl implements CallService {
         call.setExternalType(externalType);
         call.setPlayedMessages(playedMessages);
 
+        //External integrated system reference information
+        call.setRefKey(refKey);
+
         // Parameters we were passed
         call.setContext(params == null ? new HashMap<String, Object>() : params);
 
@@ -116,7 +122,7 @@ public class CallServiceImpl implements CallService {
     @Transactional
     public Call create(String config, CallFlow start, String startNode, CallDirection direction,
                        Map<String, Object> params) {
-        return create(config, start, startNode, direction, null, null, null, null, null, params);
+        return create(config, start, startNode, direction, null, null, null, null, null, null, params);
     }
 
     @Override
@@ -156,6 +162,11 @@ public class CallServiceImpl implements CallService {
         if (null == currentCall.getActorId()) {
             currentCall.setActorId(call.getActorId());
             currentCall.setActorType(call.getActorType());
+        }
+
+        //We can update external reference information, if it wasn't set earlier
+        if (null == currentCall.getRefKey()) {
+            currentCall.setRefKey(call.getRefKey());
         }
 
         //Update the start time when the call is picked/answered
@@ -231,6 +242,16 @@ public class CallServiceImpl implements CallService {
         return call;
     }
 
+    @Override
+    public List<Call> findAll(QueryParams queryParams) {
+        return callDataService.retrieveAll(queryParams);
+    }
+
+    @Override
+    public long retrieveCount() {
+        return callDataService.count();
+    }
+
     private void handleError(Call call, String reason, Map<String, Object> params) {
         LOGGER.error("call {} failed with reason {}", call, reason);
         // update call failed status
@@ -265,14 +286,17 @@ public class CallServiceImpl implements CallService {
 
         String startNode = flow.getNodes().get(0).getStep();
 
-        // Set the external provider information and messages played, if any.
+        // Set the external provider information and messages played, if any
         String externalId = (String) params.get(Constants.PARAM_EXTERNAL_ID);
         String externalType = (String) params.get(Constants.PARAM_EXTERNAL_TYPE);
         String playedMessages = (String) params.get(Constants.PARAM_PLAYED_MESSAGES);
 
+        // Set external reference information, if any
+        String refKey = (String) params.get(Constants.PARAM_REF_KEY);
+
         // create the call
         return create(config.getName(), callFlow, startNode, CallDirection.OUTGOING, actorId, actorType, externalId,
-                      externalType, playedMessages, context);
+                      externalType, playedMessages, refKey, context);
     }
 
     private void makeOutboundRequest(HttpUriRequest request, Call call, Map<String, Object> params) throws IOException {

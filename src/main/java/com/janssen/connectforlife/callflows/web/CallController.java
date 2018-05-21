@@ -18,8 +18,10 @@ import com.janssen.connectforlife.callflows.service.SettingsService;
 import com.janssen.connectforlife.callflows.util.CallUtil;
 import com.janssen.connectforlife.callflows.util.FlowUtil;
 
+import org.motechproject.mds.query.QueryParams;
 import org.motechproject.mds.service.ServiceUtil;
 
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
@@ -32,6 +34,7 @@ import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,7 +45,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -100,6 +109,14 @@ public class CallController extends RestController {
      * Separator which will be used for played messages
      */
     private static final String SEPERATOR_MESSAGE = "|";
+    private static final String FILE_NAME_INITIALS = "cfl_calls_";
+    private static final String HEADER_CONTENT_DISPOSITION = "Content-Disposition";
+    private static final String ATTACHMENT_FILENAME = "attachment; filename=";
+    private static final String EXTENSION_ZIP = ".zip";
+    private static final String ZIP_FILENAME = "calls_reference";
+    private static final String HEADER_CONTENT_TYPE = "Content-Type";
+    private static final int DEFAULT_FETCH_SIZE = 10000;
+    private static final int NUMBER_OF_TEN_K_FILES = 5;
 
     @Autowired
     private SettingsService settingsService;
@@ -371,6 +388,47 @@ public class CallController extends RestController {
                      params);
         Call call = callService.makeCall(configName, name, params);
         return call != null ? new OutboundCallResponse(call) : null;
+    }
+
+    @RequestMapping(value = "/calls/export-details", method = RequestMethod.GET)
+    @ResponseBody
+    public Map<String, Object> exportCallsDetails(@RequestParam(defaultValue = "1") Integer set,
+                                                  HttpServletResponse response) throws IOException {
+
+        response.setHeader(HEADER_CONTENT_DISPOSITION, ATTACHMENT_FILENAME + ZIP_FILENAME + EXTENSION_ZIP);
+        response.addHeader(HEADER_CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+
+        // Logic: Fetching of data is divided into sets of 50,000 records, which should be downloaded as 'cfl_references.zip' file.
+        // Every zip contains 5 .csv files with 10,000 records each.
+        long totalNumberOfRecords = callService.retrieveCount();
+        int allowedNumberOfSets = (int) ((totalNumberOfRecords / (NUMBER_OF_TEN_K_FILES * DEFAULT_FETCH_SIZE)) + 1);
+
+        QueryParams queryParams = null;
+        List<Call> outboundCalls = null;
+        Path tempFiles = Files.createTempDirectory(null);
+        String tempDir = tempFiles.toString();
+
+        Map<String, String> fileNames = new HashedMap(5);
+        String currentFileName = null;
+        if (0 < set && set <= allowedNumberOfSets && totalNumberOfRecords > 0) {
+            for (int i = 1; i <= NUMBER_OF_TEN_K_FILES; i++) {
+                queryParams = new QueryParams(i + (5 * (set - 1)), DEFAULT_FETCH_SIZE);
+                outboundCalls = callService.findAll(queryParams);
+                if (!outboundCalls.isEmpty()) {
+                    currentFileName = FILE_NAME_INITIALS + i;
+                    fileNames.put(currentFileName, callUtil.generateFileName(tempDir, i));
+                    callUtil.generateReports(fileNames.get(currentFileName), outboundCalls);
+                }
+            }
+            if (! fileNames.isEmpty()) {
+                callUtil.createZip(response, fileNames);
+                callUtil.deleteTempFile(tempDir, fileNames);
+            }
+        }
+
+        return null;
     }
 
     private ResponseEntity buildOutput(Exception error, String output, Node node, Call call, String extension,

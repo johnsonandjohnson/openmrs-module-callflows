@@ -123,7 +123,7 @@ public class CallServiceBundleIT extends BasePaxIT {
         Call newCall = callService
                 .create(Constants.CONFIG_VOXEO, mainFlow, Constants.CALLFLOW_MAIN_ENTRY, CallDirection.INCOMING,
                         Constants.ACTOR_ID, Constants.ACTOR_TYPE, Constants.EXTERNAL_ID, Constants.EXTERNAL_TYPE,
-                        Constants.PLAYED_MESSAGES, params);
+                        Constants.PLAYED_MESSAGES, null, params);
 
         // Then
         CallAssert.assertBasicFields(newCall);
@@ -140,12 +140,13 @@ public class CallServiceBundleIT extends BasePaxIT {
         // When
         Call newCall = callService
                 .create(Constants.CONFIG_VOXEO, mainFlow, Constants.CALLFLOW_MAIN_ENTRY, CallDirection.OUTGOING,
-                        Constants.ACTOR_ID, Constants.ACTOR_TYPE, null, null, null, params);
+                        Constants.ACTOR_ID, Constants.ACTOR_TYPE, null, null, null, Constants.REF_KEY, params);
 
         // Then
         CallAssert.assertBasicFields(newCall);
         CallAssert.assertOutgoingCall(newCall);
         CallAssert.assertActor(newCall);
+        CallAssert.assertRefKey(newCall);
         CallAssert.assertTimestamps(newCall);
     }
 

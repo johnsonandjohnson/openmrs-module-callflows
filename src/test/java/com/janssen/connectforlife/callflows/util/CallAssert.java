@@ -114,6 +114,10 @@ public final class CallAssert {
         assertThat(call.getPlayedMessages(), equalTo(Constants.PLAYED_MESSAGES));
     }
 
+    public static void assertRefKey(Call call) {
+        assertThat(call.getRefKey(), equalTo(Constants.REF_KEY));
+    }
+
     public static void assertPlayedMessagesUpdated(Call call) {
         assertThat(call.getPlayedMessages(),
                    equalTo(Constants.PLAYED_MESSAGES + Constants.UPDATED));

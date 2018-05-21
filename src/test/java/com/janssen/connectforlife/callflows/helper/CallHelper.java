@@ -76,6 +76,7 @@ public final class CallHelper {
         call.setExternalType(Constants.EXTERNAL_TYPE);
         call.setPlayedMessages(Constants.PLAYED_MESSAGES);
 
+        call.setRefKey(Constants.REF_KEY);
         return call;
     }
 

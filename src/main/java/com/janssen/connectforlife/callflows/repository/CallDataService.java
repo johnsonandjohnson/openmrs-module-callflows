@@ -47,5 +47,4 @@ public interface CallDataService extends MotechDataService<Call> {
      */
     long countFindCallsByDirectionAndStatus(@LookupField(name = "direction") CallDirection direction,
                                             @LookupField(name = "status") Set<CallStatus> statusSet);
-
 }

@@ -166,6 +166,13 @@ public class Call {
     private String playedMessages;
 
     /**
+     * A reference passed by different systems integrated with callflow module,
+     * to identify the relation with calls, may be for reporting as well
+     */
+    @Field
+    private String refKey;
+
+    /**
      * The current context of this call
      * Context variables are as set in the various templates of the callflow and contain information to continue handling the call
      * Typically params from the caller are short-lived per single request and are not stored here for security reasons,
@@ -179,6 +186,16 @@ public class Call {
      */
     @Field
     private Map<String, String> providerData = new HashMap<>();
+
+    private DateTime creationDate;
+
+    public DateTime getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(DateTime creationDate) {
+        this.creationDate = creationDate;
+    }
 
     public Long getId() {
         return id;
@@ -340,6 +357,14 @@ public class Call {
         this.playedMessages = playedMessages;
     }
 
+    public String getRefKey() {
+        return refKey;
+    }
+
+    public void setRefKey(String refKey) {
+        this.refKey = refKey;
+    }
+
     public Map<String, Object> getContext() {
         return context;
     }
@@ -375,19 +400,9 @@ public class Call {
 
     @Override
     public String toString() {
-        return "Call{" +
-                "id=" + id +
-                ", callId='" + callId + '\'' +
-                ", direction=" + direction +
-                ", status=" + status +
-                ", start='" + startFlow + '.' + startNode + '\'' +
-                ", startTime=" + startTime +
-                ", end='" + endFlow + '.' + endNode + '\'' +
-                ", endTime='" + endTime + '\'' +
-                ", config='" + config + '\'' +
-                ", actorId='" + actorId + '\'' +
-                ", actorType='" + actorType + '\'' +
-                ", steps=" + steps +
-                '}';
+        return "Call{" + "id=" + id + ", callId='" + callId + '\'' + ", direction=" + direction + ", status=" + status +
+                ", start='" + startFlow + '.' + startNode + '\'' + ", startTime=" + startTime + ", end='" + endFlow +
+                '.' + endNode + '\'' + ", endTime='" + endTime + '\'' + ", config='" + config + '\'' + ", actorId='" +
+                actorId + '\'' + ", actorType='" + actorType + '\'' + ", steps=" + steps + '}';
     }
 }

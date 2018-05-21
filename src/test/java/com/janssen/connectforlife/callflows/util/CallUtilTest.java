@@ -28,30 +28,44 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.supercsv.io.CsvMapWriter;
+import org.supercsv.prefs.CsvPreference;
 import javax.naming.OperationNotSupportedException;
 import javax.servlet.http.HttpServletRequest;
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
+import static org.apache.commons.lang.CharEncoding.UTF_8;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
@@ -62,7 +76,8 @@ import static org.mockito.internal.verification.VerificationModeFactory.times;
  * @author bramak09
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ DateTime.class })
+@PrepareForTest({ CallUtil.class, DateTime.class, BufferedWriter.class, OutputStreamWriter.class,
+        FileOutputStream.class, CsvMapWriter.class })
 public class CallUtilTest extends BaseTest {
 
     private MotechEvent motechEvent;
@@ -87,6 +102,11 @@ public class CallUtilTest extends BaseTest {
 
     private Set<CallStatus> callStatusSet = new HashSet<>(Constants.ACTIVE_OUTBOUND_CALL_STATUSES);
 
+    private BufferedWriter bufferedWriter;
+    private FileOutputStream fileOutputStream;
+    private OutputStreamWriter outputStreamWriter;
+    private CsvMapWriter csvMapWriter;
+
     @InjectMocks
     private CallUtil callUtil = new CallUtil();
 
@@ -108,11 +128,20 @@ public class CallUtilTest extends BaseTest {
     @Mock
     private Call call;
 
+    @Captor
+    private ArgumentCaptor<LinkedHashMap> csvArgumentCaptor;
+
     @Before
     public void setUp() throws IOException {
 
         MockitoAnnotations.initMocks(CallUtilTest.class);
         PowerMockito.mockStatic(DateTime.class);
+        bufferedWriter = PowerMockito.mock(BufferedWriter.class);
+        fileOutputStream = PowerMockito.mock(FileOutputStream.class);
+        outputStreamWriter = PowerMockito.mock(OutputStreamWriter.class);
+        csvMapWriter = PowerMockito.mock(CsvMapWriter.class);
+
+
         dateTime = new DateTime();
         given(DateTime.now()).willReturn(dateTime);
 
@@ -401,6 +430,8 @@ public class CallUtilTest extends BaseTest {
         context.put("externalType", Constants.EXTERNAL_TYPE);
         context.put("playedMessages", Constants.PLAYED_MESSAGES);
 
+        context.put("refKey", Constants.REF_KEY);
+
         // When
         callUtil.mergeContextWithCall(context, outboundCall);
 
@@ -423,6 +454,8 @@ public class CallUtilTest extends BaseTest {
         assertTrue(outboundCall.getContext().containsKey("externalId"));
         assertTrue(outboundCall.getContext().containsKey("externalType"));
         assertTrue(outboundCall.getContext().containsKey("playedMessages"));
+
+        assertTrue(outboundCall.getContext().containsKey("refKey"));
     }
 
     @Test
@@ -491,6 +524,42 @@ public class CallUtilTest extends BaseTest {
         verify(schedulerService, times(1)).scheduleRunOnceJob(new RunOnceSchedulableJob(motechEvent, DateTime.now()
                                                                                                              .plusSeconds(
                                                                                                                      Constants.CONFIG_VOXEO_OUTBOUND_CALL_RETRY_SECONDS)));
+    }
+
+    @Test
+    public void shouldNotThrowAnyExceptionWhileGeneratingCallReports() throws Exception {
+        //Given
+        List<Call> calls = new ArrayList<>(1);
+        calls.add(setupCallData());
+        final String[] headers = { "id", "actorId", "phone", "actorType", "callId", "direction", "creationDate",
+                "callReference", "status", "statusText", "startTime", "endTime" };
+
+        LinkedHashMap<String, Object> linkedHashMap = new LinkedHashMap<>();
+
+        PowerMockito.whenNew(FileOutputStream.class).withArguments(anyString()).thenReturn(fileOutputStream);
+        PowerMockito.whenNew(OutputStreamWriter.class).withArguments(fileOutputStream, Charset.forName(UTF_8))
+                    .thenReturn(outputStreamWriter);
+        PowerMockito.whenNew(BufferedWriter.class).withArguments(outputStreamWriter).thenReturn(bufferedWriter);
+        PowerMockito.whenNew(CsvMapWriter.class).withArguments(bufferedWriter, CsvPreference.STANDARD_PREFERENCE)
+                    .thenReturn(csvMapWriter);
+        PowerMockito.whenNew(LinkedHashMap.class).withArguments(anyInt()).thenReturn(linkedHashMap);
+
+        //When
+        callUtil.generateReports("", calls);
+
+        //verify
+        verify(csvMapWriter, times(1)).write(csvArgumentCaptor.capture(), Matchers.<String>anyVararg());
+        assertEquals(calls.get(0).getId(), csvArgumentCaptor.getValue().get("id"));
+        assertEquals(calls.get(0).getCallId(), csvArgumentCaptor.getValue().get("callId"));
+    }
+
+    private Call setupCallData() {
+        Call callData = new Call();
+        callData.setId(1L);
+        callData.setActorId("10L");
+        callData.setCallId("91882-92882-1882-9383ss-28292");
+        callData.setDirection(CallDirection.OUTGOING);
+        return callData;
     }
 
     private void assertCallStatusEvent(MotechEvent event) {

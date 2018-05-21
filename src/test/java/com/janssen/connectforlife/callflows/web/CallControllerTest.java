@@ -25,6 +25,8 @@ import com.janssen.connectforlife.callflows.service.SettingsService;
 import com.janssen.connectforlife.callflows.util.CallUtil;
 import com.janssen.connectforlife.callflows.util.FlowUtil;
 import com.janssen.connectforlife.callflows.util.TestUtil;
+import org.motechproject.mds.query.QueryParams;
+import org.motechproject.mds.service.ServiceUtil;
 import org.apache.velocity.VelocityContext;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,7 +35,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.motechproject.mds.service.ServiceUtil;
 import org.osgi.framework.BundleContext;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -45,7 +46,9 @@ import org.springframework.test.web.server.setup.MockMvcBuilders;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static junit.framework.TestCase.assertNotNull;
@@ -55,6 +58,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
@@ -73,7 +77,7 @@ import static org.springframework.test.web.server.result.MockMvcResultMatchers.s
  * @author bramak09
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ ServiceUtil.class })
+@PrepareForTest({ CallController.class, ServiceUtil.class, QueryParams.class })
 public class CallControllerTest extends BaseTest {
 
     private static final String LOCALHOST = "localhost";
@@ -153,10 +157,13 @@ public class CallControllerTest extends BaseTest {
 
     private static final String CALL_SERVICE_CLASS = "com.janssen.connectforlife.callflows.service.CallService";
 
+    private QueryParams queryParams;
+
     @Before
     public void setUp() throws IOException {
         // initialize
         PowerMockito.mockStatic(ServiceUtil.class);
+        PowerMockito.mockStatic(QueryParams.class);
         mockMvc = MockMvcBuilders.standaloneSetup(callController).build();
         callController.initialize();
 
@@ -723,6 +730,50 @@ public class CallControllerTest extends BaseTest {
         verify(callService, times(1)).makeCall(eq(Constants.CONFIG_VOXEO), eq(Constants.CALLFLOW_MAIN), any(Map.class));
 
     }
+
+    @Test
+    public void shouldReturnStatusOkayForGenerateReportWhenCallTableIsEmpty() throws Exception {
+        given(callService.retrieveCount()).willReturn(0L);
+
+        // When we make a outbound call request
+        mockMvc.perform(customGet("/calls/export-details", "set", ""))
+               .andExpect(status().is(HttpStatus.OK.value()));
+
+        verify(callService, times(1)).retrieveCount();
+    }
+
+    @Test
+    public void shouldReturnStatusOkayForGenerateReportWhenCallTableIsNotEmpty() throws Exception {
+        //Given
+        List<Call> calls = new ArrayList<>(1);
+        calls.add(setUpCall());
+
+        queryParams = new QueryParams(1, 10000);
+        given(callService.retrieveCount()).willReturn(1L);
+        PowerMockito.whenNew(QueryParams.class).withArguments(1, 10000).thenReturn(queryParams);
+        given(callService.findAll(queryParams)).willReturn(calls);
+
+        // When we make export call data request
+        mockMvc.perform(customGet("/calls/export-details", "set", ""))
+               .andExpect(status().is(HttpStatus.OK.value()));
+
+        verify(callService, times(1)).retrieveCount();
+        verify(callService, times(1)).findAll(queryParams);
+        verify(callService, times(5)).findAll(any(QueryParams.class));
+        verify(callUtil, times(1)).generateReports(anyString(), anyListOf(Call.class));
+    }
+
+    private Call setUpCall() {
+        Call call = new Call();
+        call.setId(1L);
+        call.setActorId("10L");
+        call.setCallId("91882-92882-1882-9383ss-28292");
+        call.setDirection(CallDirection.OUTGOING);
+
+        return call;
+    }
+
+
 
 
     private void assertContext(VelocityContext context, Call call, String nextURL) {

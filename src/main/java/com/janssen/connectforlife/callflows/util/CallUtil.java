@@ -18,6 +18,7 @@ import org.motechproject.event.listener.EventRelay;
 import org.motechproject.scheduler.contract.RunOnceSchedulableJob;
 import org.motechproject.scheduler.service.MotechSchedulerService;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -28,6 +29,8 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.exception.VelocityException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,19 +40,36 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ClassUtils;
+import org.supercsv.io.CsvMapWriter;
+import org.supercsv.prefs.CsvPreference;
 import javax.naming.OperationNotSupportedException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+import static org.apache.commons.lang.CharEncoding.UTF_8;
 
 
 /**
@@ -90,12 +110,24 @@ public class CallUtil {
 
     private static final String EXTERNAL_TYPE = "externalType";
 
+    private static final String REF_KEY = "refKey";
+
     private static final String INTERNAL = "internal";
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
     private static final Collection<CallStatus> ACTIVE_OUTBOUND_CALL_STATUSES = Arrays
             .asList(CallStatus.INITIATED, CallStatus.IN_PROGRESS, CallStatus.MOTECH_INITIATED);
+
+    private static final String MESSAGE_KEY = "messageKey";
+    private static final String CSV = ".csv";
+    private static final String FILE_NAME_INITIALS = "cfl_calls_";
+
+    private final String[] headers = { "id", "actorId", "phone", "actorType", "callId", "direction", "creationDate",
+            "callReference", "status", "statusText", "startTime", "endTime" };
+
+    private static DateTimeFormatter fromFormatter = DateTimeFormat.forPattern("MM/dd/yyyy HH:mm:ss");
+    private static DateTimeFormatter toFormatter = DateTimeFormat.forPattern("yyMMddHHmm");
 
     @Autowired
     private CallDataService callDataService;
@@ -132,14 +164,14 @@ public class CallUtil {
         Map<String, Object> callContext = call.getContext();
         String actorId;
         String externalId;
+        String refKey;
         String keyString;
         for (Object key : context.getKeys()) {
             keyString = (String) key;
             Object val = context.get(keyString);
             // we are not going to capture domain objects or other complex objects, just simple objects
             if (val != null) {
-                if (isAllowedToPersist(keyString, val) ||
-                        ClassUtils.isPrimitiveOrWrapper(val.getClass()) ||
+                if (isAllowedToPersist(keyString, val) || ClassUtils.isPrimitiveOrWrapper(val.getClass()) ||
                         ClassUtils.isPrimitiveArray(val.getClass()) ||
                         ClassUtils.isPrimitiveWrapperArray(val.getClass())) {
                     callContext.put((String) key, val);
@@ -158,6 +190,11 @@ public class CallUtil {
         if (null != externalId) {
             call.setExternalId(externalId);
             call.setExternalType(internalCtx.get(EXTERNAL_TYPE));
+        }
+
+        refKey = internalCtx.get(REF_KEY);
+        if (null != refKey) {
+            call.setRefKey(refKey);
         }
     }
 
@@ -424,9 +461,9 @@ public class CallUtil {
                     post.setHeader(entry.getKey(), entry.getValue() == null ? "" : entry.getValue().toString());
                 }
 
-                StringEntity entity = new StringEntity(mergeUriAndRemoveParams(config.getOutgoingCallPostParams(), completeParams));
-                entity.setContentType(new BasicHeader("Content-Type",
-                                                      "application/x-www-form-urlencoded"));
+                StringEntity entity = new StringEntity(
+                        mergeUriAndRemoveParams(config.getOutgoingCallPostParams(), completeParams));
+                entity.setContentType(new BasicHeader("Content-Type", "application/x-www-form-urlencoded"));
                 post.setEntity(entity);
 
                 request = post;
@@ -500,6 +537,102 @@ public class CallUtil {
         data.put(Constants.PARAM_PARAMS, params);
         MotechEvent statusChangedEvent = new MotechEvent(Events.CALLFLOWS_CALL_STATUS, data);
         eventRelay.sendEventMessage(statusChangedEvent);
+    }
+
+    /**
+     * Generate csv report out of the list of calls with pre-configured headers
+     *
+     * @param currentFilePath absolute path of the file where file will be generated
+     * @param calls           list of call to traverse for report generation
+     * @throws IOException
+     */
+    public void generateReports(String currentFilePath, List<Call> calls) throws IOException {
+
+        try (Writer writer = new BufferedWriter(
+                new OutputStreamWriter(new FileOutputStream(currentFilePath), Charset.forName(UTF_8)))) {
+            try (CsvMapWriter csvMapWriter = new CsvMapWriter(writer, CsvPreference.STANDARD_PREFERENCE)) {
+                csvMapWriter.writeHeader(headers);
+                final LinkedHashMap<String, Object> callMap = new LinkedHashMap<>(headers.length);
+
+                for (Call call : calls) {
+                    try {
+                        callMap.clear();
+                        initializeCallMap(callMap, call);
+                        if (null != callMap) {
+                            csvMapWriter.write(callMap, headers);
+                        }
+                    } catch (Exception e) {
+                        LOGGER.error("Exception occurred for call record having id:{} with exception message: {}",
+                                     call.getId(), e.getMessage());
+                    }
+                }
+            }
+        }
+    }
+
+
+    public void deleteTempFile(String tempDir, Map<String, String> fileNames) throws IOException {
+
+        for (String fileName : fileNames.keySet()) {
+            Files.delete(Paths.get(fileNames.get(fileName)));
+        }
+        Files.delete(Paths.get(tempDir));
+    }
+
+    public String generateFileName(String tempDir, int fileNumber) {
+
+        return new StringBuilder(tempDir).append(File.separator).append(FILE_NAME_INITIALS).append(fileNumber)
+                                         .append(CSV).toString();
+    }
+
+    public void createZip(HttpServletResponse response, Map<String, String> fileNames) throws IOException {
+        int length = 0;
+        try (ZipOutputStream zipOutputStream = new ZipOutputStream(response.getOutputStream())) {
+            for (String currentFileName : fileNames.keySet()) {
+                try (FileInputStream is = new FileInputStream(fileNames.get(currentFileName))) {
+                    ZipEntry zipEntry = new ZipEntry(currentFileName + CSV);
+                    zipOutputStream.putNextEntry(zipEntry);
+                    byte[] b = new byte[1024];
+                    while ((length = is.read(b)) != -1) {
+                        zipOutputStream.write(b, 0, length);
+                    }
+                } catch (Exception e) {
+                    LOGGER.error("Error in creating zip entry for file: {} with error message: {}",
+                                 currentFileName + CSV, e.getMessage());
+                }
+            }
+        }
+    }
+
+    private void initializeCallMap(Map<String, Object> callMap, Call call) {
+
+        callMap.put(headers[0], call.getId());
+        callMap.put(headers[1], call.getActorId());
+        callMap.put(headers[2], (null != call.getContext()) ? call.getContext().get("phone") : null);
+        callMap.put(headers[3], call.getActorType());
+        callMap.put(headers[4], call.getCallId());
+        callMap.put(headers[5], call.getDirection());
+        callMap.put(headers[6], null != call.getCreationDate() ? call.getCreationDate().toString(toFormatter) : null);
+
+        if (null != call.getContext() && null != call.getContext().get(MESSAGE_KEY) &&
+                StringUtils.isNotEmpty(call.getContext().get(MESSAGE_KEY).toString())) {
+            try {
+                DateTime dateTimeMessageKey = fromFormatter
+                        .parseDateTime(call.getContext().get(MESSAGE_KEY).toString());
+                callMap.put(headers[7], dateTimeMessageKey.toString(toFormatter));
+            } catch (IllegalArgumentException e) {
+                LOGGER.error(
+                        "Invalid input format to parse messageKey to dateTime for calls record having id: {} with messageKey value: {}",
+                        call.getId(), call.getContext().get(MESSAGE_KEY));
+                callMap.put(headers[7], null);
+            }
+        } else {
+            callMap.put(headers[7], null);
+        }
+        callMap.put(headers[8], call.getStatus());
+        callMap.put(headers[9], call.getStatusText());
+        callMap.put(headers[10], call.getStartTime());
+        callMap.put(headers[11], call.getEndTime());
     }
 
     private String buildJsonResponse(Exception error, String content, Node node, Call call) throws IOException {
