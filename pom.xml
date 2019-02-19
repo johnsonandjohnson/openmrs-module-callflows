@@ -4,7 +4,7 @@
     <parent>
         <artifactId>modules</artifactId>
         <groupId>com.janssen.connectforlife</groupId>
-        <version>9.0.0</version>
+        <version>9.1.0</version>
         <relativePath>../..</relativePath>
     </parent>
 
