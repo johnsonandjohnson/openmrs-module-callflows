@@ -1,4 +1,4 @@
-package com.janssen.connectforlife.callflows.web.it;
+package org.openmrs.module.callflows.web.it;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

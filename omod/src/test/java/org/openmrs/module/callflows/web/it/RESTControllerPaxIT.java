@@ -1,4 +1,4 @@
-package com.janssen.connectforlife.callflows.web.it;
+package org.openmrs.module.callflows.web.it;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpResponse;

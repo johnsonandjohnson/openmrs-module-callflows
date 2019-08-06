@@ -1,4 +1,4 @@
-package com.janssen.connectforlife.callflows.web.it;
+package org.openmrs.module.callflows.web.it;
 
 import com.janssen.connectforlife.callflows.Constants;
 import com.janssen.connectforlife.callflows.domain.Call;

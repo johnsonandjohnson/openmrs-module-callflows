@@ -1,4 +1,4 @@
-package com.janssen.connectforlife.callflows.web;
+package org.openmrs.module.callflows.web.controller;
 
 import com.janssen.connectforlife.callflows.builder.ConfigBuilder;
 import com.janssen.connectforlife.callflows.builder.ConfigContractBuilder;

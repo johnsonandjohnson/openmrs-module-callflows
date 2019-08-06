@@ -1,4 +1,4 @@
-package com.janssen.connectforlife.callflows.web;
+package org.openmrs.module.callflows.web.controller;
 
 import com.janssen.connectforlife.callflows.BaseTest;
 import com.janssen.connectforlife.callflows.Constants;
