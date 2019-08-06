@@ -1,12 +1,12 @@
 package org.openmrs.module.callflows.web.it;
 
-import com.janssen.connectforlife.callflows.contract.ConfigContract;
-import com.janssen.connectforlife.callflows.contract.RendererContract;
-import com.janssen.connectforlife.callflows.domain.Config;
-import com.janssen.connectforlife.callflows.domain.Renderer;
-import com.janssen.connectforlife.callflows.helper.ConfigHelper;
-import com.janssen.connectforlife.callflows.helper.RendererHelper;
-import com.janssen.connectforlife.callflows.service.SettingsService;
+import org.openmrs.module.callflows.api.contract.ConfigContract;
+import org.openmrs.module.callflows.api.contract.RendererContract;
+import org.openmrs.module.callflows.api.domain.Config;
+import org.openmrs.module.callflows.api.domain.Renderer;
+import org.openmrs.module.callflows.api.helper.ConfigHelper;
+import org.openmrs.module.callflows.api.helper.RendererHelper;
+import org.openmrs.module.callflows.api.service.SettingsService;
 
 import org.motechproject.testing.osgi.container.MotechNativeTestContainerFactory;
 

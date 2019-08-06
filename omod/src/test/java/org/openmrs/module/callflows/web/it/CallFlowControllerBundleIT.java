@@ -1,12 +1,12 @@
 package org.openmrs.module.callflows.web.it;
 
-import com.janssen.connectforlife.callflows.contract.CallFlowRequest;
-import com.janssen.connectforlife.callflows.domain.CallFlow;
-import com.janssen.connectforlife.callflows.exception.CallFlowAlreadyExistsException;
-import com.janssen.connectforlife.callflows.helper.CallFlowContractHelper;
-import com.janssen.connectforlife.callflows.helper.CallFlowHelper;
-import com.janssen.connectforlife.callflows.repository.CallFlowDataService;
-import com.janssen.connectforlife.callflows.service.CallFlowService;
+import org.openmrs.module.callflows.api.contract.CallFlowRequest;
+import org.openmrs.module.callflows.api.domain.CallFlow;
+import org.openmrs.module.callflows.api.exception.CallFlowAlreadyExistsException;
+import org.openmrs.module.callflows.api.helper.CallFlowContractHelper;
+import org.openmrs.module.callflows.api.helper.CallFlowHelper;
+import org.openmrs.module.callflows.api.repository.CallFlowDataService;
+import org.openmrs.module.callflows.api.service.CallFlowService;
 
 import org.motechproject.testing.osgi.container.MotechNativeTestContainerFactory;
 

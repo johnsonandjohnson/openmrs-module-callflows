@@ -1,30 +1,30 @@
 package org.openmrs.module.callflows.web.controller;
 
-import com.janssen.connectforlife.callflows.BaseTest;
-import com.janssen.connectforlife.callflows.Constants;
-import com.janssen.connectforlife.callflows.domain.Call;
-import com.janssen.connectforlife.callflows.domain.CallFlow;
-import com.janssen.connectforlife.callflows.domain.Config;
-import com.janssen.connectforlife.callflows.domain.FlowPosition;
-import com.janssen.connectforlife.callflows.domain.Renderer;
-import com.janssen.connectforlife.callflows.domain.flow.Flow;
-import com.janssen.connectforlife.callflows.domain.flow.Node;
-import com.janssen.connectforlife.callflows.domain.flow.TextElement;
-import com.janssen.connectforlife.callflows.domain.flow.UserNode;
-import com.janssen.connectforlife.callflows.domain.types.CallDirection;
-import com.janssen.connectforlife.callflows.domain.types.CallStatus;
-import com.janssen.connectforlife.callflows.helper.CallFlowHelper;
-import com.janssen.connectforlife.callflows.helper.CallHelper;
-import com.janssen.connectforlife.callflows.helper.ConfigHelper;
-import com.janssen.connectforlife.callflows.helper.FlowHelper;
-import com.janssen.connectforlife.callflows.helper.RendererHelper;
-import com.janssen.connectforlife.callflows.service.CallFlowService;
-import com.janssen.connectforlife.callflows.service.CallService;
-import com.janssen.connectforlife.callflows.service.FlowService;
-import com.janssen.connectforlife.callflows.service.SettingsService;
-import com.janssen.connectforlife.callflows.util.CallUtil;
-import com.janssen.connectforlife.callflows.util.FlowUtil;
-import com.janssen.connectforlife.callflows.util.TestUtil;
+import org.openmrs.module.callflows.api.BaseTest;
+import org.openmrs.module.callflows.api.Constants;
+import org.openmrs.module.callflows.api.domain.Call;
+import org.openmrs.module.callflows.api.domain.CallFlow;
+import org.openmrs.module.callflows.api.domain.Config;
+import org.openmrs.module.callflows.api.domain.FlowPosition;
+import org.openmrs.module.callflows.api.domain.Renderer;
+import org.openmrs.module.callflows.api.domain.flow.Flow;
+import org.openmrs.module.callflows.api.domain.flow.Node;
+import org.openmrs.module.callflows.api.domain.flow.TextElement;
+import org.openmrs.module.callflows.api.domain.flow.UserNode;
+import org.openmrs.module.callflows.api.domain.types.CallDirection;
+import org.openmrs.module.callflows.api.domain.types.CallStatus;
+import org.openmrs.module.callflows.api.helper.CallFlowHelper;
+import org.openmrs.module.callflows.api.helper.CallHelper;
+import org.openmrs.module.callflows.api.helper.ConfigHelper;
+import org.openmrs.module.callflows.api.helper.FlowHelper;
+import org.openmrs.module.callflows.api.helper.RendererHelper;
+import org.openmrs.module.callflows.api.service.CallFlowService;
+import org.openmrs.module.callflows.api.service.CallService;
+import org.openmrs.module.callflows.api.service.FlowService;
+import org.openmrs.module.callflows.api.service.SettingsService;
+import org.openmrs.module.callflows.api.util.CallUtil;
+import org.openmrs.module.callflows.api.util.FlowUtil;
+import org.openmrs.module.callflows.api.util.TestUtil;
 import org.motechproject.mds.query.QueryParams;
 import org.motechproject.mds.service.ServiceUtil;
 import org.apache.velocity.VelocityContext;
@@ -155,7 +155,7 @@ public class CallControllerTest extends BaseTest {
 
     private Map<String, String> servicesMap;
 
-    private static final String CALL_SERVICE_CLASS = "com.janssen.connectforlife.callflows.service.CallService";
+    private static final String CALL_SERVICE_CLASS = "org.openmrs.module.callflows.api.service.CallService";
 
     private QueryParams queryParams;
 

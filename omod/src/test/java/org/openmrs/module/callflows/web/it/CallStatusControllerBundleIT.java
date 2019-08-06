@@ -1,9 +1,9 @@
 package org.openmrs.module.callflows.web.it;
 
-import com.janssen.connectforlife.callflows.domain.Call;
-import com.janssen.connectforlife.callflows.helper.CallHelper;
-import com.janssen.connectforlife.callflows.repository.CallDataService;
-import com.janssen.connectforlife.callflows.repository.CallFlowDataService;
+import org.openmrs.module.callflows.api.domain.Call;
+import org.openmrs.module.callflows.api.helper.CallHelper;
+import org.openmrs.module.callflows.api.repository.CallDataService;
+import org.openmrs.module.callflows.api.repository.CallFlowDataService;
 
 import org.motechproject.testing.osgi.container.MotechNativeTestContainerFactory;
 

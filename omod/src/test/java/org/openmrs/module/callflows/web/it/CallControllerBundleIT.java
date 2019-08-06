@@ -1,26 +1,26 @@
 package org.openmrs.module.callflows.web.it;
 
-import com.janssen.connectforlife.callflows.Constants;
-import com.janssen.connectforlife.callflows.domain.Call;
-import com.janssen.connectforlife.callflows.domain.CallFlow;
-import com.janssen.connectforlife.callflows.domain.Config;
-import com.janssen.connectforlife.callflows.domain.Renderer;
-import com.janssen.connectforlife.callflows.domain.flow.Flow;
-import com.janssen.connectforlife.callflows.domain.flow.Template;
-import com.janssen.connectforlife.callflows.domain.flow.TextElement;
-import com.janssen.connectforlife.callflows.domain.flow.UserNode;
-import com.janssen.connectforlife.callflows.domain.types.CallDirection;
-import com.janssen.connectforlife.callflows.exception.CallFlowAlreadyExistsException;
-import com.janssen.connectforlife.callflows.helper.CallFlowHelper;
-import com.janssen.connectforlife.callflows.helper.ConfigHelper;
-import com.janssen.connectforlife.callflows.helper.RendererHelper;
-import com.janssen.connectforlife.callflows.repository.CallDataService;
-import com.janssen.connectforlife.callflows.repository.CallFlowDataService;
-import com.janssen.connectforlife.callflows.service.CallFlowService;
-import com.janssen.connectforlife.callflows.service.CallService;
-import com.janssen.connectforlife.callflows.service.FlowService;
-import com.janssen.connectforlife.callflows.service.SettingsService;
-import com.janssen.connectforlife.callflows.util.TestUtil;
+import org.openmrs.module.callflows.api.Constants;
+import org.openmrs.module.callflows.api.domain.Call;
+import org.openmrs.module.callflows.api.domain.CallFlow;
+import org.openmrs.module.callflows.api.domain.Config;
+import org.openmrs.module.callflows.api.domain.Renderer;
+import org.openmrs.module.callflows.api.domain.flow.Flow;
+import org.openmrs.module.callflows.api.domain.flow.Template;
+import org.openmrs.module.callflows.api.domain.flow.TextElement;
+import org.openmrs.module.callflows.api.domain.flow.UserNode;
+import org.openmrs.module.callflows.api.domain.types.CallDirection;
+import org.openmrs.module.callflows.api.exception.CallFlowAlreadyExistsException;
+import org.openmrs.module.callflows.api.helper.CallFlowHelper;
+import org.openmrs.module.callflows.api.helper.ConfigHelper;
+import org.openmrs.module.callflows.api.helper.RendererHelper;
+import org.openmrs.module.callflows.api.repository.CallDataService;
+import org.openmrs.module.callflows.api.repository.CallFlowDataService;
+import org.openmrs.module.callflows.api.service.CallFlowService;
+import org.openmrs.module.callflows.api.service.CallService;
+import org.openmrs.module.callflows.api.service.FlowService;
+import org.openmrs.module.callflows.api.service.SettingsService;
+import org.openmrs.module.callflows.api.util.TestUtil;
 
 import org.motechproject.testing.osgi.container.MotechNativeTestContainerFactory;
 

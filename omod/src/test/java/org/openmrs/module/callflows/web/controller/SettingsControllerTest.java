@@ -1,20 +1,20 @@
 package org.openmrs.module.callflows.web.controller;
 
-import com.janssen.connectforlife.callflows.BaseTest;
-import com.janssen.connectforlife.callflows.Constants;
-import com.janssen.connectforlife.callflows.builder.ConfigBuilder;
-import com.janssen.connectforlife.callflows.builder.ConfigContractBuilder;
-import com.janssen.connectforlife.callflows.builder.RendererBuilder;
-import com.janssen.connectforlife.callflows.builder.RendererContractBuilder;
-import com.janssen.connectforlife.callflows.contract.ConfigContract;
-import com.janssen.connectforlife.callflows.contract.RendererContract;
-import com.janssen.connectforlife.callflows.domain.Config;
-import com.janssen.connectforlife.callflows.domain.Renderer;
-import com.janssen.connectforlife.callflows.domain.Settings;
-import com.janssen.connectforlife.callflows.helper.ConfigHelper;
-import com.janssen.connectforlife.callflows.helper.GenericHelper;
-import com.janssen.connectforlife.callflows.helper.RendererHelper;
-import com.janssen.connectforlife.callflows.service.SettingsService;
+import org.openmrs.module.callflows.api.BaseTest;
+import org.openmrs.module.callflows.api.Constants;
+import org.openmrs.module.callflows.api.builder.ConfigBuilder;
+import org.openmrs.module.callflows.api.builder.ConfigContractBuilder;
+import org.openmrs.module.callflows.api.builder.RendererBuilder;
+import org.openmrs.module.callflows.api.builder.RendererContractBuilder;
+import org.openmrs.module.callflows.api.contract.ConfigContract;
+import org.openmrs.module.callflows.api.contract.RendererContract;
+import org.openmrs.module.callflows.api.domain.Config;
+import org.openmrs.module.callflows.api.domain.Renderer;
+import org.openmrs.module.callflows.api.domain.Settings;
+import org.openmrs.module.callflows.api.helper.ConfigHelper;
+import org.openmrs.module.callflows.api.helper.GenericHelper;
+import org.openmrs.module.callflows.api.helper.RendererHelper;
+import org.openmrs.module.callflows.api.service.SettingsService;
 
 import org.motechproject.mds.util.SecurityUtil;
 
