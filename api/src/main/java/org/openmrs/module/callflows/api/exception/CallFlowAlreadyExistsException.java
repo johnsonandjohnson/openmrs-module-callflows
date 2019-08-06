@@ -1,4 +1,4 @@
-package com.janssen.connectforlife.callflows.exception;
+package org.openmrs.module.callflows.api.exception;
 
 /**
  * Exception to indicate a callflow already exists if added as a duplicate

@@ -1,4 +1,4 @@
-package com.janssen.connectforlife.callflows;
+package org.openmrs.module.callflows;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Rule;

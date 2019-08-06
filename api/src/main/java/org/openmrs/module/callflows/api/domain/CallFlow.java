@@ -1,6 +1,6 @@
-package com.janssen.connectforlife.callflows.domain;
+package org.openmrs.module.callflows.api.domain;
 
-import com.janssen.connectforlife.callflows.domain.types.CallFlowStatus;
+import org.openmrs.module.callflows.api.domain.types.CallFlowStatus;
 
 import org.motechproject.mds.annotations.Entity;
 import org.motechproject.mds.annotations.Field;
@@ -49,7 +49,7 @@ public class CallFlow {
      * However best effort has been made to choose those elements/attributes that can be applicable even in areas
      * where VoiceXML might not be used. The flow structure is therefore a very minified subset of the whole VoiceXML schema
      *
-     * @see com.janssen.connectforlife.callflows.domain.flow.Flow
+     * @see org.openmrs.module.callflows.api.domain.flow.Flow
      */
     @Field(type = "text")
     private String raw;

@@ -1,14 +1,14 @@
-package com.janssen.connectforlife.callflows.util;
+package org.openmrs.module.callflows.api.util;
 
-import com.janssen.connectforlife.callflows.domain.flow.Block;
-import com.janssen.connectforlife.callflows.domain.flow.Element;
-import com.janssen.connectforlife.callflows.domain.flow.FieldElement;
-import com.janssen.connectforlife.callflows.domain.flow.Flow;
-import com.janssen.connectforlife.callflows.domain.flow.FormBlock;
-import com.janssen.connectforlife.callflows.domain.flow.Node;
-import com.janssen.connectforlife.callflows.domain.flow.Template;
-import com.janssen.connectforlife.callflows.domain.flow.TextElement;
-import com.janssen.connectforlife.callflows.domain.flow.UserNode;
+import org.openmrs.module.callflows.api.domain.flow.Block;
+import org.openmrs.module.callflows.api.domain.flow.Element;
+import org.openmrs.module.callflows.api.domain.flow.FieldElement;
+import org.openmrs.module.callflows.api.domain.flow.Flow;
+import org.openmrs.module.callflows.api.domain.flow.FormBlock;
+import org.openmrs.module.callflows.api.domain.flow.Node;
+import org.openmrs.module.callflows.api.domain.flow.Template;
+import org.openmrs.module.callflows.api.domain.flow.TextElement;
+import org.openmrs.module.callflows.api.domain.flow.UserNode;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;

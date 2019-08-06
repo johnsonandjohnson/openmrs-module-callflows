@@ -1,8 +1,8 @@
-package com.janssen.connectforlife.callflows.builder;
+package org.openmrs.module.callflows.api.builder;
 
-import com.janssen.connectforlife.callflows.contract.CallFlowRequest;
-import com.janssen.connectforlife.callflows.domain.CallFlow;
-import com.janssen.connectforlife.callflows.domain.types.CallFlowStatus;
+import org.openmrs.module.callflows.api.contract.CallFlowRequest;
+import org.openmrs.module.callflows.api.domain.CallFlow;
+import org.openmrs.module.callflows.api.domain.types.CallFlowStatus;
 
 import org.springframework.stereotype.Component;
 

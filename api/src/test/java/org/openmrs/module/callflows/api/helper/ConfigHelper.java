@@ -1,8 +1,8 @@
-package com.janssen.connectforlife.callflows.helper;
+package org.openmrs.module.callflows.api.helper;
 
-import com.janssen.connectforlife.callflows.Constants;
-import com.janssen.connectforlife.callflows.contract.ConfigContract;
-import com.janssen.connectforlife.callflows.domain.Config;
+import org.openmrs.module.callflows.api.Constants;
+import org.openmrs.module.callflows.api.contract.ConfigContract;
+import org.openmrs.module.callflows.api.domain.Config;
 
 import java.util.ArrayList;
 import java.util.HashMap;

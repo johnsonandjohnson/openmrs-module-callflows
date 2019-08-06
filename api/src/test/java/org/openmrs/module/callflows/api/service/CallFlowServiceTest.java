@@ -1,13 +1,13 @@
-package com.janssen.connectforlife.callflows.service;
+package org.openmrs.module.callflows.api.service;
 
-import com.janssen.connectforlife.callflows.BaseTest;
-import com.janssen.connectforlife.callflows.Constants;
-import com.janssen.connectforlife.callflows.domain.CallFlow;
-import com.janssen.connectforlife.callflows.domain.types.CallFlowStatus;
-import com.janssen.connectforlife.callflows.exception.CallFlowAlreadyExistsException;
-import com.janssen.connectforlife.callflows.helper.CallFlowHelper;
-import com.janssen.connectforlife.callflows.repository.CallFlowDataService;
-import com.janssen.connectforlife.callflows.service.impl.CallFlowServiceImpl;
+import org.openmrs.module.callflows.api.BaseTest;
+import org.openmrs.module.callflows.api.Constants;
+import org.openmrs.module.callflows.api.domain.CallFlow;
+import org.openmrs.module.callflows.api.domain.types.CallFlowStatus;
+import org.openmrs.module.callflows.api.exception.CallFlowAlreadyExistsException;
+import org.openmrs.module.callflows.api.helper.CallFlowHelper;
+import org.openmrs.module.callflows.api.repository.CallFlowDataService;
+import org.openmrs.module.callflows.api.service.impl.CallFlowServiceImpl;
 
 import org.apache.commons.lang.StringUtils;
 import org.junit.Before;

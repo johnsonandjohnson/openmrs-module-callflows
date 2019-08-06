@@ -1,12 +1,12 @@
-package com.janssen.connectforlife.callflows.util;
+package org.openmrs.module.callflows.api.util;
 
-import com.janssen.connectforlife.callflows.Constants;
-import com.janssen.connectforlife.callflows.domain.Call;
-import com.janssen.connectforlife.callflows.domain.CallFlow;
-import com.janssen.connectforlife.callflows.domain.types.CallDirection;
-import com.janssen.connectforlife.callflows.domain.types.CallStatus;
-import com.janssen.connectforlife.callflows.helper.CallFlowHelper;
-import com.janssen.connectforlife.callflows.helper.CallHelper;
+import org.openmrs.module.callflows.api.Constants;
+import org.openmrs.module.callflows.api.domain.Call;
+import org.openmrs.module.callflows.api.domain.CallFlow;
+import org.openmrs.module.callflows.api.domain.types.CallDirection;
+import org.openmrs.module.callflows.api.domain.types.CallStatus;
+import org.openmrs.module.callflows.api.helper.CallFlowHelper;
+import org.openmrs.module.callflows.api.helper.CallHelper;
 
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;

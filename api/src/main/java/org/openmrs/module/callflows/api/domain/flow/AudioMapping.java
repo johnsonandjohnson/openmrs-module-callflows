@@ -1,4 +1,4 @@
-package com.janssen.connectforlife.callflows.domain.flow;
+package org.openmrs.module.callflows.api.domain.flow;
 
 /**
  * Audio Mapping to indicate the information against a specific text mapping

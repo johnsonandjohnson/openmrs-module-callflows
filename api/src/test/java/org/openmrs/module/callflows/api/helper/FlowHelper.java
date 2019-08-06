@@ -1,6 +1,6 @@
-package com.janssen.connectforlife.callflows.helper;
+package org.openmrs.module.callflows.api.helper;
 
-import com.janssen.connectforlife.callflows.domain.flow.Flow;
+import org.openmrs.module.callflows.api.domain.flow.Flow;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import java.io.IOException;

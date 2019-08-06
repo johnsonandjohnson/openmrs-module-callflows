@@ -1,4 +1,4 @@
-package com.janssen.connectforlife.callflows.domain.flow;
+package org.openmrs.module.callflows.api.domain.flow;
 
 import java.util.List;
 
@@ -7,7 +7,7 @@ import java.util.List;
  * This class captures the properties that are specific in a user interaction node
  *
  * @author bramak09
- * @see com.janssen.connectforlife.callflows.domain.flow.SystemNode
+ * @see org.openmrs.module.callflows.api.domain.flow.SystemNode
  */
 public class UserNode extends Node {
 

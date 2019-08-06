@@ -1,4 +1,4 @@
-package com.janssen.connectforlife.callflows.domain.flow;
+package org.openmrs.module.callflows.api.domain.flow;
 
 /**
  * Menu element identifying for which input, where to jump to

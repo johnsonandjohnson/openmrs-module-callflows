@@ -1,17 +1,17 @@
-package com.janssen.connectforlife.callflows.util;
+package org.openmrs.module.callflows.api.util;
 
-import com.janssen.connectforlife.callflows.contract.JsonExecutionResponse;
-import com.janssen.connectforlife.callflows.domain.Call;
-import com.janssen.connectforlife.callflows.domain.CallFlow;
-import com.janssen.connectforlife.callflows.domain.Config;
-import com.janssen.connectforlife.callflows.domain.Constants;
-import com.janssen.connectforlife.callflows.domain.Renderer;
-import com.janssen.connectforlife.callflows.domain.flow.Node;
-import com.janssen.connectforlife.callflows.domain.flow.UserNode;
-import com.janssen.connectforlife.callflows.domain.types.CallDirection;
-import com.janssen.connectforlife.callflows.domain.types.CallStatus;
-import com.janssen.connectforlife.callflows.event.Events;
-import com.janssen.connectforlife.callflows.repository.CallDataService;
+import org.openmrs.module.callflows.api.contract.JsonExecutionResponse;
+import org.openmrs.module.callflows.api.domain.Call;
+import org.openmrs.module.callflows.api.domain.CallFlow;
+import org.openmrs.module.callflows.api.domain.Config;
+import org.openmrs.module.callflows.api.domain.Constants;
+import org.openmrs.module.callflows.api.domain.Renderer;
+import org.openmrs.module.callflows.api.domain.flow.Node;
+import org.openmrs.module.callflows.api.domain.flow.UserNode;
+import org.openmrs.module.callflows.api.domain.types.CallDirection;
+import org.openmrs.module.callflows.api.domain.types.CallStatus;
+import org.openmrs.module.callflows.api.event.Events;
+import org.openmrs.module.callflows.api.repository.CallDataService;
 
 import org.motechproject.event.MotechEvent;
 import org.motechproject.event.listener.EventRelay;

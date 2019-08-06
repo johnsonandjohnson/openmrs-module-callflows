@@ -1,4 +1,4 @@
-package com.janssen.connectforlife.callflows.domain.flow;
+package org.openmrs.module.callflows.api.domain.flow;
 
 /**
  * A form block

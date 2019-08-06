@@ -1,4 +1,4 @@
-package com.janssen.connectforlife.callflows.domain.flow;
+package org.openmrs.module.callflows.api.domain.flow;
 
 /**
  * A system node. This captures all the processing that happens on the server
@@ -6,7 +6,7 @@ package com.janssen.connectforlife.callflows.domain.flow;
  * During JSON de-serialization, it's helpful to identify this node by a specific class and hence the existence of this class
  *
  * @author bramak09
- * @see com.janssen.connectforlife.callflows.domain.flow.UserNode
+ * @see org.openmrs.module.callflows.api.domain.flow.UserNode
  */
 public class SystemNode extends Node {
 

@@ -1,4 +1,4 @@
-package com.janssen.connectforlife.callflows.domain;
+package org.openmrs.module.callflows.api.domain;
 
 /**
  * Used in the UIDisplayable annotation of the entities in this module to determine placement of fields in the data services browser

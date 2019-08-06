@@ -1,4 +1,4 @@
-package com.janssen.connectforlife.callflows.domain;
+package org.openmrs.module.callflows.api.domain;
 
 /**
  * Constants

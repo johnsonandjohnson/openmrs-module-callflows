@@ -1,8 +1,8 @@
-package com.janssen.connectforlife.callflows.helper;
+package org.openmrs.module.callflows.api.helper;
 
-import com.janssen.connectforlife.callflows.Constants;
-import com.janssen.connectforlife.callflows.domain.CallFlow;
-import com.janssen.connectforlife.callflows.domain.types.CallFlowStatus;
+import org.openmrs.module.callflows.api.Constants;
+import org.openmrs.module.callflows.api.domain.CallFlow;
+import org.openmrs.module.callflows.api.domain.types.CallFlowStatus;
 
 /**
  * Helper class to create various call flows

@@ -1,6 +1,6 @@
-package com.janssen.connectforlife.callflows.contract;
+package org.openmrs.module.callflows.api.contract;
 
-import com.janssen.connectforlife.callflows.domain.Call;
+import org.openmrs.module.callflows.api.domain.Call;
 
 /**
  * Used only for testing outbound calls

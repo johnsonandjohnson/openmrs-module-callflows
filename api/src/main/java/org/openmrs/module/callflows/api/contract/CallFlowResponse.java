@@ -1,4 +1,4 @@
-package com.janssen.connectforlife.callflows.contract;
+package org.openmrs.module.callflows.api.contract;
 
 /**
  * The Callflow response contract

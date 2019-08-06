@@ -1,4 +1,4 @@
-package com.janssen.connectforlife.callflows;
+package org.openmrs.module.callflows;
 
 import com.janssen.connectforlife.callflows.domain.types.CallStatus;
 

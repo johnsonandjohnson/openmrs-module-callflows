@@ -1,7 +1,7 @@
-package com.janssen.connectforlife.callflows.service;
+package org.openmrs.module.callflows.api.service;
 
-import com.janssen.connectforlife.callflows.domain.CallFlow;
-import com.janssen.connectforlife.callflows.exception.CallFlowAlreadyExistsException;
+import org.openmrs.module.callflows.api.domain.CallFlow;
+import org.openmrs.module.callflows.api.exception.CallFlowAlreadyExistsException;
 
 import java.util.List;
 
@@ -9,7 +9,7 @@ import java.util.List;
  * Service to manage CallFlows
  *
  * @author bramak09
- * @see com.janssen.connectforlife.callflows.domain.CallFlow
+ * @see org.openmrs.module.callflows.api.domain.CallFlow
  */
 public interface CallFlowService {
 

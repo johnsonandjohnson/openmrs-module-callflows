@@ -1,14 +1,14 @@
-package com.janssen.connectforlife.callflows.service.impl;
+package org.openmrs.module.callflows.api.service.impl;
 
-import com.janssen.connectforlife.callflows.domain.CallFlow;
-import com.janssen.connectforlife.callflows.domain.FlowPosition;
-import com.janssen.connectforlife.callflows.domain.FlowStep;
-import com.janssen.connectforlife.callflows.domain.flow.Flow;
-import com.janssen.connectforlife.callflows.domain.flow.Node;
-import com.janssen.connectforlife.callflows.domain.flow.SystemNode;
-import com.janssen.connectforlife.callflows.repository.CallFlowDataService;
-import com.janssen.connectforlife.callflows.service.FlowService;
-import com.janssen.connectforlife.callflows.util.FlowUtil;
+import org.openmrs.module.callflows.api.domain.CallFlow;
+import org.openmrs.module.callflows.api.domain.FlowPosition;
+import org.openmrs.module.callflows.api.domain.FlowStep;
+import org.openmrs.module.callflows.api.domain.flow.Flow;
+import org.openmrs.module.callflows.api.domain.flow.Node;
+import org.openmrs.module.callflows.api.domain.flow.SystemNode;
+import org.openmrs.module.callflows.api.repository.CallFlowDataService;
+import org.openmrs.module.callflows.api.service.FlowService;
+import org.openmrs.module.callflows.api.util.FlowUtil;
 
 import org.apache.velocity.VelocityContext;
 import org.codehaus.jackson.map.ObjectMapper;

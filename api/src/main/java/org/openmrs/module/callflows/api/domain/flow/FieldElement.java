@@ -1,10 +1,10 @@
-package com.janssen.connectforlife.callflows.domain.flow;
+package org.openmrs.module.callflows.api.domain.flow;
 
 /**
  * FieldElement class
  *
  * @author bramak09
- * @see com.janssen.connectforlife.callflows.domain.flow.Element
+ * @see org.openmrs.module.callflows.api.domain.flow.Element
  */
 public class FieldElement extends Element {
 

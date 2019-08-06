@@ -1,16 +1,16 @@
-package com.janssen.connectforlife.callflows.service.it;
+package org.openmrs.module.callflows.api.service.it;
 
-import com.janssen.connectforlife.callflows.Constants;
-import com.janssen.connectforlife.callflows.domain.CallFlow;
-import com.janssen.connectforlife.callflows.domain.FlowPosition;
-import com.janssen.connectforlife.callflows.domain.FlowStep;
-import com.janssen.connectforlife.callflows.domain.flow.Flow;
-import com.janssen.connectforlife.callflows.domain.flow.Node;
-import com.janssen.connectforlife.callflows.helper.CallFlowHelper;
-import com.janssen.connectforlife.callflows.helper.FlowHelper;
-import com.janssen.connectforlife.callflows.repository.CallFlowDataService;
-import com.janssen.connectforlife.callflows.service.FlowService;
-import com.janssen.connectforlife.callflows.util.TestUtil;
+import org.openmrs.module.callflows.api.Constants;
+import org.openmrs.module.callflows.api.domain.CallFlow;
+import org.openmrs.module.callflows.api.domain.FlowPosition;
+import org.openmrs.module.callflows.api.domain.FlowStep;
+import org.openmrs.module.callflows.api.domain.flow.Flow;
+import org.openmrs.module.callflows.api.domain.flow.Node;
+import org.openmrs.module.callflows.api.helper.CallFlowHelper;
+import org.openmrs.module.callflows.api.helper.FlowHelper;
+import org.openmrs.module.callflows.api.repository.CallFlowDataService;
+import org.openmrs.module.callflows.api.service.FlowService;
+import org.openmrs.module.callflows.api.util.TestUtil;
 
 import org.motechproject.testing.osgi.BasePaxIT;
 import org.motechproject.testing.osgi.container.MotechNativeTestContainerFactory;

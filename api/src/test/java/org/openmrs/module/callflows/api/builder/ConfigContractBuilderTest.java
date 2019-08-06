@@ -1,9 +1,9 @@
-package com.janssen.connectforlife.callflows.builder;
+package org.openmrs.module.callflows.api.builder;
 
-import com.janssen.connectforlife.callflows.BaseTest;
-import com.janssen.connectforlife.callflows.contract.ConfigContract;
-import com.janssen.connectforlife.callflows.domain.Config;
-import com.janssen.connectforlife.callflows.helper.ConfigHelper;
+import org.openmrs.module.callflows.api.BaseTest;
+import org.openmrs.module.callflows.api.contract.ConfigContract;
+import org.openmrs.module.callflows.api.domain.Config;
+import org.openmrs.module.callflows.api.helper.ConfigHelper;
 
 import org.junit.Before;
 import org.junit.Test;

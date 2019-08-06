@@ -1,12 +1,12 @@
-package com.janssen.connectforlife.callflows.service.impl;
+package org.openmrs.module.callflows.api.service.impl;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
-import com.janssen.connectforlife.callflows.domain.Config;
-import com.janssen.connectforlife.callflows.domain.Renderer;
-import com.janssen.connectforlife.callflows.domain.Settings;
-import com.janssen.connectforlife.callflows.service.SettingsService;
+import org.openmrs.module.callflows.api.domain.Config;
+import org.openmrs.module.callflows.api.domain.Renderer;
+import org.openmrs.module.callflows.api.domain.Settings;
+import org.openmrs.module.callflows.api.service.SettingsService;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.motechproject.config.SettingsFacade;
@@ -35,7 +35,7 @@ import java.util.Map;
 public class SettingsServiceImpl implements SettingsService {
 
     private static final String CONFIG_FILE_NAME = "callflows-settings.json";
-    private static final String CONFIG_FILE_PATH = "/com.janssen.connectforlife.callflows/raw/" + CONFIG_FILE_NAME;
+    private static final String CONFIG_FILE_PATH = "/org.openmrs.module.callflows.api/raw/" + CONFIG_FILE_NAME;
     private static final Logger LOGGER = LoggerFactory.getLogger(SettingsServiceImpl.class);
 
     @Autowired

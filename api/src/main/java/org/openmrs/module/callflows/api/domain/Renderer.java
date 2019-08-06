@@ -1,4 +1,4 @@
-package com.janssen.connectforlife.callflows.domain;
+package org.openmrs.module.callflows.api.domain;
 
 /**
  * Renderer configuration for a output format like VoiceXML, kookoo, etc

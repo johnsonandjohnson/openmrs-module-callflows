@@ -1,6 +1,6 @@
-package com.janssen.connectforlife.callflows.repository;
+package org.openmrs.module.callflows.api.repository;
 
-import com.janssen.connectforlife.callflows.domain.CallFlow;
+import org.openmrs.module.callflows.api.domain.CallFlow;
 
 import org.motechproject.mds.annotations.Lookup;
 import org.motechproject.mds.annotations.LookupField;

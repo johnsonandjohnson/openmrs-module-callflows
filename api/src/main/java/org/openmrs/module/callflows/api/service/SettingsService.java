@@ -1,7 +1,7 @@
-package com.janssen.connectforlife.callflows.service;
+package org.openmrs.module.callflows.api.service;
 
-import com.janssen.connectforlife.callflows.domain.Config;
-import com.janssen.connectforlife.callflows.domain.Renderer;
+import org.openmrs.module.callflows.api.domain.Config;
+import org.openmrs.module.callflows.api.domain.Renderer;
 
 import java.util.List;
 

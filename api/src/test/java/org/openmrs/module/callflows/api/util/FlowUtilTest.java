@@ -1,12 +1,12 @@
-package com.janssen.connectforlife.callflows.util;
+package org.openmrs.module.callflows.api.util;
 
-import com.janssen.connectforlife.callflows.BaseTest;
-import com.janssen.connectforlife.callflows.Constants;
-import com.janssen.connectforlife.callflows.domain.flow.FieldElement;
-import com.janssen.connectforlife.callflows.domain.flow.Flow;
-import com.janssen.connectforlife.callflows.domain.flow.Node;
-import com.janssen.connectforlife.callflows.domain.flow.UserNode;
-import com.janssen.connectforlife.callflows.helper.FlowHelper;
+import org.openmrs.module.callflows.api.BaseTest;
+import org.openmrs.module.callflows.api.Constants;
+import org.openmrs.module.callflows.api.domain.flow.FieldElement;
+import org.openmrs.module.callflows.api.domain.flow.Flow;
+import org.openmrs.module.callflows.api.domain.flow.Node;
+import org.openmrs.module.callflows.api.domain.flow.UserNode;
+import org.openmrs.module.callflows.api.helper.FlowHelper;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;

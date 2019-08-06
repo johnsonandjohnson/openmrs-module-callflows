@@ -1,4 +1,4 @@
-package com.janssen.connectforlife.callflows.event;
+package org.openmrs.module.callflows.api.event;
 
 /**
  * Call flow events

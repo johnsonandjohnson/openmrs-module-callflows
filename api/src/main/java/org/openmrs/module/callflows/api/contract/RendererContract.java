@@ -1,4 +1,4 @@
-package com.janssen.connectforlife.callflows.contract;
+package org.openmrs.module.callflows.api.contract;
 
 import java.util.Objects;
 
@@ -6,7 +6,7 @@ import java.util.Objects;
  * Renderer Contract, maps directly to the Renderer domain
  *
  * @author bramak09
- * @see com.janssen.connectforlife.callflows.domain.Renderer
+ * @see org.openmrs.module.callflows.api.domain.Renderer
  */
 public class RendererContract {
 

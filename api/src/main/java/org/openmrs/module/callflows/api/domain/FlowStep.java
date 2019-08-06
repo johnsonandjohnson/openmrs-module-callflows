@@ -1,6 +1,6 @@
-package com.janssen.connectforlife.callflows.domain;
+package org.openmrs.module.callflows.api.domain;
 
-import com.janssen.connectforlife.callflows.domain.flow.Flow;
+import org.openmrs.module.callflows.api.domain.flow.Flow;
 
 /**
  * A representation of a step in a flow that we will jump to from one of the templates

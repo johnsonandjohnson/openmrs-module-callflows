@@ -1,6 +1,6 @@
-package com.janssen.connectforlife.callflows.event;
+package org.openmrs.module.callflows.api.event;
 
-import com.janssen.connectforlife.callflows.service.CallService;
+import org.openmrs.module.callflows.api.service.CallService;
 
 import org.motechproject.event.MotechEvent;
 import org.motechproject.event.listener.annotations.MotechListener;

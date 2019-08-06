@@ -1,4 +1,4 @@
-package com.janssen.connectforlife.callflows.contract;
+package org.openmrs.module.callflows.api.contract;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,7 +9,7 @@ import java.util.Objects;
  * Maps directly to Config domain
  *
  * @author bramak09
- * @see com.janssen.connectforlife.callflows.domain.Config
+ * @see org.openmrs.module.callflows.api.domain.Config
  */
 public class ConfigContract {
 

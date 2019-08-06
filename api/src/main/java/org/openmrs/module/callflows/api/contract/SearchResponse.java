@@ -1,4 +1,4 @@
-package com.janssen.connectforlife.callflows.contract;
+package org.openmrs.module.callflows.api.contract;
 
 import java.util.List;
 

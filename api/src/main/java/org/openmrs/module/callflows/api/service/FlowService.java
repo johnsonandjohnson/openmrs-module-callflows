@@ -1,9 +1,9 @@
-package com.janssen.connectforlife.callflows.service;
+package org.openmrs.module.callflows.api.service;
 
-import com.janssen.connectforlife.callflows.domain.FlowPosition;
-import com.janssen.connectforlife.callflows.domain.FlowStep;
-import com.janssen.connectforlife.callflows.domain.flow.Flow;
-import com.janssen.connectforlife.callflows.domain.flow.Node;
+import org.openmrs.module.callflows.api.domain.FlowPosition;
+import org.openmrs.module.callflows.api.domain.FlowStep;
+import org.openmrs.module.callflows.api.domain.flow.Flow;
+import org.openmrs.module.callflows.api.domain.flow.Node;
 
 import org.apache.velocity.VelocityContext;
 import java.io.IOException;
@@ -34,7 +34,7 @@ public interface FlowService {
      * @param currentFlow that is being executed
      * @return a flow step containing a successful parse
      * @throws IllegalArgumentException if either of flow or step could not be identified or step is not a valid step in the given flow
-     * @see com.janssen.connectforlife.callflows.util.FlowUtil
+     * @see org.openmrs.module.callflows.api.util.FlowUtil
      */
     FlowStep parse(String input, Flow currentFlow);
 

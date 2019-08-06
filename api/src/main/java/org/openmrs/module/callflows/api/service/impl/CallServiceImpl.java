@@ -1,18 +1,18 @@
-package com.janssen.connectforlife.callflows.service.impl;
+package org.openmrs.module.callflows.api.service.impl;
 
-import com.janssen.connectforlife.callflows.domain.Call;
-import com.janssen.connectforlife.callflows.domain.CallFlow;
-import com.janssen.connectforlife.callflows.domain.Config;
-import com.janssen.connectforlife.callflows.domain.Constants;
-import com.janssen.connectforlife.callflows.domain.flow.Flow;
-import com.janssen.connectforlife.callflows.domain.types.CallDirection;
-import com.janssen.connectforlife.callflows.domain.types.CallStatus;
-import com.janssen.connectforlife.callflows.repository.CallDataService;
-import com.janssen.connectforlife.callflows.service.CallFlowService;
-import com.janssen.connectforlife.callflows.service.CallService;
-import com.janssen.connectforlife.callflows.service.FlowService;
-import com.janssen.connectforlife.callflows.service.SettingsService;
-import com.janssen.connectforlife.callflows.util.CallUtil;
+import org.openmrs.module.callflows.api.domain.Call;
+import org.openmrs.module.callflows.api.domain.CallFlow;
+import org.openmrs.module.callflows.api.domain.Config;
+import org.openmrs.module.callflows.api.domain.Constants;
+import org.openmrs.module.callflows.api.domain.flow.Flow;
+import org.openmrs.module.callflows.api.domain.types.CallDirection;
+import org.openmrs.module.callflows.api.domain.types.CallStatus;
+import org.openmrs.module.callflows.api.repository.CallDataService;
+import org.openmrs.module.callflows.api.service.CallFlowService;
+import org.openmrs.module.callflows.api.service.CallService;
+import org.openmrs.module.callflows.api.service.FlowService;
+import org.openmrs.module.callflows.api.service.SettingsService;
+import org.openmrs.module.callflows.api.util.CallUtil;
 
 import org.motechproject.mds.query.QueryParams;
 

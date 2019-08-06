@@ -1,4 +1,4 @@
-package com.janssen.connectforlife.callflows.domain.types;
+package org.openmrs.module.callflows.api.domain.types;
 
 /**
  * A direction of a call with respect to the system
