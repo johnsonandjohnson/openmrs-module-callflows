@@ -1,7 +1,7 @@
 package org.openmrs.module.callflows.web.controller;
 
-import com.janssen.connectforlife.callflows.contract.ErrorResponse;
-import com.janssen.connectforlife.callflows.exception.CallFlowAlreadyExistsException;
+import org.openmrs.module.callflows.api.contract.ErrorResponse;
+import org.openmrs.module.callflows.api.exception.CallFlowAlreadyExistsException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,14 +1,14 @@
 package org.openmrs.module.callflows.web.controller;
 
-import com.janssen.connectforlife.callflows.builder.ConfigBuilder;
-import com.janssen.connectforlife.callflows.builder.ConfigContractBuilder;
-import com.janssen.connectforlife.callflows.builder.RendererBuilder;
-import com.janssen.connectforlife.callflows.builder.RendererContractBuilder;
-import com.janssen.connectforlife.callflows.contract.ConfigContract;
-import com.janssen.connectforlife.callflows.contract.RendererContract;
-import com.janssen.connectforlife.callflows.domain.Config;
-import com.janssen.connectforlife.callflows.domain.Renderer;
-import com.janssen.connectforlife.callflows.service.SettingsService;
+import org.openmrs.module.callflows.api.builder.ConfigBuilder;
+import org.openmrs.module.callflows.api.builder.ConfigContractBuilder;
+import org.openmrs.module.callflows.api.builder.RendererBuilder;
+import org.openmrs.module.callflows.api.builder.RendererContractBuilder;
+import org.openmrs.module.callflows.api.contract.ConfigContract;
+import org.openmrs.module.callflows.api.contract.RendererContract;
+import org.openmrs.module.callflows.api.domain.Config;
+import org.openmrs.module.callflows.api.domain.Renderer;
+import org.openmrs.module.callflows.api.service.SettingsService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

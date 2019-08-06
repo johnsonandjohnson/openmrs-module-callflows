@@ -1,10 +1,10 @@
 package org.openmrs.module.callflows.web.controller;
 
-import com.janssen.connectforlife.callflows.domain.Call;
-import com.janssen.connectforlife.callflows.domain.Constants;
-import com.janssen.connectforlife.callflows.domain.types.CallStatus;
-import com.janssen.connectforlife.callflows.service.CallService;
-import com.janssen.connectforlife.callflows.util.CallUtil;
+import org.openmrs.module.callflows.api.domain.Call;
+import org.openmrs.module.callflows.api.domain.Constants;
+import org.openmrs.module.callflows.api.domain.types.CallStatus;
+import org.openmrs.module.callflows.api.service.CallService;
+import org.openmrs.module.callflows.api.util.CallUtil;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;

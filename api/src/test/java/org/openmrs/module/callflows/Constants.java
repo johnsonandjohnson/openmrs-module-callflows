@@ -1,7 +1,8 @@
 package org.openmrs.module.callflows;
 
-import com.janssen.connectforlife.callflows.domain.types.CallStatus;
 
+
+import org.openmrs.module.callflows.api.domain.types.CallStatus;
 import org.springframework.http.MediaType;
 import java.nio.charset.Charset;
 import java.util.Arrays;

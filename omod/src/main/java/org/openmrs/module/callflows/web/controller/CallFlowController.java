@@ -1,13 +1,13 @@
 package org.openmrs.module.callflows.web.controller;
 
-import com.janssen.connectforlife.callflows.builder.CallFlowBuilder;
-import com.janssen.connectforlife.callflows.builder.CallFlowResponseBuilder;
-import com.janssen.connectforlife.callflows.contract.CallFlowRequest;
-import com.janssen.connectforlife.callflows.contract.CallFlowResponse;
-import com.janssen.connectforlife.callflows.contract.SearchResponse;
-import com.janssen.connectforlife.callflows.domain.CallFlow;
-import com.janssen.connectforlife.callflows.exception.CallFlowAlreadyExistsException;
-import com.janssen.connectforlife.callflows.service.CallFlowService;
+import org.openmrs.module.callflows.api.builder.CallFlowBuilder;
+import org.openmrs.module.callflows.api.builder.CallFlowResponseBuilder;
+import org.openmrs.module.callflows.api.contract.CallFlowRequest;
+import org.openmrs.module.callflows.api.contract.CallFlowResponse;
+import org.openmrs.module.callflows.api.contract.SearchResponse;
+import org.openmrs.module.callflows.api.domain.CallFlow;
+import org.openmrs.module.callflows.api.exception.CallFlowAlreadyExistsException;
+import org.openmrs.module.callflows.api.service.CallFlowService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
