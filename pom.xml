@@ -13,14 +13,12 @@
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Callflows</name>
-	<description>no description</description>
-
-	<url>https://wiki.openmrs.org/x/FQ4z</url>
+	<description>Callflows module</description>
 
 	<scm>
-		<connection>scm:git:git@github.com:openmrs/openmrs-module-callflows.git</connection>
-		<developerConnection>scm:git:git@github.com:openmrs/openmrs-module-callflows.git</developerConnection>
-		<url>https://github.com/openmrs/openmrs-module-callflows/</url>
+		<connection>scm:git:git@bitbucket.org:soldevelo/omrs-callflows.git</connection>
+		<developerConnection>scm:git:git@bitbucket.org:soldevelo/omrs-callflows.git</developerConnection>
+		<url>https://bitbucket.org/soldevelo/omrs-callflows/</url>
 	</scm>
 
 	<modules>
