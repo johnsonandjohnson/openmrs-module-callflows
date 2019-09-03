@@ -17,7 +17,7 @@ import java.util.Objects;
  */
 @Entity(name = "callFlow.CallFlow")
 @Table(name = "cfl_callflows", uniqueConstraints = @UniqueConstraint(name = "UNIQUE_CALLFLOW_IDX", columnNames = {"name"}))
-public class CallFlow {
+public class CallFlow extends AbstractBaseOpenmrsData {
 
     private static final String TEXT = "text";
 
