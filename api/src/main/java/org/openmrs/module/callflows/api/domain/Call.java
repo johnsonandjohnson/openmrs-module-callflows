@@ -9,6 +9,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import java.util.HashMap;
@@ -65,7 +67,8 @@ public class Call {
     /**
      * The call flow we started this call from. Doesn't change once set
      */
-    @Column(nullable = false)
+    @OneToOne
+    @JoinColumn(name = "startFlow_id")
     private CallFlow startFlow;
 
     /**
@@ -83,7 +86,8 @@ public class Call {
     /**
      * The flow we ended at for now. This can change as the call continues
      */
-    @Column(nullable = false)
+    @OneToOne
+    @JoinColumn(name = "endFlow_id")
     private CallFlow endFlow;
 
     /**
