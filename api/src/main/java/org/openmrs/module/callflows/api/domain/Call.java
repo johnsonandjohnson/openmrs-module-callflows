@@ -9,6 +9,12 @@ import org.motechproject.mds.annotations.UIDisplayable;
 
 import org.joda.time.DateTime;
 import javax.jdo.annotations.Unique;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -23,10 +29,15 @@ import java.util.Objects;
  *
  * @author bramak09
  */
-@Entity(recordHistory = true, tableName = "cfl_calls")
-@Unique(name = "UNIQUE_CALLFLOWS_CALL_IDX", members = { "callId" })
+@Entity(name = "callFlow.Call")
+@Table(name = "cfl_calls", uniqueConstraints = @UniqueConstraint(name = "UNIQUE_CALLFLOWS_CALL_IDX", columnNames = {"callId"}))
 public class Call {
 
+    private static final String TEXT = "text";
+
+    @Id
+    @GeneratedValue
+    @Column(name = "cfl_calls_id")
     private Long id;
 
     /**
@@ -34,85 +45,79 @@ public class Call {
      * This is used in the URL's to identify a HTTP request pertaining to a specific call,
      * cause using the ID in URL's is more prone to someone guessing a call identifier, we use a uuid
      */
-    @Field(required = true)
-    @UIDisplayable(position = UIPositions.COLUMN_1)
+    @Column(nullable = false)
     private String callId;
 
     /**
      * A call identifier at the IVR provider's end
      */
-    @Field
+    @Column
     private String providerCallId;
 
     /**
      * How did this call originate?
      */
-    @Field(required = true)
-    @UIDisplayable(position = UIPositions.COLUMN_2)
+    @Column(nullable = false)
     private CallDirection direction;
 
     /**
      * The current call status as we know it
      */
-    @Field(required = true)
-    @UIDisplayable(position = UIPositions.COLUMN_3)
+    @Column(nullable = false)
     private CallStatus status;
 
     /**
      * The call flow we started this call from. Doesn't change once set
      */
-    @Field(required = true)
-    @UIDisplayable(position = UIPositions.COLUMN_4)
+    @Column(nullable = false)
     private CallFlow startFlow;
 
     /**
      * The node we started at. Doesn't change once set
      */
-    @Field(required = true)
+    @Column(nullable = false)
     private String startNode;
 
     /**
      * The time we started the call at. Doesn't change once set
      */
-    @UIDisplayable(position = UIPositions.COLUMN_5)
+    @Column
     private DateTime startTime;
 
     /**
      * The flow we ended at for now. This can change as the call continues
      */
-    @Field(required = true)
-    @UIDisplayable(position = UIPositions.COLUMN_6)
+    @Column(nullable = false)
     private CallFlow endFlow;
 
     /**
      * The end node subject to change as the call continues.
      */
-    @Field(required = true)
+    @Column(nullable = false)
     private String endNode;
 
     /**
      * The end time prone to revision as the call continues further
      */
-    @UIDisplayable(position = UIPositions.COLUMN_7)
+    @Column
     private DateTime endTime;
 
     /**
      * Last time of update as per the provider's clock
      */
-    @Field
+    @Column
     private String providerTime;
 
     /**
      * Number of steps (or ping-pongs) in this call that has been going so far between the caller and the system
      */
-    @Field(required = true)
+    @Column(nullable = false)
     private Long steps;
 
     /**
      * The configuration we are using for this call, in case the platform supports multiple configurations
      */
-    @Field(required = true)
-    @UIDisplayable(position = UIPositions.COLUMN_8)
+    @Column(nullable = false)
     private String config;
 
     /**
@@ -123,21 +128,20 @@ public class Call {
      * Instead store the primary key of your patient / doctor tables, which can uniquely identify a patient.
      * Applications can join their tables with this table directly via this column for reporting purposes
      */
-    @Field
-    @UIDisplayable(position = UIPositions.COLUMN_9)
+    @Column
     private String actorId;
 
     /**
      * The type of actor involved in the call, i.e  a patient or a clinician etc in case the actorId comes from multiple tables
      * The value of this field is application dependent
      */
-    @Field
+    @Column
     private String actorType;
 
     /**
      * This field will store any textual information about current call status
      */
-    @Field
+    @Column
     private String statusText;
 
     /**
@@ -147,8 +151,7 @@ public class Call {
      * Instead store the primary key of your patient / doctor tables, which can uniquely identify a patient.
      * Applications can join their tables with this table directly via this column for reporting purposes
      */
-    @Field
-    @UIDisplayable(position = UIPositions.COLUMN_10)
+    @Column
     private String externalId;
 
     /**
@@ -156,20 +159,20 @@ public class Call {
      * For eg, if separate UUID is being used from IMI provider, then this field can be used to store type like 'IMI_UUID'
      * and externalId can be used to store UUID. The value of this field is application dependent
      */
-    @Field
+    @Column
     private String externalType;
 
     /**
      * This field will store information of messages played eg., voice files names
      */
-    @Field(type = "text")
+    @Column(columnDefinition = TEXT)
     private String playedMessages;
 
     /**
      * A reference passed by different systems integrated with callflow module,
      * to identify the relation with calls, may be for reporting as well
      */
-    @Field
+    @Column
     private String refKey;
 
     /**
@@ -178,15 +181,16 @@ public class Call {
      * Typically params from the caller are short-lived per single request and are not stored here for security reasons,
      * unless the callflow designer explicitly persists any of the params via a template.
      */
-    @Field
+    @Column
     private Map<String, Object> context = new HashMap<>();
 
     /**
      * Data from the provider
      */
-    @Field
+    @Column
     private Map<String, String> providerData = new HashMap<>();
 
+    @Column
     private DateTime creationDate;
 
     public DateTime getCreationDate() {
