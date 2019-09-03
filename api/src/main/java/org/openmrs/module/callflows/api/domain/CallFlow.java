@@ -2,11 +2,6 @@ package org.openmrs.module.callflows.api.domain;
 
 import org.openmrs.module.callflows.api.domain.types.CallFlowStatus;
 
-import org.motechproject.mds.annotations.Entity;
-import org.motechproject.mds.annotations.Field;
-import org.motechproject.mds.annotations.UIDisplayable;
-
-import javax.jdo.annotations.Unique;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -29,7 +24,7 @@ public class CallFlow {
     @Id
     @GeneratedValue
     @Column(name = "cfl_callflows_id")
-    private Long id;
+    private Integer id;
 
     /**
      * The callflow name. Typically alpha-numeric.
@@ -77,11 +72,11 @@ public class CallFlow {
         this.raw = raw;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

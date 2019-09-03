@@ -3,10 +3,6 @@ package org.openmrs.module.callflows.api.domain;
 import org.openmrs.module.callflows.api.domain.types.CallDirection;
 import org.openmrs.module.callflows.api.domain.types.CallStatus;
 
-import org.motechproject.mds.annotations.Entity;
-import org.motechproject.mds.annotations.Field;
-import org.motechproject.mds.annotations.UIDisplayable;
-
 import org.joda.time.DateTime;
 import javax.jdo.annotations.Unique;
 import javax.persistence.Column;
@@ -38,7 +34,7 @@ public class Call {
     @Id
     @GeneratedValue
     @Column(name = "cfl_calls_id")
-    private Long id;
+    private Integer id;
 
     /**
      * A UUID used to identify a call.
@@ -201,11 +197,11 @@ public class Call {
         this.creationDate = creationDate;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
