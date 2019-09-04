@@ -1,5 +1,6 @@
-package org.openmrs.module.callflows.api.repository;
+package org.openmrs.module.callflows.api.dao;
 
+import org.openmrs.api.db.OpenmrsDataDAO;
 import org.openmrs.module.callflows.api.domain.CallFlow;
 
 import org.motechproject.mds.annotations.Lookup;
@@ -13,7 +14,7 @@ import java.util.List;
  *
  * @author bramak09
  */
-public interface CallFlowDataService extends MotechDataService<CallFlow> {
+public interface CallFlowDao extends OpenmrsDataDAO<CallFlow> {
 
     /**
      * Finds a single call flow by name using an exact match

@@ -5,7 +5,7 @@ import org.openmrs.module.callflows.api.domain.CallFlow;
 import org.openmrs.module.callflows.api.domain.types.CallFlowStatus;
 import org.openmrs.module.callflows.api.exception.CallFlowAlreadyExistsException;
 import org.openmrs.module.callflows.api.helper.CallFlowHelper;
-import org.openmrs.module.callflows.api.repository.CallFlowDataService;
+import org.openmrs.module.callflows.api.dao.CallFlowDao;
 import org.openmrs.module.callflows.api.service.CallFlowService;
 
 import org.motechproject.testing.osgi.BasePaxIT;
@@ -49,7 +49,7 @@ public class CallFlowServiceBundleIT extends BasePaxIT {
     private CallFlowService callFlowService;
 
     @Inject
-    private CallFlowDataService callFlowDataService;
+    private CallFlowDao callFlowDao;
 
     @Before
     public void setUp() {
@@ -65,7 +65,7 @@ public class CallFlowServiceBundleIT extends BasePaxIT {
 
     @After
     public void tearDown() {
-        callFlowDataService.deleteAll();
+        callFlowDao.deleteAll();
     }
 
     @Test
@@ -225,7 +225,7 @@ public class CallFlowServiceBundleIT extends BasePaxIT {
         callFlowService.delete(mainFlow.getId());
 
         // Then
-        assertNull(callFlowDataService.findById(mainFlow.getId()));
+        assertNull(callFlowDao.findById(mainFlow.getId()));
     }
 
     @Test(expected = IllegalArgumentException.class)

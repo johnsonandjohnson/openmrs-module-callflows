@@ -2,8 +2,8 @@ package org.openmrs.module.callflows.web.it;
 
 import org.openmrs.module.callflows.api.domain.Call;
 import org.openmrs.module.callflows.api.helper.CallHelper;
-import org.openmrs.module.callflows.api.repository.CallDataService;
-import org.openmrs.module.callflows.api.repository.CallFlowDataService;
+import org.openmrs.module.callflows.api.dao.CallDao;
+import org.openmrs.module.callflows.api.dao.CallFlowDao;
 
 import org.motechproject.testing.osgi.container.MotechNativeTestContainerFactory;
 
@@ -33,16 +33,16 @@ import static org.junit.Assert.assertThat;
 public class CallStatusControllerBundleIT extends RESTControllerPaxIT {
 
     @Inject
-    private CallDataService callDataService;
+    private CallDao callDao;
 
     @Inject
-    private CallFlowDataService callFlowDataService;
+    private CallFlowDao callFlowDao;
 
     @Test
     public void shouldReturnStatusOkIfTheCallStatusUpdateIsSuccessful() throws Exception {
         //Given
         Call call = CallHelper.createOutboundCall();
-        callDataService.create(call);
+        callDao.create(call);
         //When
         HttpGet httpGet = buildGetRequest("/callflows/status/" + call.getId().toString(), "status", "ANSWERED", "reason",
                                           "call answered");
@@ -68,7 +68,7 @@ public class CallStatusControllerBundleIT extends RESTControllerPaxIT {
     @After
     public void tearDown() {
         super.tearDown();
-        callDataService.deleteAll();
-        callFlowDataService.deleteAll();
+        callDao.deleteAll();
+        callFlowDao.deleteAll();
     }
 }

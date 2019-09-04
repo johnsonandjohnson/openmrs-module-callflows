@@ -6,7 +6,7 @@ import org.openmrs.module.callflows.api.domain.CallFlow;
 import org.openmrs.module.callflows.api.domain.types.CallFlowStatus;
 import org.openmrs.module.callflows.api.exception.CallFlowAlreadyExistsException;
 import org.openmrs.module.callflows.api.helper.CallFlowHelper;
-import org.openmrs.module.callflows.api.repository.CallFlowDataService;
+import org.openmrs.module.callflows.api.dao.CallFlowDao;
 import org.openmrs.module.callflows.api.service.impl.CallFlowServiceImpl;
 
 import org.apache.commons.lang.StringUtils;
@@ -50,7 +50,7 @@ public class CallFlowServiceTest extends BaseTest {
     private CallFlowService callFlowService = new CallFlowServiceImpl();
 
     @Mock
-    private CallFlowDataService callFlowDataService;
+    private CallFlowDao callFlowDao;
 
     @Before
     public void setUp() {
@@ -68,13 +68,13 @@ public class CallFlowServiceTest extends BaseTest {
     public void shouldCreateCallFlow() throws CallFlowAlreadyExistsException {
         // Given
         ArgumentCaptor<CallFlow> callFlowArgumentCaptor = ArgumentCaptor.forClass(CallFlow.class);
-        given(callFlowDataService.create(callFlowArgumentCaptor.capture())).willReturn(mainFlow);
+        given(callFlowDao.create(callFlowArgumentCaptor.capture())).willReturn(mainFlow);
 
         // When
         CallFlow createdCallFlow = callFlowService.create(mainFlow);
 
         // Then
-        verify(callFlowDataService, times(1)).create(mainFlow);
+        verify(callFlowDao, times(1)).create(mainFlow);
         assertNotNull(createdCallFlow);
         assertThat(createdCallFlow.getName(), equalTo(mainFlow.getName()));
         assertThat(createdCallFlow.getDescription(), equalTo(mainFlow.getDescription()));
@@ -92,7 +92,7 @@ public class CallFlowServiceTest extends BaseTest {
             CallFlow createdCallFlow = callFlowService.create(badCallFlow);
         } finally {
             // Then since it's a bad name, no need to perform any DB operations
-            verifyZeroInteractions(callFlowDataService);
+            verifyZeroInteractions(callFlowDao);
         }
     }
 
@@ -106,7 +106,7 @@ public class CallFlowServiceTest extends BaseTest {
             CallFlow createdCallFlow = callFlowService.create(badCallFlow);
         } finally {
             // Then since it's a bad name, no need to perform any DB operations
-            verifyZeroInteractions(callFlowDataService);
+            verifyZeroInteractions(callFlowDao);
         }
     }
 
@@ -120,7 +120,7 @@ public class CallFlowServiceTest extends BaseTest {
             CallFlow createdCallFlow = callFlowService.create(badCallFlow);
         } finally {
             // Then since it's a bad name, no need to perform any DB operations
-            verifyZeroInteractions(callFlowDataService);
+            verifyZeroInteractions(callFlowDao);
         }
     }
 
@@ -129,13 +129,13 @@ public class CallFlowServiceTest extends BaseTest {
             throws CallFlowAlreadyExistsException {
         expectException(CallFlowAlreadyExistsException.class);
         // Given
-        given(callFlowDataService.findByName(Constants.CALLFLOW_MAIN)).willReturn(mainFlow);
+        given(callFlowDao.findByName(Constants.CALLFLOW_MAIN)).willReturn(mainFlow);
         try {
             // When
             CallFlow duplicateFlow = callFlowService.create(mainFlow);
         } finally {
             // Then
-            verify(callFlowDataService, times(1)).findByName(mainFlow.getName());
+            verify(callFlowDao, times(1)).findByName(mainFlow.getName());
         }
     }
 
@@ -143,18 +143,18 @@ public class CallFlowServiceTest extends BaseTest {
     public void shouldUpdateCallFlow() throws CallFlowAlreadyExistsException {
 
         // Given a Main Flow exists
-        given(callFlowDataService.findByName(Constants.CALLFLOW_MAIN)).willReturn(existingMainFlow);
+        given(callFlowDao.findByName(Constants.CALLFLOW_MAIN)).willReturn(existingMainFlow);
 
         // And the update on the data service returns the updated callflow
         ArgumentCaptor<CallFlow> callFlowArgumentCaptor = ArgumentCaptor.forClass(CallFlow.class);
-        given(callFlowDataService.update(callFlowArgumentCaptor.capture())).willReturn(existingMainFlow);
+        given(callFlowDao.update(callFlowArgumentCaptor.capture())).willReturn(existingMainFlow);
 
         // When we try to update it
         existingMainFlow.setDescription(existingMainFlow.getDescription() + Constants.UPDATED);
         CallFlow updatedFlow = callFlowService.update(existingMainFlow);
 
         // Then
-        verify(callFlowDataService, times(1)).update(existingMainFlow);
+        verify(callFlowDao, times(1)).update(existingMainFlow);
         assertNotNull(updatedFlow);
         assertThat(updatedFlow.getName(), equalTo(existingMainFlow.getName()));
         assertThat(updatedFlow.getDescription(), equalTo(existingMainFlow.getDescription()));
@@ -166,21 +166,21 @@ public class CallFlowServiceTest extends BaseTest {
     public void shouldUpdateCallFlowToNewName() throws CallFlowAlreadyExistsException {
 
         // Given a Main Flow exists
-        given(callFlowDataService.findByName(Constants.CALLFLOW_MAIN)).willReturn(existingMainFlow);
+        given(callFlowDao.findByName(Constants.CALLFLOW_MAIN)).willReturn(existingMainFlow);
 
         // And the update on the data service returns the updated callflow
         ArgumentCaptor<CallFlow> callFlowArgumentCaptor = ArgumentCaptor.forClass(CallFlow.class);
-        given(callFlowDataService.update(callFlowArgumentCaptor.capture())).willReturn(existingMainFlow);
-        given(callFlowDataService.findById(1L)).willReturn(existingMainFlow);
+        given(callFlowDao.update(callFlowArgumentCaptor.capture())).willReturn(existingMainFlow);
+        given(callFlowDao.findById(1L)).willReturn(existingMainFlow);
 
         // When we try to update it
         existingMainFlow.setName(Constants.CALLFLOW_MAIN2);
         CallFlow updatedFlow = callFlowService.update(existingMainFlow);
 
         // Then
-        verify(callFlowDataService, times(1)).findByName(Constants.CALLFLOW_MAIN2);
-        verify(callFlowDataService, times(1)).findById(1L);
-        verify(callFlowDataService, times(1)).update(existingMainFlow);
+        verify(callFlowDao, times(1)).findByName(Constants.CALLFLOW_MAIN2);
+        verify(callFlowDao, times(1)).findById(1L);
+        verify(callFlowDao, times(1)).update(existingMainFlow);
         assertNotNull(updatedFlow);
         assertThat(updatedFlow.getName(), equalTo(Constants.CALLFLOW_MAIN2));
         assertThat(updatedFlow.getDescription(), equalTo(existingMainFlow.getDescription()));
@@ -194,12 +194,12 @@ public class CallFlowServiceTest extends BaseTest {
         expectException(IllegalArgumentException.class);
 
         // Given a Main Flow exists
-        given(callFlowDataService.findByName(Constants.CALLFLOW_MAIN)).willReturn(existingMainFlow);
+        given(callFlowDao.findByName(Constants.CALLFLOW_MAIN)).willReturn(existingMainFlow);
 
         // And the update on the data service returns the updated callflow
         ArgumentCaptor<CallFlow> callFlowArgumentCaptor = ArgumentCaptor.forClass(CallFlow.class);
-        given(callFlowDataService.update(callFlowArgumentCaptor.capture())).willReturn(existingMainFlow);
-        given(callFlowDataService.findById(1L)).willReturn(existingMainFlow);
+        given(callFlowDao.update(callFlowArgumentCaptor.capture())).willReturn(existingMainFlow);
+        given(callFlowDao.findById(1L)).willReturn(existingMainFlow);
 
         existingMainFlow.setName(Constants.CALLFLOW_MAIN2);
         existingMainFlow.setId(-1L);
@@ -208,9 +208,9 @@ public class CallFlowServiceTest extends BaseTest {
             CallFlow updatedFlow = callFlowService.update(existingMainFlow);
         } finally {
             // Then
-            verify(callFlowDataService, times(1)).findByName(Constants.CALLFLOW_MAIN2);
-            verify(callFlowDataService, times(1)).findById(-1L);
-            verify(callFlowDataService, never()).update(any(CallFlow.class));
+            verify(callFlowDao, times(1)).findByName(Constants.CALLFLOW_MAIN2);
+            verify(callFlowDao, times(1)).findById(-1L);
+            verify(callFlowDao, never()).update(any(CallFlow.class));
         }
     }
 
@@ -224,7 +224,7 @@ public class CallFlowServiceTest extends BaseTest {
             CallFlow updatedCallFlow = callFlowService.update(badCallFlow);
         } finally {
             // Then since it's a bad name, no need to perform any DB operations
-            verifyZeroInteractions(callFlowDataService);
+            verifyZeroInteractions(callFlowDao);
         }
     }
 
@@ -238,7 +238,7 @@ public class CallFlowServiceTest extends BaseTest {
             CallFlow updatedCallFlow = callFlowService.update(badCallFlow);
         } finally {
             // Then since it's a bad name, no need to perform any DB operations
-            verifyZeroInteractions(callFlowDataService);
+            verifyZeroInteractions(callFlowDao);
         }
     }
 
@@ -252,7 +252,7 @@ public class CallFlowServiceTest extends BaseTest {
             CallFlow updatedCallFlow = callFlowService.update(badCallFlow);
         } finally {
             // Then since it's a bad name, no need to perform any DB operations
-            verifyZeroInteractions(callFlowDataService);
+            verifyZeroInteractions(callFlowDao);
         }
     }
 
@@ -261,7 +261,7 @@ public class CallFlowServiceTest extends BaseTest {
             throws CallFlowAlreadyExistsException {
         expectException(CallFlowAlreadyExistsException.class);
         // Given
-        given(callFlowDataService.findByName(Constants.CALLFLOW_MAIN)).willReturn(existingMainFlow);
+        given(callFlowDao.findByName(Constants.CALLFLOW_MAIN)).willReturn(existingMainFlow);
         // And that we make the bad call flow good and duplicate by just changing the name
         CallFlow duplicateFlow = badCallFlow;
         duplicateFlow.setName(existingMainFlow.getName());
@@ -271,46 +271,46 @@ public class CallFlowServiceTest extends BaseTest {
         } finally {
             // Then we expect an exception
             // And the below
-            verify(callFlowDataService, times(1)).findByName(mainFlow.getName());
+            verify(callFlowDao, times(1)).findByName(mainFlow.getName());
         }
     }
 
     @Test
     public void shouldFindCallFlowsForValidSearchTerm() {
         // Given
-        given(callFlowDataService.findAllByName(Constants.CALLFLOW_MAIN_PREFIX)).willReturn(searchedFlows);
+        given(callFlowDao.findAllByName(Constants.CALLFLOW_MAIN_PREFIX)).willReturn(searchedFlows);
 
         // When we search for a callflow by a prefix
         List<CallFlow> foundCallflows = callFlowService.findAllByNamePrefix(Constants.CALLFLOW_MAIN_PREFIX);
 
         // Then
         assertThat(foundCallflows.size(), equalTo(searchedFlows.size()));
-        verify(callFlowDataService, times(1)).findAllByName(Constants.CALLFLOW_MAIN_PREFIX);
+        verify(callFlowDao, times(1)).findAllByName(Constants.CALLFLOW_MAIN_PREFIX);
     }
 
     @Test
     public void shouldReturnEmptyListOfCallFlowsIfInvalidSearchTermIsUsed() {
         // Given
-        given(callFlowDataService.findAllByName(Constants.CALLFLOW_MAIN_PREFIX)).willReturn(searchedFlows);
+        given(callFlowDao.findAllByName(Constants.CALLFLOW_MAIN_PREFIX)).willReturn(searchedFlows);
 
         // When we search for a callflow by a invalid prefix
         List<CallFlow> foundCallflows = callFlowService.findAllByNamePrefix(Constants.CALLFLOW_INVALID_PREFIX);
 
         // Then
         assertThat(foundCallflows.size(), equalTo(0));
-        verify(callFlowDataService, times(1)).findAllByName(Constants.CALLFLOW_INVALID_PREFIX);
+        verify(callFlowDao, times(1)).findAllByName(Constants.CALLFLOW_INVALID_PREFIX);
     }
 
     @Test
     public void shouldFindCallFlowByValidName() {
         // Given
-        given(callFlowDataService.findByName(Constants.CALLFLOW_MAIN)).willReturn(mainFlow);
+        given(callFlowDao.findByName(Constants.CALLFLOW_MAIN)).willReturn(mainFlow);
 
         // When we search for that flow
         CallFlow returnedFlow = callFlowService.findByName(Constants.CALLFLOW_MAIN);
 
         // Then
-        verify(callFlowDataService, times(1)).findByName(Constants.CALLFLOW_MAIN);
+        verify(callFlowDao, times(1)).findByName(Constants.CALLFLOW_MAIN);
         assertNotNull(returnedFlow);
         assertThat(returnedFlow.getName(), equalTo(mainFlow.getName()));
     }
@@ -319,43 +319,43 @@ public class CallFlowServiceTest extends BaseTest {
     public void shouldThrowIllegalArgumentIfAttemptedToFindCallFlowByInvalidName() {
         expectException(IllegalArgumentException.class);
         // Given
-        given(callFlowDataService.findByName(Constants.CALLFLOW_MAIN)).willReturn(mainFlow);
+        given(callFlowDao.findByName(Constants.CALLFLOW_MAIN)).willReturn(mainFlow);
 
         try {
             // When we search for a non existent flow
             CallFlow returnedFlow = callFlowService.findByName(Constants.CALLFLOW_MAIN2);
         } finally {
             // Then
-            verify(callFlowDataService, times(1)).findByName(Constants.CALLFLOW_MAIN2);
+            verify(callFlowDao, times(1)).findByName(Constants.CALLFLOW_MAIN2);
         }
     }
 
     @Test
     public void shouldDeleteCallFlow() {
         // Given
-        given(callFlowDataService.findById(1L)).willReturn(mainFlow);
+        given(callFlowDao.findById(1L)).willReturn(mainFlow);
 
         // When
         callFlowService.delete(1L);
 
         // Then
-        verify(callFlowDataService, times(1)).findById(1L);
-        verify(callFlowDataService, times(1)).delete(mainFlow);
+        verify(callFlowDao, times(1)).findById(1L);
+        verify(callFlowDao, times(1)).delete(mainFlow);
     }
 
     @Test
     public void shouldThrowIllegalArgumentIfAttemptedToDeleteCallFlowWithInvalidId() {
         expectException(IllegalArgumentException.class);
         // Given
-        given(callFlowDataService.findById(1L)).willReturn(mainFlow);
+        given(callFlowDao.findById(1L)).willReturn(mainFlow);
 
         try {
             // When
             callFlowService.delete(-1L);
         } finally {
             // Then
-            verify(callFlowDataService, times(1)).findById(-1L);
-            verify(callFlowDataService, never()).delete(any(CallFlow.class));
+            verify(callFlowDao, times(1)).findById(-1L);
+            verify(callFlowDao, never()).delete(any(CallFlow.class));
         }
     }
 }

@@ -5,7 +5,7 @@ import org.openmrs.module.callflows.api.domain.CallFlow;
 import org.openmrs.module.callflows.api.exception.CallFlowAlreadyExistsException;
 import org.openmrs.module.callflows.api.helper.CallFlowContractHelper;
 import org.openmrs.module.callflows.api.helper.CallFlowHelper;
-import org.openmrs.module.callflows.api.repository.CallFlowDataService;
+import org.openmrs.module.callflows.api.dao.CallFlowDao;
 import org.openmrs.module.callflows.api.service.CallFlowService;
 
 import org.motechproject.testing.osgi.container.MotechNativeTestContainerFactory;
@@ -52,7 +52,7 @@ public class CallFlowControllerBundleIT extends RESTControllerPaxIT {
     private CallFlow existingFlow;
 
     @Inject
-    private CallFlowDataService callFlowDataService;
+    private CallFlowDao callFlowDao;
 
     @Inject
     private CallFlowService callFlowService;
@@ -74,7 +74,7 @@ public class CallFlowControllerBundleIT extends RESTControllerPaxIT {
     @After
     public void tearDown() {
         super.tearDown();
-        callFlowDataService.deleteAll();
+        callFlowDao.deleteAll();
     }
 
     @Test

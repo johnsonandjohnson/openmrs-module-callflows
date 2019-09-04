@@ -14,8 +14,8 @@ import org.openmrs.module.callflows.api.exception.CallFlowAlreadyExistsException
 import org.openmrs.module.callflows.api.helper.CallFlowHelper;
 import org.openmrs.module.callflows.api.helper.ConfigHelper;
 import org.openmrs.module.callflows.api.helper.RendererHelper;
-import org.openmrs.module.callflows.api.repository.CallDataService;
-import org.openmrs.module.callflows.api.repository.CallFlowDataService;
+import org.openmrs.module.callflows.api.dao.CallDao;
+import org.openmrs.module.callflows.api.dao.CallFlowDao;
 import org.openmrs.module.callflows.api.service.CallFlowService;
 import org.openmrs.module.callflows.api.service.CallService;
 import org.openmrs.module.callflows.api.service.FlowService;
@@ -56,7 +56,7 @@ public class CallControllerBundleIT extends RESTControllerPaxIT {
     private SettingsService settingsService;
 
     @Inject
-    private CallDataService callDataService;
+    private CallDao callDao;
 
     @Inject
     private CallFlowService callFlowService;
@@ -68,7 +68,7 @@ public class CallControllerBundleIT extends RESTControllerPaxIT {
     private FlowService flowService;
 
     @Inject
-    private CallFlowDataService callFlowDataService;
+    private CallFlowDao callFlowDao;
 
     private List<Config> configs;
 
@@ -122,8 +122,8 @@ public class CallControllerBundleIT extends RESTControllerPaxIT {
     public void tearDown() {
         super.tearDown();
         settingsService.updateConfigs(new ArrayList());
-        callDataService.deleteAll();
-        callFlowDataService.deleteAll();
+        callDao.deleteAll();
+        callFlowDao.deleteAll();
     }
 
     @Test

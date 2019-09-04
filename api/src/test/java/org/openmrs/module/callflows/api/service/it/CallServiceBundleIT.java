@@ -9,8 +9,8 @@ import org.openmrs.module.callflows.api.domain.types.CallStatus;
 import org.openmrs.module.callflows.api.helper.CallFlowHelper;
 import org.openmrs.module.callflows.api.helper.CallHelper;
 import org.openmrs.module.callflows.api.helper.ConfigHelper;
-import org.openmrs.module.callflows.api.repository.CallDataService;
-import org.openmrs.module.callflows.api.repository.CallFlowDataService;
+import org.openmrs.module.callflows.api.dao.CallDao;
+import org.openmrs.module.callflows.api.dao.CallFlowDao;
 import org.openmrs.module.callflows.api.service.CallService;
 import org.openmrs.module.callflows.api.service.SettingsService;
 import org.openmrs.module.callflows.api.util.CallAssert;
@@ -52,13 +52,13 @@ public class CallServiceBundleIT extends BasePaxIT {
     private CallService callService;
 
     @Inject
-    private CallDataService callDataService;
+    private CallDao callDao;
 
     @Inject
     private SettingsService settingsService;
 
     @Inject
-    private CallFlowDataService callFlowDataService;
+    private CallFlowDao callFlowDao;
 
     private CallFlow mainFlow;
 
@@ -79,7 +79,7 @@ public class CallServiceBundleIT extends BasePaxIT {
         // create a call flow
         mainFlow = CallFlowHelper.createMainFlow();
         mainFlow.setRaw(TestUtil.loadFile("main_flow.json"));
-        mainFlow = callFlowDataService.create(mainFlow);
+        mainFlow = callFlowDao.create(mainFlow);
 
         // link the call flow to a inbound
         inboundCall = CallHelper.createInboundCall();
@@ -92,8 +92,8 @@ public class CallServiceBundleIT extends BasePaxIT {
         outboundCall.setEndFlow(mainFlow);
 
         // create two calls
-        inboundCall = callDataService.create(inboundCall);
-        outboundCall = callDataService.create(outboundCall);
+        inboundCall = callDao.create(inboundCall);
+        outboundCall = callDao.create(outboundCall);
 
         params = CallHelper.createParams();
         providerData = new HashMap<>();
@@ -107,8 +107,8 @@ public class CallServiceBundleIT extends BasePaxIT {
 
     @After
     public void tearDown() {
-        callDataService.deleteAll();
-        callFlowDataService.deleteAll();
+        callDao.deleteAll();
+        callFlowDao.deleteAll();
     }
 
     @Test
@@ -195,7 +195,7 @@ public class CallServiceBundleIT extends BasePaxIT {
         // Given a existing outbound call without actors
         outboundCall.setActorId(null);
         outboundCall.setActorType(null);
-        callDataService.update(outboundCall);
+        callDao.update(outboundCall);
 
         // And we updated *all* the properties
         Call updatedCall = CallHelper.updateAllPropertiesInOutboundCall(outboundCall);
@@ -217,7 +217,7 @@ public class CallServiceBundleIT extends BasePaxIT {
         // Given a existing outbound call with actors
         outboundCall.setActorId(Constants.ACTOR_ID);
         outboundCall.setActorType(Constants.ACTOR_TYPE);
-        callDataService.update(outboundCall);
+        callDao.update(outboundCall);
 
         // And we update all of it's properties
         Call updatedCall = CallHelper.updateAllPropertiesInOutboundCall(outboundCall);

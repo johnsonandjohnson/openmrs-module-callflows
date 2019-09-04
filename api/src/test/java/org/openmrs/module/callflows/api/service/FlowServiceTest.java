@@ -9,7 +9,7 @@ import org.openmrs.module.callflows.api.domain.flow.Flow;
 import org.openmrs.module.callflows.api.domain.flow.Node;
 import org.openmrs.module.callflows.api.helper.CallFlowHelper;
 import org.openmrs.module.callflows.api.helper.FlowHelper;
-import org.openmrs.module.callflows.api.repository.CallFlowDataService;
+import org.openmrs.module.callflows.api.dao.CallFlowDao;
 import org.openmrs.module.callflows.api.service.impl.FlowServiceImpl;
 import org.openmrs.module.callflows.api.util.FlowUtil;
 import org.openmrs.module.callflows.api.util.TestUtil;
@@ -50,7 +50,7 @@ public class FlowServiceTest extends BaseTest {
     private FlowUtil flowUtil;
 
     @Mock
-    private CallFlowDataService callFlowDataService;
+    private CallFlowDao callFlowDao;
 
     private CallFlow mainFlow;
 
@@ -86,7 +86,7 @@ public class FlowServiceTest extends BaseTest {
         inactiveHandlerNode = expectedFlow.getNodes().get(5);
 
         // Given a MainFlow
-        given(callFlowDataService.findByName(Constants.CALLFLOW_MAIN)).willReturn(mainFlow);
+        given(callFlowDao.findByName(Constants.CALLFLOW_MAIN)).willReturn(mainFlow);
 
         // And the following parse behavior
         given(flowUtil.parse("|MainFlow.|", null)).willReturn(new String[]{ "MainFlow", null });
@@ -125,7 +125,7 @@ public class FlowServiceTest extends BaseTest {
         Flow flow = flowService.load(Constants.CALLFLOW_MAIN);
 
         // Then
-        verify(callFlowDataService, times(1)).findByName(Constants.CALLFLOW_MAIN);
+        verify(callFlowDao, times(1)).findByName(Constants.CALLFLOW_MAIN);
         assertNotNull(flow);
         assertThat(flow.getName(), equalTo(Constants.CALLFLOW_MAIN));
     }
@@ -140,7 +140,7 @@ public class FlowServiceTest extends BaseTest {
             Flow flow = flowService.load(Constants.CALLFLOW_MAIN2);
         } finally {
             // Then
-            verify(callFlowDataService, times(1)).findByName(Constants.CALLFLOW_MAIN2);
+            verify(callFlowDao, times(1)).findByName(Constants.CALLFLOW_MAIN2);
         }
     }
 
@@ -149,14 +149,14 @@ public class FlowServiceTest extends BaseTest {
         expectException(IllegalArgumentException.class);
         // Given a incomplete flow
         mainFlow.setRaw("");
-        given(callFlowDataService.findByName(Constants.CALLFLOW_MAIN)).willReturn(mainFlow);
+        given(callFlowDao.findByName(Constants.CALLFLOW_MAIN)).willReturn(mainFlow);
 
         try {
             // When we look for this incomplete flow
             Flow flow = flowService.load(Constants.CALLFLOW_MAIN);
         } finally {
             // Then
-            verify(callFlowDataService, times(1)).findByName(Constants.CALLFLOW_MAIN);
+            verify(callFlowDao, times(1)).findByName(Constants.CALLFLOW_MAIN);
         }
     }
 
@@ -170,7 +170,7 @@ public class FlowServiceTest extends BaseTest {
 
         // Then
         verify(flowUtil, times(1)).parse("|MainFlow.entry|", null);
-        verify(callFlowDataService, times(1)).findByName("MainFlow");
+        verify(callFlowDao, times(1)).findByName("MainFlow");
         verify(flowUtil, times(1)).getNodeByStep(expectedFlow, "entry");
         assertNotNull(flowStep);
         assertThat(flowStep.getFlow().getName(), equalTo("MainFlow"));
@@ -187,7 +187,7 @@ public class FlowServiceTest extends BaseTest {
         } finally {
             // Then
             verify(flowUtil, times(1)).parse("|MainFlow2.|", null);
-            verify(callFlowDataService, times(1)).findByName("MainFlow2");
+            verify(callFlowDao, times(1)).findByName("MainFlow2");
             verify(flowUtil, never()).getNodeByStep(any(Flow.class), anyString());
         }
     }
@@ -202,7 +202,7 @@ public class FlowServiceTest extends BaseTest {
         } finally {
             // Then
             verify(flowUtil, times(1)).parse("|MainFlow.non-existent|", null);
-            verify(callFlowDataService, times(1)).findByName("MainFlow");
+            verify(callFlowDao, times(1)).findByName("MainFlow");
             verify(flowUtil, times(1)).getNodeByStep(expectedFlow, "non-existent");
         }
 
@@ -215,7 +215,7 @@ public class FlowServiceTest extends BaseTest {
 
         // Then
         verify(flowUtil, times(1)).parse("|MainFlow.|", null);
-        verify(callFlowDataService, times(1)).findByName("MainFlow");
+        verify(callFlowDao, times(1)).findByName("MainFlow");
         verify(flowUtil, times(1)).getNodeByStep(expectedFlow, "entry");
         assertNotNull(flowStep);
         assertThat(flowStep.getFlow().getName(), equalTo("MainFlow"));
@@ -229,7 +229,7 @@ public class FlowServiceTest extends BaseTest {
 
         // Then
         verify(flowUtil, times(1)).parse("|entry|", "MainFlow");
-        verify(callFlowDataService, times(1)).findByName("MainFlow");
+        verify(callFlowDao, times(1)).findByName("MainFlow");
         verify(flowUtil, times(1)).getNodeByStep(expectedFlow, "entry");
         assertNotNull(flowStep);
         assertThat(flowStep.getFlow().getName(), equalTo("MainFlow"));

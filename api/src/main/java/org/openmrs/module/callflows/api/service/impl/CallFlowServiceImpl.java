@@ -2,7 +2,7 @@ package org.openmrs.module.callflows.api.service.impl;
 
 import org.openmrs.module.callflows.api.domain.CallFlow;
 import org.openmrs.module.callflows.api.exception.CallFlowAlreadyExistsException;
-import org.openmrs.module.callflows.api.repository.CallFlowDataService;
+import org.openmrs.module.callflows.api.dao.CallFlowDao;
 import org.openmrs.module.callflows.api.service.CallFlowService;
 
 import org.apache.commons.lang.StringUtils;
@@ -23,7 +23,7 @@ public class CallFlowServiceImpl implements CallFlowService {
     private static final Pattern ALPHA_NUMERIC = Pattern.compile("^[a-zA-Z0-9]+$");
 
     @Autowired
-    private CallFlowDataService callFlowDataService;
+    private CallFlowDao callFlowDao;
 
     @Override
     @Transactional
@@ -33,10 +33,10 @@ public class CallFlowServiceImpl implements CallFlowService {
                     "Callflow name is required and must contain only alphanumeric characters :" + callflow.getName());
         }
         // check for duplicates in database
-        if (null != callFlowDataService.findByName(callflow.getName())) {
+        if (null != callFlowDao.findByName(callflow.getName())) {
             throw new CallFlowAlreadyExistsException("CallFlow already exists! :" + callflow.getName());
         }
-        return callFlowDataService.create(callflow);
+        return callFlowDao.create(callflow);
     }
 
     @Override
@@ -51,13 +51,13 @@ public class CallFlowServiceImpl implements CallFlowService {
         // First we can check whether the call flow that we are trying to update exists
         // Second we can check whether the id of this call flow matches the one we are trying to update
         // If the second condition fails, it means that the call flow name is being changed to another callflow's name
-        CallFlow existingFlow = callFlowDataService.findByName(callflow.getName());
+        CallFlow existingFlow = callFlowDao.findByName(callflow.getName());
         if (null != existingFlow && !existingFlow.getId().equals(callflow.getId())) {
             throw new CallFlowAlreadyExistsException(
                     "Callflow name is already used by another flow :" + callflow.getName());
         }
         if (null == existingFlow) {
-            existingFlow = callFlowDataService.findById(callflow.getId());
+            existingFlow = callFlowDao.findById(callflow.getId());
             if (null == existingFlow) {
                 throw new IllegalArgumentException("Callflow not retrievable for invalid id : " + callflow.getId());
             }
@@ -67,18 +67,18 @@ public class CallFlowServiceImpl implements CallFlowService {
         existingFlow.setDescription(callflow.getDescription());
         existingFlow.setRaw(callflow.getRaw());
         existingFlow.setStatus(callflow.getStatus());
-        return callFlowDataService.update(existingFlow);
+        return callFlowDao.update(existingFlow);
     }
 
     @Override
     @Transactional
     public List<CallFlow> findAllByNamePrefix(String prefix) {
-        return callFlowDataService.findAllByName(prefix);
+        return callFlowDao.findAllByName(prefix);
     }
 
     @Override
     public CallFlow findByName(String name) {
-        CallFlow callflow = callFlowDataService.findByName(name);
+        CallFlow callflow = callFlowDao.findByName(name);
         if (null == callflow) {
             throw new IllegalArgumentException("Callflow cannot be found for name : " + name);
         } else {
@@ -88,11 +88,11 @@ public class CallFlowServiceImpl implements CallFlowService {
 
     @Override
     public void delete(Long id) {
-        CallFlow callflow = callFlowDataService.findById(id);
+        CallFlow callflow = callFlowDao.findById(id);
         if (callflow == null) {
             throw new IllegalArgumentException("Callflow cannot be found for id : " + id);
         } else {
-            callFlowDataService.delete(callflow);
+            callFlowDao.delete(callflow);
         }
     }
 }
