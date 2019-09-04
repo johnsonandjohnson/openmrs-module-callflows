@@ -70,7 +70,7 @@ public class Call extends AbstractBaseOpenmrsData {
      * The call flow we started this call from. Doesn't change once set
      */
     @OneToOne
-    @JoinColumn(name = "startFlow_id")
+    @JoinColumn(name = "startFlow_id", nullable = false)
     private CallFlow startFlow;
 
     /**
@@ -89,7 +89,7 @@ public class Call extends AbstractBaseOpenmrsData {
      * The flow we ended at for now. This can change as the call continues
      */
     @OneToOne
-    @JoinColumn(name = "endFlow_id")
+    @JoinColumn(name = "endFlow_id", nullable = false)
     private CallFlow endFlow;
 
     /**
