@@ -1,15 +1,29 @@
 package org.openmrs.module.callflows.api.dao.impl;
 
+import org.openmrs.api.db.hibernate.DbSession;
+import org.openmrs.api.db.hibernate.DbSessionFactory;
 import org.openmrs.api.db.hibernate.HibernateOpenmrsDataDAO;
 import org.openmrs.module.callflows.api.dao.CallDao;
 import org.openmrs.module.callflows.api.domain.Call;
 import org.openmrs.module.callflows.api.domain.types.CallDirection;
 import org.openmrs.module.callflows.api.domain.types.CallStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Set;
 
 public class CallDaoImpl extends HibernateOpenmrsDataDAO<Call> implements CallDao {
+
+    @Autowired
+    private DbSessionFactory sessionFactory;
+
+    public CallDaoImpl(){
+        super(Call.class);
+    }
+
+    private DbSession getSession() {
+        return sessionFactory.getCurrentSession();
+    }
 
     @Override
     public Call findByCallId(String callId) {
