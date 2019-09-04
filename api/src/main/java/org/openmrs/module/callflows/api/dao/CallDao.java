@@ -44,4 +44,17 @@ public interface CallDao extends OpenmrsDataDAO<Call> {
      * @return call count for the specified Call direction and Call status
      */
     long countFindCallsByDirectionAndStatus(CallDirection direction, Set<CallStatus> statusSet);
+
+    Call create(Call call);
+
+    Call update(Call call);
+
+    Call findById(Integer id);
+
+    List<Call> retrieveAll();
+
+    void deleteAll();
+
+    long count();
+
 }

@@ -37,7 +37,27 @@ public class CallFlowDaoImpl extends HibernateOpenmrsDataDAO<CallFlow> implement
     public List<CallFlow> findAllByName(String prefix) {
         Criteria crit = getSession().createCriteria(this.mappedClass);
         crit.add(Restrictions.like("name", prefix, MatchMode.START));
-        
+
         return crit.list();
+    }
+
+    @Override
+    public CallFlow create(CallFlow callFlow) {
+        return null;
+    }
+
+    @Override
+    public CallFlow update(CallFlow callFlow) {
+        return null;
+    }
+
+    @Override
+    public CallFlow findById(Integer id) {
+        return null;
+    }
+
+    @Override
+    public void deleteAll() {
+
     }
 }

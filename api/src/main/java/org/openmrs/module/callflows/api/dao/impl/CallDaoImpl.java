@@ -62,4 +62,34 @@ public class CallDaoImpl extends HibernateOpenmrsDataDAO<Call> implements CallDa
         Number count = (Number) crit.uniqueResult();
         return count.longValue();
     }
+
+    @Override
+    public Call create(Call call) {
+        return null;
+    }
+
+    @Override
+    public Call update(Call call) {
+        return null;
+    }
+
+    @Override
+    public Call findById(Integer id) {
+        return null;
+    }
+
+    @Override
+    public List<Call> retrieveAll() {
+        return null;
+    }
+
+    @Override
+    public void deleteAll() {
+
+    }
+
+    @Override
+    public long count() {
+        return 0;
+    }
 }

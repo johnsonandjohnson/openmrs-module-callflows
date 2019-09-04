@@ -32,4 +32,12 @@ public interface CallFlowDao extends OpenmrsDataDAO<CallFlow> {
      */
     List<CallFlow> findAllByName(String prefix);
 
+    CallFlow create(CallFlow callFlow);
+
+    CallFlow update(CallFlow callFlow);
+
+    CallFlow findById(Integer id);
+
+    void deleteAll();
+
 }
