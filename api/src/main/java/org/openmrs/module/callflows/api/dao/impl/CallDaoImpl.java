@@ -1,5 +1,8 @@
 package org.openmrs.module.callflows.api.dao.impl;
 
+import org.hibernate.Criteria;
+import org.hibernate.criterion.Disjunction;
+import org.hibernate.criterion.Restrictions;
 import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.api.db.hibernate.DbSessionFactory;
 import org.openmrs.api.db.hibernate.HibernateOpenmrsDataDAO;
@@ -27,16 +30,36 @@ public class CallDaoImpl extends HibernateOpenmrsDataDAO<Call> implements CallDa
 
     @Override
     public Call findByCallId(String callId) {
-        return null;
+        Criteria crit = getSession().createCriteria(this.mappedClass);
+        crit.add(Restrictions.eq("callId", callId));
+
+        return (Call) crit.uniqueResult();
     }
 
     @Override
     public List<Call> findCallsByDirectionAndStatus(CallDirection direction, Set<CallStatus> statusSet) {
-        return null;
+        Criteria crit = getSession().createCriteria(this.mappedClass);
+        crit.add(Restrictions.eq("direction", direction));
+        Disjunction or = Restrictions.disjunction();
+        for (CallStatus callStatus : statusSet) {
+            or.add(Restrictions.eq("status", callStatus));
+        }
+        crit.add(or);
+
+        return crit.list();
     }
 
     @Override
     public long countFindCallsByDirectionAndStatus(CallDirection direction, Set<CallStatus> statusSet) {
-        return 0;
+        Criteria crit = getSession().createCriteria(this.mappedClass);
+        crit.add(Restrictions.eq("direction", direction));
+        Disjunction or = Restrictions.disjunction();
+        for (CallStatus callStatus : statusSet) {
+            or.add(Restrictions.eq("status", callStatus));
+        }
+        crit.add(or);
+
+        Number count = (Number) crit.uniqueResult();
+        return count.longValue();
     }
 }

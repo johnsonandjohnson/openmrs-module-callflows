@@ -1,5 +1,8 @@
 package org.openmrs.module.callflows.api.dao.impl;
 
+import org.hibernate.Criteria;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Restrictions;
 import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.api.db.hibernate.DbSessionFactory;
 import org.openmrs.api.db.hibernate.HibernateOpenmrsDataDAO;
@@ -24,11 +27,17 @@ public class CallFlowDaoImpl extends HibernateOpenmrsDataDAO<CallFlow> implement
 
     @Override
     public CallFlow findByName(String name) {
-        return null;
+        Criteria crit = getSession().createCriteria(this.mappedClass);
+        crit.add(Restrictions.eq("name", name));
+
+        return (CallFlow) crit.uniqueResult();
     }
 
     @Override
     public List<CallFlow> findAllByName(String prefix) {
-        return null;
+        Criteria crit = getSession().createCriteria(this.mappedClass);
+        crit.add(Restrictions.like("name", prefix, MatchMode.START));
+        
+        return crit.list();
     }
 }
