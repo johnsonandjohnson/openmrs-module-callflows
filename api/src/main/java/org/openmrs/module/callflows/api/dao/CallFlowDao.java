@@ -22,8 +22,7 @@ public interface CallFlowDao extends OpenmrsDataDAO<CallFlow> {
      * @param name
      * @return the callflow
      */
-    @Lookup
-    CallFlow findByName(@LookupField(name = "name") String name);
+    CallFlow findByName(String name);
 
     /**
      * Finds all call flows that start with the given name
@@ -31,7 +30,6 @@ public interface CallFlowDao extends OpenmrsDataDAO<CallFlow> {
      * @param prefix
      * @return a list of the callflows
      */
-    @Lookup
-    List<CallFlow> findAllByName(@LookupField(name = "name", customOperator = "startsWith()") String prefix);
+    List<CallFlow> findAllByName(String prefix);
 
 }

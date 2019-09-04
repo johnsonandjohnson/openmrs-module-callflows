@@ -25,8 +25,7 @@ public interface CallDao extends OpenmrsDataDAO<Call> {
      * @param callId
      * @return the call object
      */
-    @Lookup
-    Call findByCallId(@LookupField(name = "callId") String callId);
+    Call findByCallId(String callId);
 
     /**
      * Find the calls based on the call direction and call status
@@ -35,9 +34,7 @@ public interface CallDao extends OpenmrsDataDAO<Call> {
      * @param statusSet The set of IVR Call status
      * @return list of calls for the specified Call direction and Call status
      */
-    @Lookup
-    List<Call> findCallsByDirectionAndStatus(@LookupField(name = "direction") CallDirection direction,
-                                             @LookupField(name = "status") Set<CallStatus> statusSet);
+    List<Call> findCallsByDirectionAndStatus(CallDirection direction, Set<CallStatus> statusSet);
 
     /**
      * Find the call count based on the call direction and call status
@@ -46,6 +43,5 @@ public interface CallDao extends OpenmrsDataDAO<Call> {
      * @param statusSet The set of IVR Call status
      * @return call count for the specified Call direction and Call status
      */
-    long countFindCallsByDirectionAndStatus(@LookupField(name = "direction") CallDirection direction,
-                                            @LookupField(name = "status") Set<CallStatus> statusSet);
+    long countFindCallsByDirectionAndStatus(CallDirection direction, Set<CallStatus> statusSet);
 }
