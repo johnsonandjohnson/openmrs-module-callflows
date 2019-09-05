@@ -43,21 +43,21 @@ public class CallFlowDaoImpl extends HibernateOpenmrsDataDAO<CallFlow> implement
 
     @Override
     public CallFlow create(CallFlow callFlow) {
-        return null;
+        return saveOrUpdate(callFlow);
     }
 
     @Override
     public CallFlow update(CallFlow callFlow) {
-        return null;
+        return saveOrUpdate(callFlow);
     }
 
     @Override
     public CallFlow findById(Integer id) {
-        return null;
+        return getById(id);
     }
 
     @Override
     public void deleteAll() {
-
+        getSession().createQuery("delete from callFlow.CallFlow");
     }
 }

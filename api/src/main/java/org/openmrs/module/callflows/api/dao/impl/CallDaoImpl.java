@@ -65,31 +65,31 @@ public class CallDaoImpl extends HibernateOpenmrsDataDAO<Call> implements CallDa
 
     @Override
     public Call create(Call call) {
-        return null;
+        return saveOrUpdate(call);
     }
 
     @Override
     public Call update(Call call) {
-        return null;
+        return saveOrUpdate(call);
     }
 
     @Override
     public Call findById(Integer id) {
-        return null;
+        return getById(id);
     }
 
     @Override
     public List<Call> retrieveAll() {
-        return null;
+        return getAll(false);
     }
 
     @Override
     public void deleteAll() {
-
+        getSession().createQuery("delete from callFlow.Call");
     }
 
     @Override
     public long count() {
-        return 0;
+        return getAllCount(false);
     }
 }
