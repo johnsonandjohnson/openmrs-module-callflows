@@ -18,7 +18,7 @@ import org.openmrs.module.BaseModuleActivator;
  */
 public class CallflowsActivator extends BaseModuleActivator {
 	
-	private Log LOGGER = LogFactory.getLog(this.getClass());
+	private static final Log LOGGER = LogFactory.getLog(CallflowsActivator.class);
 	
 	/**
 	 * @see #started()
