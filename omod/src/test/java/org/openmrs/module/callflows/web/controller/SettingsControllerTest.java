@@ -14,7 +14,7 @@ import org.openmrs.module.callflows.api.domain.Settings;
 import org.openmrs.module.callflows.api.helper.ConfigHelper;
 import org.openmrs.module.callflows.api.helper.GenericHelper;
 import org.openmrs.module.callflows.api.helper.RendererHelper;
-import org.openmrs.module.callflows.api.service.SettingsService;
+import org.openmrs.module.callflows.api.service.ConfigService;
 
 import org.motechproject.mds.util.SecurityUtil;
 
@@ -56,7 +56,7 @@ public class SettingsControllerTest extends BaseTest {
     private SettingsController settingsController = new SettingsController();
 
     @Mock
-    private SettingsService settingsService;
+    private ConfigService configService;
 
     @Mock
     private ConfigContractBuilder configContractBuilder;
@@ -133,7 +133,7 @@ public class SettingsControllerTest extends BaseTest {
         given(configContractBuilder.createFrom(yo)).willReturn(yoContract);
         given(configContractBuilder.createFrom(imiMobile)).willReturn(imiMobileContract);
         // And
-        given(settingsService.allConfigs()).willReturn(configs);
+        given(configService.allConfigs()).willReturn(configs);
 
         // When and Then
         mockMvc.perform(get("/configs").contentType(MediaType.APPLICATION_JSON))
@@ -144,7 +144,7 @@ public class SettingsControllerTest extends BaseTest {
         // Then no incoming, so no builders
         verify(configBuilder, never()).createFrom(any(ConfigContract.class));
         // And one service call
-        verify(settingsService, times(1)).allConfigs();
+        verify(configService, times(1)).allConfigs();
         // And two response builders
         verify(configContractBuilder, times(3)).createFrom(any(Config.class));
     }
@@ -160,7 +160,7 @@ public class SettingsControllerTest extends BaseTest {
         given(configContractBuilder.createFrom(yo)).willReturn(yoContract);
         given(configContractBuilder.createFrom(imiMobile)).willReturn(imiMobileContract);
         // And
-        given(settingsService.allConfigs()).willReturn(configs);
+        given(configService.allConfigs()).willReturn(configs);
 
         // When and Then
         mockMvc.perform(post("/configs").contentType(MediaType.APPLICATION_JSON).body(jsonBytes(configContracts)))
@@ -171,9 +171,9 @@ public class SettingsControllerTest extends BaseTest {
         // Then two builders for request
         verify(configBuilder, times(3)).createFrom(any(ConfigContract.class));
         // And must update once with correct data
-        verify(settingsService, times(1)).updateConfigs(configs);
+        verify(configService, times(1)).updateConfigs(configs);
         // and must retrieve again to return back
-        verify(settingsService, times(1)).allConfigs();
+        verify(configService, times(1)).allConfigs();
         // And must call response builder twice
         verify(configContractBuilder, times(3)).createFrom(any(Config.class));
     }
@@ -185,7 +185,7 @@ public class SettingsControllerTest extends BaseTest {
         given(rendererContractBuilder.createFrom(vxml)).willReturn(vxmlContract);
         given(rendererContractBuilder.createFrom(txt)).willReturn(txtContract);
         // And
-        given(settingsService.allRenderers()).willReturn(renderers);
+        given(configService.allRenderers()).willReturn(renderers);
 
         // When and Then
         mockMvc.perform(get("/renderers").contentType(MediaType.APPLICATION_JSON))
@@ -196,7 +196,7 @@ public class SettingsControllerTest extends BaseTest {
         // Then no incoming, so no builders
         verify(configBuilder, never()).createFrom(any(ConfigContract.class));
         // And one service call
-        verify(settingsService, times(1)).allRenderers();
+        verify(configService, times(1)).allRenderers();
         // And two response builders
         verify(rendererContractBuilder, times(2)).createFrom(any(Renderer.class));
     }
@@ -210,7 +210,7 @@ public class SettingsControllerTest extends BaseTest {
         given(rendererContractBuilder.createFrom(vxml)).willReturn(vxmlContract);
         given(rendererContractBuilder.createFrom(txt)).willReturn(txtContract);
         // And
-        given(settingsService.allRenderers()).willReturn(renderers);
+        given(configService.allRenderers()).willReturn(renderers);
 
         // When and Then
         mockMvc.perform(post("/renderers").contentType(MediaType.APPLICATION_JSON).body(jsonBytes(rendererContracts)))
@@ -221,9 +221,9 @@ public class SettingsControllerTest extends BaseTest {
         // Then two builders for request
         verify(rendererBuilder, times(2)).createFrom(any(RendererContract.class));
         // And must update once with correct data
-        verify(settingsService, times(1)).updateRenderers(renderers);
+        verify(configService, times(1)).updateRenderers(renderers);
         // and must retrieve again to return back
-        verify(settingsService, times(1)).allRenderers();
+        verify(configService, times(1)).allRenderers();
         // And must call response builder twice
         verify(rendererContractBuilder, times(2)).createFrom(any(Renderer.class));
     }

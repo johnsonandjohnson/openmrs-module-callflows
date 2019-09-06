@@ -8,7 +8,7 @@ import org.openmrs.module.callflows.api.contract.ConfigContract;
 import org.openmrs.module.callflows.api.contract.RendererContract;
 import org.openmrs.module.callflows.api.domain.Config;
 import org.openmrs.module.callflows.api.domain.Renderer;
-import org.openmrs.module.callflows.api.service.SettingsService;
+import org.openmrs.module.callflows.api.service.ConfigService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,7 +30,7 @@ import java.util.List;
 public class SettingsController {
 
     @Autowired
-    private SettingsService settingsService;
+    private ConfigService configService;
 
     @Autowired
     private ConfigBuilder configBuilder;
@@ -52,7 +52,7 @@ public class SettingsController {
     @RequestMapping(value = "/configs", method = RequestMethod.GET)
     @ResponseBody
     public List<ConfigContract> getConfigs() {
-        return buildConfigContract(settingsService.allConfigs());
+        return buildConfigContract(configService.allConfigs());
     }
 
     /**
@@ -69,8 +69,8 @@ public class SettingsController {
         for (ConfigContract configContract : configContracts) {
             configs.add(configBuilder.createFrom(configContract));
         }
-        settingsService.updateConfigs(configs);
-        return buildConfigContract(settingsService.allConfigs());
+        configService.updateConfigs(configs);
+        return buildConfigContract(configService.allConfigs());
     }
 
     /**
@@ -81,7 +81,7 @@ public class SettingsController {
     @RequestMapping(value = "/renderers", method = RequestMethod.GET)
     @ResponseBody
     public List<RendererContract> getRenderers() {
-        return buildRendererContract(settingsService.allRenderers());
+        return buildRendererContract(configService.allRenderers());
     }
 
     /**
@@ -98,8 +98,8 @@ public class SettingsController {
         for (RendererContract rendererContract : rendererContracts) {
             renderers.add(rendererBuilder.createFrom(rendererContract));
         }
-        settingsService.updateRenderers(renderers);
-        return buildRendererContract(settingsService.allRenderers());
+        configService.updateRenderers(renderers);
+        return buildRendererContract(configService.allRenderers());
     }
 
     private List<ConfigContract> buildConfigContract(List<Config> configs) {

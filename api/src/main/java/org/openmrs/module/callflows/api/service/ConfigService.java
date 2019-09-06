@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @author bramak09
  */
-public interface SettingsService extends OpenmrsService {
+public interface ConfigService extends OpenmrsService {
 
     /**
      * Get a configuration for a specific name

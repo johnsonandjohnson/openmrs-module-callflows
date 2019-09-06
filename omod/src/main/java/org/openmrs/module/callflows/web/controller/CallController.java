@@ -14,7 +14,7 @@ import org.openmrs.module.callflows.api.domain.types.CallStatus;
 import org.openmrs.module.callflows.api.service.CallFlowService;
 import org.openmrs.module.callflows.api.service.CallService;
 import org.openmrs.module.callflows.api.service.FlowService;
-import org.openmrs.module.callflows.api.service.SettingsService;
+import org.openmrs.module.callflows.api.service.ConfigService;
 import org.openmrs.module.callflows.api.util.CallUtil;
 import org.openmrs.module.callflows.api.util.FlowUtil;
 
@@ -119,7 +119,7 @@ public class CallController extends RestController {
     private static final int NUMBER_OF_TEN_K_FILES = 5;
 
     @Autowired
-    private SettingsService settingsService;
+    private ConfigService configService;
 
     @Autowired
     private CallFlowService callFlowService;
@@ -203,7 +203,7 @@ public class CallController extends RestController {
 
         try {
             // load configuration first, cause it has the OSGI services to load. This throws IllegalArgument if can't load config
-            config = settingsService.getConfig(conf);
+            config = configService.getConfig(conf);
 
             // initialize velocity context next. Can throw IllegalState if some OSGI services could not be loaded
             context = initContext(config, params);
@@ -306,7 +306,7 @@ public class CallController extends RestController {
             call = callService.findByCallId(callId);
 
             // The configuration is part of the call, and hence why we need to retrieve the call first
-            config = settingsService.getConfig(call.getConfig());
+            config = configService.getConfig(call.getConfig());
 
             context = initContext(config, params);
 
@@ -434,8 +434,8 @@ public class CallController extends RestController {
     private ResponseEntity buildOutput(Exception error, String output, Node node, Call call, String extension,
                                        Config config) {
         Renderer renderer = null;
-        if (settingsService.hasRenderer(extension)) {
-            renderer = settingsService.getRenderer(extension);
+        if (configService.hasRenderer(extension)) {
+            renderer = configService.getRenderer(extension);
         }
         // We want very fine grained control over the final responses as they vary with extension, errors, content, etc
         // So here we control all aspects of the output rather than deferring to the RestController

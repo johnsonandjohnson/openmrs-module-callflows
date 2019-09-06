@@ -10,7 +10,7 @@ import org.openmrs.module.callflows.api.domain.Config;
 import org.openmrs.module.callflows.api.domain.Renderer;
 import org.openmrs.module.callflows.api.domain.Settings;
 import org.openmrs.module.callflows.api.service.SettingsManagerService;
-import org.openmrs.module.callflows.api.service.SettingsService;
+import org.openmrs.module.callflows.api.service.ConfigService;
 import org.apache.commons.io.IOUtils;
 import org.openmrs.module.callflows.api.util.CallFlowConstants;
 import org.openmrs.module.callflows.api.util.SettingsManagerUtil;
@@ -31,9 +31,9 @@ import java.util.Map;
  * @author bramak09
  */
 @Service("cf.settingsService")
-public class SettingsServiceImpl extends BaseOpenmrsService implements SettingsService {
+public class ConfigServiceImpl extends BaseOpenmrsService implements ConfigService {
 
-	private static final Log LOGGER = LogFactory.getLog(SettingsServiceImpl.class);
+	private static final Log LOGGER = LogFactory.getLog(ConfigServiceImpl.class);
 
 	@Autowired
 	private SettingsManagerService settingsManagerService;
