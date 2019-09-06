@@ -6,14 +6,13 @@ import org.openmrs.module.callflows.api.domain.Config;
 import org.openmrs.module.callflows.api.domain.Renderer;
 import org.openmrs.module.callflows.api.domain.Settings;
 import org.openmrs.module.callflows.api.helper.GenericHelper;
-import org.openmrs.module.callflows.api.service.impl.SettingsServiceImpl;
+import org.openmrs.module.callflows.api.service.impl.ConfigServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.motechproject.config.SettingsFacade;
 import org.springframework.core.io.ByteArrayResource;
 
 import java.io.ByteArrayInputStream;
@@ -34,7 +33,7 @@ import static org.mockito.Mockito.verify;
  * @author bramak09
  */
 @RunWith(MockitoJUnitRunner.class)
-public class SettingsServiceTest extends BaseTest {
+public class ConfigServiceTest extends BaseTest {
 
     private List<Config> configs;
 
@@ -43,10 +42,10 @@ public class SettingsServiceTest extends BaseTest {
     private Settings settings;
 
     @Mock
-    private SettingsFacade settingsFacade;
+    private SettingsManagerService settingsManagerService;
 
     @InjectMocks
-    private SettingsService settingsService = new SettingsServiceImpl();
+    private ConfigService configService = new ConfigServiceImpl();
 
     @Before
     public void setUp() throws IOException {
@@ -59,15 +58,15 @@ public class SettingsServiceTest extends BaseTest {
         InputStream is = new ByteArrayInputStream(json.getBytes());
 
         //Given
-        given(settingsFacade.getRawConfig(GenericHelper.SETTINGS_FILE_NAME)).willReturn(is);
+        given(settingsManagerService.getRawConfig(GenericHelper.SETTINGS_FILE_NAME)).willReturn(is);
 
-        ((SettingsServiceImpl) settingsService).initialize();
+        ((ConfigServiceImpl) configService).initialize();
     }
 
     @Test
     public void shouldGetConfigForValidName() {
         // When
-        Config voxeo = settingsService.getConfig(Constants.CONFIG_VOXEO);
+        Config voxeo = configService.getConfig(Constants.CONFIG_VOXEO);
         // Then
         assertNotNull(voxeo);
         assertThat(voxeo.getName(), equalTo(Constants.CONFIG_VOXEO));
@@ -79,13 +78,13 @@ public class SettingsServiceTest extends BaseTest {
     public void shouldThrowIllegalArgumentIfTriedToRetrieveInvalidConfig() {
         expectException(IllegalArgumentException.class);
         // When, Then
-        Config voxeo = settingsService.getConfig(Constants.INVALID);
+        Config voxeo = configService.getConfig(Constants.INVALID);
     }
 
     @Test
     public void shouldGetAllConfigs() {
         // When
-        List<Config> allConfigs = settingsService.allConfigs();
+        List<Config> allConfigs = configService.allConfigs();
         // Then
         assertNotNull(allConfigs);
         assertThat(allConfigs.size(), equalTo(3));
@@ -112,7 +111,7 @@ public class SettingsServiceTest extends BaseTest {
     @Test
     public void shouldReturnTrueIfCheckedForExistenceOfValidConfig() {
         // When
-        boolean exists = settingsService.hasConfig(Constants.CONFIG_VOXEO);
+        boolean exists = configService.hasConfig(Constants.CONFIG_VOXEO);
         // Then
         assertThat(exists, equalTo(true));
     }
@@ -120,7 +119,7 @@ public class SettingsServiceTest extends BaseTest {
     @Test
     public void shouldReturnFalseIfCheckedForExistenceOfInvalidConfig() {
         // When
-        boolean exists = settingsService.hasConfig(Constants.INVALID);
+        boolean exists = configService.hasConfig(Constants.INVALID);
         // Then
         assertThat(exists, equalTo(false));
     }
@@ -132,14 +131,14 @@ public class SettingsServiceTest extends BaseTest {
         String json = json(settings);
         ByteArrayResource resource = new ByteArrayResource(json.getBytes());
         InputStream is = new ByteArrayInputStream(json.getBytes());
-        given(settingsFacade.getRawConfig(GenericHelper.SETTINGS_FILE_NAME)).willReturn(is);
+        given(settingsManagerService.getRawConfig(GenericHelper.SETTINGS_FILE_NAME)).willReturn(is);
 
         // When
-        settingsService.updateConfigs(configs);
+        configService.updateConfigs(configs);
 
         // Then
-        verify(settingsFacade, times(1)).saveRawConfig(GenericHelper.SETTINGS_FILE_NAME, resource);
-        List<Config> allConfigs = settingsService.allConfigs();
+        verify(settingsManagerService, times(1)).saveRawConfig(GenericHelper.SETTINGS_FILE_NAME, resource);
+        List<Config> allConfigs = configService.allConfigs();
         assertThat(allConfigs.size(), equalTo(configs.size()));
         // The first one must be updated
         assertThat(allConfigs.get(0).getName(), equalTo(Constants.CONFIG_VOXEO + Constants.UPDATED));
@@ -151,7 +150,7 @@ public class SettingsServiceTest extends BaseTest {
     @Test
     public void shouldGetRendererForValidName() {
         // When
-        Renderer vxml = settingsService.getRenderer(Constants.CONFIG_RENDERER_VXML);
+        Renderer vxml = configService.getRenderer(Constants.CONFIG_RENDERER_VXML);
         // Then
         assertNotNull(vxml);
         assertThat(vxml.getName(), equalTo(Constants.CONFIG_RENDERER_VXML));
@@ -163,13 +162,13 @@ public class SettingsServiceTest extends BaseTest {
     public void shouldThrowIllegalArgumentIfTriedToRetrieveInvalidRenderer() {
         expectException(IllegalArgumentException.class);
         // When, Then
-        settingsService.getRenderer(Constants.INVALID);
+        configService.getRenderer(Constants.INVALID);
     }
 
     @Test
     public void shouldGetAllRenderers() {
         // When
-        List<Renderer> allRenderers = settingsService.allRenderers();
+        List<Renderer> allRenderers = configService.allRenderers();
         // Then
         assertNotNull(allRenderers);
         assertThat(allRenderers.size(), equalTo(2));
@@ -188,7 +187,7 @@ public class SettingsServiceTest extends BaseTest {
     @Test
     public void shouldReturnTrueIfCheckedForExistenceOfValidRenderer() {
         // When
-        boolean exists = settingsService.hasRenderer(Constants.CONFIG_RENDERER_VXML);
+        boolean exists = configService.hasRenderer(Constants.CONFIG_RENDERER_VXML);
         // Then
         assertThat(exists, equalTo(true));
     }
@@ -196,7 +195,7 @@ public class SettingsServiceTest extends BaseTest {
     @Test
     public void shouldReturnFalseIfCheckedForExistenceOfInvalidRenderer() {
         // When
-        boolean exists = settingsService.hasRenderer(Constants.INVALID);
+        boolean exists = configService.hasRenderer(Constants.INVALID);
         // Then
         assertThat(exists, equalTo(false));
     }
@@ -208,14 +207,14 @@ public class SettingsServiceTest extends BaseTest {
         String json = json(settings);
         ByteArrayResource resource = new ByteArrayResource(json.getBytes());
         InputStream is = new ByteArrayInputStream(json.getBytes());
-        given(settingsFacade.getRawConfig(GenericHelper.SETTINGS_FILE_NAME)).willReturn(is);
+        given(settingsManagerService.getRawConfig(GenericHelper.SETTINGS_FILE_NAME)).willReturn(is);
 
         // When
-        settingsService.updateRenderers(renderers);
+        configService.updateRenderers(renderers);
 
         // Then
-        verify(settingsFacade, times(1)).saveRawConfig(GenericHelper.SETTINGS_FILE_NAME, resource);
-        List<Renderer> allRenderers = settingsService.allRenderers();
+        verify(settingsManagerService, times(1)).saveRawConfig(GenericHelper.SETTINGS_FILE_NAME, resource);
+        List<Renderer> allRenderers = configService.allRenderers();
         assertThat(allRenderers.size(), equalTo(renderers.size()));
         // The first one must be updated
         assertThat(allRenderers.get(0).getName(), equalTo(Constants.CONFIG_RENDERER_VXML + Constants.UPDATED));

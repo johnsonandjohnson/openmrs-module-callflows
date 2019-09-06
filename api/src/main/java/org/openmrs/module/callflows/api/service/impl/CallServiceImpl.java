@@ -13,7 +13,7 @@ import org.openmrs.module.callflows.api.repository.CallDataService;
 import org.openmrs.module.callflows.api.service.CallFlowService;
 import org.openmrs.module.callflows.api.service.CallService;
 import org.openmrs.module.callflows.api.service.FlowService;
-import org.openmrs.module.callflows.api.service.SettingsService;
+import org.openmrs.module.callflows.api.service.ConfigService;
 import org.openmrs.module.callflows.api.util.CallUtil;
 
 import org.motechproject.mds.query.QueryParams;
@@ -64,7 +64,7 @@ public class CallServiceImpl implements CallService {
     private FlowService flowService;
 
     @Autowired
-    private SettingsService settingsService;
+    private ConfigService configService;
 
     @Autowired
     private CallUtil callUtil;
@@ -212,7 +212,7 @@ public class CallServiceImpl implements CallService {
             }
 
             callFlow = callFlowService.findByName(flowName);
-            config = settingsService.getConfig(configName);
+            config = configService.getConfig(configName);
             // Load Flow
             Flow flow = flowService.load(flowName);
             // Prepare Call

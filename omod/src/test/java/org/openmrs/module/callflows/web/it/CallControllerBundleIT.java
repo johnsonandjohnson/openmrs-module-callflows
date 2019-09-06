@@ -19,7 +19,7 @@ import org.openmrs.module.callflows.api.repository.CallFlowDataService;
 import org.openmrs.module.callflows.api.service.CallFlowService;
 import org.openmrs.module.callflows.api.service.CallService;
 import org.openmrs.module.callflows.api.service.FlowService;
-import org.openmrs.module.callflows.api.service.SettingsService;
+import org.openmrs.module.callflows.api.service.ConfigService;
 import org.openmrs.module.callflows.api.util.TestUtil;
 
 import org.motechproject.testing.osgi.container.MotechNativeTestContainerFactory;
@@ -53,7 +53,7 @@ import java.util.Map;
 public class CallControllerBundleIT extends RESTControllerPaxIT {
 
     @Inject
-    private SettingsService settingsService;
+    private ConfigService configService;
 
     @Inject
     private CallDataService callDataService;
@@ -92,11 +92,11 @@ public class CallControllerBundleIT extends RESTControllerPaxIT {
         // Save only voxeo in the DB and not yo
         configs = ConfigHelper.createConfigs();
         configs.remove(1);
-        settingsService.updateConfigs(configs);
+        configService.updateConfigs(configs);
 
         renderers = RendererHelper.createRenderers();
         renderers.remove(1);
-        settingsService.updateRenderers(renderers);
+        configService.updateRenderers(renderers);
 
         // create a callflow
         mainFlow = CallFlowHelper.createMainFlow();
@@ -121,7 +121,7 @@ public class CallControllerBundleIT extends RESTControllerPaxIT {
     @After
     public void tearDown() {
         super.tearDown();
-        settingsService.updateConfigs(new ArrayList());
+        configService.updateConfigs(new ArrayList());
         callDataService.deleteAll();
         callFlowDataService.deleteAll();
     }
@@ -387,7 +387,7 @@ public class CallControllerBundleIT extends RESTControllerPaxIT {
         Map<String, String> badServices = new HashMap<>();
         badServices.put("badSrvc", "com.underground.missing.but.useful.if.found.Service");
         configs.get(0).setServicesMap(badServices);
-        settingsService.updateConfigs(configs);
+        configService.updateConfigs(configs);
     }
 
 }

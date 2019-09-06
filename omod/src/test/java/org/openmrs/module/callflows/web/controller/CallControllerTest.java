@@ -21,7 +21,7 @@ import org.openmrs.module.callflows.api.helper.RendererHelper;
 import org.openmrs.module.callflows.api.service.CallFlowService;
 import org.openmrs.module.callflows.api.service.CallService;
 import org.openmrs.module.callflows.api.service.FlowService;
-import org.openmrs.module.callflows.api.service.SettingsService;
+import org.openmrs.module.callflows.api.service.ConfigService;
 import org.openmrs.module.callflows.api.util.CallUtil;
 import org.openmrs.module.callflows.api.util.FlowUtil;
 import org.openmrs.module.callflows.api.util.TestUtil;
@@ -90,7 +90,7 @@ public class CallControllerTest extends BaseTest {
     private CallController callController = new CallController();
 
     @Mock
-    private SettingsService settingsService;
+    private ConfigService configService;
 
     @Mock
     private CallFlowService callFlowService;
@@ -181,10 +181,10 @@ public class CallControllerTest extends BaseTest {
         // We'll use a service that we can use for integration testing also
         servicesMap.put("callService", CALL_SERVICE_CLASS);
         voxeo.setServicesMap(servicesMap);
-        given(settingsService.getConfig(Constants.CONFIG_VOXEO)).willReturn(voxeo);
-        given(settingsService.getConfig(Constants.CONFIG_YO)).willThrow(new IllegalArgumentException(Constants.ERROR_YO));
-        given(settingsService.hasRenderer(Constants.CONFIG_RENDERER_VXML)).willReturn(true);
-        given(settingsService.getRenderer(Constants.CONFIG_RENDERER_VXML)).willReturn(vxml);
+        given(configService.getConfig(Constants.CONFIG_VOXEO)).willReturn(voxeo);
+        given(configService.getConfig(Constants.CONFIG_YO)).willThrow(new IllegalArgumentException(Constants.ERROR_YO));
+        given(configService.hasRenderer(Constants.CONFIG_RENDERER_VXML)).willReturn(true);
+        given(configService.getRenderer(Constants.CONFIG_RENDERER_VXML)).willReturn(vxml);
 
         // Call Flow Service
         mainFlow = CallFlowHelper.createMainFlow();
@@ -412,7 +412,7 @@ public class CallControllerTest extends BaseTest {
         //TODO: Can possibly replace this with a standard error response in VXML itself by changing config and register a error template?
 
         // Then we should have tried to load the config cause the OSGI services are part of the config
-        verify(settingsService, times(1)).getConfig(Constants.CONFIG_VOXEO);
+        verify(configService, times(1)).getConfig(Constants.CONFIG_VOXEO);
         // And we should NOT have loaded the callflow
         verify(callFlowService, never()).findByName(anyString());
         // And nothing happened with calls
@@ -435,7 +435,7 @@ public class CallControllerTest extends BaseTest {
                .andExpect(content().string(sameAsFile("error_bad_services.json")));
 
         // Then we should have tried to load the config cause the OSGI services are part of the config
-        verify(settingsService, times(1)).getConfig(Constants.CONFIG_VOXEO);
+        verify(configService, times(1)).getConfig(Constants.CONFIG_VOXEO);
         // And we should NOT have loaded the callflow
         verify(callFlowService, never()).findByName(anyString());
         // And nothing happened with calls
@@ -453,7 +453,7 @@ public class CallControllerTest extends BaseTest {
                .andExpect(content().type(Constants.PLAIN_TEXT))
                .andExpect(content().string(Constants.ERROR_CONFIG));
         // Then we should have tried to load the config cause the OSGI services are part of the config
-        verify(settingsService, times(1)).getConfig(Constants.CONFIG_YO);
+        verify(configService, times(1)).getConfig(Constants.CONFIG_YO);
         // And we should NOT have loaded the callflow
         verify(callFlowService, never()).findByName(anyString());
         // And nothing happened with calls
@@ -470,7 +470,7 @@ public class CallControllerTest extends BaseTest {
                .andExpect(content().type(Constants.APPLICATION_JSON_UTF8))
                .andExpect(content().string(sameAsFile("error_bad_config.json")));
         // Then we should have tried to load the config cause the OSGI services are part of the config
-        verify(settingsService, times(1)).getConfig(Constants.CONFIG_YO);
+        verify(configService, times(1)).getConfig(Constants.CONFIG_YO);
         // And we should NOT have loaded the callflow
         verify(callFlowService, never()).findByName(anyString());
         // And nothing happened with calls
@@ -488,7 +488,7 @@ public class CallControllerTest extends BaseTest {
                .andExpect(content().type(Constants.PLAIN_TEXT))
                .andExpect(content().string(Constants.ERROR_CALLFLOW));
         // Then we should have tried to load the config
-        verify(settingsService, times(1)).getConfig(Constants.CONFIG_VOXEO);
+        verify(configService, times(1)).getConfig(Constants.CONFIG_VOXEO);
         // And we should NOT have loaded the callflow
         verify(callFlowService, times(1)).findByName(Constants.CALLFLOW_MAIN2);
         // And nothing happened with calls
@@ -505,7 +505,7 @@ public class CallControllerTest extends BaseTest {
                .andExpect(content().type(Constants.APPLICATION_JSON_UTF8))
                .andExpect(content().string(sameAsFile("error_bad_callflow.json")));
         // Then we should have tried to load the config
-        verify(settingsService, times(1)).getConfig(Constants.CONFIG_VOXEO);
+        verify(configService, times(1)).getConfig(Constants.CONFIG_VOXEO);
         // And we should NOT have loaded the callflow
         verify(callFlowService, times(1)).findByName(Constants.CALLFLOW_MAIN2);
         // And nothing happened with calls
@@ -790,7 +790,7 @@ public class CallControllerTest extends BaseTest {
     private void assertCallConfigFlowLoaded(Call call, String config, String callflow) {
         // These must be loaded
         verify(callService, times(1)).findByCallId(call.getCallId());
-        verify(settingsService, times(1)).getConfig(config);
+        verify(configService, times(1)).getConfig(config);
         verify(flowService, times(1)).load(callflow);
         // And we called the merge to load previously persisted data
         verify(callUtil, times(1)).mergeCallWithContext(eq(inboundCall), velocityContextCaptor.capture());
@@ -798,7 +798,7 @@ public class CallControllerTest extends BaseTest {
 
     private void assertConfigAndFlowLoaded(String config, String callflow) {
         // Then we have to find the configuration
-        verify(settingsService, times(1)).getConfig(config);
+        verify(configService, times(1)).getConfig(config);
         // And we need to load the flow
         verify(callFlowService, times(1)).findByName(callflow);
     }
@@ -843,14 +843,14 @@ public class CallControllerTest extends BaseTest {
     }
 
     private void assertRenderer(String renderer) {
-        verify(settingsService, times(1)).hasRenderer(renderer);
-        verify(settingsService, times(1)).getRenderer(renderer);
+        verify(configService, times(1)).hasRenderer(renderer);
+        verify(configService, times(1)).getRenderer(renderer);
     }
 
     private void assertRendererForJson() {
-        verify(settingsService, times(1)).hasRenderer(Constants.CONFIG_RENDERER_JSON);
+        verify(configService, times(1)).hasRenderer(Constants.CONFIG_RENDERER_JSON);
         // We don't provide a JSON renderer, so get shouldn't be called
-        verify(settingsService, never()).getRenderer(Constants.CONFIG_RENDERER_JSON);
+        verify(configService, never()).getRenderer(Constants.CONFIG_RENDERER_JSON);
     }
 
     private String sameAsFile(String file) throws IOException {

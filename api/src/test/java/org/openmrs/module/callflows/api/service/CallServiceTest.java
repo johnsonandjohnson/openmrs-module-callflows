@@ -84,7 +84,7 @@ public class CallServiceTest extends BaseTest {
     private CallFlowService callFlowService;
 
     @Mock
-    private SettingsService settingsService;
+    private ConfigService configService;
 
     @Spy
     @InjectMocks
@@ -150,8 +150,8 @@ public class CallServiceTest extends BaseTest {
         given(callFlowService.findByName(Constants.CALLFLOW_MAIN)).willReturn(mainFlow);
         given(callFlowService.findByName(Constants.CALLFLOW_MAIN2)).willThrow(new IllegalArgumentException("Bad!"));
 
-        given(settingsService.getConfig(Constants.CONFIG_VOXEO)).willReturn(voxeo);
-        given(settingsService.getConfig(Constants.CONFIG_YO)).willThrow(new IllegalArgumentException("Bad!"));
+        given(configService.getConfig(Constants.CONFIG_VOXEO)).willReturn(voxeo);
+        given(configService.getConfig(Constants.CONFIG_YO)).willThrow(new IllegalArgumentException("Bad!"));
         given(flowService.load(Constants.CALLFLOW_MAIN)).willReturn(flow);
 
         given(DateTime.now()).willReturn(formatter.parseDateTime(Constants.DATE_CURRENT));
@@ -513,7 +513,7 @@ public class CallServiceTest extends BaseTest {
 
         // Then
         assertNull(call);
-        verify(settingsService, times(1)).getConfig(Constants.CONFIG_YO);
+        verify(configService, times(1)).getConfig(Constants.CONFIG_YO);
         verify(callFlowService, times(1)).findByName(Constants.CALLFLOW_MAIN);
         verifyZeroInteractions(callDataService);
         verifyZeroInteractions(flowService);
@@ -532,7 +532,7 @@ public class CallServiceTest extends BaseTest {
         // Then
         assertNull(call);
         verify(callFlowService, times(1)).findByName(Constants.CALLFLOW_MAIN2);
-        verify(settingsService, never()).getConfig(anyString());
+        verify(configService, never()).getConfig(anyString());
         verifyZeroInteractions(callDataService);
         verifyZeroInteractions(flowService);
         assertEventSent("1234567890", "Bad!", "unknown");
@@ -610,13 +610,13 @@ public class CallServiceTest extends BaseTest {
 
     public void assertAllLoaded() {
         verify(callFlowService, times(1)).findByName(Constants.CALLFLOW_MAIN);
-        verify(settingsService, times(1)).getConfig(Constants.CONFIG_VOXEO);
+        verify(configService, times(1)).getConfig(Constants.CONFIG_VOXEO);
         verify(flowService, times(1)).load(Constants.CALLFLOW_MAIN);
     }
 
     public void assertNoServiceInteractions() {
         verifyZeroInteractions(callFlowService);
-        verifyZeroInteractions(settingsService);
+        verifyZeroInteractions(configService);
         verifyZeroInteractions(callDataService);
         verifyZeroInteractions(flowService);
     }
