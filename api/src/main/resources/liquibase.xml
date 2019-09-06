@@ -56,10 +56,6 @@
                      indexName="cfl_callflows_index_name">
             <column name="name"></column>
         </createIndex>
-        <createIndex tableName="cfl_callflows"
-                     indexName="cfl_callflows_index_cfl_callflows_id">
-            <column name=""></column>
-        </createIndex>
     </changeSet>
 
     <changeSet id="callFlow-2019-09-06-11:00" author="Dawid Ruchniewicz">
@@ -113,7 +109,6 @@
             <column name="context_value" type="mediumblob"></column>
             <column name="providerData_key" type="varchar(255)"></column>
             <column name="providerData_value" type="varchar(255)"></column>
-            <column name="creationDate" type="datetime"></column>
             <column name="uuid" type="char(38)">
                 <constraints nullable="false" unique="true"/>
             </column>
@@ -146,10 +141,6 @@
                                  baseTableName="cfl_calls" baseColumnNames="startFlow"
                                  referencedTableName="cfl_callflows" referencedColumnNames="cfl_callflows_id"/>
         <addUniqueConstraint tableName="cfl_calls" columnNames="callId" constraintName="UNIQUE_CALLFLOWS_CALL_IDX"/>
-        <createIndex tableName="cfl_calls"
-                     indexName="cfl_calls_index_callId">
-            <column name="callId"></column>
-        </createIndex>
         <createIndex tableName="cfl_calls"
                      indexName="cfl_calls_index_startFlow">
             <column name="startFlow"></column>
