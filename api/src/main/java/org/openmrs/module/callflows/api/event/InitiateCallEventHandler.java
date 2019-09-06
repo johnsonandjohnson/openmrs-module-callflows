@@ -1,12 +1,12 @@
 package org.openmrs.module.callflows.api.event;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.callflows.api.service.CallService;
 
 import org.motechproject.event.MotechEvent;
 import org.motechproject.event.listener.annotations.MotechListener;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.util.Map;
@@ -23,14 +23,14 @@ public class InitiateCallEventHandler {
 
     private static final String PARAM_CONFIG = "config";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(InitiateCallEventHandler.class);
+    private static final Log LOGGER = LogFactory.getLog(InitiateCallEventHandler.class);
 
     @Autowired
     private CallService callService;
 
     @MotechListener(subjects = { Events.CALLFLOWS_INITIATE_CALL })
     public void handleOutboundCallEvent(MotechEvent event) {
-        LOGGER.info("Handling outbound call event {}: {}", event.getSubject(), event.getParameters().toString());
+        LOGGER.info(String.format("Handling outbound call event %s: %s", event.getSubject(), event.getParameters().toString()));
         Map<String, Object> eventParams = event.getParameters();
         String config = eventParams.get(PARAM_CONFIG).toString();
         String flowName = eventParams.get(PARAM_FLOW_NAME).toString();

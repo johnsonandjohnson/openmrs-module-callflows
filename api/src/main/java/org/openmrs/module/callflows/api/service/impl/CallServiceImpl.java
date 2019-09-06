@@ -1,5 +1,7 @@
 package org.openmrs.module.callflows.api.service.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.callflows.api.domain.Call;
 import org.openmrs.module.callflows.api.domain.CallFlow;
 import org.openmrs.module.callflows.api.domain.Config;
@@ -23,8 +25,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,7 +47,7 @@ import com.google.common.collect.Sets;
 @Service("callService")
 public class CallServiceImpl implements CallService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CallServiceImpl.class);
+    private static final Log LOGGER = LogFactory.getLog(CallServiceImpl.class);
 
     private static final String FAILURE = "failure";
 
@@ -225,9 +225,9 @@ public class CallServiceImpl implements CallService {
             makeOutboundRequest(request, call, params);
 
         } catch (OperationNotSupportedException ose) {
-            LOGGER.error(
-                    "Outbound call not made for flow: {}, config: {}, phone: {} as the call queuing limit has been exceeded at this point in time",
-                    flowName, configName, phone, ose);
+            LOGGER.error(String.format(
+                    "Outbound call not made for flow: %s, config: %s, phone: %s as the call queuing limit has been exceeded at this point in time",
+                    flowName, configName, phone), ose);
 
             if (call != null) {
                 // Since this is an error, the status is always FAILED
@@ -236,7 +236,7 @@ public class CallServiceImpl implements CallService {
                 callDataService.update(call);
             }
         } catch (Exception e) {
-            LOGGER.error("Outbound call not made for flow: {}, config: {}, phone: {}", flowName, configName, phone, e);
+            LOGGER.error(String.format("Outbound call not made for flow: %s, config: %s, phone: %s", flowName, configName, phone), e);
             handleError(call, e.getMessage(), params);
         }
         return call;
@@ -253,7 +253,7 @@ public class CallServiceImpl implements CallService {
     }
 
     private void handleError(Call call, String reason, Map<String, Object> params) {
-        LOGGER.error("call {} failed with reason {}", call, reason);
+        LOGGER.error(String.format("call %s failed with reason %s", call, reason));
         // update call failed status
         if (call != null) {
             // Since this is an error, the status is always FAILED
@@ -303,8 +303,8 @@ public class CallServiceImpl implements CallService {
 
         HttpResponse response = new DefaultHttpClient().execute(request);
 
-        LOGGER.debug("Response for call {} -> {}  headers : {}  ", call.getCallId(),
-                     response.getStatusLine().toString(), response.getAllHeaders());
+        LOGGER.debug(String.format("Response for call %s -> %s  headers : %s  ", call.getCallId(),
+                     response.getStatusLine().toString(), response.getAllHeaders()));
 
 
         // check status code for any possible issues
@@ -315,13 +315,13 @@ public class CallServiceImpl implements CallService {
             try (InputStream is = response.getEntity().getContent()) {
                 String content = IOUtils.toString(is);
 
-                LOGGER.debug("response : {} ", content);
+                LOGGER.debug(String.format("response : %s ", content));
 
                 if (content.indexOf(FAILURE) != -1) {
                     handleError(call, "Unacceptable body: " + content, params);
                 }
             } catch (IOException ioe) {
-                LOGGER.error("Error retrieving content response for call {} ", call.getCallId(), ioe);
+                LOGGER.error(String.format("Error retrieving content response for call %s ", call.getCallId()), ioe);
                 handleError(call, "Unreadable content: " + response.getStatusLine().toString(), params);
             }
         }
