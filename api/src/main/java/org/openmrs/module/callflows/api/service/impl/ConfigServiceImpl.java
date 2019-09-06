@@ -139,7 +139,7 @@ public class ConfigServiceImpl extends BaseOpenmrsService implements ConfigServi
 	}
 
 	private void loadDefaultConfigurationIfNotExists(String filename) {
-		if (settingsManagerService.configurationNotExist(filename)){
+		if (!settingsManagerService.configurationExist(filename)){
 			String defaultConfiguration = readResourceFile(filename);
 			ByteArrayResource resource = new ByteArrayResource(defaultConfiguration.getBytes());
 			settingsManagerService.saveRawConfig(filename, resource);

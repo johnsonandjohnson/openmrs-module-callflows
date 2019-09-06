@@ -43,8 +43,8 @@ public class SettingsManagerServiceImpl extends BaseOpenmrsService implements Se
 	}
 
 	@Override
-	public boolean configurationNotExist(String configurationFileName) {
-		return !getDestinationFile(configurationFileName).exists();
+	public boolean configurationExist(String configurationFileName) {
+		return getDestinationFile(configurationFileName).exists();
 	}
 
 	private File getDestinationFile(String filename) {
