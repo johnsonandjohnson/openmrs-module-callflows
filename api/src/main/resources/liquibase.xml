@@ -12,28 +12,159 @@
         See http://www.liquibase.org/manual/home#available_database_refactorings
         for a list of supported elements and attributes
     -->
- 
- 	<!-- Uncomment the changeset below if you want to make the Item class persistable, see also Item and CallflowsDaoTest -->
- 	<!--
-	<changeSet id="callflows-2016-08-02-12-21" author="raff">
-		<preConditions onFail="MARK_RAN">
-			<not><tableExists tableName="callflows_item"/></not>
-		</preConditions>
-		<comment>
-			Creating the callflows_item table
-		</comment>
-		<createTable tableName="callflows_item">
-			<column name="callflows_item_id" type="int" autoIncrement="true">
-				<constraints primaryKey="true" nullable="false"/>
-			</column>
-			<column name="uuid" type="char(38)">
-				<constraints nullable="false" unique="true"></constraints>
-			</column>
-			<column name="owner" type="int" />
-			<column name="description" type="varchar(255)" />
-		</createTable>
-        <addForeignKeyConstraint constraintName="callflows_item_owner_fk" baseTableName="callflows_item" baseColumnNames="owner"  referencedTableName="users"
-                                 referencedColumnNames="user_id" />
-    </changeSet> -->
- 
+
+    <changeSet id="callFlow-2019-09-06-10:00" author="Dawid Ruchniewicz">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="cfl_callflows"/></not>
+        </preConditions>
+        <comment>Created the cfl_callflows table</comment>
+        <createTable tableName="cfl_callflows">
+            <column name="cfl_callflows_id">
+                <constraints primaryKey="true" unique="true"/>
+            </column>
+            <column name="name" type="varchar(255)"></column>
+            <column name="description" type="varchar(255)"></column>
+            <column name="status" type="varchar(255)"></column>
+            <column name="raw" type="TEXT"></column>
+            <column name="uuid" type="char(38)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="creator" type="int"/>
+            <column name="changed_by" type="int"/>
+            <column name="date_changed" type="datetime"/>
+            <column name="date_created" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_voided" type="datetime"/>
+            <column name="void_reason" type="varchar(255)"/>
+            <column name="voided" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="voided_by" type="int"/>
+        </createTable>
+        <addForeignKeyConstraint constraintName="etl_error_logs_creator_fk"
+                                 baseTableName="etl_error_logs" baseColumnNames="creator"
+                                 referencedTableName="users" referencedColumnNames="user_id"/>
+        <addForeignKeyConstraint constraintName="etl_error_logs_changed_by_fk"
+                                 baseTableName="etl_error_logs" baseColumnNames="changed_by"
+                                 referencedTableName="users" referencedColumnNames="user_id"/>
+        <addForeignKeyConstraint constraintName="etl_error_logs_voided_by_fk"
+                                 baseTableName="etl_error_logs" baseColumnNames="voided_by"
+                                 referencedTableName="users" referencedColumnNames="user_id"/>
+        <addUniqueConstraint tableName="cfl_callflows" columnNames="name" constraintName="unique_callflow_idx"/>
+        <createIndex tableName="cfl_callflows"
+                     indexName="cfl_callflows_index_name">
+            <column name="name"></column>
+        </createIndex>
+        <createIndex tableName="cfl_callflows"
+                     indexName="cfl_callflows_index_cfl_callflows_id">
+            <column name=""></column>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="callFlow-2019-09-06-11:00" author="Dawid Ruchniewicz">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="cfl_calls"/></not>
+        </preConditions>
+        <comment>Created the cfl_calls table</comment>
+        <createTable tableName="cfl_calls">
+            <column name="cfl_calls_id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" unique="true"/>
+            </column>
+            <column name="callId" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="providerCallId" type="varchar(255)"></column>
+            <column name="direction" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="startFlow" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="startNode" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="startTime" type="datetime"></column>
+            <column name="endFlow" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="endNode" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="endTime" type="datetime"></column>
+            <column name="providerTime" type="varchar(255)"></column>
+            <column name="steps" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="config" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="actorId" type="varchar(255)"></column>
+            <column name="actorType" type="varchar(255)"></column>
+            <column name="statusText" type="varchar(255)"></column>
+            <column name="externalId" type="varchar(255)"></column>
+            <column name="externalType" type="varchar(255)"></column>
+            <column name="playedMessages" type="TEXT"></column>
+            <column name="refKey" type="varchar(255)"></column>
+            <column name="context_key" type="varchar(255)"></column>
+            <column name="context_value" type=""></column>
+            <column name="providerData_key" type="varchar(255)"></column>
+            <column name="providerData_value" type="varchar(255)"></column>
+            <column name="creationDate" type="datetime"></column>
+            <column name="uuid" type="char(38)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="creator" type="int"/>
+            <column name="changed_by" type="int"/>
+            <column name="date_changed" type="datetime"/>
+            <column name="date_created" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_voided" type="datetime"/>
+            <column name="void_reason" type="varchar(255)"/>
+            <column name="voided" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="voided_by" type="int"/>
+        </createTable>
+        <addForeignKeyConstraint constraintName="etl_error_logs_creator_fk"
+                                 baseTableName="etl_error_logs" baseColumnNames="creator"
+                                 referencedTableName="users" referencedColumnNames="user_id"/>
+        <addForeignKeyConstraint constraintName="etl_error_logs_changed_by_fk"
+                                 baseTableName="etl_error_logs" baseColumnNames="changed_by"
+                                 referencedTableName="users" referencedColumnNames="user_id"/>
+        <addForeignKeyConstraint constraintName="etl_error_logs_voided_by_fk"
+                                 baseTableName="etl_error_logs" baseColumnNames="voided_by"
+                                 referencedTableName="users" referencedColumnNames="user_id"/>
+        <addForeignKeyConstraint constraintName="cfl_calls_FK1"
+                                 baseTableName="cfl_calls" baseColumnNames="endFlow"
+                                 referencedTableName="cfl_callflows" referencedColumnNames="cfl_callflows_id"/>
+        <addForeignKeyConstraint constraintName="cfl_calls_FK2"
+                                 baseTableName="cfl_calls" baseColumnNames="startFlow"
+                                 referencedTableName="cfl_callflows" referencedColumnNames="cfl_callflows_id"/>
+        <addUniqueConstraint tableName="cfl_calls" columnNames="callId" constraintName="UNIQUE_CALLFLOWS_CALL_IDX"/>
+        <createIndex tableName="cfl_calls"
+                     indexName="cfl_calls_index_callId">
+            <column name="callId"></column>
+        </createIndex>
+        <createIndex tableName="cfl_calls"
+                     indexName="cfl_calls_index_startFlow">
+            <column name="startFlow"></column>
+        </createIndex>
+        <createIndex tableName="cfl_calls"
+                     indexName="cfl_calls_index_direction">
+            <column name="direction"></column>
+        </createIndex>
+        <createIndex tableName="cfl_calls"
+                     indexName="cfl_calls_index_status">
+            <column name="status"></column>
+        </createIndex>
+        <createIndex tableName="cfl_calls"
+                     indexName="cfl_calls_index_endFlow">
+            <column name="endFlow"></column>
+        </createIndex>
+    </changeSet>
 </databaseChangeLog>
