@@ -14,7 +14,6 @@ import org.openmrs.module.callflows.api.service.FlowService;
 import org.openmrs.module.callflows.api.service.SettingsService;
 import org.openmrs.module.callflows.api.util.CallUtil;
 
-import org.motechproject.mds.query.QueryParams;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.io.IOUtils;
@@ -243,8 +242,8 @@ public class CallServiceImpl implements CallService {
     }
 
     @Override
-    public List<Call> findAll(QueryParams queryParams) {
-        return callDao.retrieveAll(queryParams);
+    public List<Call> findAll() {
+        return callDao.retrieveAll();
     }
 
     @Override

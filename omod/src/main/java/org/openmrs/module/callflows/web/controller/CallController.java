@@ -18,7 +18,6 @@ import org.openmrs.module.callflows.api.service.SettingsService;
 import org.openmrs.module.callflows.api.util.CallUtil;
 import org.openmrs.module.callflows.api.util.FlowUtil;
 
-import org.motechproject.mds.query.QueryParams;
 import org.motechproject.mds.service.ServiceUtil;
 
 import org.apache.commons.collections.map.HashedMap;
@@ -405,7 +404,6 @@ public class CallController extends RestController {
         long totalNumberOfRecords = callService.retrieveCount();
         int allowedNumberOfSets = (int) ((totalNumberOfRecords / (NUMBER_OF_TEN_K_FILES * DEFAULT_FETCH_SIZE)) + 1);
 
-        QueryParams queryParams = null;
         List<Call> outboundCalls = null;
         Path tempFiles = Files.createTempDirectory(null);
         String tempDir = tempFiles.toString();
@@ -414,8 +412,7 @@ public class CallController extends RestController {
         String currentFileName = null;
         if (0 < set && set <= allowedNumberOfSets && totalNumberOfRecords > 0) {
             for (int i = 1; i <= NUMBER_OF_TEN_K_FILES; i++) {
-                queryParams = new QueryParams(i + (5 * (set - 1)), DEFAULT_FETCH_SIZE);
-                outboundCalls = callService.findAll(queryParams);
+                outboundCalls = callService.findAll();
                 if (!outboundCalls.isEmpty()) {
                     currentFileName = FILE_NAME_INITIALS + i;
                     fileNames.put(currentFileName, callUtil.generateFileName(tempDir, i));

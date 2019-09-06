@@ -4,7 +4,6 @@ import org.openmrs.module.callflows.api.domain.Call;
 import org.openmrs.module.callflows.api.domain.CallFlow;
 import org.openmrs.module.callflows.api.domain.types.CallDirection;
 
-import org.motechproject.mds.query.QueryParams;
 
 import java.util.List;
 import java.util.Map;
@@ -115,10 +114,9 @@ public interface CallService {
      * Fetch call details based on query params by utilizing motech data service 'retrieveAll' function
      * Limitation of 'retrieveAll()' due to MOTECH issue - Throws heap memory issue for 25000 records, but works fine with 20000 records at a time.
      *
-     * @param queryParams
      * @return list of calls
      */
-    List<Call> findAll(QueryParams queryParams);
+    List<Call> findAll();
 
     /**
      * Fetch the count of call records present in db
