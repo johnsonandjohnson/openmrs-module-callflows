@@ -11,6 +11,6 @@ public interface SettingsManagerService extends OpenmrsService {
 
 	InputStream getRawConfig(String configFileName);
 
-	boolean configurationExist(String configurationFileName);
+	boolean configurationNotExist(String configurationFileName);
 
 }

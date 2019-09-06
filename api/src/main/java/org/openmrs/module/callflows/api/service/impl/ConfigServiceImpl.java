@@ -9,16 +9,17 @@ import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.callflows.api.domain.Config;
 import org.openmrs.module.callflows.api.domain.Renderer;
 import org.openmrs.module.callflows.api.domain.Settings;
+import org.openmrs.module.callflows.api.exception.CallFlowRuntimeException;
 import org.openmrs.module.callflows.api.service.SettingsManagerService;
 import org.openmrs.module.callflows.api.service.ConfigService;
 import org.apache.commons.io.IOUtils;
 import org.openmrs.module.callflows.api.util.CallFlowConstants;
-import org.openmrs.module.callflows.api.util.SettingsManagerUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -110,7 +111,7 @@ public class ConfigServiceImpl extends BaseOpenmrsService implements ConfigServi
 	private synchronized void loadSettings() {
 		List<Config> configList;
 		List<Renderer> rendererList;
-        SettingsManagerUtil.loadDefaultIfNotExists(CallFlowConstants.CONFIG_FILE_NAME);
+        loadDefaultConfigurationIfNotExists(CallFlowConstants.CONFIG_FILE_NAME);
 		try (InputStream is = settingsManagerService.getRawConfig(CallFlowConstants.CONFIG_FILE_NAME)) {
 			String jsonText = IOUtils.toString(is);
 			LOGGER.debug(String.format("Loading %s", CallFlowConstants.CONFIG_FILE_NAME));
@@ -134,6 +135,25 @@ public class ConfigServiceImpl extends BaseOpenmrsService implements ConfigServi
 		renderers = new LinkedHashMap<>();
 		for (Renderer renderer : rendererList) {
 			renderers.put(renderer.getName(), renderer);
+		}
+	}
+
+	private void loadDefaultConfigurationIfNotExists(String filename) {
+		if (settingsManagerService.configurationNotExist(filename)){
+			String defaultConfiguration = readResourceFile(filename);
+			ByteArrayResource resource = new ByteArrayResource(defaultConfiguration.getBytes());
+			settingsManagerService.saveRawConfig(filename, resource);
+		}
+	}
+
+	private String readResourceFile(String filename) throws CallFlowRuntimeException {
+		try (InputStream in = ConfigServiceImpl.class.getClassLoader().getResourceAsStream(filename)) {
+			if (in == null) {
+				throw new CallFlowRuntimeException("Resource '" + filename + "' doesn't exist");
+			}
+			return IOUtils.toString(in);
+		} catch (IOException e) {
+			throw new CallFlowRuntimeException(e);
 		}
 	}
 }
