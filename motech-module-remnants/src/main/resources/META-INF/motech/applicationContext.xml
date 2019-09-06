@@ -12,14 +12,6 @@
 
     <context:component-scan base-package="com.janssen.connectforlife.callflows"/>
 
-    <bean id="callflowsSettings" class="org.motechproject.config.SettingsFacade" autowire="byType">
-        <property name="rawConfigFiles">
-            <list>
-                <value>classpath:callflows-settings.json</value>
-            </list>
-        </property>
-    </bean>
-
     <bean id="moduleRegistrationData" class="org.motechproject.osgi.web.ModuleRegistrationData">
         <constructor-arg name="moduleName" value="callflows" />
         <constructor-arg name="url" value="../callflows/resources/index.html" />

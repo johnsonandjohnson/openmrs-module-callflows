@@ -1,5 +1,6 @@
 package org.openmrs.module.callflows.api.service;
 
+import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.callflows.api.domain.Config;
 import org.openmrs.module.callflows.api.domain.Renderer;
 
@@ -12,7 +13,7 @@ import java.util.List;
  *
  * @author bramak09
  */
-public interface SettingsService {
+public interface SettingsService extends OpenmrsService {
 
     /**
      * Get a configuration for a specific name

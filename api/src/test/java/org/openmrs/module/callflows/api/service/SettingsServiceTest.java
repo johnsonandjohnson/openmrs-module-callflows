@@ -13,7 +13,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.motechproject.config.SettingsFacade;
 import org.springframework.core.io.ByteArrayResource;
 
 import java.io.ByteArrayInputStream;
@@ -43,7 +42,7 @@ public class SettingsServiceTest extends BaseTest {
     private Settings settings;
 
     @Mock
-    private SettingsFacade settingsFacade;
+    private SettingsManagerService settingsManagerService;
 
     @InjectMocks
     private SettingsService settingsService = new SettingsServiceImpl();
@@ -59,7 +58,7 @@ public class SettingsServiceTest extends BaseTest {
         InputStream is = new ByteArrayInputStream(json.getBytes());
 
         //Given
-        given(settingsFacade.getRawConfig(GenericHelper.SETTINGS_FILE_NAME)).willReturn(is);
+        given(settingsManagerService.getRawConfig(GenericHelper.SETTINGS_FILE_NAME)).willReturn(is);
 
         ((SettingsServiceImpl) settingsService).initialize();
     }
@@ -132,13 +131,13 @@ public class SettingsServiceTest extends BaseTest {
         String json = json(settings);
         ByteArrayResource resource = new ByteArrayResource(json.getBytes());
         InputStream is = new ByteArrayInputStream(json.getBytes());
-        given(settingsFacade.getRawConfig(GenericHelper.SETTINGS_FILE_NAME)).willReturn(is);
+        given(settingsManagerService.getRawConfig(GenericHelper.SETTINGS_FILE_NAME)).willReturn(is);
 
         // When
         settingsService.updateConfigs(configs);
 
         // Then
-        verify(settingsFacade, times(1)).saveRawConfig(GenericHelper.SETTINGS_FILE_NAME, resource);
+        verify(settingsManagerService, times(1)).saveRawConfig(GenericHelper.SETTINGS_FILE_NAME, resource);
         List<Config> allConfigs = settingsService.allConfigs();
         assertThat(allConfigs.size(), equalTo(configs.size()));
         // The first one must be updated
@@ -208,13 +207,13 @@ public class SettingsServiceTest extends BaseTest {
         String json = json(settings);
         ByteArrayResource resource = new ByteArrayResource(json.getBytes());
         InputStream is = new ByteArrayInputStream(json.getBytes());
-        given(settingsFacade.getRawConfig(GenericHelper.SETTINGS_FILE_NAME)).willReturn(is);
+        given(settingsManagerService.getRawConfig(GenericHelper.SETTINGS_FILE_NAME)).willReturn(is);
 
         // When
         settingsService.updateRenderers(renderers);
 
         // Then
-        verify(settingsFacade, times(1)).saveRawConfig(GenericHelper.SETTINGS_FILE_NAME, resource);
+        verify(settingsManagerService, times(1)).saveRawConfig(GenericHelper.SETTINGS_FILE_NAME, resource);
         List<Renderer> allRenderers = settingsService.allRenderers();
         assertThat(allRenderers.size(), equalTo(renderers.size()));
         // The first one must be updated
