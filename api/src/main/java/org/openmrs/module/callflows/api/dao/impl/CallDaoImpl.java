@@ -11,10 +11,12 @@ import org.openmrs.module.callflows.api.domain.Call;
 import org.openmrs.module.callflows.api.domain.types.CallDirection;
 import org.openmrs.module.callflows.api.domain.types.CallStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Set;
 
+@Repository("callFlow.CallDao")
 public class CallDaoImpl extends HibernateOpenmrsDataDAO<Call> implements CallDao {
 
     @Autowired
@@ -22,10 +24,6 @@ public class CallDaoImpl extends HibernateOpenmrsDataDAO<Call> implements CallDa
 
     public CallDaoImpl(){
         super(Call.class);
-    }
-
-    private DbSession getSession() {
-        return sessionFactory.getCurrentSession();
     }
 
     @Override
@@ -38,26 +36,14 @@ public class CallDaoImpl extends HibernateOpenmrsDataDAO<Call> implements CallDa
 
     @Override
     public List<Call> findCallsByDirectionAndStatus(CallDirection direction, Set<CallStatus> statusSet) {
-        Criteria crit = getSession().createCriteria(this.mappedClass);
-        crit.add(Restrictions.eq("direction", direction));
-        Disjunction or = Restrictions.disjunction();
-        for (CallStatus callStatus : statusSet) {
-            or.add(Restrictions.eq("status", callStatus));
-        }
-        crit.add(or);
+        Criteria crit = createCriteriaForFinding(direction, statusSet);
 
         return crit.list();
     }
 
     @Override
     public long countFindCallsByDirectionAndStatus(CallDirection direction, Set<CallStatus> statusSet) {
-        Criteria crit = getSession().createCriteria(this.mappedClass);
-        crit.add(Restrictions.eq("direction", direction));
-        Disjunction or = Restrictions.disjunction();
-        for (CallStatus callStatus : statusSet) {
-            or.add(Restrictions.eq("status", callStatus));
-        }
-        crit.add(or);
+        Criteria crit = createCriteriaForFinding(direction, statusSet);
 
         Number count = (Number) crit.uniqueResult();
         return count.longValue();
@@ -91,5 +77,21 @@ public class CallDaoImpl extends HibernateOpenmrsDataDAO<Call> implements CallDa
     @Override
     public long count() {
         return getAllCount(false);
+    }
+
+    private DbSession getSession() {
+        return sessionFactory.getCurrentSession();
+    }
+
+    private Criteria createCriteriaForFinding(CallDirection direction, Set<CallStatus> statusSet) {
+        Criteria crit = getSession().createCriteria(this.mappedClass);
+        crit.add(Restrictions.eq("direction", direction));
+        Disjunction or = Restrictions.disjunction();
+        for (CallStatus callStatus : statusSet) {
+            or.add(Restrictions.eq("status", callStatus));
+        }
+        crit.add(or);
+
+        return crit;
     }
 }
