@@ -1,5 +1,7 @@
 package org.openmrs.module.callflows.api.util;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.callflows.api.contract.JsonExecutionResponse;
 import org.openmrs.module.callflows.api.domain.Call;
 import org.openmrs.module.callflows.api.domain.CallFlow;
@@ -31,8 +33,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -84,7 +84,7 @@ public class CallUtil {
 
     private static final String JSON = "json";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CallUtil.class);
+    private static final Log LOGGER = LogFactory.getLog(CallUtil.class);
 
     private static final String ERROR_RESPONSE_JSON = "{error: true, body: \"%s\"}";
 
@@ -290,7 +290,7 @@ public class CallUtil {
             LOGGER.error(e.toString(), e);
             return ERROR_RESPONSE_JSON;
         }
-        LOGGER.debug("callId={}, content={}", call.getCallId(), content);
+        LOGGER.debug(String.format("callId=%s, content=%s", call.getCallId(), content));
         return content;
     }
 
@@ -370,7 +370,7 @@ public class CallUtil {
             throws OperationNotSupportedException {
 
         Integer retryAttempts = 0;
-        LOGGER.debug("pre-call-hook => call : {}, config: {}, params: {}", call, config, params);
+        LOGGER.debug(String.format("pre-call-hook => call : %s, config: %s, params: %s", call, config, params));
 
         // Only if outbound call limit is set, we have to worry about no of active calls, retries, etc
         if (config.getOutboundCallLimit() > 0) {
@@ -439,12 +439,12 @@ public class CallUtil {
         Map<String, String> testUsersMap = config.getTestUsersMap();
 
         if (testUsersMap != null && testUsersMap.containsKey(phone)) {
-            LOGGER.debug("TestURL for user, phone = {}, url = {}", phone, testUsersMap.get(phone));
+            LOGGER.debug(String.format("TestURL for user, phone = %s, url = %s", phone, testUsersMap.get(phone)));
             uri = mergeUriAndRemoveParams(config.getTestUsersMap().get(phone), completeParams);
         } else {
             uri = mergeUriAndRemoveParams(config.getOutgoingCallUriTemplate(), completeParams);
         }
-        LOGGER.debug("user = {}, uri = {}", phone, uri);
+        LOGGER.debug(String.format("user = %s, uri = %s", phone, uri));
 
         HttpUriRequest request;
         URIBuilder builder;
@@ -472,7 +472,7 @@ public class CallUtil {
             throw new IllegalArgumentException("Unexpected error creating a URI", e);
         }
 
-        LOGGER.debug("Generated {} for call {}", request.toString(), call.getCallId());
+        LOGGER.debug(String.format("Generated %s for call %s", request.toString(), call.getCallId()));
 
         return request;
     }
@@ -508,8 +508,8 @@ public class CallUtil {
         Map<String, Object> data = new HashMap<>();
 
         if (null != call) {
-            LOGGER.debug("Triggering call status changed event for call={}, status={}, reason={}", call.getCallId(),
-                         call.getStatus(), call.getStatusText());
+            LOGGER.debug(String.format("Triggering call status changed event for call=%s, status=%s, reason=%s", call.getCallId(),
+                         call.getStatus(), call.getStatusText()));
             data.put(Constants.PARAM_CALL_ID, call.getCallId());
             // We are sending status to clients, to whom we shouldn't expose our domain objects
             data.put(Constants.PARAM_STATUS, call.getStatus().name());
@@ -562,8 +562,8 @@ public class CallUtil {
                             csvMapWriter.write(callMap, headers);
                         }
                     } catch (Exception e) {
-                        LOGGER.error("Exception occurred for call record having id:{} with exception message: {}",
-                                     call.getId(), e.getMessage());
+                        LOGGER.error(String.format("Exception occurred for call record having id:%s with exception message: %s",
+                                     call.getId(), e.getMessage()));
                     }
                 }
             }
@@ -597,8 +597,8 @@ public class CallUtil {
                         zipOutputStream.write(b, 0, length);
                     }
                 } catch (Exception e) {
-                    LOGGER.error("Error in creating zip entry for file: {} with error message: {}",
-                                 currentFileName + CSV, e.getMessage());
+                    LOGGER.error(String.format("Error in creating zip entry for file: %s with error message: %s",
+                                 currentFileName + CSV, e.getMessage()));
                 }
             }
         }
@@ -621,9 +621,9 @@ public class CallUtil {
                         .parseDateTime(call.getContext().get(MESSAGE_KEY).toString());
                 callMap.put(headers[7], dateTimeMessageKey.toString(toFormatter));
             } catch (IllegalArgumentException e) {
-                LOGGER.error(
-                        "Invalid input format to parse messageKey to dateTime for calls record having id: {} with messageKey value: {}",
-                        call.getId(), call.getContext().get(MESSAGE_KEY));
+                LOGGER.error(String.format(
+                        "Invalid input format to parse messageKey to dateTime for calls record having id: %s with messageKey value: %s",
+                        call.getId(), call.getContext().get(MESSAGE_KEY)));
                 callMap.put(headers[7], null);
             }
         } else {
