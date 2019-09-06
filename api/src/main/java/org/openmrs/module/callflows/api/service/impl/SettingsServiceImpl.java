@@ -3,6 +3,8 @@ package org.openmrs.module.callflows.api.service.impl;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.callflows.api.domain.Config;
 import org.openmrs.module.callflows.api.domain.Renderer;
 import org.openmrs.module.callflows.api.domain.Settings;
@@ -13,8 +15,6 @@ import org.motechproject.config.SettingsFacade;
 import org.motechproject.config.core.constants.ConfigurationConstants;
 import org.motechproject.event.MotechEvent;
 import org.motechproject.event.listener.annotations.MotechListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
@@ -36,7 +36,7 @@ public class SettingsServiceImpl implements SettingsService {
 
     private static final String CONFIG_FILE_NAME = "callflows-settings.json";
     private static final String CONFIG_FILE_PATH = "/org.openmrs.module.callflows.api/raw/" + CONFIG_FILE_NAME;
-    private static final Logger LOGGER = LoggerFactory.getLogger(SettingsServiceImpl.class);
+    private static final Log LOGGER = LogFactory.getLog(SettingsServiceImpl.class);
 
     @Autowired
     private SettingsFacade settingsFacade;
@@ -56,7 +56,7 @@ public class SettingsServiceImpl implements SettingsService {
     public void handleFileChanged(MotechEvent event) {
         String filePath = (String) event.getParameters().get(ConfigurationConstants.FILE_PATH);
         if (!StringUtils.isBlank(filePath) && filePath.endsWith(CONFIG_FILE_PATH)) {
-            LOGGER.info("{} has changed, reloading configs.", CONFIG_FILE_NAME);
+            LOGGER.info(String.format("%s has changed, reloading configs.", CONFIG_FILE_NAME));
             loadSettings();
         }
     }
@@ -124,7 +124,7 @@ public class SettingsServiceImpl implements SettingsService {
         List<Renderer> rendererList;
         try (InputStream is = settingsFacade.getRawConfig(CONFIG_FILE_NAME)) {
             String jsonText = IOUtils.toString(is);
-            LOGGER.debug("Loading {}", CONFIG_FILE_NAME);
+            LOGGER.debug(String.format("Loading %s", CONFIG_FILE_NAME));
             Gson gson = new Gson();
             settings = gson.fromJson(jsonText, Settings.class);
             configList = settings.getConfigs();
