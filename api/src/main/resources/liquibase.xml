@@ -109,6 +109,7 @@
             <column name="context_value" type="mediumblob"></column>
             <column name="providerData_key" type="varchar(255)"></column>
             <column name="providerData_value" type="varchar(255)"></column>
+            <column name="creationDate" type="datetime"></column>
             <column name="uuid" type="char(38)">
                 <constraints nullable="false" unique="true"/>
             </column>

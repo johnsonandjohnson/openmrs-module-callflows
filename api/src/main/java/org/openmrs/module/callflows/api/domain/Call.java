@@ -198,6 +198,7 @@ public class Call extends AbstractBaseOpenmrsData {
     @Column(name = "providerData_value")
     private Map<String, String> providerData = new HashMap<>();
 
+    @Column
     private DateTime creationDate;
 
     public DateTime getCreationDate() {
