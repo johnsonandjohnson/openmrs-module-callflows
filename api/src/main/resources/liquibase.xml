@@ -110,7 +110,7 @@
             <column name="playedMessages" type="TEXT"></column>
             <column name="refKey" type="varchar(255)"></column>
             <column name="context_key" type="varchar(255)"></column>
-            <column name="context_value" type=""></column>
+            <column name="context_value" type="mediumblob"></column>
             <column name="providerData_key" type="varchar(255)"></column>
             <column name="providerData_value" type="varchar(255)"></column>
             <column name="creationDate" type="datetime"></column>
