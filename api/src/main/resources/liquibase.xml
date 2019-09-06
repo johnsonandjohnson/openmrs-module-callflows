@@ -42,14 +42,14 @@
             </column>
             <column name="voided_by" type="int"/>
         </createTable>
-        <addForeignKeyConstraint constraintName="etl_error_logs_creator_fk"
-                                 baseTableName="etl_error_logs" baseColumnNames="creator"
+        <addForeignKeyConstraint constraintName="cfl_callflows_creator_fk"
+                                 baseTableName="cfl_callflows" baseColumnNames="creator"
                                  referencedTableName="users" referencedColumnNames="user_id"/>
-        <addForeignKeyConstraint constraintName="etl_error_logs_changed_by_fk"
-                                 baseTableName="etl_error_logs" baseColumnNames="changed_by"
+        <addForeignKeyConstraint constraintName="cfl_callflows_changed_by_fk"
+                                 baseTableName="cfl_callflows" baseColumnNames="changed_by"
                                  referencedTableName="users" referencedColumnNames="user_id"/>
-        <addForeignKeyConstraint constraintName="etl_error_logs_voided_by_fk"
-                                 baseTableName="etl_error_logs" baseColumnNames="voided_by"
+        <addForeignKeyConstraint constraintName="cfl_callflows_voided_by_fk"
+                                 baseTableName="cfl_callflows" baseColumnNames="voided_by"
                                  referencedTableName="users" referencedColumnNames="user_id"/>
         <addUniqueConstraint tableName="cfl_callflows" columnNames="name" constraintName="unique_callflow_idx"/>
         <createIndex tableName="cfl_callflows"
@@ -130,14 +130,14 @@
             </column>
             <column name="voided_by" type="int"/>
         </createTable>
-        <addForeignKeyConstraint constraintName="etl_error_logs_creator_fk"
-                                 baseTableName="etl_error_logs" baseColumnNames="creator"
+        <addForeignKeyConstraint constraintName="cfl_calls_creator_fk"
+                                 baseTableName="cfl_calls" baseColumnNames="creator"
                                  referencedTableName="users" referencedColumnNames="user_id"/>
-        <addForeignKeyConstraint constraintName="etl_error_logs_changed_by_fk"
-                                 baseTableName="etl_error_logs" baseColumnNames="changed_by"
+        <addForeignKeyConstraint constraintName="cfl_calls_changed_by_fk"
+                                 baseTableName="cfl_calls" baseColumnNames="changed_by"
                                  referencedTableName="users" referencedColumnNames="user_id"/>
-        <addForeignKeyConstraint constraintName="etl_error_logs_voided_by_fk"
-                                 baseTableName="etl_error_logs" baseColumnNames="voided_by"
+        <addForeignKeyConstraint constraintName="cfl_calls_voided_by_fk"
+                                 baseTableName="cfl_calls" baseColumnNames="voided_by"
                                  referencedTableName="users" referencedColumnNames="user_id"/>
         <addForeignKeyConstraint constraintName="cfl_calls_FK1"
                                  baseTableName="cfl_calls" baseColumnNames="endFlow"
