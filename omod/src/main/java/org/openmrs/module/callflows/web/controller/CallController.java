@@ -1,5 +1,7 @@
 package org.openmrs.module.callflows.web.controller;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.callflows.api.contract.OutboundCallResponse;
 import org.openmrs.module.callflows.api.domain.Call;
 import org.openmrs.module.callflows.api.domain.CallFlow;
@@ -11,6 +13,7 @@ import org.openmrs.module.callflows.api.domain.flow.Flow;
 import org.openmrs.module.callflows.api.domain.flow.Node;
 import org.openmrs.module.callflows.api.domain.types.CallDirection;
 import org.openmrs.module.callflows.api.domain.types.CallStatus;
+import org.openmrs.module.callflows.api.event.InitiateCallEventHandler;
 import org.openmrs.module.callflows.api.service.CallFlowService;
 import org.openmrs.module.callflows.api.service.CallService;
 import org.openmrs.module.callflows.api.service.FlowService;
@@ -31,8 +34,6 @@ import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.osgi.framework.BundleContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -63,7 +64,7 @@ import java.util.Properties;
 @Controller
 public class CallController extends RestController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CallController.class);
+    private static final Log LOGGER = LogFactory.getLog(CallController.class);
 
     private static final String ROOT_LOGGER = "root";
 
@@ -174,7 +175,7 @@ public class CallController extends RestController {
                                                  @RequestParam Map<String, String> params,
                                                  @RequestHeader Map<String, String> headers) {
 
-        LOGGER.debug("handleIncoming(name={}, params={}, headers={}", flowName, params, headers);
+        LOGGER.debug(String.format("handleIncoming(name=%s, params=%s, headers=%s", flowName, params, headers));
 
         // Typically we won't get this parameter for inbound calls,
         // but when the system makes a outbound call, it creates a call record and then enters here with a callId
@@ -281,7 +282,7 @@ public class CallController extends RestController {
                                                      @RequestParam Map<String, String> params,
                                                      @RequestHeader Map<String, String> headers) {
 
-        LOGGER.debug("handleContinuation(callId={}, params={}, headers={}", callId, params, headers);
+        LOGGER.debug(String.format("handleContinuation(callId=%s, params=%s, headers=%s", callId, params, headers));
 
         // The requested configuration from the URL
         Config config = null;
@@ -384,8 +385,8 @@ public class CallController extends RestController {
     public OutboundCallResponse handleOutgoing(@PathVariable String configName, @PathVariable String name,
                                                @PathVariable String extension,
                                                @RequestParam Map<String, Object> params) {
-        LOGGER.debug("handleOutgoing(config={}, name = {}, extension={}, params={}", configName, name, extension,
-                     params);
+        LOGGER.debug(String.format("handleOutgoing(config=%s, name = %s, extension=%s, params=%s", configName, name,
+                extension, params));
         Call call = callService.makeCall(configName, name, params);
         return call != null ? new OutboundCallResponse(call) : null;
     }
