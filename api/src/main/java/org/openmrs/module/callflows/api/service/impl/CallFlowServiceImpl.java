@@ -87,7 +87,7 @@ public class CallFlowServiceImpl implements CallFlowService {
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(Integer id) {
         CallFlow callflow = callFlowDao.findById(id);
         if (callflow == null) {
             throw new IllegalArgumentException("Callflow cannot be found for id : " + id);

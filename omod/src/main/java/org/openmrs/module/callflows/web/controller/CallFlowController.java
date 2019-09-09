@@ -67,7 +67,7 @@ public class CallFlowController extends RestController {
     @RequestMapping(value = "/flows/{id}", method = RequestMethod.PUT)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public CallFlowResponse updateFlow(@PathVariable Long id, @RequestBody CallFlowRequest callFlowRequest)
+    public CallFlowResponse updateFlow(@PathVariable Integer id, @RequestBody CallFlowRequest callFlowRequest)
             throws CallFlowAlreadyExistsException {
         CallFlow callflow = callFlowBuilder.createFrom(callFlowRequest);
         callflow.setId(id);
