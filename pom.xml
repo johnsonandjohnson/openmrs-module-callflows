@@ -41,6 +41,11 @@
 				<artifactId>gson</artifactId>
 				<version>${gsonVersion}</version>
 			</dependency>
+			<dependency>
+				<groupId>com.google.guava</groupId>
+				<artifactId>guava</artifactId>
+				<version>${guavaVersion}</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -73,5 +78,6 @@
 		<javaCompilerSource>1.8</javaCompilerSource>
 		<javaCompilerTarget>1.8</javaCompilerTarget>
 		<gsonVersion>1.7.1</gsonVersion>
+		<guavaVersion>23.0</guavaVersion>
 	</properties>
 </project>
