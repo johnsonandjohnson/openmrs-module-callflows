@@ -1,10 +1,10 @@
 package org.openmrs.module.callflows.web.controller;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.callflows.api.contract.ErrorResponse;
 import org.openmrs.module.callflows.api.exception.CallFlowAlreadyExistsException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  */
 public class RestController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RestController.class);
+    private static final Log LOGGER = LogFactory.getLog(RestController.class);
 
     private static final String ERR_CALLFLOW_DUPLICATE = "callflow.duplicate";
 

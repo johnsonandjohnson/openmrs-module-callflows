@@ -1,5 +1,7 @@
 package org.openmrs.module.callflows.web.controller;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.callflows.api.domain.Call;
 import org.openmrs.module.callflows.api.domain.Constants;
 import org.openmrs.module.callflows.api.domain.types.CallStatus;
@@ -7,8 +9,6 @@ import org.openmrs.module.callflows.api.service.CallService;
 import org.openmrs.module.callflows.api.util.CallUtil;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -27,7 +27,7 @@ import java.util.Map;
 @Controller
 public class CallStatusController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CallStatusController.class);
+    private static final Log LOGGER = LogFactory.getLog(CallStatusController.class);
 
     private static final String OK_RESPONSE = "";
 
@@ -58,7 +58,7 @@ public class CallStatusController {
     @RequestMapping(value = "/status/{callId}")
     @ResponseBody
     public String handleStatus(@PathVariable String callId, @RequestParam Map<String, String> params) {
-        LOGGER.debug("handleStatus(callId={}, params={}", callId, params);
+        LOGGER.debug(String.format("handleStatus(callId=%s, params=%s", callId, params));
         Call call = callService.findByCallId(callId);
         if (null == call) {
             return ERROR_RESPONSE;
