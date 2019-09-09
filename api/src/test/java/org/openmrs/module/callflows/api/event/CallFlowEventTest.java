@@ -76,7 +76,7 @@ public class CallFlowEventTest {
 	}
 
 	@Test
-	public void ConvertPropertiesToMapStringObject() {
+	public void convertPropertiesToMapStringObject() {
 		Map<String, Object> actual = CallFlowEvent.convertProperties(propertiesString);
 
 		assertThat(actual.size(), equalTo(actual.size()));
