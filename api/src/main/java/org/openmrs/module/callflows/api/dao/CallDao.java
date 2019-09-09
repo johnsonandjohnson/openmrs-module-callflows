@@ -1,12 +1,9 @@
-package org.openmrs.module.callflows.api.repository;
+package org.openmrs.module.callflows.api.dao;
 
+import org.openmrs.api.db.OpenmrsDataDAO;
 import org.openmrs.module.callflows.api.domain.Call;
 import org.openmrs.module.callflows.api.domain.types.CallDirection;
 import org.openmrs.module.callflows.api.domain.types.CallStatus;
-
-import org.motechproject.mds.annotations.Lookup;
-import org.motechproject.mds.annotations.LookupField;
-import org.motechproject.mds.service.MotechDataService;
 
 import java.util.List;
 import java.util.Set;
@@ -16,7 +13,7 @@ import java.util.Set;
  *
  * @author bramak09
  */
-public interface CallDataService extends MotechDataService<Call> {
+public interface CallDao extends OpenmrsDataDAO<Call> {
 
     /**
      * Find a Call record using the call id
@@ -24,8 +21,7 @@ public interface CallDataService extends MotechDataService<Call> {
      * @param callId
      * @return the call object
      */
-    @Lookup
-    Call findByCallId(@LookupField(name = "callId") String callId);
+    Call findByCallId(String callId);
 
     /**
      * Find the calls based on the call direction and call status
@@ -34,9 +30,7 @@ public interface CallDataService extends MotechDataService<Call> {
      * @param statusSet The set of IVR Call status
      * @return list of calls for the specified Call direction and Call status
      */
-    @Lookup
-    List<Call> findCallsByDirectionAndStatus(@LookupField(name = "direction") CallDirection direction,
-                                             @LookupField(name = "status") Set<CallStatus> statusSet);
+    List<Call> findCallsByDirectionAndStatus(CallDirection direction, Set<CallStatus> statusSet);
 
     /**
      * Find the call count based on the call direction and call status
@@ -45,6 +39,18 @@ public interface CallDataService extends MotechDataService<Call> {
      * @param statusSet The set of IVR Call status
      * @return call count for the specified Call direction and Call status
      */
-    long countFindCallsByDirectionAndStatus(@LookupField(name = "direction") CallDirection direction,
-                                            @LookupField(name = "status") Set<CallStatus> statusSet);
+    long countFindCallsByDirectionAndStatus(CallDirection direction, Set<CallStatus> statusSet);
+
+    Call create(Call call);
+
+    Call update(Call call);
+
+    Call findById(Integer id);
+
+    List<Call> retrieveAll(int startingRecord, int recordsAmount);
+
+    void deleteAll();
+
+    long count();
+
 }

@@ -8,7 +8,7 @@ import org.openmrs.module.callflows.api.domain.flow.Flow;
 import org.openmrs.module.callflows.api.domain.flow.Node;
 import org.openmrs.module.callflows.api.helper.CallFlowHelper;
 import org.openmrs.module.callflows.api.helper.FlowHelper;
-import org.openmrs.module.callflows.api.repository.CallFlowDataService;
+import org.openmrs.module.callflows.api.dao.CallFlowDao;
 import org.openmrs.module.callflows.api.service.FlowService;
 import org.openmrs.module.callflows.api.util.TestUtil;
 
@@ -48,7 +48,7 @@ public class FlowServiceBundleIT extends BasePaxIT {
     private FlowService flowService;
 
     @Inject
-    private CallFlowDataService callFlowDataService;
+    private CallFlowDao callFlowDao;
 
     private CallFlow mainFlow;
 
@@ -71,7 +71,7 @@ public class FlowServiceBundleIT extends BasePaxIT {
         mainFlow = CallFlowHelper.createMainFlow();
         String raw = TestUtil.loadFile("main_flow.json");
         mainFlow.setRaw(raw);
-        callFlowDataService.create(mainFlow);
+        callFlowDao.create(mainFlow);
 
         loadedFlow = FlowHelper.createFlow(raw);
         entryHandlerNode = loadedFlow.getNodes().get(1);
@@ -85,7 +85,7 @@ public class FlowServiceBundleIT extends BasePaxIT {
 
     @After
     public void tearDown() {
-        callFlowDataService.deleteAll();
+        callFlowDao.deleteAll();
     }
 
     @Test
@@ -119,7 +119,7 @@ public class FlowServiceBundleIT extends BasePaxIT {
     public void shouldThrowIllegalArgumentIfFlowIsBadlyFormattedDuringLoadFlow() {
         // Given a incomplete flow
         mainFlow.setRaw("");
-        callFlowDataService.update(mainFlow);
+        callFlowDao.update(mainFlow);
 
         // When we look for this flow
         Flow flow = flowService.load(Constants.CALLFLOW_MAIN);
@@ -189,7 +189,7 @@ public class FlowServiceBundleIT extends BasePaxIT {
         // And inactive-handler to not a known place
         inactiveHandlerNode.getTemplates().get(Constants.VELOCITY).setContent("am_in_a_bad_place");
         mainFlow.setRaw(objectMapper.writeValueAsString(loadedFlow));
-        callFlowDataService.update(mainFlow);
+        callFlowDao.update(mainFlow);
 
         // When
         FlowPosition position = flowService.evalNode(loadedFlow, entryHandlerNode, context);
@@ -211,7 +211,7 @@ public class FlowServiceBundleIT extends BasePaxIT {
         // And inactive-handler to inactive
         inactiveHandlerNode.getTemplates().get(Constants.VELOCITY).setContent("|inactive|");
         mainFlow.setRaw(objectMapper.writeValueAsString(loadedFlow));
-        callFlowDataService.update(mainFlow);
+        callFlowDao.update(mainFlow);
 
         // When
         FlowPosition position = flowService.evalNode(loadedFlow, entryHandlerNode, context);
@@ -228,7 +228,7 @@ public class FlowServiceBundleIT extends BasePaxIT {
         entryHandlerNode.getTemplates().get(Constants.VELOCITY).setContent("|active-handler|");
         activeHandlerNode.getTemplates().get(Constants.VELOCITY).setContent("|entry-handler|");
         mainFlow.setRaw(objectMapper.writeValueAsString(loadedFlow));
-        callFlowDataService.update(mainFlow);
+        callFlowDao.update(mainFlow);
 
         // When we try to run from entry-handler
         flowService.evalNode(loadedFlow, entryHandlerNode, context);

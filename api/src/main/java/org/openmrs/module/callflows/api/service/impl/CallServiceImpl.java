@@ -10,14 +10,13 @@ import org.openmrs.module.callflows.api.domain.Constants;
 import org.openmrs.module.callflows.api.domain.flow.Flow;
 import org.openmrs.module.callflows.api.domain.types.CallDirection;
 import org.openmrs.module.callflows.api.domain.types.CallStatus;
-import org.openmrs.module.callflows.api.repository.CallDataService;
+import org.openmrs.module.callflows.api.dao.CallDao;
 import org.openmrs.module.callflows.api.service.CallFlowService;
 import org.openmrs.module.callflows.api.service.CallService;
 import org.openmrs.module.callflows.api.service.FlowService;
 import org.openmrs.module.callflows.api.service.ConfigService;
 import org.openmrs.module.callflows.api.util.CallUtil;
 
-import org.motechproject.mds.query.QueryParams;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -57,7 +56,7 @@ public class CallServiceImpl implements CallService {
             .newHashSet(HttpURLConnection.HTTP_OK, HttpURLConnection.HTTP_ACCEPTED, HttpURLConnection.HTTP_CREATED);
 
     @Autowired
-    private CallDataService callDataService;
+    private CallDao callDao;
 
     @Autowired
     private CallFlowService callFlowService;
@@ -117,7 +116,7 @@ public class CallServiceImpl implements CallService {
 
         // and finally the call status
         call.setStatus(determineStatus(direction));
-        return callDataService.create(call);
+        return callDao.create(call);
     }
 
     @Override
@@ -130,7 +129,7 @@ public class CallServiceImpl implements CallService {
     @Override
     @Transactional
     public Call update(Call call) {
-        Call currentCall = callDataService.findById(call.getId());
+        Call currentCall = callDao.findById(call.getId());
 
         if (null == currentCall) {
             throw new IllegalArgumentException("Invalid call {} " + call);
@@ -189,13 +188,13 @@ public class CallServiceImpl implements CallService {
         currentCall.setPlayedMessages(call.getPlayedMessages());
 
         // update in the database
-        return callDataService.update(currentCall);
+        return callDao.update(currentCall);
     }
 
     @Override
     @Transactional
     public Call findByCallId(String callId) {
-        return callDataService.findByCallId(callId);
+        return callDao.findByCallId(callId);
     }
 
     @Override
@@ -235,7 +234,7 @@ public class CallServiceImpl implements CallService {
                 // Since this is an error, the status is always FAILED
                 call.setStatus(CallStatus.FAILED);
                 call.setStatusText(ose.getMessage());
-                callDataService.update(call);
+                callDao.update(call);
             }
         } catch (Exception e) {
             LOGGER.error(String.format("Outbound call not made for flow: %s, config: %s, phone: %s", flowName, configName, phone), e);
@@ -245,13 +244,13 @@ public class CallServiceImpl implements CallService {
     }
 
     @Override
-    public List<Call> findAll(QueryParams queryParams) {
-        return callDataService.retrieveAll(queryParams);
+    public List<Call> findAll(int startingRecord, int recordsAmount) {
+        return callDao.retrieveAll((startingRecord - 1) * recordsAmount, recordsAmount);
     }
 
     @Override
     public long retrieveCount() {
-        return callDataService.count();
+        return callDao.count();
     }
 
     private void handleError(Call call, String reason, Map<String, Object> params) {
@@ -261,7 +260,7 @@ public class CallServiceImpl implements CallService {
             // Since this is an error, the status is always FAILED
             call.setStatus(CallStatus.FAILED);
             call.setStatusText(reason);
-            callDataService.update(call);
+            callDao.update(call);
             // send a motech event with all params as received, so that the module that called this
             // could inspect the error and retry if so desired
             callUtil.sendStatusEvent(call);

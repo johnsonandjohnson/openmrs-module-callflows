@@ -10,7 +10,7 @@ public class CallFlowResponse {
     /**
      * Call flow ID
      */
-    private Long id;
+    private Integer id;
 
     /**
      * Call flow name
@@ -32,7 +32,7 @@ public class CallFlowResponse {
      */
     private String raw;
 
-    public CallFlowResponse(Long id, String name, String description, String status, String raw) {
+    public CallFlowResponse(Integer id, String name, String description, String status, String raw) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -40,11 +40,11 @@ public class CallFlowResponse {
         this.raw = raw;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

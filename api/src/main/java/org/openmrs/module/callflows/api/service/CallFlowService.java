@@ -60,5 +60,5 @@ public interface CallFlowService {
      * @param id of the callflow to delete
      * @throws IllegalArgumentException if no callflow with the given id exists
      */
-    void delete(Long id);
+    void delete(Integer id);
 }

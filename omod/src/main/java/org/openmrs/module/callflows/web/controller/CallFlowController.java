@@ -70,7 +70,7 @@ public class CallFlowController extends RestController {
     public CallFlowResponse updateFlow(@PathVariable Long id, @RequestBody CallFlowRequest callFlowRequest)
             throws CallFlowAlreadyExistsException {
         CallFlow callflow = callFlowBuilder.createFrom(callFlowRequest);
-        callflow.setId(id);
+        callflow.setId(id != null ? id.intValue() : null);
         return callFlowResponseBuilder.createFrom(callFlowService.update(callflow));
     }
 
@@ -83,7 +83,7 @@ public class CallFlowController extends RestController {
     @RequestMapping(value = "/flows/{id}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.OK)
     public void deleteFlow(@PathVariable Long id) {
-        callFlowService.delete(id);
+        callFlowService.delete(id != null ? id.intValue() : null);
     }
 
     /**

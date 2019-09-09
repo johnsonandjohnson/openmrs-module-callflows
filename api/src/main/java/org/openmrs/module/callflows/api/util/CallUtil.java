@@ -12,8 +12,9 @@ import org.openmrs.module.callflows.api.domain.flow.Node;
 import org.openmrs.module.callflows.api.domain.flow.UserNode;
 import org.openmrs.module.callflows.api.domain.types.CallDirection;
 import org.openmrs.module.callflows.api.domain.types.CallStatus;
+import org.openmrs.module.callflows.api.dao.CallDao;
+import org.springframework.http.MediaType;
 import org.openmrs.module.callflows.api.event.CallFlowEvent;
-import org.openmrs.module.callflows.api.repository.CallDataService;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.methods.HttpGet;
@@ -125,7 +126,7 @@ public class CallUtil {
     private static DateTimeFormatter toFormatter = DateTimeFormat.forPattern("yyMMddHHmm");
 
     @Autowired
-    private CallDataService callDataService;
+    private CallDao callDao;
 
     @Autowired
     @Qualifier("callflow.schedulerService")
@@ -373,7 +374,7 @@ public class CallUtil {
         if (config.getOutboundCallLimit() > 0) {
             // Check how many current active calls are there
             Set<CallStatus> callStatusSet = new HashSet<>(ACTIVE_OUTBOUND_CALL_STATUSES);
-            long currentOutboundCallCount = callDataService
+            long currentOutboundCallCount = callDao
                     .countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet);
             // Do we have enough bandwidth to make this call?
             if (currentOutboundCallCount > config.getOutboundCallLimit()) {

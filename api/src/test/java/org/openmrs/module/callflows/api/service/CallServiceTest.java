@@ -14,7 +14,7 @@ import org.openmrs.module.callflows.api.helper.CallFlowHelper;
 import org.openmrs.module.callflows.api.helper.CallHelper;
 import org.openmrs.module.callflows.api.helper.ConfigHelper;
 import org.openmrs.module.callflows.api.helper.FlowHelper;
-import org.openmrs.module.callflows.api.repository.CallDataService;
+import org.openmrs.module.callflows.api.dao.CallDao;
 import org.openmrs.module.callflows.api.service.impl.CallServiceImpl;
 import org.openmrs.module.callflows.api.util.CallAssert;
 import org.openmrs.module.callflows.api.util.CallUtil;
@@ -73,7 +73,7 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 public class CallServiceTest extends BaseTest {
 
     @Mock
-    private CallDataService callDataService;
+    private CallDao callDao;
 
     @InjectMocks
     private CallService callService = new CallServiceImpl();
@@ -195,7 +195,7 @@ public class CallServiceTest extends BaseTest {
         given(UUID.randomUUID()).willReturn(Constants.OUTBOUND_CALL_ID);
         ArgumentCaptor<Call> callArgumentCaptor = ArgumentCaptor.forClass(Call.class);
         ArgumentCaptor<HttpUriRequest> request = ArgumentCaptor.forClass(HttpUriRequest.class);
-        given(callDataService.create(callArgumentCaptor.capture())).willReturn(outboundCall);
+        given(callDao.create(callArgumentCaptor.capture())).willReturn(outboundCall);
 
         errorParams.put("callId", "unknown");
         errorParams.put("status", CallStatus.FAILED.name());
@@ -209,7 +209,7 @@ public class CallServiceTest extends BaseTest {
 
         // Given
         ArgumentCaptor<Call> callFlowArgumentCaptor = ArgumentCaptor.forClass(Call.class);
-        given(callDataService.create(callFlowArgumentCaptor.capture())).willReturn(inboundCall);
+        given(callDao.create(callFlowArgumentCaptor.capture())).willReturn(inboundCall);
         given(UUID.randomUUID()).willReturn(Constants.INBOUND_CALL_ID);
 
         // When
@@ -219,7 +219,7 @@ public class CallServiceTest extends BaseTest {
                         Constants.PLAYED_MESSAGES, null, params);
 
         // Then
-        verify(callDataService, times(1)).create(inboundCall);
+        verify(callDao, times(1)).create(inboundCall);
 
         // And
         CallAssert.assertBasicFields(newCall);
@@ -235,7 +235,7 @@ public class CallServiceTest extends BaseTest {
     public void shouldCreateOutboundCallWithActor() {
         // Given
         ArgumentCaptor<Call> callFlowArgumentCaptor = ArgumentCaptor.forClass(Call.class);
-        given(callDataService.create(callFlowArgumentCaptor.capture())).willReturn(outboundCall);
+        given(callDao.create(callFlowArgumentCaptor.capture())).willReturn(outboundCall);
         given(UUID.randomUUID()).willReturn(Constants.OUTBOUND_CALL_ID);
 
         // When
@@ -244,7 +244,7 @@ public class CallServiceTest extends BaseTest {
                         Constants.ACTOR_ID, Constants.ACTOR_TYPE, null, null, null, Constants.REF_KEY, params);
 
         // Then
-        verify(callDataService, times(1)).create(outboundCall);
+        verify(callDao, times(1)).create(outboundCall);
 
         // And
         CallAssert.assertBasicFields(newCall);
@@ -261,7 +261,7 @@ public class CallServiceTest extends BaseTest {
         inboundCall.setActorId(null);
         inboundCall.setActorType(null);
         ArgumentCaptor<Call> callFlowArgumentCaptor = ArgumentCaptor.forClass(Call.class);
-        given(callDataService.create(callFlowArgumentCaptor.capture())).willReturn(inboundCall);
+        given(callDao.create(callFlowArgumentCaptor.capture())).willReturn(inboundCall);
         given(UUID.randomUUID()).willReturn(Constants.INBOUND_CALL_ID);
 
         // When
@@ -269,7 +269,7 @@ public class CallServiceTest extends BaseTest {
                 .create(Constants.CONFIG_VOXEO, mainFlow, Constants.CALLFLOW_MAIN_ENTRY, CallDirection.INCOMING, params);
 
         // Then
-        verify(callDataService, times(1)).create(inboundCall);
+        verify(callDao, times(1)).create(inboundCall);
 
         // And
         CallAssert.assertBasicFields(newCall);
@@ -285,7 +285,7 @@ public class CallServiceTest extends BaseTest {
         outboundCall.setActorId(null);
         outboundCall.setActorType(null);
         ArgumentCaptor<Call> callFlowArgumentCaptor = ArgumentCaptor.forClass(Call.class);
-        given(callDataService.create(callFlowArgumentCaptor.capture())).willReturn(outboundCall);
+        given(callDao.create(callFlowArgumentCaptor.capture())).willReturn(outboundCall);
         given(UUID.randomUUID()).willReturn(Constants.OUTBOUND_CALL_ID);
 
         // When
@@ -293,7 +293,7 @@ public class CallServiceTest extends BaseTest {
                 .create(Constants.CONFIG_VOXEO, mainFlow, Constants.CALLFLOW_MAIN_ENTRY, CallDirection.OUTGOING, params);
 
         // Then
-        verify(callDataService, times(1)).create(outboundCall);
+        verify(callDao, times(1)).create(outboundCall);
 
         // And
         CallAssert.assertBasicFields(newCall);
@@ -306,13 +306,13 @@ public class CallServiceTest extends BaseTest {
     @Test
     public void shouldFindCallByCallID() {
         // Given
-        given(callDataService.findByCallId(Constants.INBOUND_CALL_ID.toString())).willReturn(inboundCall);
+        given(callDao.findByCallId(Constants.INBOUND_CALL_ID.toString())).willReturn(inboundCall);
 
         // When
         Call call = callService.findByCallId(Constants.INBOUND_CALL_ID.toString());
 
         // Then
-        verify(callDataService, times(1)).findByCallId(Constants.INBOUND_CALL_ID.toString());
+        verify(callDao, times(1)).findByCallId(Constants.INBOUND_CALL_ID.toString());
         assertNotNull(call);
         assertThat(call.getCallId(), equalTo(Constants.INBOUND_CALL_ID.toString()));
     }
@@ -333,7 +333,7 @@ public class CallServiceTest extends BaseTest {
         Call updatedCall = CallHelper.updateAllPropertiesInOutboundCall(outboundCall);
 
         ArgumentCaptor<Call> callArgumentCaptor = ArgumentCaptor.forClass(Call.class);
-        given(callDataService.findById(1L)).willReturn(outboundCall);
+        given(callDao.findById(1L)).willReturn(outboundCall);
 
         // Given for create we returned DATE_CURRENT, And for update we return DATE_NEXT_DAY
         given(DateTime.now()).willReturn(formatter.parseDateTime(Constants.DATE_NEXT_DAY));
@@ -342,7 +342,7 @@ public class CallServiceTest extends BaseTest {
         callService.update(updatedCall);
 
         // Then
-        verify(callDataService, times(1)).update(callArgumentCaptor.capture());
+        verify(callDao, times(1)).update(callArgumentCaptor.capture());
 
         // And let's see what gets sent to the database
         Call returnedCall = callArgumentCaptor.getValue();
@@ -381,7 +381,7 @@ public class CallServiceTest extends BaseTest {
         updatedCall.setPlayedMessages("");
 
         ArgumentCaptor<Call> callArgumentCaptor = ArgumentCaptor.forClass(Call.class);
-        given(callDataService.findById(1L)).willReturn(outboundCall);
+        given(callDao.findById(1L)).willReturn(outboundCall);
 
         // Given for create we returned DATE_CURRENT, And for update we return DATE_NEXT_DAY
         given(DateTime.now()).willReturn(formatter.parseDateTime(Constants.DATE_NEXT_DAY));
@@ -390,7 +390,7 @@ public class CallServiceTest extends BaseTest {
         callService.update(updatedCall);
 
         // Then
-        verify(callDataService, times(1)).update(callArgumentCaptor.capture());
+        verify(callDao, times(1)).update(callArgumentCaptor.capture());
 
         // And let's see what gets sent to the database
         Call returnedCall = callArgumentCaptor.getValue();
@@ -410,7 +410,7 @@ public class CallServiceTest extends BaseTest {
         Call updatedCall = CallHelper.updateAllPropertiesInOutboundCall(outboundCall);
 
         ArgumentCaptor<Call> callArgumentCaptor = ArgumentCaptor.forClass(Call.class);
-        given(callDataService.findById(1L)).willReturn(outboundCall);
+        given(callDao.findById(1L)).willReturn(outboundCall);
 
         // Given for create we returned DATE_CURRENT, for update we return DATE_NEXT_DAY
         given(DateTime.now()).willReturn(formatter.parseDateTime(Constants.DATE_NEXT_DAY));
@@ -419,7 +419,7 @@ public class CallServiceTest extends BaseTest {
         callService.update(updatedCall);
 
         // Then
-        verify(callDataService, times(1)).update(callArgumentCaptor.capture());
+        verify(callDao, times(1)).update(callArgumentCaptor.capture());
 
         // And let's see what gets sent to the database
         Call returnedCall = callArgumentCaptor.getValue();
@@ -441,7 +441,7 @@ public class CallServiceTest extends BaseTest {
         // Given
         Call updatedCall = CallHelper.updateAllPropertiesInOutboundCall(outboundCall);
         updatedCall.setId(2L);
-        given(callDataService.findById(1L)).willReturn(outboundCall);
+        given(callDao.findById(1L)).willReturn(outboundCall);
         // Given for create we returned DATE_CURRENT, for update we return DATE_NEXT_DAY
         given(DateTime.now()).willReturn(formatter.parseDateTime(Constants.DATE_NEXT_DAY));
 
@@ -449,7 +449,7 @@ public class CallServiceTest extends BaseTest {
         try {
             callService.update(updatedCall);
         } finally {
-            verify(callDataService, never()).update(any(Call.class));
+            verify(callDao, never()).update(any(Call.class));
         }
     }
 
@@ -467,7 +467,7 @@ public class CallServiceTest extends BaseTest {
         // And callflow, config and flow must be loaded
         assertAllLoaded();
         // And we shouldn't have to update the call status, since we are creating it
-        verify(callDataService, never()).update(any(Call.class));
+        verify(callDao, never()).update(any(Call.class));
         verify(callUtil, times(1)).buildOutboundRequest("1234567890", outboundCall, voxeo, params);
         // And no failure , so no motech event to be sent
         assertNoEventSent();
@@ -516,7 +516,7 @@ public class CallServiceTest extends BaseTest {
         assertNull(call);
         verify(configService, times(1)).getConfig(Constants.CONFIG_YO);
         verify(callFlowService, times(1)).findByName(Constants.CALLFLOW_MAIN);
-        verifyZeroInteractions(callDataService);
+        verifyZeroInteractions(callDao);
         verifyZeroInteractions(flowService);
         assertEventSent("1234567890", "Bad!", "unknown");
     }
@@ -534,7 +534,7 @@ public class CallServiceTest extends BaseTest {
         assertNull(call);
         verify(callFlowService, times(1)).findByName(Constants.CALLFLOW_MAIN2);
         verify(configService, never()).getConfig(anyString());
-        verifyZeroInteractions(callDataService);
+        verifyZeroInteractions(callDao);
         verifyZeroInteractions(flowService);
         assertEventSent("1234567890", "Bad!", "unknown");
     }
@@ -551,7 +551,7 @@ public class CallServiceTest extends BaseTest {
         // Then
         assertAllLoaded();
         assertCallCreated();
-        verify(callDataService, times(1)).update(outboundCall);
+        verify(callDao, times(1)).update(outboundCall);
         verify(callUtil, times(1)).buildOutboundRequest("1234567890", outboundCall, voxeo, params);
         // Since phone and config are fine, we have a valid call object which we'll use for error reporting
         assertEventSent(outboundCall);
@@ -571,7 +571,7 @@ public class CallServiceTest extends BaseTest {
         // Then
         assertAllLoaded();
         assertCallCreated();
-        verify(callDataService, times(1)).update(outboundCall);
+        verify(callDao, times(1)).update(outboundCall);
         verify(callUtil, never()).buildOutboundRequest("1234567890", outboundCall, voxeo, params);
     }
 
@@ -587,7 +587,7 @@ public class CallServiceTest extends BaseTest {
         // Then
         assertAllLoaded();
         assertCallCreated();
-        verify(callDataService, times(1)).update(outboundCall);
+        verify(callDao, times(1)).update(outboundCall);
         verify(callUtil, times(1)).buildOutboundRequest("1234567890", outboundCall, voxeo, params);
         assertEventSent(outboundCall);
     }
@@ -603,8 +603,8 @@ public class CallServiceTest extends BaseTest {
 
         // Then
         assertAllLoaded();
-        verify(callDataService, times(1)).create(outboundCall);
-        verify(callDataService, times(1)).update(outboundCall);
+        verify(callDao, times(1)).create(outboundCall);
+        verify(callDao, times(1)).update(outboundCall);
         verify(callUtil, times(1)).buildOutboundRequest("1234567890", outboundCall, voxeo, params);
         assertEventSent(outboundCall);
     }
@@ -618,16 +618,16 @@ public class CallServiceTest extends BaseTest {
     public void assertNoServiceInteractions() {
         verifyZeroInteractions(callFlowService);
         verifyZeroInteractions(configService);
-        verifyZeroInteractions(callDataService);
+        verifyZeroInteractions(callDao);
         verifyZeroInteractions(flowService);
     }
 
     public void assertCallCreated() {
-        verify(callDataService, times(1)).create(outboundCall);
+        verify(callDao, times(1)).create(outboundCall);
     }
 
     public void assertCallNotCreated() {
-        verify(callDataService, never()).create(any(Call.class));
+        verify(callDao, never()).create(any(Call.class));
     }
 
     public void assertNoEventSent() {
