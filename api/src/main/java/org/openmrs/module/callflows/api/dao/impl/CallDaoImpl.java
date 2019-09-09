@@ -65,10 +65,10 @@ public class CallDaoImpl extends HibernateOpenmrsDataDAO<Call> implements CallDa
     }
 
     @Override
-    public List<Call> retrieveAll(int startingRecord, int pageSize) {
+    public List<Call> retrieveAll(int startingRecord, int recordsAmount) {
         Criteria crit = getSession().createCriteria(this.mappedClass);
-        crit.setFirstResult((startingRecord);
-        crit.setMaxResults(pageSize);
+        crit.setFirstResult(startingRecord);
+        crit.setMaxResults(recordsAmount);
 
         return crit.list();
     }

@@ -244,12 +244,8 @@ public class CallServiceImpl implements CallService {
     }
 
     @Override
-    public List<Call> findAll(int page, int pageSize) {
-        return callDao.retrieveAll((page - 1) * pageSize, pageSize);
-    }
-
-    private int temp(int startingRecord, int pageSize) {
-        return (startingRecord - 1) * pageSize;
+    public List<Call> findAll(int startingRecord, int recordsAmount) {
+        return callDao.retrieveAll((startingRecord - 1) * recordsAmount, recordsAmount);
     }
 
     @Override

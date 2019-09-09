@@ -23,10 +23,6 @@ public class CallFlowDaoImpl extends HibernateOpenmrsDataDAO<CallFlow> implement
         super(CallFlow.class);
     }
 
-    private DbSession getSession() {
-        return sessionFactory.getCurrentSession();
-    }
-
     @Override
     public CallFlow findByName(String name) {
         Criteria crit = getSession().createCriteria(this.mappedClass);
@@ -61,5 +57,9 @@ public class CallFlowDaoImpl extends HibernateOpenmrsDataDAO<CallFlow> implement
     @Override
     public void deleteAll() {
         getSession().createQuery("delete from callFlow.CallFlow");
+    }
+
+    private DbSession getSession() {
+        return sessionFactory.getCurrentSession();
     }
 }

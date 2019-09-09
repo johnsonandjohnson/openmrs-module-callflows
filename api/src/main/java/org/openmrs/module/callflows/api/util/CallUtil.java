@@ -14,6 +14,7 @@ import org.openmrs.module.callflows.api.domain.types.CallDirection;
 import org.openmrs.module.callflows.api.domain.types.CallStatus;
 import org.openmrs.module.callflows.api.event.Events;
 import org.openmrs.module.callflows.api.dao.CallDao;
+import org.springframework.http.MediaType;
 
 import org.motechproject.event.MotechEvent;
 import org.motechproject.event.listener.EventRelay;

@@ -111,12 +111,15 @@ public interface CallService {
 
 
     /**
-     * Fetch call details based on query params by utilizing motech data service 'retrieveAll' function
-     * Limitation of 'retrieveAll()' due to MOTECH issue - Throws heap memory issue for 25000 records, but works fine with 20000 records at a time.
+     * Fetch calls based on startingRecord and recordsAmount params utilizing 'retrieveAll' function
+     * Hibernate uses number of record from which we want to start fetching data (first record has index 0) and
+     * amount of records we want to fetch
      *
+     * @param startingRecord indicating number of record from which we want to start fetching data
+     * @param recordsAmount indicating amount of records which we want to fetch
      * @return list of calls
      */
-    List<Call> findAll(int page, int pageSize);
+    List<Call> findAll(int startingRecord, int recordsAmount);
 
     /**
      * Fetch the count of call records present in db

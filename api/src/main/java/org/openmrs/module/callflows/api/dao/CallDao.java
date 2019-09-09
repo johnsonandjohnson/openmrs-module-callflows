@@ -47,7 +47,7 @@ public interface CallDao extends OpenmrsDataDAO<Call> {
 
     Call findById(Integer id);
 
-    List<Call> retrieveAll(int startingRecord, int pageSize);
+    List<Call> retrieveAll(int startingRecord, int recordsAmount);
 
     void deleteAll();
 
