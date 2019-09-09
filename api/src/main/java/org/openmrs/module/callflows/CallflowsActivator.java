@@ -12,6 +12,7 @@ package org.openmrs.module.callflows;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.BaseModuleActivator;
+import org.openmrs.module.callflows.api.event.CallFlowEventListenerFactory;
 
 /**
  * This class contains the logic that is run every time this module is either started or shutdown
@@ -26,6 +27,7 @@ public class CallflowsActivator extends BaseModuleActivator {
 	@Override
 	public void started() {
 		LOGGER.info("Started Callflows");
+		CallFlowEventListenerFactory.registerEventListeners();
 	}
 	
 	/**
@@ -33,6 +35,7 @@ public class CallflowsActivator extends BaseModuleActivator {
 	 */
 	public void shutdown() {
 		LOGGER.info("Shutdown Callflows");
+		CallFlowEventListenerFactory.unRegisterEventListeners();
 	}
 
 	/**
@@ -41,5 +44,6 @@ public class CallflowsActivator extends BaseModuleActivator {
 	@Override
 	public void stopped() {
 		LOGGER.info("Stopped Sms");
+		CallFlowEventListenerFactory.unRegisterEventListeners();
 	}
 }

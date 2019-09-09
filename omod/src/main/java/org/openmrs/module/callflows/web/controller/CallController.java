@@ -14,7 +14,6 @@ import org.openmrs.module.callflows.api.domain.flow.Flow;
 import org.openmrs.module.callflows.api.domain.flow.Node;
 import org.openmrs.module.callflows.api.domain.types.CallDirection;
 import org.openmrs.module.callflows.api.domain.types.CallStatus;
-import org.openmrs.module.callflows.api.event.InitiateCallEventHandler;
 import org.openmrs.module.callflows.api.service.CallFlowService;
 import org.openmrs.module.callflows.api.service.CallService;
 import org.openmrs.module.callflows.api.service.FlowService;

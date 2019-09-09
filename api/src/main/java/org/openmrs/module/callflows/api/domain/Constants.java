@@ -41,6 +41,10 @@ public final class Constants {
 
     public static final String PARAM_FLOW_NAME = "flowName";
 
+    public static final String PARAM_RETRY_ATTEMPTS = "retryAttempts";
+
+    public static final String PARAM_JOB_ID = "JobID";
+
     // private constructor
     private Constants() {
 

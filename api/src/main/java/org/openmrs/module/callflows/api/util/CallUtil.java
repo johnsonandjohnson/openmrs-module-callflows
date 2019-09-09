@@ -12,14 +12,9 @@ import org.openmrs.module.callflows.api.domain.flow.Node;
 import org.openmrs.module.callflows.api.domain.flow.UserNode;
 import org.openmrs.module.callflows.api.domain.types.CallDirection;
 import org.openmrs.module.callflows.api.domain.types.CallStatus;
-import org.openmrs.module.callflows.api.event.Events;
 import org.openmrs.module.callflows.api.dao.CallDao;
 import org.springframework.http.MediaType;
-
-import org.motechproject.event.MotechEvent;
-import org.motechproject.event.listener.EventRelay;
-import org.motechproject.scheduler.contract.RunOnceSchedulableJob;
-import org.motechproject.scheduler.service.MotechSchedulerService;
+import org.openmrs.module.callflows.api.event.CallFlowEvent;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.methods.HttpGet;
@@ -34,10 +29,15 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.openmrs.module.callflows.api.service.CallFlowEventService;
+import org.openmrs.module.callflows.api.service.CallFlowSchedulerService;
+import org.openmrs.module.callflows.api.task.CallFlowScheduledTask;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ClassUtils;
 import org.supercsv.io.CsvMapWriter;
@@ -45,7 +45,6 @@ import org.supercsv.prefs.CsvPreference;
 import javax.naming.OperationNotSupportedException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.MediaType;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -93,15 +92,11 @@ public class CallUtil {
 
     private static final Charset UTF8_CHARSET = Charset.forName("UTF-8");
 
-    private static final MediaType DEFAULT_MEDIA_TYPE = MediaType.TEXT_PLAIN_TYPE;
+    private static final MediaType DEFAULT_MEDIA_TYPE = MediaType.TEXT_PLAIN;
 
-    private static final MediaType JSON_MEDIA_TYPE = MediaType.APPLICATION_JSON_TYPE;
+    private static final MediaType JSON_MEDIA_TYPE = MediaType.APPLICATION_JSON;
 
     private static final String REPLACEMENT_PATTERN = "[%s]";
-
-    private static final String PARAM_RETRY_ATTEMPTS = "retryAttempts";
-
-    private static final String PARAM_JOB_ID = "JobID";
 
     private static final String ACTOR_ID = "actorId";
 
@@ -134,10 +129,12 @@ public class CallUtil {
     private CallDao callDao;
 
     @Autowired
-    private MotechSchedulerService schedulerService;
+    @Qualifier("callflow.schedulerService")
+    private CallFlowSchedulerService schedulerService;
 
     @Autowired
-    private EventRelay eventRelay;
+    @Qualifier("callFlow.eventService")
+    private CallFlowEventService callFlowEventService;
 
 
     /**
@@ -384,8 +381,8 @@ public class CallUtil {
                 // No we don't!
                 // So let's retry after some time and check again
                 // but before that how many retries have we made?
-                retryAttempts =
-                        null != params.get(PARAM_RETRY_ATTEMPTS) ? (Integer) params.get(PARAM_RETRY_ATTEMPTS) : 0;
+                retryAttempts = null != params.get(Constants.PARAM_RETRY_ATTEMPTS) ?
+                        (Integer) params.get(Constants.PARAM_RETRY_ATTEMPTS) : 0;
                 if (retryAttempts >= config.getOutboundCallRetryAttempts()) {
                     // We have exceeded anyway , so only one thing to do
                     if (!config.getCallAllowed()) {
@@ -394,7 +391,7 @@ public class CallUtil {
                     // otherwise we allow the call to do even though retries have been exceeded cause the configuration says so!
                 } else {
                     // retry after some time
-                    params.put(PARAM_RETRY_ATTEMPTS, retryAttempts + 1);
+                    params.put(Constants.PARAM_RETRY_ATTEMPTS, retryAttempts + 1);
                     scheduleOutboundCall(call.getCallId(), config, params);
                     // Exception is thrown at this point in time to avoid placing of call directly and
                     // to place the call only at the recall time set for call queuing
@@ -516,8 +513,8 @@ public class CallUtil {
             data.put(Constants.PARAM_STATUS, call.getStatus().name());
             data.put(Constants.PARAM_REASON, call.getStatusText());
             data.put(Constants.PARAM_PARAMS, call.getContext());
-            MotechEvent statusChangedEvent = new MotechEvent(Events.CALLFLOWS_CALL_STATUS, data);
-            eventRelay.sendEventMessage(statusChangedEvent);
+            CallFlowEvent statusChangedEvent = new CallFlowEvent(CallFlowEventSubjects.CALLFLOWS_CALL_STATUS, data);
+            callFlowEventService.sendEventMessage(statusChangedEvent);
         }
     }
 
@@ -536,8 +533,8 @@ public class CallUtil {
         data.put(Constants.PARAM_STATUS, status.name());
         data.put(Constants.PARAM_REASON, reason);
         data.put(Constants.PARAM_PARAMS, params);
-        MotechEvent statusChangedEvent = new MotechEvent(Events.CALLFLOWS_CALL_STATUS, data);
-        eventRelay.sendEventMessage(statusChangedEvent);
+        CallFlowEvent statusChangedEvent = new CallFlowEvent(CallFlowEventSubjects.CALLFLOWS_CALL_STATUS, data);
+        callFlowEventService.sendEventMessage(statusChangedEvent);
     }
 
     /**
@@ -678,9 +675,9 @@ public class CallUtil {
         //set the params
         eventParams.put(Constants.PARAM_PARAMS, params);
         eventParams.put(Constants.PARAM_HEADERS, config.getOutgoingCallPostHeadersMap());
-        eventParams.put(PARAM_JOB_ID, callId);
-        MotechEvent motechEvent = new MotechEvent(Events.CALLFLOWS_INITIATE_CALL, eventParams);
-        schedulerService.scheduleRunOnceJob(new RunOnceSchedulableJob(motechEvent, DateTime.now().plusSeconds(
-                config.getOutboundCallRetrySeconds())));
+        eventParams.put(Constants.PARAM_JOB_ID, callId);
+        CallFlowEvent event = new CallFlowEvent(CallFlowEventSubjects.CALLFLOWS_INITIATE_CALL, eventParams);
+        schedulerService.scheduleRunOnceJob(event,
+                DateTime.now().plusSeconds(config.getOutboundCallRetrySeconds()).toDate(),  new CallFlowScheduledTask());
     }
 }
