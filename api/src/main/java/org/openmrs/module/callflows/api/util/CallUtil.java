@@ -200,7 +200,7 @@ public class CallUtil {
 
     private boolean isAllowedToPersist(String key, Object val) {
         return key.equals(INTERNAL) || val instanceof String || val instanceof String[] ||
-                isCollectionOfStringOrPrimitive(val);CallUtil
+                isCollectionOfStringOrPrimitive(val);
     }
 
     private boolean isCollectionOfStringOrPrimitive(Object val) {
