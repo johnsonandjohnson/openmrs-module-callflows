@@ -3,10 +3,6 @@ package org.openmrs.module.callflows.api.dao;
 import org.openmrs.api.db.OpenmrsDataDAO;
 import org.openmrs.module.callflows.api.domain.CallFlow;
 
-import org.motechproject.mds.annotations.Lookup;
-import org.motechproject.mds.annotations.LookupField;
-import org.motechproject.mds.service.MotechDataService;
-
 import java.util.List;
 
 /**
