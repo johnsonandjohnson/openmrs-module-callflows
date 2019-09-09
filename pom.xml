@@ -57,6 +57,18 @@
 				<version>${jodaTimeVersion}</version>
 			</dependency>
 			<dependency>
+				<groupId>org.openmrs</groupId>
+				<artifactId>event-api</artifactId>
+				<version>${eventVersion}</version>
+				<scope>provided</scope>
+				<exclusions>
+					<exclusion>
+						<groupId>commons-codec</groupId>
+						<artifactId>commons-codec</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>
 				<version>${guavaVersion}</version>
@@ -103,5 +115,6 @@
 		<superCsvVersion>2.2.1</superCsvVersion>
 		<apacheHttpClientVersion>4.4.1</apacheHttpClientVersion>
 		<jodaTimeVersion>2.9.1</jodaTimeVersion>
+		<eventVersion>2.6.0</eventVersion>
 	</properties>
 </project>

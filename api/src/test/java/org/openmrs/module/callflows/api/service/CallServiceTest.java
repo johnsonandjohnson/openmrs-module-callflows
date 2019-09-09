@@ -8,7 +8,8 @@ import org.openmrs.module.callflows.api.domain.Config;
 import org.openmrs.module.callflows.api.domain.flow.Flow;
 import org.openmrs.module.callflows.api.domain.types.CallDirection;
 import org.openmrs.module.callflows.api.domain.types.CallStatus;
-import org.openmrs.module.callflows.api.event.Events;
+import org.openmrs.module.callflows.api.event.CallFlowEvent;
+import org.openmrs.module.callflows.api.util.CallFlowEventSubjects;
 import org.openmrs.module.callflows.api.helper.CallFlowHelper;
 import org.openmrs.module.callflows.api.helper.CallHelper;
 import org.openmrs.module.callflows.api.helper.ConfigHelper;
@@ -35,11 +36,11 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.motechproject.event.MotechEvent;
-import org.motechproject.event.listener.EventRelay;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import javax.naming.OperationNotSupportedException;
 import java.io.IOException;
@@ -124,9 +125,9 @@ public class CallServiceTest extends BaseTest {
     private CloseableHttpResponse badResponse;
 
     @Mock
-    private EventRelay eventRelay;
+    private CallFlowEventService callFlowEventService;
 
-    private MotechEvent callFailedEvent;
+    private CallFlowEvent callFailedEvent;
 
     @Before
     public void setUp() throws Exception {
@@ -200,7 +201,7 @@ public class CallServiceTest extends BaseTest {
         errorParams.put("status", CallStatus.FAILED.name());
         errorParams.put("params", params);
         errorParams.put("reason", "Empty Phone no while initiating a outbound call for flow MainFlow");
-        callFailedEvent = new MotechEvent(Events.CALLFLOWS_CALL_STATUS, errorParams);
+        callFailedEvent = new CallFlowEvent(CallFlowEventSubjects.CALLFLOWS_CALL_STATUS, errorParams);
     }
 
     @Test
@@ -630,14 +631,14 @@ public class CallServiceTest extends BaseTest {
     }
 
     public void assertNoEventSent() {
-        verify(eventRelay, never()).sendEventMessage(any(MotechEvent.class));
+        verify(callFlowEventService, never()).sendEventMessage(any(CallFlowEvent.class));
     }
 
     public void assertEventSent(String phone, String reason, String callId) {
         errorParams.put("reason", reason);
         errorParams.put("callId", callId);
         verify(callUtil, times(1)).sendStatusEvent(CallStatus.FAILED, reason, params);
-        verify(eventRelay, times(1)).sendEventMessage(callFailedEvent);
+        verify(callFlowEventService, times(1)).sendEventMessage(callFailedEvent);
     }
 
     public void assertEventSent(Call call) {

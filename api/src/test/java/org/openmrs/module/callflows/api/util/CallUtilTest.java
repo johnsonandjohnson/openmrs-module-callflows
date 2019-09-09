@@ -8,18 +8,15 @@ import org.openmrs.module.callflows.api.domain.Config;
 import org.openmrs.module.callflows.api.domain.flow.Flow;
 import org.openmrs.module.callflows.api.domain.types.CallDirection;
 import org.openmrs.module.callflows.api.domain.types.CallStatus;
-import org.openmrs.module.callflows.api.event.Events;
+import org.openmrs.module.callflows.api.event.CallFlowEvent;
 import org.openmrs.module.callflows.api.helper.CallFlowHelper;
 import org.openmrs.module.callflows.api.helper.CallHelper;
 import org.openmrs.module.callflows.api.helper.ConfigHelper;
 import org.openmrs.module.callflows.api.helper.FlowHelper;
 import org.openmrs.module.callflows.api.repository.CallDataService;
+import org.openmrs.module.callflows.api.service.CallFlowEventService;
+import org.openmrs.module.callflows.api.service.CallFlowSchedulerService;
 import org.openmrs.module.callflows.api.service.impl.CallServiceImpl;
-
-import org.motechproject.event.MotechEvent;
-import org.motechproject.event.listener.EventRelay;
-import org.motechproject.scheduler.contract.RunOnceSchedulableJob;
-import org.motechproject.scheduler.service.MotechSchedulerService;
 
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.velocity.VelocityContext;
@@ -33,9 +30,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.openmrs.module.callflows.api.task.CallFlowScheduledTask;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.supercsv.io.CsvMapWriter;
 import org.supercsv.prefs.CsvPreference;
 import javax.naming.OperationNotSupportedException;
@@ -80,7 +80,7 @@ import static org.mockito.internal.verification.VerificationModeFactory.times;
         FileOutputStream.class, CsvMapWriter.class })
 public class CallUtilTest extends BaseTest {
 
-    private MotechEvent motechEvent;
+    private CallFlowEvent callFlowEvent;
 
     private CallFlow mainFlow;
 
@@ -116,11 +116,13 @@ public class CallUtilTest extends BaseTest {
     @Mock
     private CallDataService callDataService;
 
-    @Mock
-    private MotechSchedulerService schedulerService;
+    @Autowired
+    @Qualifier("callflow.schedulerService")
+    private CallFlowSchedulerService schedulerService;
 
-    @Mock
-    private EventRelay eventRelay;
+    @Autowired
+    @Qualifier("callFlow.eventService")
+    private CallFlowEventService callFlowEventService;
 
     @Mock
     private Config config;
@@ -161,7 +163,7 @@ public class CallUtilTest extends BaseTest {
 
         eventParams.put(Constants.PARAM_CONFIG, Constants.CONFIG_VOXEO);
         eventParams.put(Constants.PARAM_FLOW_NAME, Constants.CALLFLOW_MAIN);
-        motechEvent = new MotechEvent(Events.CALLFLOWS_INITIATE_CALL, eventParams);
+        callFlowEvent = new CallFlowEvent(CallFlowEventSubjects.CALLFLOWS_INITIATE_CALL, eventParams);
     }
 
     @Test
@@ -336,7 +338,7 @@ public class CallUtilTest extends BaseTest {
         eventParams.put(Constants.PARAM_JOB_ID, outboundCall.getCallId());
         eventParams.put(Constants.PARAM_RETRY_ATTEMPTS, 1);
         given(config.getOutboundCallRetryAttempts()).willReturn(5);
-        motechEvent = new MotechEvent(Events.CALLFLOWS_INITIATE_CALL, eventParams);
+        callFlowEvent = new CallFlowEvent(CallFlowEventSubjects.CALLFLOWS_INITIATE_CALL, eventParams);
 
         //When
         callUtil.checkCallCanBePlaced(outboundCall, config, eventParams);
@@ -345,9 +347,8 @@ public class CallUtilTest extends BaseTest {
         verify(config, times(2)).getOutboundCallLimit();
         verify(callDataService, times(1)).countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet);
         assertThat(eventParams.get(Constants.PARAM_RETRY_ATTEMPTS).toString(), equalTo("2"));
-        verify(schedulerService, times(1)).scheduleRunOnceJob(new RunOnceSchedulableJob(motechEvent, DateTime.now()
-                                                                                                             .plusSeconds(
-                                                                                                                     Constants.CONFIG_VOXEO_OUTBOUND_CALL_RETRY_SECONDS)));
+        verify(schedulerService, times(1)).safeScheduleRunOnceJob(callFlowEvent,
+                DateTime.now().plusSeconds(Constants.CONFIG_VOXEO_OUTBOUND_CALL_RETRY_SECONDS).toDate(), new CallFlowScheduledTask());
     }
 
     @Test(expected = OperationNotSupportedException.class)
@@ -381,7 +382,7 @@ public class CallUtilTest extends BaseTest {
         eventParams.put(Constants.PARAM_JOB_ID, outboundCall.getCallId());
         eventParams.put(Constants.PARAM_RETRY_ATTEMPTS, 6);
         given(config.getOutboundCallRetryAttempts()).willReturn(5);
-        motechEvent = new MotechEvent(Events.CALLFLOWS_INITIATE_CALL, eventParams);
+        callFlowEvent = new CallFlowEvent(CallFlowEventSubjects.CALLFLOWS_INITIATE_CALL, eventParams);
         given(config.getCallAllowed()).willReturn(true);
 
         //When
@@ -464,14 +465,14 @@ public class CallUtilTest extends BaseTest {
         outboundCall.setStatus(CallStatus.BUSY);
         outboundCall.setStatusText(Constants.STATUS_TEXT);
         outboundCall.setContext(callParams);
-        ArgumentCaptor<MotechEvent> motechEventArgumentCaptor = ArgumentCaptor.forClass(MotechEvent.class);
+        ArgumentCaptor<CallFlowEvent> CallFlowEventArgumentCaptor = ArgumentCaptor.forClass(CallFlowEvent.class);
 
         // When
         callUtil.sendStatusEvent(outboundCall);
 
         // Then
-        verify(eventRelay, times(1)).sendEventMessage(motechEventArgumentCaptor.capture());
-        MotechEvent capturedEvent = motechEventArgumentCaptor.getValue();
+        verify(eventRelay, times(1)).sendEventMessage(CallFlowEventArgumentCaptor.capture());
+        CallFlowEvent capturedEvent = CallFlowEventArgumentCaptor.getValue();
         assertThat((String) capturedEvent.getParameters().get(Constants.PARAM_CALL_ID),
                    equalTo(outboundCall.getCallId()));
         assertCallStatusEvent(capturedEvent);
@@ -486,18 +487,18 @@ public class CallUtilTest extends BaseTest {
         callUtil.sendStatusEvent(badCall);
 
         // Then
-        verifyZeroInteractions(eventRelay);
+        verifyZeroInteractions(callFlowEventService);
     }
 
     @Test
     public void shouldSendStatusEventForArgumentsPassed() {
         // Given, When
         callUtil.sendStatusEvent(CallStatus.BUSY, Constants.STATUS_TEXT, callParams);
-        ArgumentCaptor<MotechEvent> motechEventArgumentCaptor = ArgumentCaptor.forClass(MotechEvent.class);
+        ArgumentCaptor<CallFlowEvent> callFlowEventArgumentCaptor = ArgumentCaptor.forClass(CallFlowEvent.class);
 
         // Then
-        verify(eventRelay, times(1)).sendEventMessage(motechEventArgumentCaptor.capture());
-        MotechEvent capturedEvent = motechEventArgumentCaptor.getValue();
+        verify(callFlowEventService, times(1)).sendEventMessage(callFlowEventArgumentCaptor.capture());
+        CallFlowEvent capturedEvent = callFlowEventArgumentCaptor.getValue();
         // Since we are sending this event without a call object being created, the call ID should be unknown
         assertThat((String) capturedEvent.getParameters().get(Constants.PARAM_CALL_ID), equalTo("unknown"));
         assertCallStatusEvent(capturedEvent);
@@ -512,7 +513,7 @@ public class CallUtilTest extends BaseTest {
         eventParams.put(Constants.PARAM_JOB_ID, outboundCall.getCallId());
         eventParams.put(Constants.PARAM_RETRY_ATTEMPTS, null);
         given(config.getOutboundCallRetryAttempts()).willReturn(5);
-        motechEvent = new MotechEvent(Events.CALLFLOWS_INITIATE_CALL, eventParams);
+        callFlowEvent = new CallFlowEvent(CallFlowEventSubjects.CALLFLOWS_INITIATE_CALL, eventParams);
 
         //When
         callUtil.checkCallCanBePlaced(outboundCall, config, eventParams);
@@ -521,9 +522,9 @@ public class CallUtilTest extends BaseTest {
         verify(config, times(2)).getOutboundCallLimit();
         verify(callDataService, times(1)).countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet);
         assertThat(eventParams.get(Constants.PARAM_RETRY_ATTEMPTS).toString(), equalTo("1"));
-        verify(schedulerService, times(1)).scheduleRunOnceJob(new RunOnceSchedulableJob(motechEvent, DateTime.now()
-                                                                                                             .plusSeconds(
-                                                                                                                     Constants.CONFIG_VOXEO_OUTBOUND_CALL_RETRY_SECONDS)));
+        verify(schedulerService, times(1)).safeScheduleRunOnceJob(callFlowEvent,
+                DateTime.now().plusSeconds(Constants.CONFIG_VOXEO_OUTBOUND_CALL_RETRY_SECONDS).toDate(),
+                new CallFlowScheduledTask());
     }
 
     @Test
@@ -562,8 +563,8 @@ public class CallUtilTest extends BaseTest {
         return callData;
     }
 
-    private void assertCallStatusEvent(MotechEvent event) {
-        assertThat(event.getSubject(), equalTo(Events.CALLFLOWS_CALL_STATUS));
+    private void assertCallStatusEvent(CallFlowEvent event) {
+        assertThat(event.getSubject(), equalTo(CallFlowEventSubjects.CALLFLOWS_CALL_STATUS));
         Map<String, Object> eventParameters = event.getParameters();
         assertThat(eventParameters.get(Constants.PARAM_STATUS), equalTo(CallStatus.BUSY.name()));
         assertThat(eventParameters.get(Constants.PARAM_REASON), equalTo(Constants.STATUS_TEXT));
