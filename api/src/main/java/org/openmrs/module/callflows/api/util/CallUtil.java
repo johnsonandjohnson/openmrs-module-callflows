@@ -37,7 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+//import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ClassUtils;
 import org.supercsv.io.CsvMapWriter;
@@ -45,6 +45,7 @@ import org.supercsv.prefs.CsvPreference;
 import javax.naming.OperationNotSupportedException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.MediaType;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -91,10 +92,6 @@ public class CallUtil {
     private static final String ERROR_RESPONSE = "error:%s:%s";
 
     private static final Charset UTF8_CHARSET = Charset.forName("UTF-8");
-
-    private static final MediaType DEFAULT_MEDIA_TYPE = new MediaType("text", "plain", UTF8_CHARSET);
-
-    private static final MediaType JSON_MEDIA_TYPE = new MediaType("application", JSON, UTF8_CHARSET);
 
     private static final String REPLACEMENT_PATTERN = "[%s]";
 
@@ -323,11 +320,11 @@ public class CallUtil {
     public HttpHeaders buildHeaders(Exception error, String extension, Config config, Renderer renderer) {
         HttpHeaders responseHeaders = new HttpHeaders();
         if (JSON.equals(extension)) {
-            responseHeaders.setContentType(JSON_MEDIA_TYPE);
+            responseHeaders.setContentType(MediaType.APPLICATION_JSON_TYPE);
         } else if (null == config || null != error) {
             // If we didn't get any configuration or we have a error, default to plain text
             // cause the renderers and mime types are all part of the config!
-            responseHeaders.setContentType(DEFAULT_MEDIA_TYPE);
+            responseHeaders.setContentType(MediaType.TEXT_PLAIN_TYPE);
         } else {
             if (renderer != null) {
                 String[] mimeParts = renderer.getMimeType().split("/");
