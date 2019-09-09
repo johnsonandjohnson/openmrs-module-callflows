@@ -26,16 +26,6 @@
 		<module>omod</module>
 	</modules>
 
-	<properties>
-		<openmrsPlatformVersion>1.11.6</openmrsPlatformVersion>
-		<javaCompilerSource>1.8</javaCompilerSource>
-		<javaCompilerTarget>1.8</javaCompilerTarget>
-		<gsonVersion>1.7.1</gsonVersion>
-		<superCsvVersion>2.2.1</superCsvVersion>
-		<apacheHttpClientVersion>4.4.1</apacheHttpClientVersion>
-		<jodaTimeVersion>2.9.1</jodaTimeVersion>
-	</properties>
-
 	<dependencyManagement>
 		<dependencies>
 			<!-- Importing versions from refapp distro -->
@@ -66,6 +56,16 @@
 				<artifactId>joda-time</artifactId>
 				<version>${jodaTimeVersion}</version>
 			</dependency>
+			<dependency>
+				<groupId>com.google.guava</groupId>
+				<artifactId>guava</artifactId>
+				<version>${guavaVersion}</version>
+			</dependency>
+			<dependency>
+				<groupId>javax.ws.rs</groupId>
+				<artifactId>jsr311-api</artifactId>
+				<version>${jsr311ApiVersion}</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -93,4 +93,15 @@
 		</pluginRepository>
 	</pluginRepositories>
 
+	<properties>
+		<openmrsPlatformVersion>1.11.6</openmrsPlatformVersion>
+		<javaCompilerSource>1.8</javaCompilerSource>
+		<javaCompilerTarget>1.8</javaCompilerTarget>
+		<gsonVersion>1.7.1</gsonVersion>
+		<guavaVersion>23.0</guavaVersion>
+		<jsr311ApiVersion>1.1</jsr311ApiVersion>
+		<superCsvVersion>2.2.1</superCsvVersion>
+		<apacheHttpClientVersion>4.4.1</apacheHttpClientVersion>
+		<jodaTimeVersion>2.9.1</jodaTimeVersion>
+	</properties>
 </project>
