@@ -676,7 +676,7 @@ public class CallUtil {
         eventParams.put(Constants.PARAM_HEADERS, config.getOutgoingCallPostHeadersMap());
         eventParams.put(Constants.PARAM_JOB_ID, callId);
         CallFlowEvent event = new CallFlowEvent(CallFlowEventSubjects.CALLFLOWS_INITIATE_CALL, eventParams);
-        schedulerService.safeScheduleRunOnceJob(event,
+        schedulerService.scheduleRunOnceJob(event,
                 DateTime.now().plusSeconds(config.getOutboundCallRetrySeconds()).toDate(),  new CallFlowScheduledTask());
     }
 }

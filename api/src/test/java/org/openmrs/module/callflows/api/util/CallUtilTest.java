@@ -347,7 +347,7 @@ public class CallUtilTest extends BaseTest {
         verify(config, times(2)).getOutboundCallLimit();
         verify(callDataService, times(1)).countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet);
         assertThat(eventParams.get(Constants.PARAM_RETRY_ATTEMPTS).toString(), equalTo("2"));
-        verify(schedulerService, times(1)).safeScheduleRunOnceJob(callFlowEvent,
+        verify(schedulerService, times(1)).scheduleRunOnceJob(callFlowEvent,
                 DateTime.now().plusSeconds(Constants.CONFIG_VOXEO_OUTBOUND_CALL_RETRY_SECONDS).toDate(), new CallFlowScheduledTask());
     }
 
@@ -522,7 +522,7 @@ public class CallUtilTest extends BaseTest {
         verify(config, times(2)).getOutboundCallLimit();
         verify(callDataService, times(1)).countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet);
         assertThat(eventParams.get(Constants.PARAM_RETRY_ATTEMPTS).toString(), equalTo("1"));
-        verify(schedulerService, times(1)).safeScheduleRunOnceJob(callFlowEvent,
+        verify(schedulerService, times(1)).scheduleRunOnceJob(callFlowEvent,
                 DateTime.now().plusSeconds(Constants.CONFIG_VOXEO_OUTBOUND_CALL_RETRY_SECONDS).toDate(),
                 new CallFlowScheduledTask());
     }

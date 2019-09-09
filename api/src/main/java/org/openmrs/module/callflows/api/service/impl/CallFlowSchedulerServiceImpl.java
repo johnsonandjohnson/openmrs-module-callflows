@@ -24,9 +24,8 @@ public class CallFlowSchedulerServiceImpl extends BaseOpenmrsService implements 
 	private SchedulerService schedulerService;
 
 	@Override
-	public void safeScheduleRunOnceJob(CallFlowEvent event, Date startTime, AbstractTask task) {
+	public void scheduleRunOnceJob(CallFlowEvent event, Date startTime, AbstractTask task) {
 		String taskName = event.generateTaskName();
-		shutdownTask(taskName);
 
 		TaskDefinition taskDefinition = new TaskDefinition();
 		taskDefinition.setName(taskName);
@@ -42,20 +41,6 @@ public class CallFlowSchedulerServiceImpl extends BaseOpenmrsService implements 
 			schedulerService.scheduleTask(taskDefinition);
 		} catch(SchedulerException ex) {
 			throw new CallFlowRuntimeException(ex);
-		}
-	}
-
-	private void shutdownTask(String taskName) {
-		try {
-			TaskDefinition taskDefinition = schedulerService.getTaskByName(taskName);
-			if (taskDefinition != null) {
-				LOGGER.debug(String.format("Task %s was shutdown. Last execution time: %s", taskName,
-						taskDefinition.getLastExecutionTime()));
-				schedulerService.shutdownTask(taskDefinition);
-				schedulerService.deleteTask(taskDefinition.getId());
-			}
-		} catch(SchedulerException ex) {
-			LOGGER.error(ex);
 		}
 	}
 }
