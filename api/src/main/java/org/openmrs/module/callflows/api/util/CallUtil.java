@@ -92,9 +92,9 @@ public class CallUtil {
 
     private static final Charset UTF8_CHARSET = Charset.forName("UTF-8");
 
-    private static final MediaType DEFAULT_MEDIA_TYPE = MediaType.TEXT_PLAIN;
+    private static final MediaType DEFAULT_MEDIA_TYPE = new MediaType("text", "plain", UTF8_CHARSET);
 
-    private static final MediaType JSON_MEDIA_TYPE = MediaType.APPLICATION_JSON;
+    private static final MediaType JSON_MEDIA_TYPE = new MediaType("application", JSON, UTF8_CHARSET);
 
     private static final String REPLACEMENT_PATTERN = "[%s]";
 
