@@ -92,6 +92,10 @@ public class CallUtil {
 
     private static final Charset UTF8_CHARSET = Charset.forName("UTF-8");
 
+    private static final MediaType DEFAULT_MEDIA_TYPE = MediaType.TEXT_PLAIN_TYPE;
+
+    private static final MediaType JSON_MEDIA_TYPE = MediaType.APPLICATION_JSON_TYPE;
+
     private static final String REPLACEMENT_PATTERN = "[%s]";
 
     private static final String PARAM_RETRY_ATTEMPTS = "retryAttempts";
@@ -196,7 +200,7 @@ public class CallUtil {
 
     private boolean isAllowedToPersist(String key, Object val) {
         return key.equals(INTERNAL) || val instanceof String || val instanceof String[] ||
-                isCollectionOfStringOrPrimitive(val);
+                isCollectionOfStringOrPrimitive(val);CallUtil
     }
 
     private boolean isCollectionOfStringOrPrimitive(Object val) {
@@ -319,11 +323,11 @@ public class CallUtil {
     public HttpHeaders buildHeaders(Exception error, String extension, Config config, Renderer renderer) {
         HttpHeaders responseHeaders = new HttpHeaders();
         if (JSON.equals(extension)) {
-            responseHeaders.setContentType(MediaType.APPLICATION_JSON_TYPE);
+            responseHeaders.setContentType(JSON_MEDIA_TYPE);
         } else if (null == config || null != error) {
             // If we didn't get any configuration or we have a error, default to plain text
             // cause the renderers and mime types are all part of the config!
-            responseHeaders.setContentType(MediaType.TEXT_PLAIN_TYPE);
+            responseHeaders.setContentType(DEFAULT_MEDIA_TYPE);
         } else {
             if (renderer != null) {
                 String[] mimeParts = renderer.getMimeType().split("/");
