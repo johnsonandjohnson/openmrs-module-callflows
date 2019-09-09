@@ -351,7 +351,7 @@ public class CallController extends RestController {
             call.setStatus(position.isTerminated() ? CallStatus.COMPLETED : call.getStatus());
             // one more interaction happened
             call.setSteps(call.getSteps() + 1);
-            // merge everything backfindAll
+            // merge everything back
             callUtil.mergeContextWithCall(context, call);
             // persist
             callService.update(call);
