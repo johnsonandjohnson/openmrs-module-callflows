@@ -1,5 +1,6 @@
 package org.openmrs.module.callflows.web.controller;
 
+import org.openmrs.api.context.ServiceContext;
 import org.openmrs.module.callflows.api.BaseTest;
 import org.openmrs.module.callflows.api.Constants;
 import org.openmrs.module.callflows.api.domain.Call;
@@ -26,7 +27,6 @@ import org.openmrs.module.callflows.api.util.CallUtil;
 import org.openmrs.module.callflows.api.util.FlowUtil;
 import org.openmrs.module.callflows.api.util.TestUtil;
 import org.motechproject.mds.query.QueryParams;
-import org.motechproject.mds.service.ServiceUtil;
 import org.apache.velocity.VelocityContext;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,10 +35,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.osgi.framework.BundleContext;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.web.server.MockMvc;
 import org.springframework.test.web.server.request.DefaultRequestBuilder;
@@ -61,6 +61,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -77,12 +78,14 @@ import static org.springframework.test.web.server.result.MockMvcResultMatchers.s
  * @author bramak09
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ CallController.class, ServiceUtil.class, QueryParams.class })
+@PrepareForTest({ CallController.class, ServiceContext.class, QueryParams.class })
 public class CallControllerTest extends BaseTest {
 
     private static final String LOCALHOST = "localhost";
 
     private static final String CONTEXT_PATH = "/motech-platform-server/modules";
+
+    private static final String BEAN_NAME = "callService";
 
     private MockMvc mockMvc;
 
@@ -100,9 +103,6 @@ public class CallControllerTest extends BaseTest {
 
     @Mock
     private FlowService flowService;
-
-    @Mock
-    private BundleContext bundleContext;
 
     @Spy
     @InjectMocks
@@ -162,7 +162,9 @@ public class CallControllerTest extends BaseTest {
     @Before
     public void setUp() throws IOException {
         // initialize
-        PowerMockito.mockStatic(ServiceUtil.class);
+        PowerMockito.mockStatic(ServiceContext.class);
+        given(ServiceContext.getInstance()).willReturn(mock(ServiceContext.class));
+        given(ServiceContext.getInstance().getApplicationContext()).willReturn(mock(ApplicationContext.class));
         PowerMockito.mockStatic(QueryParams.class);
         mockMvc = MockMvcBuilders.standaloneSetup(callController).build();
         callController.initialize();
@@ -193,9 +195,7 @@ public class CallControllerTest extends BaseTest {
 
         given(callFlowService.findByName(Constants.CALLFLOW_MAIN)).willReturn(mainFlow);
         given(callFlowService.findByName(Constants.CALLFLOW_MAIN2)).willThrow(new IllegalArgumentException(Constants.ERROR_MAIN_FLOW2));
-
-        // bundleContext
-        given(ServiceUtil.getServiceForInterfaceName(bundleContext, CALL_SERVICE_CLASS)).willReturn("callService");
+        given(ServiceContext.getInstance().getApplicationContext().getBean(BEAN_NAME)).willReturn(BEAN_NAME);
 
         // Flow Service
         flow = FlowHelper.createFlow(raw);

@@ -2,6 +2,7 @@ package org.openmrs.module.callflows.api.service.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.HttpStatus;
 import org.openmrs.module.callflows.api.domain.Call;
 import org.openmrs.module.callflows.api.domain.CallFlow;
 import org.openmrs.module.callflows.api.domain.Config;
@@ -17,19 +18,20 @@ import org.openmrs.module.callflows.api.service.ConfigService;
 import org.openmrs.module.callflows.api.util.CallUtil;
 
 
-import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.joda.time.DateTime;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import javax.naming.OperationNotSupportedException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +53,7 @@ public class CallServiceImpl implements CallService {
     private static final String FAILURE = "failure";
 
     private static final Set<Integer> ACCEPTABLE_IVR_RESPONSE_STATUSES = Sets
-            .newHashSet(HttpStatus.SC_OK, HttpStatus.SC_ACCEPTED, HttpStatus.SC_CREATED);
+            .newHashSet(HttpURLConnection.HTTP_OK, HttpURLConnection.HTTP_ACCEPTED, HttpURLConnection.HTTP_CREATED);
 
     @Autowired
     private CallDao callDao;
@@ -241,11 +243,6 @@ public class CallServiceImpl implements CallService {
         return call;
     }
 
-    /*
-    In Motech was passed number of page and pageSize to fetch records
-    Hibernate uses number of startingRecord from which we want to start fetching data (first record with index 0)
-    and pageSize to specify how much records you want to fetch
-    */
     @Override
     public List<Call> findAll(int page, int pageSize) {
         return callDao.retrieveAll((page - 1) * pageSize, pageSize);

@@ -37,7 +37,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ClassUtils;
 import org.supercsv.io.CsvMapWriter;
@@ -45,6 +44,7 @@ import org.supercsv.prefs.CsvPreference;
 import javax.naming.OperationNotSupportedException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.MediaType;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -92,9 +92,9 @@ public class CallUtil {
 
     private static final Charset UTF8_CHARSET = Charset.forName("UTF-8");
 
-    private static final MediaType DEFAULT_MEDIA_TYPE = new MediaType("text", "plain", UTF8_CHARSET);
+    private static final MediaType DEFAULT_MEDIA_TYPE = MediaType.TEXT_PLAIN_TYPE;
 
-    private static final MediaType JSON_MEDIA_TYPE = new MediaType("application", JSON, UTF8_CHARSET);
+    private static final MediaType JSON_MEDIA_TYPE = MediaType.APPLICATION_JSON_TYPE;
 
     private static final String REPLACEMENT_PATTERN = "[%s]";
 
