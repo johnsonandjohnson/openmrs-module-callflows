@@ -11,4 +11,11 @@
 	<packaging>jar</packaging>
 	<name>Callflows API</name>
 	<description>API project for Callflows</description>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+		</dependency>
+	</dependencies>
 </project>

@@ -12,7 +12,7 @@ import org.openmrs.module.callflows.api.helper.ConfigHelper;
 import org.openmrs.module.callflows.api.dao.CallDao;
 import org.openmrs.module.callflows.api.dao.CallFlowDao;
 import org.openmrs.module.callflows.api.service.CallService;
-import org.openmrs.module.callflows.api.service.SettingsService;
+import org.openmrs.module.callflows.api.service.ConfigService;
 import org.openmrs.module.callflows.api.util.CallAssert;
 import org.openmrs.module.callflows.api.util.TestUtil;
 
@@ -55,7 +55,7 @@ public class CallServiceBundleIT extends BasePaxIT {
     private CallDao callDao;
 
     @Inject
-    private SettingsService settingsService;
+    private ConfigService configService;
 
     @Inject
     private CallFlowDao callFlowDao;
@@ -102,7 +102,7 @@ public class CallServiceBundleIT extends BasePaxIT {
         configs = ConfigHelper.createConfigs();
         voxeo = configs.get(0);
         voxeo.setOutgoingCallUriTemplate("http://www.google.com");
-        settingsService.updateConfigs(configs);
+        configService.updateConfigs(configs);
     }
 
     @After
@@ -251,7 +251,7 @@ public class CallServiceBundleIT extends BasePaxIT {
         params.put("phone", "1234567890");
         // Just need a url that returns a 200 response, for lack of imagination we point to google :)
         voxeo.setOutgoingCallUriTemplate("http://www.google.com");
-        settingsService.updateConfigs(configs);
+        configService.updateConfigs(configs);
         // When
         Call call = callService.makeCall(Constants.CONFIG_VOXEO, Constants.CALLFLOW_MAIN, params);
 
@@ -310,7 +310,7 @@ public class CallServiceBundleIT extends BasePaxIT {
         // Given
         params.put("phone", "1234567890");
         voxeo.setOutgoingCallUriTemplate("http://localhost/should-return-404");
-        settingsService.updateConfigs(configs);
+        configService.updateConfigs(configs);
 
         // When
         Call call = callService.makeCall(Constants.CONFIG_VOXEO, Constants.CALLFLOW_MAIN, params);

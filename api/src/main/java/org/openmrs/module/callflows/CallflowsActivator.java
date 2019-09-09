@@ -18,20 +18,28 @@ import org.openmrs.module.BaseModuleActivator;
  */
 public class CallflowsActivator extends BaseModuleActivator {
 	
-	private Log log = LogFactory.getLog(this.getClass());
+	private static final Log LOGGER = LogFactory.getLog(CallflowsActivator.class);
 	
 	/**
 	 * @see #started()
 	 */
+	@Override
 	public void started() {
-		log.info("Started Callflows");
+		LOGGER.info("Started Callflows");
 	}
 	
 	/**
 	 * @see #shutdown()
 	 */
 	public void shutdown() {
-		log.info("Shutdown Callflows");
+		LOGGER.info("Shutdown Callflows");
 	}
-	
+
+	/**
+	 +	 * @see #stopped()
+	 +	 */
+	@Override
+	public void stopped() {
+		LOGGER.info("Stopped Sms");
+	}
 }

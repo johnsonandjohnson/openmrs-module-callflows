@@ -1,5 +1,7 @@
 package org.openmrs.module.callflows.api.service.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.callflows.api.domain.CallFlow;
 import org.openmrs.module.callflows.api.domain.FlowPosition;
 import org.openmrs.module.callflows.api.domain.FlowStep;
@@ -12,8 +14,6 @@ import org.openmrs.module.callflows.api.util.FlowUtil;
 
 import org.apache.velocity.VelocityContext;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
@@ -28,7 +28,7 @@ import java.util.List;
 @Service("flowService")
 public class FlowServiceImpl implements FlowService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FlowServiceImpl.class);
+    private static final Log LOGGER = LogFactory.getLog(FlowServiceImpl.class);
 
     private static final String SPACE = " ";
 
@@ -94,7 +94,7 @@ public class FlowServiceImpl implements FlowService {
         Flow currentFlow = startFlow;
         Node currentNode = startNode;
 
-        LOGGER.debug("evalNode:[START] {} of flow {} ", startNode, startFlow);
+        LOGGER.debug(String.format("evalNode:[START] %s of flow %s ", startNode, startFlow));
 
         // Idea is to keep evaluating until we arrive at a user node, cause at the time of confronting a user-node
         // we have to communicate to the user and hence stop processing
@@ -110,9 +110,9 @@ public class FlowServiceImpl implements FlowService {
                                                                   buildVisited(visited)));
                 }
                 visited.add(currentNode);
-                LOGGER.debug("evalNode:[LOOP] {} of flow {} ", currentNode, currentFlow);
+                LOGGER.debug(String.format("evalNode:[LOOP] %s of flow %s ", currentNode, currentFlow));
                 output = flowUtil.evalNode(currentFlow, currentNode, context, VELOCITY);
-                LOGGER.debug("evalNode:[LOOP] {} --> {} ", currentNode, output);
+                LOGGER.debug(String.format("evalNode:[LOOP] %s --> %s ", currentNode, output));
                 FlowStep flowStep = parse(output, currentFlow);
 
                 currentFlow = flowStep.getFlow();
@@ -122,7 +122,7 @@ public class FlowServiceImpl implements FlowService {
             LOGGER.error(e.getMessage(), e);
             return buildFlowPosition(startFlow, currentFlow, startNode, currentNode, visited, output, true);
         }
-        LOGGER.debug("evalNode:[END] {} of flow {} ", currentNode, currentFlow);
+        LOGGER.debug(String.format("evalNode:[END] %s of flow %s ", currentNode, currentFlow));
         return buildFlowPosition(startFlow, currentFlow, startNode, currentNode, visited, output, false);
     }
 

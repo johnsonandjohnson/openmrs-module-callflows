@@ -5,7 +5,7 @@ import org.openmrs.module.callflows.api.domain.Config;
 import org.openmrs.module.callflows.api.domain.Renderer;
 import org.openmrs.module.callflows.api.helper.ConfigHelper;
 import org.openmrs.module.callflows.api.helper.RendererHelper;
-import org.openmrs.module.callflows.api.service.SettingsService;
+import org.openmrs.module.callflows.api.service.ConfigService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,10 +34,10 @@ import static org.junit.Assert.assertThat;
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerSuite.class)
 @ExamFactory(MotechNativeTestContainerFactory.class)
-public class SettingsServiceBundleIT extends BasePaxIT {
+public class ConfigServiceBundleIT extends BasePaxIT {
 
     @Inject
-    private SettingsService settingsService;
+    private ConfigService configService;
 
     private List<Config> configs;
 
@@ -48,29 +48,29 @@ public class SettingsServiceBundleIT extends BasePaxIT {
 
         // Save a bunch of configs in the database
         configs = ConfigHelper.createConfigs();
-        settingsService.updateConfigs(configs);
+        configService.updateConfigs(configs);
 
         // and some renderers
         renderers = RendererHelper.createRenderers();
-        settingsService.updateRenderers(renderers);
+        configService.updateRenderers(renderers);
     }
 
     @After
     public void tearDown() {
         // reset by emptying out the configuration
-        settingsService.updateConfigs(new ArrayList<Config>());
-        settingsService.updateRenderers(new ArrayList<Renderer>());
+        configService.updateConfigs(new ArrayList<Config>());
+        configService.updateRenderers(new ArrayList<Renderer>());
     }
 
     @Test
     public void shouldReturnOSGIService() {
-        assertNotNull(settingsService);
+        assertNotNull(configService);
     }
 
     @Test
     public void shouldGetConfigForValidName() {
         // When
-        Config voxeo = settingsService.getConfig(Constants.CONFIG_VOXEO);
+        Config voxeo = configService.getConfig(Constants.CONFIG_VOXEO);
         // Then
         assertNotNull(voxeo);
         assertThat(voxeo.getName(), equalTo(Constants.CONFIG_VOXEO));
@@ -81,13 +81,13 @@ public class SettingsServiceBundleIT extends BasePaxIT {
     @Test(expected = IllegalArgumentException.class)
     public void shouldThrowIllegalArgumentIfTriedToRetrieveInvalidConfig() {
         // When, Then
-        Config voxeo = settingsService.getConfig(Constants.INVALID);
+        Config voxeo = configService.getConfig(Constants.INVALID);
     }
 
     @Test
     public void shouldGetAllConfigs() {
         // When
-        List<Config> allConfigs = settingsService.allConfigs();
+        List<Config> allConfigs = configService.allConfigs();
         // Then
         assertNotNull(allConfigs);
         assertThat(allConfigs.size(), equalTo(3));
@@ -123,7 +123,7 @@ public class SettingsServiceBundleIT extends BasePaxIT {
     @Test
     public void shouldReturnTrueIfCheckedForExistenceOfValidConfig() {
         // When
-        boolean exists = settingsService.hasConfig(Constants.CONFIG_VOXEO);
+        boolean exists = configService.hasConfig(Constants.CONFIG_VOXEO);
         // Then
         assertThat(exists, equalTo(true));
     }
@@ -131,7 +131,7 @@ public class SettingsServiceBundleIT extends BasePaxIT {
     @Test
     public void shouldReturnFalseIfCheckedForExistenceOfInvalidConfig() {
         // When
-        boolean exists = settingsService.hasConfig(Constants.INVALID);
+        boolean exists = configService.hasConfig(Constants.INVALID);
         // Then
         assertThat(exists, equalTo(false));
     }
@@ -142,10 +142,10 @@ public class SettingsServiceBundleIT extends BasePaxIT {
         configs.get(0).setName(Constants.CONFIG_VOXEO + Constants.UPDATED);
 
         // When
-        settingsService.updateConfigs(configs);
+        configService.updateConfigs(configs);
 
         // Then
-        List<Config> allConfigs = settingsService.allConfigs();
+        List<Config> allConfigs = configService.allConfigs();
         assertThat(allConfigs.size(), equalTo(configs.size()));
         // The first one must be updated
         assertThat(allConfigs.get(0).getName(), equalTo(Constants.CONFIG_VOXEO + Constants.UPDATED));
@@ -158,7 +158,7 @@ public class SettingsServiceBundleIT extends BasePaxIT {
     @Test
     public void shouldGetRendererValidName() {
         // When
-        Renderer vxml = settingsService.getRenderer(Constants.CONFIG_RENDERER_VXML);
+        Renderer vxml = configService.getRenderer(Constants.CONFIG_RENDERER_VXML);
         // Then
         assertNotNull(vxml);
         assertThat(vxml.getName(), equalTo(Constants.CONFIG_RENDERER_VXML));
@@ -169,13 +169,13 @@ public class SettingsServiceBundleIT extends BasePaxIT {
     @Test(expected = IllegalArgumentException.class)
     public void shouldThrowIllegalArgumentIfTriedToRetrieveInvalidRenderer() {
         // When, Then
-        settingsService.getRenderer(Constants.INVALID);
+        configService.getRenderer(Constants.INVALID);
     }
 
     @Test
     public void shouldGetAllRenderers() {
         // When
-        List<Renderer> allRenderers = settingsService.allRenderers();
+        List<Renderer> allRenderers = configService.allRenderers();
         // Then
         assertNotNull(allRenderers);
         assertThat(allRenderers.size(), equalTo(2));
@@ -194,7 +194,7 @@ public class SettingsServiceBundleIT extends BasePaxIT {
     @Test
     public void shouldReturnTrueIfCheckedForExistenceOfValidRenderer() {
         // When
-        boolean exists = settingsService.hasRenderer(Constants.CONFIG_RENDERER_VXML);
+        boolean exists = configService.hasRenderer(Constants.CONFIG_RENDERER_VXML);
         // Then
         assertThat(exists, equalTo(true));
     }
@@ -202,7 +202,7 @@ public class SettingsServiceBundleIT extends BasePaxIT {
     @Test
     public void shouldReturnFalseIfCheckedForExistenceOfInvalidRenderer() {
         // When
-        boolean exists = settingsService.hasRenderer(Constants.INVALID);
+        boolean exists = configService.hasRenderer(Constants.INVALID);
         // Then
         assertThat(exists, equalTo(false));
     }
@@ -213,10 +213,10 @@ public class SettingsServiceBundleIT extends BasePaxIT {
         renderers.get(0).setName(Constants.CONFIG_RENDERER_VXML + Constants.UPDATED);
 
         // When
-        settingsService.updateRenderers(renderers);
+        configService.updateRenderers(renderers);
 
         // Then
-        List<Renderer> allRenderers = settingsService.allRenderers();
+        List<Renderer> allRenderers = configService.allRenderers();
         assertThat(allRenderers.size(), equalTo(renderers.size()));
         // The first one must be updated
         assertThat(allRenderers.get(0).getName(), equalTo(Constants.CONFIG_RENDERER_VXML + Constants.UPDATED));

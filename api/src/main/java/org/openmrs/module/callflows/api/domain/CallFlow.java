@@ -2,11 +2,12 @@ package org.openmrs.module.callflows.api.domain;
 
 import org.openmrs.module.callflows.api.domain.types.CallFlowStatus;
 
-import org.motechproject.mds.annotations.Entity;
-import org.motechproject.mds.annotations.Field;
-import org.motechproject.mds.annotations.UIDisplayable;
-
-import javax.jdo.annotations.Unique;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import java.util.Objects;
 
 /**
@@ -14,33 +15,35 @@ import java.util.Objects;
  *
  * @author bramak09
  */
-@Entity(recordHistory = true, tableName = "cfl_callflows")
-@Unique(name = "UNIQUE_CALLFLOW_IDX", members = { "name" })
-public class CallFlow {
+@Entity(name = "callFlow.CallFlow")
+@Table(name = "cfl_callflows", uniqueConstraints = @UniqueConstraint(name = "UNIQUE_CALLFLOW_IDX", columnNames = {"name"}))
+public class CallFlow extends AbstractBaseOpenmrsData {
 
-    private Long id;
+    private static final String TEXT = "text";
+
+    @Id
+    @GeneratedValue
+    @Column(name = "cfl_callflows_id")
+    private Integer id;
 
     /**
      * The callflow name. Typically alpha-numeric.
      * Can not contain dots strictly, as a dot is used to separate a call flow from a step in a call flow
      */
-    @Field
-    @UIDisplayable(position = UIPositions.COLUMN_1)
+    @Column
     private String name;
 
     /**
      * A description of the call flow
      */
-    @Field
-    @UIDisplayable(position = UIPositions.COLUMN_2)
+    @Column
     private String description;
 
     /**
      * The call flow status
      * Used to determine whether a call flow is active in the system or being currently worked on (DRAFT) mode
      */
-    @Field
-    @UIDisplayable(position = UIPositions.COLUMN_3)
+    @Column
     private CallFlowStatus status;
 
     /**
@@ -51,7 +54,7 @@ public class CallFlow {
      *
      * @see org.openmrs.module.callflows.api.domain.flow.Flow
      */
-    @Field(type = "text")
+    @Column(columnDefinition = TEXT)
     private String raw;
 
     /**
@@ -69,11 +72,11 @@ public class CallFlow {
         this.raw = raw;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

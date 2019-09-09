@@ -6,7 +6,7 @@ import org.openmrs.module.callflows.api.domain.Config;
 import org.openmrs.module.callflows.api.domain.Renderer;
 import org.openmrs.module.callflows.api.helper.ConfigHelper;
 import org.openmrs.module.callflows.api.helper.RendererHelper;
-import org.openmrs.module.callflows.api.service.SettingsService;
+import org.openmrs.module.callflows.api.service.ConfigService;
 
 import org.motechproject.testing.osgi.container.MotechNativeTestContainerFactory;
 
@@ -43,7 +43,7 @@ import static org.junit.Assert.assertThat;
 public class SettingsControllerBundleIT extends RESTControllerPaxIT {
 
     @Inject
-    private SettingsService settingsService;
+    private ConfigService configService;
 
     private List<Config> configs;
 
@@ -57,26 +57,26 @@ public class SettingsControllerBundleIT extends RESTControllerPaxIT {
     public void setUp() {
         configs = ConfigHelper.createConfigs();
         configContracts = ConfigHelper.createConfigContracts();
-        settingsService.updateConfigs(configs);
+        configService.updateConfigs(configs);
 
         renderers = RendererHelper.createRenderers();
         rendererContracts = RendererHelper.createRendererContracts();
-        settingsService.updateRenderers(renderers);
+        configService.updateRenderers(renderers);
     }
 
     @After
     public void tearDown() {
         super.tearDown();
         configs = new ArrayList<>();
-        settingsService.updateConfigs(configs);
+        configService.updateConfigs(configs);
 
         renderers = new ArrayList<>();
-        settingsService.updateRenderers(renderers);
+        configService.updateRenderers(renderers);
     }
 
     @Test
     public void shouldReturnService() {
-        assertNotNull(settingsService);
+        assertNotNull(configService);
     }
 
     @Test
