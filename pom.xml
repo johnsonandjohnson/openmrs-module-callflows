@@ -73,11 +73,6 @@
 				<artifactId>guava</artifactId>
 				<version>${guavaVersion}</version>
 			</dependency>
-			<dependency>
-				<groupId>javax.ws.rs</groupId>
-				<artifactId>jsr311-api</artifactId>
-				<version>${jsr311ApiVersion}</version>
-			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -111,7 +106,6 @@
 		<javaCompilerTarget>1.8</javaCompilerTarget>
 		<gsonVersion>1.7.1</gsonVersion>
 		<guavaVersion>23.0</guavaVersion>
-		<jsr311ApiVersion>1.1</jsr311ApiVersion>
 		<superCsvVersion>2.2.1</superCsvVersion>
 		<apacheHttpClientVersion>4.4.1</apacheHttpClientVersion>
 		<jodaTimeVersion>2.9.1</jodaTimeVersion>
