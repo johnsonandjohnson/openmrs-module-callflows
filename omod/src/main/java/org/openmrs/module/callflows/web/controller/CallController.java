@@ -413,7 +413,7 @@ public class CallController extends RestController {
         String currentFileName = null;
         if (0 < set && set <= allowedNumberOfSets && totalNumberOfRecords > 0) {
             for (int i = 1; i <= NUMBER_OF_TEN_K_FILES; i++) {
-                outboundCalls = callService.findAll((i - 1) * DEFAULT_FETCH_SIZE + (5 * (set - 1)), DEFAULT_FETCH_SIZE);
+                outboundCalls = callService.findAll(i + (5 * (set - 1)), DEFAULT_FETCH_SIZE);
                 if (!outboundCalls.isEmpty()) {
                     currentFileName = FILE_NAME_INITIALS + i;
                     fileNames.put(currentFileName, callUtil.generateFileName(tempDir, i));

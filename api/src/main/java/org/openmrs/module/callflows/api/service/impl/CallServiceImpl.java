@@ -241,9 +241,18 @@ public class CallServiceImpl implements CallService {
         return call;
     }
 
+    /*
+    In Motech was passed number of page and pageSize to fetch records
+    Hibernate uses number of startingRecord from which we want to start fetching data (first record with index 0)
+    and pageSize to specify how much records you want to fetch
+    */
     @Override
-    public List<Call> findAll(Integer startingRecord, Integer recordsAmount) {
-        return callDao.retrieveAll(startingRecord, recordsAmount);
+    public List<Call> findAll(int page, int pageSize) {
+        return callDao.retrieveAll((page - 1) * pageSize, pageSize);
+    }
+
+    private int temp(int startingRecord, int pageSize) {
+        return (startingRecord - 1) * pageSize;
     }
 
     @Override
