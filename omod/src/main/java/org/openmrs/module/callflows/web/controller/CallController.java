@@ -2,6 +2,7 @@ package org.openmrs.module.callflows.web.controller;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.api.context.ServiceContext;
 import org.openmrs.module.callflows.api.contract.OutboundCallResponse;
 import org.openmrs.module.callflows.api.domain.Call;
 import org.openmrs.module.callflows.api.domain.CallFlow;
@@ -22,7 +23,6 @@ import org.openmrs.module.callflows.api.util.CallUtil;
 import org.openmrs.module.callflows.api.util.FlowUtil;
 
 import org.motechproject.mds.query.QueryParams;
-import org.motechproject.mds.service.ServiceUtil;
 
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
@@ -33,7 +33,6 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.osgi.framework.BundleContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -130,9 +129,6 @@ public class CallController extends RestController {
 
     @Autowired
     private FlowService flowService;
-
-    @Autowired
-    private BundleContext bundleContext;
 
     @Autowired
     private FlowUtil flowUtil;
@@ -476,7 +472,7 @@ public class CallController extends RestController {
         context.put("Math", Math.class);
 
         loadParams(context, params);
-        loadBundles(context, config.getServicesMap());
+        loadBeans(context, config.getServicesMap());
         return context;
     }
 
@@ -490,11 +486,11 @@ public class CallController extends RestController {
         context.put(KEY_PARAMS, params);
     }
 
-    private void loadBundles(VelocityContext context, Map<String, String> bundlesToLoad) {
+    private void loadBeans(VelocityContext context, Map<String, String> bundlesToLoad) {
         StringBuilder notFoundServices = new StringBuilder();
 
         for (Map.Entry<String, String> entry : bundlesToLoad.entrySet()) {
-            Object service = ServiceUtil.getServiceForInterfaceName(bundleContext, entry.getValue());
+            Object service = ServiceContext.getInstance().getApplicationContext().getBean(entry.getValue());
             if (service != null) {
                 context.put(entry.getKey(), service);
             } else {

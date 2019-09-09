@@ -26,6 +26,16 @@
 		<module>omod</module>
 	</modules>
 
+	<properties>
+		<openmrsPlatformVersion>1.11.6</openmrsPlatformVersion>
+		<javaCompilerSource>1.8</javaCompilerSource>
+		<javaCompilerTarget>1.8</javaCompilerTarget>
+		<gsonVersion>1.7.1</gsonVersion>
+		<superCsvVersion>2.2.1</superCsvVersion>
+		<apacheHttpClientVersion>4.4.1</apacheHttpClientVersion>
+		<jodaTimeVersion>2.9.1</jodaTimeVersion>
+	</properties>
+
 	<dependencyManagement>
 		<dependencies>
 			<!-- Importing versions from refapp distro -->
@@ -40,6 +50,21 @@
 				<groupId>com.google.code.gson</groupId>
 				<artifactId>gson</artifactId>
 				<version>${gsonVersion}</version>
+			</dependency>
+			<dependency>
+				<groupId>net.sf.supercsv</groupId>
+				<artifactId>super-csv</artifactId>
+				<version>${superCsvVersion}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpclient</artifactId>
+				<version>${apacheHttpClientVersion}</version>
+			</dependency>
+			<dependency>
+				<groupId>joda-time</groupId>
+				<artifactId>joda-time</artifactId>
+				<version>${jodaTimeVersion}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -68,10 +93,4 @@
 		</pluginRepository>
 	</pluginRepositories>
 
-	<properties>
-		<openmrsPlatformVersion>1.11.6</openmrsPlatformVersion>
-		<javaCompilerSource>1.8</javaCompilerSource>
-		<javaCompilerTarget>1.8</javaCompilerTarget>
-		<gsonVersion>1.7.1</gsonVersion>
-	</properties>
 </project>
