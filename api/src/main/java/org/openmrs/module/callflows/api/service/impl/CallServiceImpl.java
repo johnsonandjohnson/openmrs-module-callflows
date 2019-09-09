@@ -242,8 +242,8 @@ public class CallServiceImpl implements CallService {
     }
 
     @Override
-    public List<Call> findAll() {
-        return callDao.retrieveAll();
+    public List<Call> findAll(Integer startingRecord, Integer recordsAmount) {
+        return callDao.retrieveAll(startingRecord, recordsAmount);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package org.openmrs.module.callflows.api.dao;
 
+import org.hibernate.Criteria;
 import org.openmrs.api.db.OpenmrsDataDAO;
 import org.openmrs.module.callflows.api.domain.Call;
 import org.openmrs.module.callflows.api.domain.types.CallDirection;
@@ -51,7 +52,7 @@ public interface CallDao extends OpenmrsDataDAO<Call> {
 
     Call findById(Integer id);
 
-    List<Call> retrieveAll();
+    List<Call> retrieveAll(Integer startingRecord, Integer recordsAmount);
 
     void deleteAll();
 

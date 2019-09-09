@@ -116,7 +116,7 @@ public interface CallService {
      *
      * @return list of calls
      */
-    List<Call> findAll();
+    List<Call> findAll(Integer startingRecord, Integer recordsAmount);
 
     /**
      * Fetch the count of call records present in db
