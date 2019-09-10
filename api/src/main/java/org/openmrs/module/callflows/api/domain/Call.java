@@ -11,6 +11,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
+import javax.persistence.MapKeyColumn;
 import javax.persistence.MapKeyJoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -183,19 +185,17 @@ public class Call extends AbstractBaseOpenmrsData {
      * Typically params from the caller are short-lived per single request and are not stored here for security reasons,
      * unless the callflow designer explicitly persists any of the params via a template.
      */
-    @ElementCollection
-    @CollectionTable(name = "cfl_calls")
-    @MapKeyJoinColumn(name = "context_key")
-    @Column(name = "context_value")
+    @Lob
+    @Column(name = "context")
     private Map<String, Object> context = new HashMap<>();
 
     /**
      * Data from the provider
      */
     @ElementCollection
-    @CollectionTable(name = "cfl_calls")
-    @MapKeyJoinColumn(name = "providerData_key")
-    @Column(name = "providerData_value")
+    @CollectionTable(name = "cfl_calls_providerdata", joinColumns=@JoinColumn(name="id_oid"))
+    @MapKeyJoinColumn(name = "key")
+    @Column(name = "value")
     private Map<String, String> providerData = new HashMap<>();
 
     @Column
