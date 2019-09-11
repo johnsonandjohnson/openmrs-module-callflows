@@ -185,8 +185,11 @@ public class Call extends AbstractBaseOpenmrsData {
      * Typically params from the caller are short-lived per single request and are not stored here for security reasons,
      * unless the callflow designer explicitly persists any of the params via a template.
      */
+    @ElementCollection
+    @CollectionTable(name = "cfl_calls_context", joinColumns=@JoinColumn(name="id_oid"))
+    @MapKeyJoinColumn(name = "key")
     @Lob
-    @Column(name = "context")
+    @Column(name = "value", columnDefinition = "MEDIUMBLOB")
     private Map<String, Object> context = new HashMap<>();
 
     /**

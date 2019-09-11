@@ -105,7 +105,6 @@
             <column name="externalType" type="varchar(255)"></column>
             <column name="playedMessages" type="TEXT"></column>
             <column name="refKey" type="varchar(255)"></column>
-            <column name="context" type="mediumblob"></column>
             <column name="creationDate" type="datetime"></column>
             <column name="uuid" type="char(38)">
                 <constraints nullable="false" unique="true"/>
@@ -172,6 +171,24 @@
         </createTable>
         <addForeignKeyConstraint constraintName="cfl_calls_providerdata_fk"
                                  baseTableName="cfl_calls_providerdata" baseColumnNames="id_oid"
+                                 referencedTableName="cfl_calls" referencedColumnNames="cfl_calls_id"/>
+    </changeSet>
+
+    <changeSet id="callFlow-2019-09-10-11:01" author="Arkadiusz Lalo">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="cfl_calls_context"/></not>
+        </preConditions>
+        <createTable tableName="cfl_calls_context">
+            <column name="id_oid" type="int">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="key" type="varchar(255)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="value" type="mediumblob" />
+        </createTable>
+        <addForeignKeyConstraint constraintName="cfl_calls_context_fk"
+                                 baseTableName="cfl_calls_context" baseColumnNames="id_oid"
                                  referencedTableName="cfl_calls" referencedColumnNames="cfl_calls_id"/>
     </changeSet>
 </databaseChangeLog>
