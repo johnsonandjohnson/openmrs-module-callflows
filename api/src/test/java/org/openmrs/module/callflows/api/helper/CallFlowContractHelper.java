@@ -1,6 +1,6 @@
 package org.openmrs.module.callflows.api.helper;
 
-import org.openmrs.module.callflows.api.Constants;
+import org.openmrs.module.callflows.Constants;
 import org.openmrs.module.callflows.api.contract.CallFlowRequest;
 import org.openmrs.module.callflows.api.contract.CallFlowResponse;
 import org.openmrs.module.callflows.api.domain.types.CallFlowStatus;
@@ -18,7 +18,7 @@ public final class CallFlowContractHelper {
     }
 
     public static CallFlowResponse createMainFlowResponse() {
-        return new CallFlowResponse(1L,
+        return new CallFlowResponse(1,
                                     Constants.CALLFLOW_MAIN,
                                     Constants.CALLFLOW_MAIN_DESCRIPTION,
                                     CallFlowStatus.DRAFT.name(),
@@ -44,7 +44,7 @@ public final class CallFlowContractHelper {
     }
 
     public static CallFlowResponse createFlow1Response() {
-        return new CallFlowResponse(1L,
+        return new CallFlowResponse(1,
                                     Constants.CALLFLOW_MAIN,
                                     Constants.CALLFLOW_MAIN_DESCRIPTION,
                                     CallFlowStatus.DRAFT.name(),
@@ -52,7 +52,7 @@ public final class CallFlowContractHelper {
     }
 
     public static CallFlowResponse createFlow2Response() {
-        return new CallFlowResponse(2L,
+        return new CallFlowResponse(2,
                                     Constants.CALLFLOW_MAIN2,
                                     Constants.CALLFLOW_MAIN_DESCRIPTION,
                                     CallFlowStatus.DRAFT.name(),

@@ -1,6 +1,6 @@
 package org.openmrs.module.callflows.api.helper;
 
-import org.openmrs.module.callflows.api.Constants;
+import org.openmrs.module.callflows.Constants;
 import org.openmrs.module.callflows.api.domain.Call;
 import org.openmrs.module.callflows.api.domain.CallFlow;
 import org.openmrs.module.callflows.api.domain.types.CallDirection;
@@ -82,7 +82,7 @@ public final class CallHelper {
 
     public static Call updateAllPropertiesInOutboundCall(Call existingCall) {
         Call call = new Call();
-        call.setId(existingCall.getId() == null ? 1L : existingCall.getId());
+        call.setId(existingCall.getId() == null ? 1 : existingCall.getId());
         call.setConfig(Constants.CONFIG_VOXEO + Constants.UPDATED);
         call.setCallId(existingCall.getCallId() + Constants.UPDATED);
 

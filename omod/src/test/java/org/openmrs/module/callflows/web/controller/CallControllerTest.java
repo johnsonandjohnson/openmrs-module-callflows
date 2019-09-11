@@ -1,8 +1,17 @@
 package org.openmrs.module.callflows.web.controller;
 
+import org.apache.velocity.VelocityContext;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.motechproject.mds.query.QueryParams;
 import org.openmrs.api.context.ServiceContext;
-import org.openmrs.module.callflows.api.BaseTest;
-import org.openmrs.module.callflows.api.Constants;
+import org.openmrs.module.callflows.BaseTest;
+import org.openmrs.module.callflows.Constants;
 import org.openmrs.module.callflows.api.domain.Call;
 import org.openmrs.module.callflows.api.domain.CallFlow;
 import org.openmrs.module.callflows.api.domain.Config;
@@ -21,28 +30,19 @@ import org.openmrs.module.callflows.api.helper.FlowHelper;
 import org.openmrs.module.callflows.api.helper.RendererHelper;
 import org.openmrs.module.callflows.api.service.CallFlowService;
 import org.openmrs.module.callflows.api.service.CallService;
-import org.openmrs.module.callflows.api.service.FlowService;
 import org.openmrs.module.callflows.api.service.ConfigService;
+import org.openmrs.module.callflows.api.service.FlowService;
 import org.openmrs.module.callflows.api.util.CallUtil;
 import org.openmrs.module.callflows.api.util.FlowUtil;
 import org.openmrs.module.callflows.api.util.TestUtil;
-import org.motechproject.mds.query.QueryParams;
-import org.apache.velocity.VelocityContext;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Spy;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.web.server.MockMvc;
-import org.springframework.test.web.server.request.DefaultRequestBuilder;
-import org.springframework.test.web.server.setup.MockMvcBuilders;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -66,9 +66,10 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.springframework.test.web.server.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.server.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.server.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+
 
 /**
  * Call Controller Unit Test Cases
@@ -191,7 +192,7 @@ public class CallControllerTest extends BaseTest {
         // Call Flow Service
         mainFlow = CallFlowHelper.createMainFlow();
         mainFlow.setRaw(raw);
-        mainFlow.setId(1L);
+        mainFlow.setId(1);
 
         given(callFlowService.findByName(Constants.CALLFLOW_MAIN)).willReturn(mainFlow);
         given(callFlowService.findByName(Constants.CALLFLOW_MAIN2)).willThrow(new IllegalArgumentException(Constants.ERROR_MAIN_FLOW2));
@@ -749,7 +750,7 @@ public class CallControllerTest extends BaseTest {
         calls.add(setUpCall());
 
         queryParams = new QueryParams(1, 10000);
-        given(callService.retrieveCount()).willReturn(1L);
+        given(callService.retrieveCount()).willReturn(1);
         PowerMockito.whenNew(QueryParams.class).withArguments(1, 10000).thenReturn(queryParams);
         given(callService.findAll(queryParams)).willReturn(calls);
 
@@ -765,8 +766,8 @@ public class CallControllerTest extends BaseTest {
 
     private Call setUpCall() {
         Call call = new Call();
-        call.setId(1L);
-        call.setActorId("10L");
+        call.setId(1);
+        call.setActorId("10");
         call.setCallId("91882-92882-1882-9383ss-28292");
         call.setDirection(CallDirection.OUTGOING);
 
@@ -857,7 +858,7 @@ public class CallControllerTest extends BaseTest {
         return TestUtil.loadFile(file);
     }
 
-    private DefaultRequestBuilder customGet(String urlTemplate, Object... urlVariables) {
+    private MockHttpServletRequestBuilder customGet(String urlTemplate, Object... urlVariables) {
         return get(CONTEXT_PATH + urlTemplate, urlVariables).header("Host", LOCALHOST).contextPath(CONTEXT_PATH);
     }
 }

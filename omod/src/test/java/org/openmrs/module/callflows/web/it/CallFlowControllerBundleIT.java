@@ -1,246 +1,246 @@
-package org.openmrs.module.callflows.web.it;
-
-import org.openmrs.module.callflows.api.contract.CallFlowRequest;
-import org.openmrs.module.callflows.api.domain.CallFlow;
-import org.openmrs.module.callflows.api.exception.CallFlowAlreadyExistsException;
-import org.openmrs.module.callflows.api.helper.CallFlowContractHelper;
-import org.openmrs.module.callflows.api.helper.CallFlowHelper;
-import org.openmrs.module.callflows.api.dao.CallFlowDao;
-import org.openmrs.module.callflows.api.service.CallFlowService;
-
-import org.motechproject.testing.osgi.container.MotechNativeTestContainerFactory;
-
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.ops4j.pax.exam.ExamFactory;
-import org.ops4j.pax.exam.junit.PaxExam;
-import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
-import org.ops4j.pax.exam.spi.reactors.PerSuite;
-import javax.inject.Inject;
-import java.io.IOException;
-import java.net.URISyntaxException;
-
-import static junit.framework.TestCase.assertNotNull;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
-
-/**
- * CallFlow Controller Integration Tests
- *
- * @author bramak09
- */
-@RunWith(PaxExam.class)
-@ExamReactorStrategy(PerSuite.class)
-@ExamFactory(MotechNativeTestContainerFactory.class)
-public class CallFlowControllerBundleIT extends RESTControllerPaxIT {
-
-    private CallFlow mainFlow;
-    private CallFlow mainFlow2;
-    private CallFlow nonMainFlow;
-
-    private CallFlowRequest mainFlowRequest;
-    private CallFlowRequest badFlowRequest;
-
-    private CallFlow existingFlow;
-
-    @Inject
-    private CallFlowDao callFlowDao;
-
-    @Inject
-    private CallFlowService callFlowService;
-
-    @Before
-    public void setUp() throws CallFlowAlreadyExistsException {
-        // for create
-        mainFlowRequest = CallFlowContractHelper.createMainFlowRequest();
-        badFlowRequest = CallFlowContractHelper.createBadFlowRequest();
-        mainFlow = CallFlowHelper.createMainFlow();
-        // for searches
-        mainFlow2 = CallFlowHelper.createMainFlow();
-        mainFlow2.setName("MainFlow2");
-
-        nonMainFlow = CallFlowHelper.createMainFlow();
-        nonMainFlow.setName("NonMainFlow");
-    }
-
-    @After
-    public void tearDown() {
-        super.tearDown();
-        callFlowDao.deleteAll();
-    }
-
-    @Test
-    public void shouldReturnStatusOkOnCreateCallFlow() throws IOException, URISyntaxException, InterruptedException {
-
-        // Given
-        HttpPost httpPost = buildPostRequest("/callflows/flows", json(mainFlowRequest));
-
-        // When
-        HttpResponse response = getHttpClient().execute(httpPost);
-
-        // Then
-        assertNotNull(response);
-        assertThat(response.getStatusLine().getStatusCode(), equalTo(HttpStatus.SC_OK));
-    }
-
-    @Test
-    public void shouldReturnStatusConflictOnCreateDuplicateCallFlow()
-            throws CallFlowAlreadyExistsException, IOException, URISyntaxException, InterruptedException {
-
-        // Given
-        callFlowService.create(CallFlowHelper.createMainFlow());
-        HttpPost httpPost = buildPostRequest("/callflows/flows", json(mainFlowRequest));
-
-        // When
-        HttpResponse response = getHttpClient().execute(httpPost);
-
-        // Then
-        assertNotNull(response);
-        assertThat(response.getStatusLine().getStatusCode(), equalTo(HttpStatus.SC_CONFLICT));
-    }
-
-    @Test
-    public void shouldReturnStatusBadRequestOnCreationOfBadCallFlow()
-            throws CallFlowAlreadyExistsException, IOException, URISyntaxException, InterruptedException {
-
-        // Given
-        HttpPost httpPost = buildPostRequest("/callflows/flows", json(badFlowRequest));
-
-        // When
-        HttpResponse response = getHttpClient().execute(httpPost);
-
-        // Then
-        assertNotNull(response);
-        assertThat(response.getStatusLine().getStatusCode(), equalTo(HttpStatus.SC_BAD_REQUEST));
-    }
-
-
-    @Test
-    public void shouldReturnStatusOkOnUpdateCallFlow()
-            throws IOException, URISyntaxException, InterruptedException, CallFlowAlreadyExistsException {
-
-        // Given
-        existingFlow = callFlowService.create(mainFlow);
-        HttpPut httpPut = buildPutRequest("/callflows/flows/" + existingFlow.getId(), json(mainFlowRequest));
-
-        // When
-        HttpResponse response = getHttpClient().execute(httpPut);
-
-        // Then
-        assertNotNull(response);
-        assertThat(response.getStatusLine().getStatusCode(), equalTo(HttpStatus.SC_OK));
-    }
-
-    @Test
-    public void shouldReturnStatusConflictOnUpdateThatLeadsToDuplicateCallFlow()
-            throws CallFlowAlreadyExistsException, IOException, URISyntaxException, InterruptedException {
-
-        // Given Two flows with name MainFlow and NewMainFlow
-        CallFlow flow1 = CallFlowHelper.createMainFlow();
-        CallFlow flow2 = CallFlowHelper.createMainFlow();
-        flow2.setName("NewMainFlow");
-        callFlowService.create(flow1);
-        CallFlow flowToUpdate = callFlowService.create(flow2);
-
-        // When we try to update flow2 to have the same name as flow1
-        mainFlowRequest.setName(flow1.getName());
-        HttpPut httpPut = buildPutRequest("/callflows/flows/" + flow2.getId(), json(mainFlowRequest));
-
-        // And we execute the request
-        HttpResponse response = getHttpClient().execute(httpPut);
-
-        // Then we expect the below
-        assertNotNull(response);
-        assertThat(response.getStatusLine().getStatusCode(), equalTo(HttpStatus.SC_CONFLICT));
-    }
-
-    @Test
-    public void shouldReturnStatusBadRequestOnUpdateOfBadCallFlow()
-            throws CallFlowAlreadyExistsException, IOException, URISyntaxException, InterruptedException {
-
-        // Given
-        mainFlowRequest.setName("BadFlow.");
-        HttpPut httpPut = buildPutRequest("/callflows/flows/1", json(mainFlowRequest));
-
-        // When
-        HttpResponse response = getHttpClient().execute(httpPut);
-
-        // Then
-        assertNotNull(response);
-        assertThat(response.getStatusLine().getStatusCode(), equalTo(HttpStatus.SC_BAD_REQUEST));
-    }
-
-    @Test
-    public void shouldReturnStatusOKForSuccessfulCallFlowSearches()
-            throws CallFlowAlreadyExistsException, IOException, URISyntaxException, InterruptedException {
-
-        // Given three call flows that have names MainFlow and MainFlow2 and NonMainFlow
-        callFlowService.create(mainFlow);
-        callFlowService.create(mainFlow2);
-        callFlowService.create(nonMainFlow);
-
-        // When we search for callflows by the name prefix "Ma"
-        HttpGet httpGet = buildGetRequest("/callflows/flows", "lookup", "By Name", "term", "Ma");
-        HttpResponse response = getHttpClient().execute(httpGet);
-
-        // Then
-        assertNotNull(response);
-        assertThat(response.getStatusLine().getStatusCode(), equalTo(HttpStatus.SC_OK));
-    }
-
-    @Test
-    public void shouldReturnStatusOKForUnSuccessfulCallFlowSearches()
-            throws CallFlowAlreadyExistsException, IOException, URISyntaxException, InterruptedException {
-
-        // Given three call flows that have names MainFlow and MainFlow2 and NonMainFlow
-        callFlowService.create(mainFlow);
-        callFlowService.create(mainFlow2);
-        callFlowService.create(nonMainFlow);
-
-        // When we search for callflows by the name prefix "Xu" (invalid)
-        HttpGet httpGet = buildGetRequest("/callflows/flows", "lookup", "By Name", "term", "Xu");
-        HttpResponse response = getHttpClient().execute(httpGet);
-
-        // Then
-        assertNotNull(response);
-        assertThat(response.getStatusLine().getStatusCode(), equalTo(HttpStatus.SC_OK));
-    }
-
-    @Test
-    public void shouldReturnStatusOKForSuccessfulDelete()
-            throws CallFlowAlreadyExistsException, IOException, URISyntaxException, InterruptedException {
-        // Given a callflow by name MainFlow
-        mainFlow = callFlowService.create(mainFlow);
-
-        // When we try to delete this callflow by passing it's ID
-        HttpDelete httpDelete = buildDeleteRequest("/callflows/flows/" + mainFlow.getId());
-        HttpResponse response = getHttpClient().execute(httpDelete);
-
-        // Then
-        assertNotNull(response);
-        assertThat(response.getStatusLine().getStatusCode(), equalTo(HttpStatus.SC_OK));
-    }
-
-    @Test
-    public void shouldReturnStatusBadRequestForUnsuccessfulDelete()
-            throws CallFlowAlreadyExistsException, IOException, URISyntaxException, InterruptedException {
-        // Given a callflow by name MainFlow
-        mainFlow = callFlowService.create(mainFlow);
-
-        // When we invoke a deletion operation with a invalid ID
-        HttpDelete httpDelete = buildDeleteRequest("/callflows/flows/-1");
-        HttpResponse response = getHttpClient().execute(httpDelete);
-
-        // Then
-        assertNotNull(response);
-        assertThat(response.getStatusLine().getStatusCode(), equalTo(HttpStatus.SC_BAD_REQUEST));
-    }
-}
+//package org.openmrs.module.callflows.web.it;
+//
+//import org.openmrs.module.callflows.api.contract.CallFlowRequest;
+//import org.openmrs.module.callflows.api.domain.CallFlow;
+//import org.openmrs.module.callflows.api.exception.CallFlowAlreadyExistsException;
+//import org.openmrs.module.callflows.api.helper.CallFlowContractHelper;
+//import org.openmrs.module.callflows.api.helper.CallFlowHelper;
+//import org.openmrs.module.callflows.api.dao.CallFlowDao;
+//import org.openmrs.module.callflows.api.service.CallFlowService;
+//
+//import org.motechproject.testing.osgi.container.MotechNativeTestContainerFactory;
+//
+//import org.apache.commons.httpclient.HttpStatus;
+//import org.apache.http.HttpResponse;
+//import org.apache.http.client.methods.HttpDelete;
+//import org.apache.http.client.methods.HttpGet;
+//import org.apache.http.client.methods.HttpPost;
+//import org.apache.http.client.methods.HttpPut;
+//import org.junit.After;
+//import org.junit.Before;
+//import org.junit.Test;
+//import org.junit.runner.RunWith;
+//import org.ops4j.pax.exam.ExamFactory;
+//import org.ops4j.pax.exam.junit.PaxExam;
+//import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
+//import org.ops4j.pax.exam.spi.reactors.PerSuite;
+//import javax.inject.Inject;
+//import java.io.IOException;
+//import java.net.URISyntaxException;
+//
+//import static junit.framework.TestCase.assertNotNull;
+//import static org.hamcrest.CoreMatchers.equalTo;
+//import static org.junit.Assert.assertThat;
+//
+///**
+// * CallFlow Controller Integration Tests
+// *
+// * @author bramak09
+// */
+//@RunWith(PaxExam.class)
+//@ExamReactorStrategy(PerSuite.class)
+//@ExamFactory(MotechNativeTestContainerFactory.class)
+//public class CallFlowControllerBundleIT extends RESTControllerPaxIT {
+//
+//    private CallFlow mainFlow;
+//    private CallFlow mainFlow2;
+//    private CallFlow nonMainFlow;
+//
+//    private CallFlowRequest mainFlowRequest;
+//    private CallFlowRequest badFlowRequest;
+//
+//    private CallFlow existingFlow;
+//
+//    @Inject
+//    private CallFlowDao callFlowDao;
+//
+//    @Inject
+//    private CallFlowService callFlowService;
+//
+//    @Before
+//    public void setUp() throws CallFlowAlreadyExistsException {
+//        // for create
+//        mainFlowRequest = CallFlowContractHelper.createMainFlowRequest();
+//        badFlowRequest = CallFlowContractHelper.createBadFlowRequest();
+//        mainFlow = CallFlowHelper.createMainFlow();
+//        // for searches
+//        mainFlow2 = CallFlowHelper.createMainFlow();
+//        mainFlow2.setName("MainFlow2");
+//
+//        nonMainFlow = CallFlowHelper.createMainFlow();
+//        nonMainFlow.setName("NonMainFlow");
+//    }
+//
+//    @After
+//    public void tearDown() {
+//        super.tearDown();
+//        callFlowDao.deleteAll();
+//    }
+//
+//    @Test
+//    public void shouldReturnStatusOkOnCreateCallFlow() throws IOException, URISyntaxException, InterruptedException {
+//
+//        // Given
+//        HttpPost httpPost = buildPostRequest("/callflows/flows", json(mainFlowRequest));
+//
+//        // When
+//        HttpResponse response = getHttpClient().execute(httpPost);
+//
+//        // Then
+//        assertNotNull(response);
+//        assertThat(response.getStatusLine().getStatusCode(), equalTo(HttpStatus.SC_OK));
+//    }
+//
+//    @Test
+//    public void shouldReturnStatusConflictOnCreateDuplicateCallFlow()
+//            throws CallFlowAlreadyExistsException, IOException, URISyntaxException, InterruptedException {
+//
+//        // Given
+//        callFlowService.create(CallFlowHelper.createMainFlow());
+//        HttpPost httpPost = buildPostRequest("/callflows/flows", json(mainFlowRequest));
+//
+//        // When
+//        HttpResponse response = getHttpClient().execute(httpPost);
+//
+//        // Then
+//        assertNotNull(response);
+//        assertThat(response.getStatusLine().getStatusCode(), equalTo(HttpStatus.SC_CONFLICT));
+//    }
+//
+//    @Test
+//    public void shouldReturnStatusBadRequestOnCreationOfBadCallFlow()
+//            throws CallFlowAlreadyExistsException, IOException, URISyntaxException, InterruptedException {
+//
+//        // Given
+//        HttpPost httpPost = buildPostRequest("/callflows/flows", json(badFlowRequest));
+//
+//        // When
+//        HttpResponse response = getHttpClient().execute(httpPost);
+//
+//        // Then
+//        assertNotNull(response);
+//        assertThat(response.getStatusLine().getStatusCode(), equalTo(HttpStatus.SC_BAD_REQUEST));
+//    }
+//
+//
+//    @Test
+//    public void shouldReturnStatusOkOnUpdateCallFlow()
+//            throws IOException, URISyntaxException, InterruptedException, CallFlowAlreadyExistsException {
+//
+//        // Given
+//        existingFlow = callFlowService.create(mainFlow);
+//        HttpPut httpPut = buildPutRequest("/callflows/flows/" + existingFlow.getId(), json(mainFlowRequest));
+//
+//        // When
+//        HttpResponse response = getHttpClient().execute(httpPut);
+//
+//        // Then
+//        assertNotNull(response);
+//        assertThat(response.getStatusLine().getStatusCode(), equalTo(HttpStatus.SC_OK));
+//    }
+//
+//    @Test
+//    public void shouldReturnStatusConflictOnUpdateThatLeadsToDuplicateCallFlow()
+//            throws CallFlowAlreadyExistsException, IOException, URISyntaxException, InterruptedException {
+//
+//        // Given Two flows with name MainFlow and NewMainFlow
+//        CallFlow flow1 = CallFlowHelper.createMainFlow();
+//        CallFlow flow2 = CallFlowHelper.createMainFlow();
+//        flow2.setName("NewMainFlow");
+//        callFlowService.create(flow1);
+//        CallFlow flowToUpdate = callFlowService.create(flow2);
+//
+//        // When we try to update flow2 to have the same name as flow1
+//        mainFlowRequest.setName(flow1.getName());
+//        HttpPut httpPut = buildPutRequest("/callflows/flows/" + flow2.getId(), json(mainFlowRequest));
+//
+//        // And we execute the request
+//        HttpResponse response = getHttpClient().execute(httpPut);
+//
+//        // Then we expect the below
+//        assertNotNull(response);
+//        assertThat(response.getStatusLine().getStatusCode(), equalTo(HttpStatus.SC_CONFLICT));
+//    }
+//
+//    @Test
+//    public void shouldReturnStatusBadRequestOnUpdateOfBadCallFlow()
+//            throws CallFlowAlreadyExistsException, IOException, URISyntaxException, InterruptedException {
+//
+//        // Given
+//        mainFlowRequest.setName("BadFlow.");
+//        HttpPut httpPut = buildPutRequest("/callflows/flows/1", json(mainFlowRequest));
+//
+//        // When
+//        HttpResponse response = getHttpClient().execute(httpPut);
+//
+//        // Then
+//        assertNotNull(response);
+//        assertThat(response.getStatusLine().getStatusCode(), equalTo(HttpStatus.SC_BAD_REQUEST));
+//    }
+//
+//    @Test
+//    public void shouldReturnStatusOKForSuccessfulCallFlowSearches()
+//            throws CallFlowAlreadyExistsException, IOException, URISyntaxException, InterruptedException {
+//
+//        // Given three call flows that have names MainFlow and MainFlow2 and NonMainFlow
+//        callFlowService.create(mainFlow);
+//        callFlowService.create(mainFlow2);
+//        callFlowService.create(nonMainFlow);
+//
+//        // When we search for callflows by the name prefix "Ma"
+//        HttpGet httpGet = buildGetRequest("/callflows/flows", "lookup", "By Name", "term", "Ma");
+//        HttpResponse response = getHttpClient().execute(httpGet);
+//
+//        // Then
+//        assertNotNull(response);
+//        assertThat(response.getStatusLine().getStatusCode(), equalTo(HttpStatus.SC_OK));
+//    }
+//
+//    @Test
+//    public void shouldReturnStatusOKForUnSuccessfulCallFlowSearches()
+//            throws CallFlowAlreadyExistsException, IOException, URISyntaxException, InterruptedException {
+//
+//        // Given three call flows that have names MainFlow and MainFlow2 and NonMainFlow
+//        callFlowService.create(mainFlow);
+//        callFlowService.create(mainFlow2);
+//        callFlowService.create(nonMainFlow);
+//
+//        // When we search for callflows by the name prefix "Xu" (invalid)
+//        HttpGet httpGet = buildGetRequest("/callflows/flows", "lookup", "By Name", "term", "Xu");
+//        HttpResponse response = getHttpClient().execute(httpGet);
+//
+//        // Then
+//        assertNotNull(response);
+//        assertThat(response.getStatusLine().getStatusCode(), equalTo(HttpStatus.SC_OK));
+//    }
+//
+//    @Test
+//    public void shouldReturnStatusOKForSuccessfulDelete()
+//            throws CallFlowAlreadyExistsException, IOException, URISyntaxException, InterruptedException {
+//        // Given a callflow by name MainFlow
+//        mainFlow = callFlowService.create(mainFlow);
+//
+//        // When we try to delete this callflow by passing it's ID
+//        HttpDelete httpDelete = buildDeleteRequest("/callflows/flows/" + mainFlow.getId());
+//        HttpResponse response = getHttpClient().execute(httpDelete);
+//
+//        // Then
+//        assertNotNull(response);
+//        assertThat(response.getStatusLine().getStatusCode(), equalTo(HttpStatus.SC_OK));
+//    }
+//
+//    @Test
+//    public void shouldReturnStatusBadRequestForUnsuccessfulDelete()
+//            throws CallFlowAlreadyExistsException, IOException, URISyntaxException, InterruptedException {
+//        // Given a callflow by name MainFlow
+//        mainFlow = callFlowService.create(mainFlow);
+//
+//        // When we invoke a deletion operation with a invalid ID
+//        HttpDelete httpDelete = buildDeleteRequest("/callflows/flows/-1");
+//        HttpResponse response = getHttpClient().execute(httpDelete);
+//
+//        // Then
+//        assertNotNull(response);
+//        assertThat(response.getStatusLine().getStatusCode(), equalTo(HttpStatus.SC_BAD_REQUEST));
+//    }
+//}

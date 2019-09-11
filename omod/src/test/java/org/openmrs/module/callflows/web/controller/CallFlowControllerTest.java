@@ -1,7 +1,13 @@
 package org.openmrs.module.callflows.web.controller;
 
-import org.openmrs.module.callflows.api.BaseTest;
-import org.openmrs.module.callflows.api.Constants;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.motechproject.mds.util.SecurityUtil;
+import org.openmrs.module.callflows.BaseTest;
+import org.openmrs.module.callflows.Constants;
 import org.openmrs.module.callflows.api.builder.CallFlowBuilder;
 import org.openmrs.module.callflows.api.builder.CallFlowResponseBuilder;
 import org.openmrs.module.callflows.api.contract.CallFlowRequest;
@@ -12,19 +18,13 @@ import org.openmrs.module.callflows.api.exception.CallFlowAlreadyExistsException
 import org.openmrs.module.callflows.api.helper.CallFlowContractHelper;
 import org.openmrs.module.callflows.api.helper.CallFlowHelper;
 import org.openmrs.module.callflows.api.service.CallFlowService;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.motechproject.mds.util.SecurityUtil;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.server.MockMvc;
-import org.springframework.test.web.server.setup.MockMvcBuilders;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,12 +32,12 @@ import java.util.List;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
-import static org.springframework.test.web.server.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.server.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.server.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.server.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.server.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.server.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 /**
  * Call Flow Controller Unit Tests
@@ -97,10 +97,10 @@ public class CallFlowControllerTest extends BaseTest {
         searchedFlows = new ArrayList<>();
         flow1 = CallFlowHelper.createMainFlow();
         flow1.setName("MainFlow");
-        flow1.setId(1L);
+        flow1.setId(1);
         flow2 = CallFlowHelper.createMainFlow();
         flow2.setName("MainFlow2");
-        flow2.setId(2L);
+        flow2.setId(2);
         searchedFlows.add(flow1);
         searchedFlows.add(flow2);
     }
@@ -227,7 +227,7 @@ public class CallFlowControllerTest extends BaseTest {
     @Test
     public void shouldReturnStatusBadRequestForUnSuccessfulDelete() throws Exception {
         // Given that deleting by a bad id will throw illegal argument
-        doThrow(new IllegalArgumentException()).when(callFlowService).delete(-1L);
+        doThrow(new IllegalArgumentException()).when(callFlowService).delete(-1);
 
         // When we delete by a invalid ID , Then
         mockMvc.perform(delete("/flows/-1"))

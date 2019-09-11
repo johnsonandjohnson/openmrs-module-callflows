@@ -1,7 +1,7 @@
 package org.openmrs.module.callflows.api.util;
 
-import org.openmrs.module.callflows.api.BaseTest;
-import org.openmrs.module.callflows.api.Constants;
+import org.openmrs.module.callflows.BaseTest;
+import org.openmrs.module.callflows.Constants;
 import org.openmrs.module.callflows.api.domain.Call;
 import org.openmrs.module.callflows.api.domain.CallFlow;
 import org.openmrs.module.callflows.api.domain.Config;
@@ -471,7 +471,7 @@ public class CallUtilTest extends BaseTest {
         callUtil.sendStatusEvent(outboundCall);
 
         // Then
-        verify(eventRelay, times(1)).sendEventMessage(CallFlowEventArgumentCaptor.capture());
+        verify(callFlowEventService, times(1)).sendEventMessage(CallFlowEventArgumentCaptor.capture());
         CallFlowEvent capturedEvent = CallFlowEventArgumentCaptor.getValue();
         assertThat((String) capturedEvent.getParameters().get(Constants.PARAM_CALL_ID),
                    equalTo(outboundCall.getCallId()));
@@ -556,7 +556,7 @@ public class CallUtilTest extends BaseTest {
 
     private Call setupCallData() {
         Call callData = new Call();
-        callData.setId(1L);
+        callData.setId(1);
         callData.setActorId("10L");
         callData.setCallId("91882-92882-1882-9383ss-28292");
         callData.setDirection(CallDirection.OUTGOING);

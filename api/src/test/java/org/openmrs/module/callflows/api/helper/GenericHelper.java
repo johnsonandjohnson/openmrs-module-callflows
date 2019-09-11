@@ -1,6 +1,6 @@
 package org.openmrs.module.callflows.api.helper;
 
-import org.openmrs.module.callflows.api.Constants;
+import org.openmrs.module.callflows.Constants;
 import org.openmrs.module.callflows.api.domain.Settings;
 
 import java.util.HashMap;
