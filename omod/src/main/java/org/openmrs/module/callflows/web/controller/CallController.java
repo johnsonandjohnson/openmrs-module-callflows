@@ -163,8 +163,10 @@ public class CallController extends RestController {
      * @return
      */
     @RequestMapping(value = "/in/{conf}/flows/{flowName}.{extension}", method = RequestMethod.GET)
-    public ResponseEntity<String> handleIncoming(HttpServletRequest request, @PathVariable String conf,
-                                                 @PathVariable String flowName, @PathVariable String extension,
+    public ResponseEntity<String> handleIncoming(HttpServletRequest request,
+                                                 @PathVariable(value = "conf") String conf,
+                                                 @PathVariable(value = "flowName") String flowName,
+                                                 @PathVariable(value = "extension") String extension,
                                                  @RequestParam Map<String, String> params,
                                                  @RequestHeader Map<String, String> headers) {
 
@@ -270,8 +272,9 @@ public class CallController extends RestController {
      * @return
      */
     @RequestMapping(value = "/calls/{callId}.{extension}", method = RequestMethod.GET)
-    public ResponseEntity<String> handleContinuation(HttpServletRequest request, @PathVariable String callId,
-                                                     @PathVariable String extension,
+    public ResponseEntity<String> handleContinuation(HttpServletRequest request,
+                                                     @PathVariable(value = "callId") String callId,
+                                                     @PathVariable(value = "extension") String extension,
                                                      @RequestParam Map<String, String> params,
                                                      @RequestHeader Map<String, String> headers) {
 
@@ -375,8 +378,9 @@ public class CallController extends RestController {
      */
     @RequestMapping(value = "/out/{configName}/flows/{name}.{extension}", method = RequestMethod.GET)
     @ResponseBody
-    public OutboundCallResponse handleOutgoing(@PathVariable String configName, @PathVariable String name,
-                                               @PathVariable String extension,
+    public OutboundCallResponse handleOutgoing(@PathVariable(value = "configName") String configName,
+                                               @PathVariable(value = "name") String name,
+                                               @PathVariable(value = "extension") String extension,
                                                @RequestParam Map<String, Object> params) {
         LOGGER.debug(String.format("handleOutgoing(config=%s, name = %s, extension=%s, params=%s", configName, name,
                 extension, params));
@@ -386,7 +390,7 @@ public class CallController extends RestController {
 
     @RequestMapping(value = "/calls/export-details", method = RequestMethod.GET)
     @ResponseBody
-    public Map<String, Object> exportCallsDetails(@RequestParam(defaultValue = "1") Integer set,
+    public Map<String, Object> exportCallsDetails(@RequestParam(defaultValue = "1", value = "set") Integer set,
                                                   HttpServletResponse response) throws IOException {
 
         response.setHeader(HEADER_CONTENT_DISPOSITION, ATTACHMENT_FILENAME + ZIP_FILENAME + EXTENSION_ZIP);

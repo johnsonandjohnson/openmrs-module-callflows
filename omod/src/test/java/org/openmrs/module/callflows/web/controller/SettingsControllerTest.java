@@ -5,7 +5,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.motechproject.mds.util.SecurityUtil;
 import org.openmrs.module.callflows.BaseTest;
 import org.openmrs.module.callflows.Constants;
 import org.openmrs.module.callflows.api.builder.ConfigBuilder;
@@ -21,7 +20,6 @@ import org.openmrs.module.callflows.api.helper.ConfigHelper;
 import org.openmrs.module.callflows.api.helper.GenericHelper;
 import org.openmrs.module.callflows.api.helper.RendererHelper;
 import org.openmrs.module.callflows.api.service.ConfigService;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -35,10 +33,10 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 /**
  * Config Controller Web Test
@@ -46,7 +44,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
  * @author bramak09
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(SecurityUtil.class)
 public class SettingsControllerTest extends BaseTest {
 
     private MockMvc mockMvc;
@@ -162,7 +159,7 @@ public class SettingsControllerTest extends BaseTest {
         given(configService.allConfigs()).willReturn(configs);
 
         // When and Then
-        mockMvc.perform(post("/configs").contentType(MediaType.APPLICATION_JSON).body(jsonBytes(configContracts)))
+        mockMvc.perform(post("/configs").contentType(MediaType.APPLICATION_JSON).content(jsonBytes(configContracts)))
                .andExpect(status().is(HttpStatus.OK.value()))
                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
                .andExpect(content().string(json(configContracts)));
@@ -212,7 +209,7 @@ public class SettingsControllerTest extends BaseTest {
         given(configService.allRenderers()).willReturn(renderers);
 
         // When and Then
-        mockMvc.perform(post("/renderers").contentType(MediaType.APPLICATION_JSON).body(jsonBytes(rendererContracts)))
+        mockMvc.perform(post("/renderers").contentType(MediaType.APPLICATION_JSON).content(jsonBytes(rendererContracts)))
                .andExpect(status().is(HttpStatus.OK.value()))
                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
                .andExpect(content().string(json(rendererContracts)));

@@ -116,10 +116,12 @@ public class CallUtilTest extends BaseTest {
     @Mock
     private CallDao callDao;
 
+    @Mock
     @Autowired
     @Qualifier("callflow.schedulerService")
     private CallFlowSchedulerService schedulerService;
 
+    @Mock
     @Autowired
     @Qualifier("callFlow.eventService")
     private CallFlowEventService callFlowEventService;
