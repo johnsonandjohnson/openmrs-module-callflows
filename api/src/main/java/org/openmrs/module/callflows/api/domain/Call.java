@@ -1,11 +1,13 @@
 package org.openmrs.module.callflows.api.domain;
 
+import org.openmrs.module.callflows.api.dao.converter.MapConverter;
 import org.openmrs.module.callflows.api.domain.types.CallDirection;
 import org.openmrs.module.callflows.api.domain.types.CallStatus;
 
 import org.joda.time.DateTime;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -183,19 +185,17 @@ public class Call extends AbstractBaseOpenmrsData {
      * Typically params from the caller are short-lived per single request and are not stored here for security reasons,
      * unless the callflow designer explicitly persists any of the params via a template.
      */
-    @ElementCollection
-    @CollectionTable(name = "cfl_calls")
-    @MapKeyJoinColumn(name = "context_key")
-    @Column(name = "context_value")
+    @Column(name = "context")
+    @Convert(converter = MapConverter.class)
     private Map<String, Object> context = new HashMap<>();
 
     /**
      * Data from the provider
      */
     @ElementCollection
-    @CollectionTable(name = "cfl_calls")
-    @MapKeyJoinColumn(name = "providerData_key")
-    @Column(name = "providerData_value")
+    @CollectionTable(name = "cfl_calls_providerdata", joinColumns=@JoinColumn(name="id_oid"))
+    @MapKeyJoinColumn(name = "key")
+    @Column(name = "value")
     private Map<String, String> providerData = new HashMap<>();
 
     @Column
