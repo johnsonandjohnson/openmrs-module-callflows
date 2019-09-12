@@ -1,22 +1,8 @@
 package org.openmrs.module.callflows.api.util;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openmrs.module.callflows.api.contract.JsonExecutionResponse;
-import org.openmrs.module.callflows.api.domain.Call;
-import org.openmrs.module.callflows.api.domain.CallFlow;
-import org.openmrs.module.callflows.api.domain.Config;
-import org.openmrs.module.callflows.api.domain.Constants;
-import org.openmrs.module.callflows.api.domain.Renderer;
-import org.openmrs.module.callflows.api.domain.flow.Node;
-import org.openmrs.module.callflows.api.domain.flow.UserNode;
-import org.openmrs.module.callflows.api.domain.types.CallDirection;
-import org.openmrs.module.callflows.api.domain.types.CallStatus;
-import org.openmrs.module.callflows.api.dao.CallDao;
-import org.springframework.http.MediaType;
-import org.openmrs.module.callflows.api.event.CallFlowEvent;
-
-import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -29,6 +15,18 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.openmrs.module.callflows.api.contract.JsonExecutionResponse;
+import org.openmrs.module.callflows.api.dao.CallDao;
+import org.openmrs.module.callflows.api.domain.Call;
+import org.openmrs.module.callflows.api.domain.CallFlow;
+import org.openmrs.module.callflows.api.domain.Config;
+import org.openmrs.module.callflows.api.domain.Constants;
+import org.openmrs.module.callflows.api.domain.Renderer;
+import org.openmrs.module.callflows.api.domain.flow.Node;
+import org.openmrs.module.callflows.api.domain.flow.UserNode;
+import org.openmrs.module.callflows.api.domain.types.CallDirection;
+import org.openmrs.module.callflows.api.domain.types.CallStatus;
+import org.openmrs.module.callflows.api.event.CallFlowEvent;
 import org.openmrs.module.callflows.api.service.CallFlowEventService;
 import org.openmrs.module.callflows.api.service.CallFlowSchedulerService;
 import org.openmrs.module.callflows.api.task.CallFlowScheduledTask;
@@ -42,6 +40,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ClassUtils;
 import org.supercsv.io.CsvMapWriter;
 import org.supercsv.prefs.CsvPreference;
+
 import javax.naming.OperationNotSupportedException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -92,9 +91,10 @@ public class CallUtil {
 
     private static final Charset UTF8_CHARSET = Charset.forName("UTF-8");
 
-    private static final MediaType DEFAULT_MEDIA_TYPE = MediaType.TEXT_PLAIN;
+    private static final MediaType DEFAULT_MEDIA_TYPE = new MediaType("text", "plain", Charset.forName("UTF-8"));
 
-    private static final MediaType JSON_MEDIA_TYPE = MediaType.APPLICATION_JSON;
+    private static final MediaType JSON_MEDIA_TYPE = new MediaType("application", "json",
+            Charset.forName("UTF-8"));
 
     private static final String REPLACEMENT_PATTERN = "[%s]";
 

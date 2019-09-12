@@ -157,7 +157,7 @@ public class CallControllerTest extends BaseTest {
 
     private Map<String, String> servicesMap;
 
-    private static final String CALL_SERVICE_CLASS = "org.openmrs.module.callflows.api.service.CallService";
+    private static final String CALL_SERVICE_CLASS = "callService";
 
     //private QueryParams queryParams;
 
@@ -751,11 +751,7 @@ public class CallControllerTest extends BaseTest {
         List<Call> calls = new ArrayList<>(1);
         calls.add(setUpCall());
 
-        //queryParams = new QueryParams(1, 10000);
         given(callService.retrieveCount()).willReturn(1L);
-        //PowerMockito.whenNew(QueryParams.class).withArguments(1, 10000).thenReturn(queryParams);
-
-        //given(callService.findAll(queryParams)).willReturn(calls);
         given(callService.findAll(1,10000)).willReturn(calls);
 
         // When we make export call data request
@@ -763,11 +759,7 @@ public class CallControllerTest extends BaseTest {
                .andExpect(status().is(HttpStatus.OK.value()));
 
         verify(callService, times(1)).retrieveCount();
-
-        //verify(callService, times(1)).findAll(queryParams);
         verify(callService, times(1)).findAll(1,10000);
-
-        //verify(callService, times(5)).findAll(any(QueryParams.class));
         verify(callUtil, times(1)).generateReports(anyString(), anyListOf(Call.class));
     }
 
