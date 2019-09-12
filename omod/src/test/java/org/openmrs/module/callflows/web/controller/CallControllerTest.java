@@ -69,9 +69,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-//import org.motechproject.mds.query.QueryParams;
-
-
 /**
  * Call Controller Unit Test Cases
  * We use @Spy for a couple of the util classes as these are mostly stand-alone utils without additional dependencies
@@ -86,8 +83,6 @@ public class CallControllerTest extends BaseTest {
     private static final String LOCALHOST = "localhost";
 
     private static final String CONTEXT_PATH = "/motech-platform-server/modules";
-
-    private static final String BEAN_NAME = "callService";
 
     private MockMvc mockMvc;
 
@@ -157,9 +152,7 @@ public class CallControllerTest extends BaseTest {
 
     private Map<String, String> servicesMap;
 
-    private static final String CALL_SERVICE_CLASS = "callService";
-
-    //private QueryParams queryParams;
+    private static final String CALL_SERVICE_BEAN_NAME = "callService";
 
     @Before
     public void setUp() throws IOException {
@@ -167,7 +160,6 @@ public class CallControllerTest extends BaseTest {
         PowerMockito.mockStatic(ServiceContext.class);
         given(ServiceContext.getInstance()).willReturn(mock(ServiceContext.class));
         given(ServiceContext.getInstance().getApplicationContext()).willReturn(mock(ApplicationContext.class));
-        //PowerMockito.mockStatic(QueryParams.class);
         mockMvc = MockMvcBuilders.standaloneSetup(callController).build();
         callController.initialize();
 
@@ -183,7 +175,7 @@ public class CallControllerTest extends BaseTest {
 
         servicesMap = new HashMap<>();
         // We'll use a service that we can use for integration testing also
-        servicesMap.put("callService", CALL_SERVICE_CLASS);
+        servicesMap.put("callService", CALL_SERVICE_BEAN_NAME);
         voxeo.setServicesMap(servicesMap);
         given(configService.getConfig(Constants.CONFIG_VOXEO)).willReturn(voxeo);
         given(configService.getConfig(Constants.CONFIG_YO)).willThrow(new IllegalArgumentException(Constants.ERROR_YO));
@@ -197,7 +189,7 @@ public class CallControllerTest extends BaseTest {
 
         given(callFlowService.findByName(Constants.CALLFLOW_MAIN)).willReturn(mainFlow);
         given(callFlowService.findByName(Constants.CALLFLOW_MAIN2)).willThrow(new IllegalArgumentException(Constants.ERROR_MAIN_FLOW2));
-        given(ServiceContext.getInstance().getApplicationContext().getBean(BEAN_NAME)).willReturn(BEAN_NAME);
+        given(ServiceContext.getInstance().getApplicationContext().getBean(CALL_SERVICE_BEAN_NAME)).willReturn(CALL_SERVICE_BEAN_NAME);
 
         // Flow Service
         flow = FlowHelper.createFlow(raw);

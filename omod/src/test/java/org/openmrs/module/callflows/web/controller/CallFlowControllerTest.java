@@ -78,7 +78,6 @@ public class CallFlowControllerTest extends BaseTest {
 
     @Before
     public void setUp() {
-        //PowerMockito.mockStatic(SecurityUtil.class);
         mockMvc = MockMvcBuilders.standaloneSetup(callFlowController).build();
         // flows to be created
         mainFlow = CallFlowHelper.createMainFlow();
