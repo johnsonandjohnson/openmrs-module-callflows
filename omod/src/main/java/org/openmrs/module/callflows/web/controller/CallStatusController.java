@@ -57,7 +57,7 @@ public class CallStatusController {
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = "/status/{callId}")
     @ResponseBody
-    public String handleStatus(@PathVariable String callId, @RequestParam Map<String, String> params) {
+    public String handleStatus(@PathVariable(value = "callId") String callId, @RequestParam Map<String, String> params) {
         LOGGER.debug(String.format("handleStatus(callId=%s, params=%s", callId, params));
         Call call = callService.findByCallId(callId);
         if (null == call) {

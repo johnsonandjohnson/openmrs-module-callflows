@@ -1,20 +1,20 @@
 package org.openmrs.module.callflows.api.util;
 
-import org.openmrs.module.callflows.api.BaseTest;
-import org.openmrs.module.callflows.api.Constants;
-import org.openmrs.module.callflows.api.domain.flow.FieldElement;
-import org.openmrs.module.callflows.api.domain.flow.Flow;
-import org.openmrs.module.callflows.api.domain.flow.Node;
-import org.openmrs.module.callflows.api.domain.flow.UserNode;
-import org.openmrs.module.callflows.api.helper.FlowHelper;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
-import javax.inject.Inject;
+import org.openmrs.module.callflows.BaseTest;
+import org.openmrs.module.callflows.Constants;
+import org.openmrs.module.callflows.api.domain.flow.FieldElement;
+import org.openmrs.module.callflows.api.domain.flow.Flow;
+import org.openmrs.module.callflows.api.domain.flow.Node;
+import org.openmrs.module.callflows.api.domain.flow.UserNode;
+import org.openmrs.module.callflows.api.helper.FlowHelper;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +32,7 @@ import static org.junit.Assert.assertThat;
 @RunWith(MockitoJUnitRunner.class)
 public class FlowUtilTest extends BaseTest {
 
-    @Inject
+    @Autowired
     private FlowUtil flowUtil = new FlowUtil();
 
     private Flow flow;

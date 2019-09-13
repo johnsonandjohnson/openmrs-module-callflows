@@ -1,9 +1,9 @@
 package org.openmrs.module.callflows;
 
 
-
 import org.openmrs.module.callflows.api.domain.types.CallStatus;
 import org.springframework.http.MediaType;
+
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collection;

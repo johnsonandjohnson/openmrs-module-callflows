@@ -1,7 +1,12 @@
 package org.openmrs.module.callflows.web.controller;
 
-import org.openmrs.module.callflows.api.BaseTest;
-import org.openmrs.module.callflows.api.Constants;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.openmrs.module.callflows.BaseTest;
+import org.openmrs.module.callflows.Constants;
 import org.openmrs.module.callflows.api.builder.ConfigBuilder;
 import org.openmrs.module.callflows.api.builder.ConfigContractBuilder;
 import org.openmrs.module.callflows.api.builder.RendererBuilder;
@@ -15,20 +20,12 @@ import org.openmrs.module.callflows.api.helper.ConfigHelper;
 import org.openmrs.module.callflows.api.helper.GenericHelper;
 import org.openmrs.module.callflows.api.helper.RendererHelper;
 import org.openmrs.module.callflows.api.service.ConfigService;
-
-import org.motechproject.mds.util.SecurityUtil;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.server.MockMvc;
-import org.springframework.test.web.server.setup.MockMvcBuilders;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
 import java.util.List;
 
 import static org.mockito.BDDMockito.given;
@@ -36,10 +33,10 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.springframework.test.web.server.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.server.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.server.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.server.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Config Controller Web Test
@@ -47,7 +44,6 @@ import static org.springframework.test.web.server.result.MockMvcResultMatchers.s
  * @author bramak09
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(SecurityUtil.class)
 public class SettingsControllerTest extends BaseTest {
 
     private MockMvc mockMvc;
@@ -138,7 +134,7 @@ public class SettingsControllerTest extends BaseTest {
         // When and Then
         mockMvc.perform(get("/configs").contentType(MediaType.APPLICATION_JSON))
                .andExpect(status().is(HttpStatus.OK.value()))
-               .andExpect(content().type(Constants.APPLICATION_JSON_UTF8))
+               .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
                .andExpect(content().string(json(configContracts)));
 
         // Then no incoming, so no builders
@@ -163,9 +159,9 @@ public class SettingsControllerTest extends BaseTest {
         given(configService.allConfigs()).willReturn(configs);
 
         // When and Then
-        mockMvc.perform(post("/configs").contentType(MediaType.APPLICATION_JSON).body(jsonBytes(configContracts)))
+        mockMvc.perform(post("/configs").contentType(MediaType.APPLICATION_JSON).content(jsonBytes(configContracts)))
                .andExpect(status().is(HttpStatus.OK.value()))
-               .andExpect(content().type(Constants.APPLICATION_JSON_UTF8))
+               .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
                .andExpect(content().string(json(configContracts)));
 
         // Then two builders for request
@@ -190,7 +186,7 @@ public class SettingsControllerTest extends BaseTest {
         // When and Then
         mockMvc.perform(get("/renderers").contentType(MediaType.APPLICATION_JSON))
                .andExpect(status().is(HttpStatus.OK.value()))
-               .andExpect(content().type(Constants.APPLICATION_JSON_UTF8))
+               .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
                .andExpect(content().string(json(rendererContracts)));
 
         // Then no incoming, so no builders
@@ -213,9 +209,9 @@ public class SettingsControllerTest extends BaseTest {
         given(configService.allRenderers()).willReturn(renderers);
 
         // When and Then
-        mockMvc.perform(post("/renderers").contentType(MediaType.APPLICATION_JSON).body(jsonBytes(rendererContracts)))
+        mockMvc.perform(post("/renderers").contentType(MediaType.APPLICATION_JSON).content(jsonBytes(rendererContracts)))
                .andExpect(status().is(HttpStatus.OK.value()))
-               .andExpect(content().type(Constants.APPLICATION_JSON_UTF8))
+               .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
                .andExpect(content().string(json(rendererContracts)));
 
         // Then two builders for request

@@ -1,7 +1,7 @@
 package org.openmrs.module.callflows.api.service;
 
-import org.openmrs.module.callflows.api.BaseTest;
-import org.openmrs.module.callflows.api.Constants;
+import org.openmrs.module.callflows.BaseTest;
+import org.openmrs.module.callflows.Constants;
 import org.openmrs.module.callflows.api.domain.CallFlow;
 import org.openmrs.module.callflows.api.domain.FlowPosition;
 import org.openmrs.module.callflows.api.domain.FlowStep;

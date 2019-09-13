@@ -1,30 +1,29 @@
 package org.openmrs.module.callflows.web.controller;
 
-import org.openmrs.module.callflows.api.BaseTest;
-import org.openmrs.module.callflows.api.Constants;
-import org.openmrs.module.callflows.api.domain.Call;
-import org.openmrs.module.callflows.api.helper.CallHelper;
-import org.openmrs.module.callflows.api.service.CallService;
-import org.openmrs.module.callflows.api.util.CallUtil;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.openmrs.module.callflows.BaseTest;
+import org.openmrs.module.callflows.Constants;
+import org.openmrs.module.callflows.api.domain.Call;
+import org.openmrs.module.callflows.api.helper.CallHelper;
+import org.openmrs.module.callflows.api.service.CallService;
+import org.openmrs.module.callflows.api.util.CallUtil;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.web.server.MockMvc;
-import org.springframework.test.web.server.setup.MockMvcBuilders;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.springframework.test.web.server.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.server.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.server.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Call Status Controller Test

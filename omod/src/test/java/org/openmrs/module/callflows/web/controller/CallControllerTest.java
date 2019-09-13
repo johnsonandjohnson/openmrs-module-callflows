@@ -1,8 +1,16 @@
 package org.openmrs.module.callflows.web.controller;
 
+import org.apache.velocity.VelocityContext;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
 import org.openmrs.api.context.ServiceContext;
-import org.openmrs.module.callflows.api.BaseTest;
-import org.openmrs.module.callflows.api.Constants;
+import org.openmrs.module.callflows.BaseTest;
+import org.openmrs.module.callflows.Constants;
 import org.openmrs.module.callflows.api.domain.Call;
 import org.openmrs.module.callflows.api.domain.CallFlow;
 import org.openmrs.module.callflows.api.domain.Config;
@@ -21,28 +29,19 @@ import org.openmrs.module.callflows.api.helper.FlowHelper;
 import org.openmrs.module.callflows.api.helper.RendererHelper;
 import org.openmrs.module.callflows.api.service.CallFlowService;
 import org.openmrs.module.callflows.api.service.CallService;
-import org.openmrs.module.callflows.api.service.FlowService;
 import org.openmrs.module.callflows.api.service.ConfigService;
+import org.openmrs.module.callflows.api.service.FlowService;
 import org.openmrs.module.callflows.api.util.CallUtil;
 import org.openmrs.module.callflows.api.util.FlowUtil;
 import org.openmrs.module.callflows.api.util.TestUtil;
-import org.motechproject.mds.query.QueryParams;
-import org.apache.velocity.VelocityContext;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Spy;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.web.server.MockMvc;
-import org.springframework.test.web.server.request.DefaultRequestBuilder;
-import org.springframework.test.web.server.setup.MockMvcBuilders;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -66,9 +65,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.springframework.test.web.server.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.server.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.server.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Call Controller Unit Test Cases
@@ -78,14 +77,12 @@ import static org.springframework.test.web.server.result.MockMvcResultMatchers.s
  * @author bramak09
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ CallController.class, ServiceContext.class, QueryParams.class })
+@PrepareForTest({ CallController.class, ServiceContext.class})
 public class CallControllerTest extends BaseTest {
 
     private static final String LOCALHOST = "localhost";
 
     private static final String CONTEXT_PATH = "/motech-platform-server/modules";
-
-    private static final String BEAN_NAME = "callService";
 
     private MockMvc mockMvc;
 
@@ -155,9 +152,7 @@ public class CallControllerTest extends BaseTest {
 
     private Map<String, String> servicesMap;
 
-    private static final String CALL_SERVICE_CLASS = "org.openmrs.module.callflows.api.service.CallService";
-
-    private QueryParams queryParams;
+    private static final String CALL_SERVICE_BEAN_NAME = "callService";
 
     @Before
     public void setUp() throws IOException {
@@ -165,7 +160,6 @@ public class CallControllerTest extends BaseTest {
         PowerMockito.mockStatic(ServiceContext.class);
         given(ServiceContext.getInstance()).willReturn(mock(ServiceContext.class));
         given(ServiceContext.getInstance().getApplicationContext()).willReturn(mock(ApplicationContext.class));
-        PowerMockito.mockStatic(QueryParams.class);
         mockMvc = MockMvcBuilders.standaloneSetup(callController).build();
         callController.initialize();
 
@@ -181,7 +175,7 @@ public class CallControllerTest extends BaseTest {
 
         servicesMap = new HashMap<>();
         // We'll use a service that we can use for integration testing also
-        servicesMap.put("callService", CALL_SERVICE_CLASS);
+        servicesMap.put("callService", CALL_SERVICE_BEAN_NAME);
         voxeo.setServicesMap(servicesMap);
         given(configService.getConfig(Constants.CONFIG_VOXEO)).willReturn(voxeo);
         given(configService.getConfig(Constants.CONFIG_YO)).willThrow(new IllegalArgumentException(Constants.ERROR_YO));
@@ -191,11 +185,11 @@ public class CallControllerTest extends BaseTest {
         // Call Flow Service
         mainFlow = CallFlowHelper.createMainFlow();
         mainFlow.setRaw(raw);
-        mainFlow.setId(1L);
+        mainFlow.setId(1);
 
         given(callFlowService.findByName(Constants.CALLFLOW_MAIN)).willReturn(mainFlow);
         given(callFlowService.findByName(Constants.CALLFLOW_MAIN2)).willThrow(new IllegalArgumentException(Constants.ERROR_MAIN_FLOW2));
-        given(ServiceContext.getInstance().getApplicationContext().getBean(BEAN_NAME)).willReturn(BEAN_NAME);
+        given(ServiceContext.getInstance().getApplicationContext().getBean(CALL_SERVICE_BEAN_NAME)).willReturn(CALL_SERVICE_BEAN_NAME);
 
         // Flow Service
         flow = FlowHelper.createFlow(raw);
@@ -254,7 +248,7 @@ public class CallControllerTest extends BaseTest {
         // When we make a inbound call with vxml extension
         mockMvc.perform(customGet("/in/voxeo/flows/MainFlow.vxml"))
                .andExpect(status().is(HttpStatus.OK.value()))
-               .andExpect(content().type(Constants.APPLICATION_VXML))
+               .andExpect(content().contentType(Constants.APPLICATION_VXML))
                .andExpect((content().string(sameAsFile("main_flow_entry.vxml"))));
 
         // Then config and flow must have loaded correctly
@@ -279,7 +273,7 @@ public class CallControllerTest extends BaseTest {
         // When we make a inbound call with json extension
         mockMvc.perform(customGet("/in/voxeo/flows/MainFlow.json"))
                .andExpect(status().is(HttpStatus.OK.value()))
-               .andExpect(content().type(Constants.APPLICATION_JSON_UTF8))
+               .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
                .andExpect(content().string(sameAsFile("main_flow_entry_with_body.json")));
 
         // Then config and flow must have loaded correctly
@@ -304,7 +298,7 @@ public class CallControllerTest extends BaseTest {
         // When we make a inbound call with vxml extension
         mockMvc.perform(customGet("/in/voxeo/flows/MainFlow.vxml?callId=" + outboundCall.getCallId()))
                .andExpect(status().is(HttpStatus.OK.value()))
-               .andExpect(content().type(Constants.APPLICATION_VXML))
+               .andExpect(content().contentType(Constants.APPLICATION_VXML))
                .andExpect(content().string(sameAsFile("main_flow_entry_outbound.vxml")));
 
         // Then config and flow must have loaded correctly
@@ -330,7 +324,7 @@ public class CallControllerTest extends BaseTest {
         // When we make a inbound call with vxml extension
         mockMvc.perform(customGet("/in/voxeo/flows/MainFlow.json?callId=" + outboundCall.getCallId()))
                .andExpect(status().is(HttpStatus.OK.value()))
-               .andExpect(content().type(Constants.APPLICATION_JSON_UTF8))
+               .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
                .andExpect(content().string(sameAsFile("main_flow_entry_outbound_with_body.json")));
 
         // Then config and flow must have loaded correctly
@@ -363,7 +357,7 @@ public class CallControllerTest extends BaseTest {
         // When we make a inbound call with vxml extension
         mockMvc.perform(customGet("/in/voxeo/flows/MainFlow.vxml"))
                .andExpect(status().is(HttpStatus.INTERNAL_SERVER_ERROR.value()))
-               .andExpect(content().type(Constants.PLAIN_TEXT))
+               .andExpect(content().contentType(Constants.PLAIN_TEXT))
                .andExpect(content().string(Constants.ERROR_SCRIPT));
 
         //TODO: Can possibly replace this with a standard error response in VXML itself by changing config?
@@ -383,7 +377,7 @@ public class CallControllerTest extends BaseTest {
         // When we make a inbound call with vxml extension
         mockMvc.perform(customGet("/in/voxeo/flows/MainFlow.json"))
                .andExpect(status().is(HttpStatus.INTERNAL_SERVER_ERROR.value()))
-               .andExpect(content().type(Constants.APPLICATION_JSON_UTF8))
+               .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
                .andExpect(content().string(containsString(
                        "Encountered \\\"<EOF>\\\" at MainFlow.entry[line 1, column 24]")));
         // We check enough of the content to have confidence in the velocity error, but not the complete text as the string
@@ -406,7 +400,7 @@ public class CallControllerTest extends BaseTest {
         // When we make a inbound call with vxml extension
         mockMvc.perform(customGet("/in/voxeo/flows/MainFlow.vxml"))
                .andExpect(status().is(HttpStatus.INTERNAL_SERVER_ERROR.value()))
-               .andExpect(content().type(Constants.PLAIN_TEXT))
+               .andExpect(content().contentType(Constants.PLAIN_TEXT))
                .andExpect(content().string(Constants.ERROR_SYSTEM));
 
         //TODO: Can possibly replace this with a standard error response in VXML itself by changing config and register a error template?
@@ -431,7 +425,7 @@ public class CallControllerTest extends BaseTest {
         // When we make a inbound call with vxml extension
         mockMvc.perform(customGet("/in/voxeo/flows/MainFlow.json"))
                .andExpect(status().is(HttpStatus.INTERNAL_SERVER_ERROR.value()))
-               .andExpect(content().type(Constants.APPLICATION_JSON_UTF8))
+               .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
                .andExpect(content().string(sameAsFile("error_bad_services.json")));
 
         // Then we should have tried to load the config cause the OSGI services are part of the config
@@ -450,7 +444,7 @@ public class CallControllerTest extends BaseTest {
         // When we make a inbound call with a configuration (yo) that's not defined in the system yet
         mockMvc.perform(customGet("/in/yo/flows/MainFlow.vxml"))
                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-               .andExpect(content().type(Constants.PLAIN_TEXT))
+               .andExpect(content().contentType(Constants.PLAIN_TEXT))
                .andExpect(content().string(Constants.ERROR_CONFIG));
         // Then we should have tried to load the config cause the OSGI services are part of the config
         verify(configService, times(1)).getConfig(Constants.CONFIG_YO);
@@ -467,7 +461,7 @@ public class CallControllerTest extends BaseTest {
         // When we make a inbound call with a configuration (yo) that's not defined in the system yet
         mockMvc.perform(customGet("/in/yo/flows/MainFlow.json"))
                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-               .andExpect(content().type(Constants.APPLICATION_JSON_UTF8))
+               .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
                .andExpect(content().string(sameAsFile("error_bad_config.json")));
         // Then we should have tried to load the config cause the OSGI services are part of the config
         verify(configService, times(1)).getConfig(Constants.CONFIG_YO);
@@ -485,7 +479,7 @@ public class CallControllerTest extends BaseTest {
         // When we make a inbound call with a flow that's not defined in the system yet
         mockMvc.perform(customGet("/in/voxeo/flows/MainFlow2.vxml"))
                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-               .andExpect(content().type(Constants.PLAIN_TEXT))
+               .andExpect(content().contentType(Constants.PLAIN_TEXT))
                .andExpect(content().string(Constants.ERROR_CALLFLOW));
         // Then we should have tried to load the config
         verify(configService, times(1)).getConfig(Constants.CONFIG_VOXEO);
@@ -502,7 +496,7 @@ public class CallControllerTest extends BaseTest {
         // When we make a inbound call with a flow that's not defined in the system yet
         mockMvc.perform(customGet("/in/voxeo/flows/MainFlow2.json"))
                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-               .andExpect(content().type(Constants.APPLICATION_JSON_UTF8))
+               .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
                .andExpect(content().string(sameAsFile("error_bad_callflow.json")));
         // Then we should have tried to load the config
         verify(configService, times(1)).getConfig(Constants.CONFIG_VOXEO);
@@ -523,7 +517,7 @@ public class CallControllerTest extends BaseTest {
         // When we make a call continuation request for a existing inbound call with vxml
         mockMvc.perform(customGet("/calls/" + inboundCall.getCallId() + ".vxml"))
                .andExpect(status().is(HttpStatus.OK.value()))
-               .andExpect(content().type(Constants.APPLICATION_VXML))
+               .andExpect(content().contentType(Constants.APPLICATION_VXML))
                .andExpect(content().string(sameAsFile("main_flow_inactive.vxml")));
 
         // Then we should have tried to load the call first and then config and then flow
@@ -540,7 +534,7 @@ public class CallControllerTest extends BaseTest {
         // When we make a call continuation request for a existing inbound call with json
         mockMvc.perform(customGet("/calls/" + inboundCall.getCallId() + ".json"))
                .andExpect(status().is(HttpStatus.OK.value()))
-               .andExpect(content().type(Constants.APPLICATION_JSON_UTF8))
+               .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
                .andExpect(content().string(sameAsFile("main_flow_inactive_with_body.json")));
 
         // Then we should have tried to load the call first and then config and then flow
@@ -569,7 +563,7 @@ public class CallControllerTest extends BaseTest {
 
         //When
         mockMvc.perform(customGet("/calls/" + inboundCall.getCallId() + ".json" + "?jumpTo=" + flowName))
-               .andExpect(status().is(HttpStatus.OK.value())).andExpect(content().type(Constants.APPLICATION_JSON_UTF8))
+               .andExpect(status().is(HttpStatus.OK.value())).andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
                .andExpect(content().string(sameAsFile("main_flow_inactive_with_body.json")));
 
         // Then we should have tried to load the call first and then config and then flow
@@ -600,7 +594,7 @@ public class CallControllerTest extends BaseTest {
         //When
         mockMvc.perform(get("/calls/" + inboundCall.getCallId() + ".json")
                 .param("playedMessages", messages))
-                .andExpect(status().is(HttpStatus.OK.value())).andExpect(content().type(Constants.APPLICATION_JSON_UTF8))
+                .andExpect(status().is(HttpStatus.OK.value())).andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
                 .andExpect(content().string(sameAsFile("main_flow_inactive_with_body.json")));
 
         // Then we should have tried to load the call first and then config and then flow
@@ -622,7 +616,7 @@ public class CallControllerTest extends BaseTest {
         // When we make a call continuation request for a existing inbound call with vxml
         mockMvc.perform(customGet("/calls/" + inboundCall.getCallId() + ".vxml"))
                .andExpect(status().is(HttpStatus.OK.value()))
-               .andExpect(content().type(Constants.APPLICATION_VXML))
+               .andExpect(content().contentType(Constants.APPLICATION_VXML))
                .andExpect(content().string("|active|"));
 
         // Then call, config and flow must be loaded
@@ -643,7 +637,7 @@ public class CallControllerTest extends BaseTest {
         // When we make a call continuation request for a existing inbound call with json
         mockMvc.perform(customGet("/calls/" + inboundCall.getCallId() + ".json"))
                .andExpect(status().is(HttpStatus.OK.value()))
-               .andExpect(content().type(Constants.APPLICATION_JSON_UTF8))
+               .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
                .andExpect(content().string(sameAsFile("main_flow_inactive_terminated_with_body.json")));
 
         // Then
@@ -666,7 +660,7 @@ public class CallControllerTest extends BaseTest {
         // When we make a call continuation request for a existing inbound call with json
         mockMvc.perform(customGet("/calls/" + inboundCall.getCallId() + ".vxml"))
                .andExpect(status().is(HttpStatus.INTERNAL_SERVER_ERROR.value()))
-               .andExpect(content().type(Constants.PLAIN_TEXT))
+               .andExpect(content().contentType(Constants.PLAIN_TEXT))
                .andExpect(content().string("error:SYSTEM:system error"));
         // Then
         assertCallConfigFlowLoaded(inboundCall, Constants.CONFIG_VOXEO, mainFlow.getName());
@@ -688,7 +682,7 @@ public class CallControllerTest extends BaseTest {
         // When we make a call continuation request for a existing inbound call with json
         mockMvc.perform(customGet("/calls/" + inboundCall.getCallId() + ".json"))
                .andExpect(status().is(HttpStatus.INTERNAL_SERVER_ERROR.value()))
-               .andExpect(content().type(Constants.APPLICATION_JSON_UTF8))
+               .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
                .andExpect(content().string(sameAsFile("error_cyclic_loop.json")));
         // Then
         assertCallConfigFlowLoaded(inboundCall, Constants.CONFIG_VOXEO, mainFlow.getName());
@@ -742,31 +736,29 @@ public class CallControllerTest extends BaseTest {
         verify(callService, times(1)).retrieveCount();
     }
 
+
     @Test
     public void shouldReturnStatusOkayForGenerateReportWhenCallTableIsNotEmpty() throws Exception {
         //Given
         List<Call> calls = new ArrayList<>(1);
         calls.add(setUpCall());
 
-        queryParams = new QueryParams(1, 10000);
         given(callService.retrieveCount()).willReturn(1L);
-        PowerMockito.whenNew(QueryParams.class).withArguments(1, 10000).thenReturn(queryParams);
-        given(callService.findAll(queryParams)).willReturn(calls);
+        given(callService.findAll(1,10000)).willReturn(calls);
 
         // When we make export call data request
         mockMvc.perform(customGet("/calls/export-details", "set", ""))
                .andExpect(status().is(HttpStatus.OK.value()));
 
         verify(callService, times(1)).retrieveCount();
-        verify(callService, times(1)).findAll(queryParams);
-        verify(callService, times(5)).findAll(any(QueryParams.class));
+        verify(callService, times(1)).findAll(1,10000);
         verify(callUtil, times(1)).generateReports(anyString(), anyListOf(Call.class));
     }
 
     private Call setUpCall() {
         Call call = new Call();
-        call.setId(1L);
-        call.setActorId("10L");
+        call.setId(1);
+        call.setActorId("10");
         call.setCallId("91882-92882-1882-9383ss-28292");
         call.setDirection(CallDirection.OUTGOING);
 
@@ -857,7 +849,7 @@ public class CallControllerTest extends BaseTest {
         return TestUtil.loadFile(file);
     }
 
-    private DefaultRequestBuilder customGet(String urlTemplate, Object... urlVariables) {
+    private MockHttpServletRequestBuilder customGet(String urlTemplate, Object... urlVariables) {
         return get(CONTEXT_PATH + urlTemplate, urlVariables).header("Host", LOCALHOST).contextPath(CONTEXT_PATH);
     }
 }

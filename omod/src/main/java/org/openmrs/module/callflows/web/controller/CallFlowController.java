@@ -67,7 +67,7 @@ public class CallFlowController extends RestController {
     @RequestMapping(value = "/flows/{id}", method = RequestMethod.PUT)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public CallFlowResponse updateFlow(@PathVariable Long id, @RequestBody CallFlowRequest callFlowRequest)
+    public CallFlowResponse updateFlow(@PathVariable(value = "id") Long id, @RequestBody CallFlowRequest callFlowRequest)
             throws CallFlowAlreadyExistsException {
         CallFlow callflow = callFlowBuilder.createFrom(callFlowRequest);
         callflow.setId(id != null ? id.intValue() : null);
@@ -82,7 +82,7 @@ public class CallFlowController extends RestController {
      */
     @RequestMapping(value = "/flows/{id}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.OK)
-    public void deleteFlow(@PathVariable Long id) {
+    public void deleteFlow(@PathVariable(value = "id") Long id) {
         callFlowService.delete(id != null ? id.intValue() : null);
     }
 
@@ -95,7 +95,7 @@ public class CallFlowController extends RestController {
      */
     @RequestMapping(value = "/flows", method = RequestMethod.GET)
     @ResponseBody
-    public SearchResponse searchFlowsByName(@RequestParam String lookup, @RequestParam String term) {
+    public SearchResponse searchFlowsByName(@RequestParam(value = "lookup") String lookup, @RequestParam(value = "term") String term) {
         List<CallFlowResponse> callFlowResponses = new ArrayList<>();
         if (LOOKUP_BY_NAME_PREFIX.equals(lookup)) {
             List<CallFlow> callFlows = callFlowService.findAllByNamePrefix(term);

@@ -1,24 +1,5 @@
 package org.openmrs.module.callflows.api.service;
 
-import org.openmrs.module.callflows.api.BaseTest;
-import org.openmrs.module.callflows.api.Constants;
-import org.openmrs.module.callflows.api.domain.Call;
-import org.openmrs.module.callflows.api.domain.CallFlow;
-import org.openmrs.module.callflows.api.domain.Config;
-import org.openmrs.module.callflows.api.domain.flow.Flow;
-import org.openmrs.module.callflows.api.domain.types.CallDirection;
-import org.openmrs.module.callflows.api.domain.types.CallStatus;
-import org.openmrs.module.callflows.api.event.CallFlowEvent;
-import org.openmrs.module.callflows.api.util.CallFlowEventSubjects;
-import org.openmrs.module.callflows.api.helper.CallFlowHelper;
-import org.openmrs.module.callflows.api.helper.CallHelper;
-import org.openmrs.module.callflows.api.helper.ConfigHelper;
-import org.openmrs.module.callflows.api.helper.FlowHelper;
-import org.openmrs.module.callflows.api.dao.CallDao;
-import org.openmrs.module.callflows.api.service.impl.CallServiceImpl;
-import org.openmrs.module.callflows.api.util.CallAssert;
-import org.openmrs.module.callflows.api.util.CallUtil;
-import org.openmrs.module.callflows.api.util.TestUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
@@ -36,11 +17,28 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
+import org.openmrs.module.callflows.BaseTest;
+import org.openmrs.module.callflows.Constants;
+import org.openmrs.module.callflows.api.dao.CallDao;
+import org.openmrs.module.callflows.api.domain.Call;
+import org.openmrs.module.callflows.api.domain.CallFlow;
+import org.openmrs.module.callflows.api.domain.Config;
+import org.openmrs.module.callflows.api.domain.flow.Flow;
+import org.openmrs.module.callflows.api.domain.types.CallDirection;
+import org.openmrs.module.callflows.api.domain.types.CallStatus;
+import org.openmrs.module.callflows.api.event.CallFlowEvent;
+import org.openmrs.module.callflows.api.helper.CallFlowHelper;
+import org.openmrs.module.callflows.api.helper.CallHelper;
+import org.openmrs.module.callflows.api.helper.ConfigHelper;
+import org.openmrs.module.callflows.api.helper.FlowHelper;
+import org.openmrs.module.callflows.api.service.impl.CallServiceImpl;
+import org.openmrs.module.callflows.api.util.CallAssert;
+import org.openmrs.module.callflows.api.util.CallFlowEventSubjects;
+import org.openmrs.module.callflows.api.util.CallUtil;
+import org.openmrs.module.callflows.api.util.TestUtil;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 import javax.naming.OperationNotSupportedException;
 import java.io.IOException;
@@ -321,7 +319,7 @@ public class CallServiceTest extends BaseTest {
     public void shouldUpdateOnlyAllowedFieldsInCall() {
 
         // Given a outbound call without an actor yet
-        outboundCall.setId(1L);
+        outboundCall.setId(1);
         outboundCall.setActorId(null);
         outboundCall.setActorType(null);
         outboundCall.setExternalId(Constants.EXTERNAL_ID);
@@ -333,7 +331,7 @@ public class CallServiceTest extends BaseTest {
         Call updatedCall = CallHelper.updateAllPropertiesInOutboundCall(outboundCall);
 
         ArgumentCaptor<Call> callArgumentCaptor = ArgumentCaptor.forClass(Call.class);
-        given(callDao.findById(1L)).willReturn(outboundCall);
+        given(callDao.findById(1)).willReturn(outboundCall);
 
         // Given for create we returned DATE_CURRENT, And for update we return DATE_NEXT_DAY
         given(DateTime.now()).willReturn(formatter.parseDateTime(Constants.DATE_NEXT_DAY));
@@ -372,7 +370,7 @@ public class CallServiceTest extends BaseTest {
     public void shouldNotUpdatePlayedMessagesFieldWhenItIsNotPassed() {
 
         // Given a outbound call without an actor yet
-        outboundCall.setId(1L);
+        outboundCall.setId(1);
         outboundCall.setPlayedMessages(Constants.PLAYED_MESSAGES);
 
         // And we update all properties
@@ -381,7 +379,7 @@ public class CallServiceTest extends BaseTest {
         updatedCall.setPlayedMessages("");
 
         ArgumentCaptor<Call> callArgumentCaptor = ArgumentCaptor.forClass(Call.class);
-        given(callDao.findById(1L)).willReturn(outboundCall);
+        given(callDao.findById(1)).willReturn(outboundCall);
 
         // Given for create we returned DATE_CURRENT, And for update we return DATE_NEXT_DAY
         given(DateTime.now()).willReturn(formatter.parseDateTime(Constants.DATE_NEXT_DAY));
@@ -403,14 +401,14 @@ public class CallServiceTest extends BaseTest {
     @Test
     public void shouldNotUpdateActorIfCallWasCreatedWithActorSet() {
         // Given
-        outboundCall.setId(1L);
+        outboundCall.setId(1);
         DateTime oldEndTime = outboundCall.getEndTime();
 
         // And we update all properties
         Call updatedCall = CallHelper.updateAllPropertiesInOutboundCall(outboundCall);
 
         ArgumentCaptor<Call> callArgumentCaptor = ArgumentCaptor.forClass(Call.class);
-        given(callDao.findById(1L)).willReturn(outboundCall);
+        given(callDao.findById(1)).willReturn(outboundCall);
 
         // Given for create we returned DATE_CURRENT, for update we return DATE_NEXT_DAY
         given(DateTime.now()).willReturn(formatter.parseDateTime(Constants.DATE_NEXT_DAY));
@@ -440,8 +438,8 @@ public class CallServiceTest extends BaseTest {
 
         // Given
         Call updatedCall = CallHelper.updateAllPropertiesInOutboundCall(outboundCall);
-        updatedCall.setId(2L);
-        given(callDao.findById(1L)).willReturn(outboundCall);
+        updatedCall.setId(2);
+        given(callDao.findById(1)).willReturn(outboundCall);
         // Given for create we returned DATE_CURRENT, for update we return DATE_NEXT_DAY
         given(DateTime.now()).willReturn(formatter.parseDateTime(Constants.DATE_NEXT_DAY));
 

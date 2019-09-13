@@ -1,6 +1,6 @@
 package org.openmrs.module.callflows.api.builder;
 
-import org.openmrs.module.callflows.api.BaseTest;
+import org.openmrs.module.callflows.BaseTest;
 import org.openmrs.module.callflows.api.contract.CallFlowResponse;
 import org.openmrs.module.callflows.api.domain.CallFlow;
 import org.openmrs.module.callflows.api.helper.CallFlowHelper;
@@ -32,7 +32,7 @@ public class CallFlowResponseBuilderTest extends BaseTest {
     public void shouldBuildCallFlowResponseFromCallFlow() {
         // Given
         callFlow = CallFlowHelper.createMainFlow();
-        callFlow.setId(1L);
+        callFlow.setId(1);
         // When
         callFlowResponse = callFlowResponseBuilder.createFrom(callFlow);
         // Then
