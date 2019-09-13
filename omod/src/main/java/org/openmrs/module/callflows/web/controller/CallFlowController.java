@@ -28,6 +28,7 @@ import java.util.List;
  * @author bramak09
  */
 @Controller
+@RequestMapping("/callflows")
 public class CallFlowController extends RestController {
 
     private static final String LOOKUP_BY_NAME_PREFIX = "By Name";

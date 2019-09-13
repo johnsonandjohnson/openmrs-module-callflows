@@ -1,5 +1,11 @@
 package org.openmrs.module.callflows.web.it;
 
+import org.apache.http.HttpStatus;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.openmrs.module.callflows.Constants;
 import org.openmrs.module.callflows.api.contract.ConfigContract;
 import org.openmrs.module.callflows.api.contract.RendererContract;
 import org.openmrs.module.callflows.api.domain.Config;
@@ -7,131 +13,106 @@ import org.openmrs.module.callflows.api.domain.Renderer;
 import org.openmrs.module.callflows.api.helper.ConfigHelper;
 import org.openmrs.module.callflows.api.helper.RendererHelper;
 import org.openmrs.module.callflows.api.service.ConfigService;
+import org.openmrs.web.test.BaseModuleWebContextSensitiveTest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
-import org.motechproject.testing.osgi.container.MotechNativeTestContainerFactory;
-
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.ops4j.pax.exam.ExamFactory;
-import org.ops4j.pax.exam.junit.PaxExam;
-import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
-import org.ops4j.pax.exam.spi.reactors.PerSuite;
-import javax.inject.Inject;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static junit.framework.TestCase.assertNotNull;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Config Controller Integration Tests
  *
  * @author bramak09
  */
-@RunWith(PaxExam.class)
-@ExamReactorStrategy(PerSuite.class)
-@ExamFactory(MotechNativeTestContainerFactory.class)
-public class SettingsControllerBundleIT extends RESTControllerPaxIT {
+@WebAppConfiguration
+public class SettingsControllerBundleIT extends BaseModuleWebContextSensitiveTest {
 
-    @Inject
-    private ConfigService configService;
+	@Autowired
+	private ConfigService configService;
 
-    private List<Config> configs;
+	@Autowired
+	private WebApplicationContext webApplicationContext;
 
-    private List<Renderer> renderers;
+	private MockMvc mockMvc;
 
-    private List<ConfigContract> configContracts;
+	private List<Config> configs;
 
-    private List<RendererContract> rendererContracts;
+	private List<Renderer> renderers;
 
-    @Before
-    public void setUp() {
-        configs = ConfigHelper.createConfigs();
-        configContracts = ConfigHelper.createConfigContracts();
-        configService.updateConfigs(configs);
+	private List<ConfigContract> configContracts;
 
-        renderers = RendererHelper.createRenderers();
-        rendererContracts = RendererHelper.createRendererContracts();
-        configService.updateRenderers(renderers);
-    }
+	private List<RendererContract> rendererContracts;
 
-    @After
-    public void tearDown() {
-        super.tearDown();
-        configs = new ArrayList<>();
-        configService.updateConfigs(configs);
+	@Before
+	public void setUp() {
+		configs = ConfigHelper.createConfigs();
+		configContracts = ConfigHelper.createConfigContracts();
+		configService.updateConfigs(configs);
 
-        renderers = new ArrayList<>();
-        configService.updateRenderers(renderers);
-    }
+		renderers = RendererHelper.createRenderers();
+		rendererContracts = RendererHelper.createRendererContracts();
+		configService.updateRenderers(renderers);
 
-    @Test
-    public void shouldReturnService() {
-        assertNotNull(configService);
-    }
+		mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+	}
 
-    @Test
-    public void shouldReturnStatusOKForGetAllConfigs() throws IOException, URISyntaxException, InterruptedException {
+	@After
+	public void tearDown() {
+		configs = new ArrayList<>();
+		configService.updateConfigs(configs);
 
-        // Given
-        HttpGet httpGet = buildGetRequest("/callflows/configs");
+		renderers = new ArrayList<>();
+		configService.updateRenderers(renderers);
+	}
 
-        // When we try to get all configs
-        HttpResponse response = getHttpClient().execute(httpGet);
+	@Test
+	public void shouldReturnService() {
+		assertNotNull(configService);
+	}
 
-        // Then
-        assertNotNull(response);
-        assertThat(response.getStatusLine().getStatusCode(), equalTo(HttpStatus.SC_OK));
-    }
+	@Test
+	public void shouldReturnStatusOKForGetAllConfigs() throws Exception {
+		mockMvc.perform(get("/callflows/configs"))
+				.andExpect(status().is(HttpStatus.SC_OK))
+				.andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8));
+	}
 
-    @Test
-    public void shouldReturnStatusOKForUpdateConfigs() throws IOException, URISyntaxException, InterruptedException {
+	@Test
+	public void shouldReturnStatusOKForUpdateConfigs() throws Exception {
+		mockMvc.perform(post("/callflows/configs").contentType(MediaType.APPLICATION_JSON)
+				.content(json(configContracts)))
+				.andExpect(status().is(HttpStatus.SC_OK))
+				.andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8));
+	}
 
-        // Given
-        HttpPost httpPost = buildPostRequest("/callflows/configs", json(configContracts));
+	@Test
+	public void shouldReturnStatusOKForGetAllRenderers() throws Exception {
+		mockMvc.perform(get("/callflows/renderers"))
+				.andExpect(status().is(HttpStatus.SC_OK))
+				.andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8));
+	}
 
-        // When
-        HttpResponse response = getHttpClient().execute(httpPost);
+	@Test
+	public void shouldReturnStatusOKForUpdateRenderers() throws Exception {
+		mockMvc.perform(post("/callflows/renderers").contentType(MediaType.APPLICATION_JSON)
+				.content(json(rendererContracts)))
+				.andExpect(status().is(HttpStatus.SC_OK))
+				.andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8));
+	}
 
-        // Then
-        assertNotNull(response);
-        assertThat(response.getStatusLine().getStatusCode(), equalTo(HttpStatus.SC_OK));
-    }
-
-    @Test
-    public void shouldReturnStatusOKForGetAllRenderers() throws IOException, URISyntaxException, InterruptedException {
-
-        // Given
-        HttpGet httpGet = buildGetRequest("/callflows/renderers");
-
-        // When we try to get all configs
-        HttpResponse response = getHttpClient().execute(httpGet);
-
-        // Then
-        assertNotNull(response);
-        assertThat(response.getStatusLine().getStatusCode(), equalTo(HttpStatus.SC_OK));
-    }
-
-    @Test
-    public void shouldReturnStatusOKForUpdateRenderers() throws IOException, URISyntaxException, InterruptedException {
-
-        // Given
-        HttpPost httpPost = buildPostRequest("/callflows/renderers", json(rendererContracts));
-
-        // When
-        HttpResponse response = getHttpClient().execute(httpPost);
-
-        // Then
-        assertNotNull(response);
-        assertThat(response.getStatusLine().getStatusCode(), equalTo(HttpStatus.SC_OK));
-    }
+	private String json(Object obj) throws IOException {
+		return new ObjectMapper().writeValueAsString(obj);
+	}
 }

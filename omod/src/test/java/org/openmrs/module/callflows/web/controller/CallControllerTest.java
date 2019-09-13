@@ -246,7 +246,7 @@ public class CallControllerTest extends BaseTest {
     public void shouldHandleIncoming() throws Exception {
 
         // When we make a inbound call with vxml extension
-        mockMvc.perform(customGet("/in/voxeo/flows/MainFlow.vxml"))
+        mockMvc.perform(customGet("/callflows/in/voxeo/flows/MainFlow.vxml"))
                .andExpect(status().is(HttpStatus.OK.value()))
                .andExpect(content().contentType(Constants.APPLICATION_VXML))
                .andExpect((content().string(sameAsFile("main_flow_entry.vxml"))));
@@ -271,7 +271,7 @@ public class CallControllerTest extends BaseTest {
     public void shouldHandleIncomingWithJsonExtension() throws Exception {
 
         // When we make a inbound call with json extension
-        mockMvc.perform(customGet("/in/voxeo/flows/MainFlow.json"))
+        mockMvc.perform(customGet("/callflows/in/voxeo/flows/MainFlow.json"))
                .andExpect(status().is(HttpStatus.OK.value()))
                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
                .andExpect(content().string(sameAsFile("main_flow_entry_with_body.json")));
@@ -296,7 +296,7 @@ public class CallControllerTest extends BaseTest {
     public void shouldHandleIncomingWithCallIdParamAndUseExistingOutboundCall() throws Exception {
 
         // When we make a inbound call with vxml extension
-        mockMvc.perform(customGet("/in/voxeo/flows/MainFlow.vxml?callId=" + outboundCall.getCallId()))
+        mockMvc.perform(customGet("/callflows/in/voxeo/flows/MainFlow.vxml?callId=" + outboundCall.getCallId()))
                .andExpect(status().is(HttpStatus.OK.value()))
                .andExpect(content().contentType(Constants.APPLICATION_VXML))
                .andExpect(content().string(sameAsFile("main_flow_entry_outbound.vxml")));
@@ -322,7 +322,7 @@ public class CallControllerTest extends BaseTest {
     public void shouldHandleIncomingWithJsonExtensionAndCallIdParamAndUseExistingOutboundCall() throws Exception {
 
         // When we make a inbound call with vxml extension
-        mockMvc.perform(customGet("/in/voxeo/flows/MainFlow.json?callId=" + outboundCall.getCallId()))
+        mockMvc.perform(customGet("/callflows/in/voxeo/flows/MainFlow.json?callId=" + outboundCall.getCallId()))
                .andExpect(status().is(HttpStatus.OK.value()))
                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
                .andExpect(content().string(sameAsFile("main_flow_entry_outbound_with_body.json")));
@@ -355,7 +355,7 @@ public class CallControllerTest extends BaseTest {
             .setContent("#if ($x) we won't close!");
 
         // When we make a inbound call with vxml extension
-        mockMvc.perform(customGet("/in/voxeo/flows/MainFlow.vxml"))
+        mockMvc.perform(customGet("/callflows/in/voxeo/flows/MainFlow.vxml"))
                .andExpect(status().is(HttpStatus.INTERNAL_SERVER_ERROR.value()))
                .andExpect(content().contentType(Constants.PLAIN_TEXT))
                .andExpect(content().string(Constants.ERROR_SCRIPT));
@@ -375,7 +375,7 @@ public class CallControllerTest extends BaseTest {
         ((TextElement) userNode.getBlocks().get(0).getElements().get(0)).setTxt("#if ($x) we won't close!");
 
         // When we make a inbound call with vxml extension
-        mockMvc.perform(customGet("/in/voxeo/flows/MainFlow.json"))
+        mockMvc.perform(customGet("/callflows/in/voxeo/flows/MainFlow.json"))
                .andExpect(status().is(HttpStatus.INTERNAL_SERVER_ERROR.value()))
                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
                .andExpect(content().string(containsString(
@@ -398,7 +398,7 @@ public class CallControllerTest extends BaseTest {
         voxeo.setServicesMap(srvcMap);
 
         // When we make a inbound call with vxml extension
-        mockMvc.perform(customGet("/in/voxeo/flows/MainFlow.vxml"))
+        mockMvc.perform(customGet("/callflows/in/voxeo/flows/MainFlow.vxml"))
                .andExpect(status().is(HttpStatus.INTERNAL_SERVER_ERROR.value()))
                .andExpect(content().contentType(Constants.PLAIN_TEXT))
                .andExpect(content().string(Constants.ERROR_SYSTEM));
@@ -423,7 +423,7 @@ public class CallControllerTest extends BaseTest {
         voxeo.setServicesMap(srvcMap);
 
         // When we make a inbound call with vxml extension
-        mockMvc.perform(customGet("/in/voxeo/flows/MainFlow.json"))
+        mockMvc.perform(customGet("/callflows/in/voxeo/flows/MainFlow.json"))
                .andExpect(status().is(HttpStatus.INTERNAL_SERVER_ERROR.value()))
                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
                .andExpect(content().string(sameAsFile("error_bad_services.json")));
@@ -442,7 +442,7 @@ public class CallControllerTest extends BaseTest {
     public void shouldReturnBadRequestIfBadConfigIsUsedInHandleIncomingCall() throws Exception {
 
         // When we make a inbound call with a configuration (yo) that's not defined in the system yet
-        mockMvc.perform(customGet("/in/yo/flows/MainFlow.vxml"))
+        mockMvc.perform(customGet("/callflows/in/yo/flows/MainFlow.vxml"))
                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                .andExpect(content().contentType(Constants.PLAIN_TEXT))
                .andExpect(content().string(Constants.ERROR_CONFIG));
@@ -459,7 +459,7 @@ public class CallControllerTest extends BaseTest {
     public void shouldReturnBadRequestIfBadConfigIsUsedInHandleIncomingCallWithJsonExtension() throws Exception {
 
         // When we make a inbound call with a configuration (yo) that's not defined in the system yet
-        mockMvc.perform(customGet("/in/yo/flows/MainFlow.json"))
+        mockMvc.perform(customGet("/callflows/in/yo/flows/MainFlow.json"))
                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
                .andExpect(content().string(sameAsFile("error_bad_config.json")));
@@ -477,7 +477,7 @@ public class CallControllerTest extends BaseTest {
     public void shouldReturnBadRequestIfBadFlowNameIsUsedInHandleIncomingCall() throws Exception {
 
         // When we make a inbound call with a flow that's not defined in the system yet
-        mockMvc.perform(customGet("/in/voxeo/flows/MainFlow2.vxml"))
+        mockMvc.perform(customGet("/callflows/in/voxeo/flows/MainFlow2.vxml"))
                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                .andExpect(content().contentType(Constants.PLAIN_TEXT))
                .andExpect(content().string(Constants.ERROR_CALLFLOW));
@@ -494,7 +494,7 @@ public class CallControllerTest extends BaseTest {
     public void shouldReturnBadRequestIfBadFlowNameIsUsedInHandleIncomingCallWithJsonExtension() throws Exception {
 
         // When we make a inbound call with a flow that's not defined in the system yet
-        mockMvc.perform(customGet("/in/voxeo/flows/MainFlow2.json"))
+        mockMvc.perform(customGet("/callflows/in/voxeo/flows/MainFlow2.json"))
                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
                .andExpect(content().string(sameAsFile("error_bad_callflow.json")));
@@ -515,7 +515,7 @@ public class CallControllerTest extends BaseTest {
     public void shouldHandleCallContinuation() throws Exception {
 
         // When we make a call continuation request for a existing inbound call with vxml
-        mockMvc.perform(customGet("/calls/" + inboundCall.getCallId() + ".vxml"))
+        mockMvc.perform(customGet("/callflows/calls/" + inboundCall.getCallId() + ".vxml"))
                .andExpect(status().is(HttpStatus.OK.value()))
                .andExpect(content().contentType(Constants.APPLICATION_VXML))
                .andExpect(content().string(sameAsFile("main_flow_inactive.vxml")));
@@ -532,7 +532,7 @@ public class CallControllerTest extends BaseTest {
     @Test
     public void shouldHandleCallContinuationWithJsonExtension() throws Exception {
         // When we make a call continuation request for a existing inbound call with json
-        mockMvc.perform(customGet("/calls/" + inboundCall.getCallId() + ".json"))
+        mockMvc.perform(customGet("/callflows/calls/" + inboundCall.getCallId() + ".json"))
                .andExpect(status().is(HttpStatus.OK.value()))
                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
                .andExpect(content().string(sameAsFile("main_flow_inactive_with_body.json")));
@@ -562,7 +562,7 @@ public class CallControllerTest extends BaseTest {
                 .willReturn(flowPosition);
 
         //When
-        mockMvc.perform(customGet("/calls/" + inboundCall.getCallId() + ".json" + "?jumpTo=" + flowName))
+        mockMvc.perform(customGet("/callflows/calls/" + inboundCall.getCallId() + ".json" + "?jumpTo=" + flowName))
                .andExpect(status().is(HttpStatus.OK.value())).andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
                .andExpect(content().string(sameAsFile("main_flow_inactive_with_body.json")));
 
@@ -592,7 +592,7 @@ public class CallControllerTest extends BaseTest {
                 .willReturn(flowPosition);
 
         //When
-        mockMvc.perform(get("/calls/" + inboundCall.getCallId() + ".json")
+        mockMvc.perform(get("/callflows/calls/" + inboundCall.getCallId() + ".json")
                 .param("playedMessages", messages))
                 .andExpect(status().is(HttpStatus.OK.value())).andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
                 .andExpect(content().string(sameAsFile("main_flow_inactive_with_body.json")));
@@ -614,7 +614,7 @@ public class CallControllerTest extends BaseTest {
         flowPosition.setTerminated(true);
 
         // When we make a call continuation request for a existing inbound call with vxml
-        mockMvc.perform(customGet("/calls/" + inboundCall.getCallId() + ".vxml"))
+        mockMvc.perform(customGet("/callflows/calls/" + inboundCall.getCallId() + ".vxml"))
                .andExpect(status().is(HttpStatus.OK.value()))
                .andExpect(content().contentType(Constants.APPLICATION_VXML))
                .andExpect(content().string("|active|"));
@@ -635,7 +635,7 @@ public class CallControllerTest extends BaseTest {
         flowPosition.setTerminated(true);
 
         // When we make a call continuation request for a existing inbound call with json
-        mockMvc.perform(customGet("/calls/" + inboundCall.getCallId() + ".json"))
+        mockMvc.perform(customGet("/callflows/calls/" + inboundCall.getCallId() + ".json"))
                .andExpect(status().is(HttpStatus.OK.value()))
                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
                .andExpect(content().string(sameAsFile("main_flow_inactive_terminated_with_body.json")));
@@ -658,7 +658,7 @@ public class CallControllerTest extends BaseTest {
                                    any(VelocityContext.class))).willThrow(new IllegalStateException("Cyclic Loop!"));
 
         // When we make a call continuation request for a existing inbound call with json
-        mockMvc.perform(customGet("/calls/" + inboundCall.getCallId() + ".vxml"))
+        mockMvc.perform(customGet("/callflows/calls/" + inboundCall.getCallId() + ".vxml"))
                .andExpect(status().is(HttpStatus.INTERNAL_SERVER_ERROR.value()))
                .andExpect(content().contentType(Constants.PLAIN_TEXT))
                .andExpect(content().string("error:SYSTEM:system error"));
@@ -680,7 +680,7 @@ public class CallControllerTest extends BaseTest {
                                    any(VelocityContext.class))).willThrow(new IllegalStateException("Cyclic Loop!"));
 
         // When we make a call continuation request for a existing inbound call with json
-        mockMvc.perform(customGet("/calls/" + inboundCall.getCallId() + ".json"))
+        mockMvc.perform(customGet("/callflows/calls/" + inboundCall.getCallId() + ".json"))
                .andExpect(status().is(HttpStatus.INTERNAL_SERVER_ERROR.value()))
                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
                .andExpect(content().string(sameAsFile("error_cyclic_loop.json")));
@@ -702,9 +702,9 @@ public class CallControllerTest extends BaseTest {
                 outboundCall);
 
         // When we make a outbound call request
-        mockMvc.perform(customGet("/out/voxeo/flows/MainFlow.vxml", "phone", "1234567890"))
+        mockMvc.perform(customGet("/callflows/out/voxeo/flows/MainFlow.vxml", "phone", "1234567890"))
                .andExpect(status().is(HttpStatus.OK.value()))
-               .andExpect(content().string("{\"callId\":\"5c8f6f83-567c-4586-a3b6-368397d5aba8\",\"status\":\"MOTECH_INITIATED\",\"reason\":null}"));
+               .andExpect(content().string("{\"callId\":\"5c8f6f83-567c-4586-a3b6-368397d5aba8\",\"status\":\"MOTECH_INITIATED\"}"));
 
         // Then we should have tried to use the callService to initiate a call
         verify(callService, times(1)).makeCall(eq(Constants.CONFIG_VOXEO), eq(Constants.CALLFLOW_MAIN), any(Map.class));
@@ -716,7 +716,7 @@ public class CallControllerTest extends BaseTest {
         // Given no mock, so callService.makeCall will return null
 
         // When we make a outbound call request
-        mockMvc.perform(customGet("/out/voxeo/flows/MainFlow.vxml"))
+        mockMvc.perform(customGet("/callflows/out/voxeo/flows/MainFlow.vxml"))
                .andExpect(status().is(HttpStatus.OK.value()))
                .andExpect(content().string(""));
 
@@ -730,7 +730,7 @@ public class CallControllerTest extends BaseTest {
         given(callService.retrieveCount()).willReturn(0L);
 
         // When we make a outbound call request
-        mockMvc.perform(customGet("/calls/export-details", "set", ""))
+        mockMvc.perform(customGet("/callflows/calls/export-details", "set", ""))
                .andExpect(status().is(HttpStatus.OK.value()));
 
         verify(callService, times(1)).retrieveCount();
@@ -747,7 +747,7 @@ public class CallControllerTest extends BaseTest {
         given(callService.findAll(1,10000)).willReturn(calls);
 
         // When we make export call data request
-        mockMvc.perform(customGet("/calls/export-details", "set", ""))
+        mockMvc.perform(customGet("/callflows/calls/export-details", "set", ""))
                .andExpect(status().is(HttpStatus.OK.value()));
 
         verify(callService, times(1)).retrieveCount();

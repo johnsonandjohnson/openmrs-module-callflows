@@ -22,7 +22,16 @@
 
 	<context:component-scan base-package="org.openmrs.module.callflows.web.controller" />
 
-	<bean class="org.openmrs.ui.framework.StandardModuleUiConfiguration">
-		<property name="moduleId" value="${project.parent.artifactId}"/>
+	<!-- Used to handle AnnotationMethodHandlerExceptionResolver (@ExceptionHandler)
+	before default HandlerExceptionResolver implementations registered with DispatcherServlet -->
+	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerExceptionResolver" p:order="1">
+		<property name="messageConverters">
+			<list>
+				<bean id="cfStringConverter" class="org.springframework.http.converter.StringHttpMessageConverter" />
+				<bean id="cfJsonConverter" class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter" />
+				<!-- This bean is defined in the core 'openmrs-servlet.xml' file -->
+				<ref bean="xmlMarshallingHttpMessageConverter"/>
+			</list>
+		</property>
 	</bean>
 </beans>

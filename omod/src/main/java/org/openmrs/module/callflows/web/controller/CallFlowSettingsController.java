@@ -27,7 +27,8 @@ import java.util.List;
  * @author bramak09
  */
 @Controller
-public class SettingsController {
+@RequestMapping("/callflows")
+public class CallFlowSettingsController {
 
     @Autowired
     private ConfigService configService;

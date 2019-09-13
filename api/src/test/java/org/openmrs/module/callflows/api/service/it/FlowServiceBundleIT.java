@@ -1,6 +1,6 @@
 package org.openmrs.module.callflows.api.service.it;
 
-import org.openmrs.module.callflows.api.Constants;
+import org.openmrs.module.callflows.Constants;
 import org.openmrs.module.callflows.api.domain.CallFlow;
 import org.openmrs.module.callflows.api.domain.FlowPosition;
 import org.openmrs.module.callflows.api.domain.FlowStep;
@@ -12,20 +12,14 @@ import org.openmrs.module.callflows.api.dao.CallFlowDao;
 import org.openmrs.module.callflows.api.service.FlowService;
 import org.openmrs.module.callflows.api.util.TestUtil;
 
-import org.motechproject.testing.osgi.BasePaxIT;
-import org.motechproject.testing.osgi.container.MotechNativeTestContainerFactory;
-
 import org.apache.velocity.VelocityContext;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.ops4j.pax.exam.ExamFactory;
-import org.ops4j.pax.exam.junit.PaxExam;
-import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
-import org.ops4j.pax.exam.spi.reactors.PerSuite;
-import javax.inject.Inject;
+import org.openmrs.test.BaseModuleContextSensitiveTest;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.io.IOException;
 
 import static junit.framework.TestCase.assertNotNull;
@@ -39,15 +33,12 @@ import static org.junit.Assert.assertThat;
  *
  * @author bramak09
  */
-@RunWith(PaxExam.class)
-@ExamReactorStrategy(PerSuite.class)
-@ExamFactory(MotechNativeTestContainerFactory.class)
-public class FlowServiceBundleIT extends BasePaxIT {
+public class FlowServiceBundleIT extends BaseModuleContextSensitiveTest {
 
-    @Inject
+    @Autowired
     private FlowService flowService;
 
-    @Inject
+    @Autowired
     private CallFlowDao callFlowDao;
 
     private CallFlow mainFlow;

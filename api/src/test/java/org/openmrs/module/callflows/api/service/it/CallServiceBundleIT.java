@@ -1,6 +1,8 @@
 package org.openmrs.module.callflows.api.service.it;
 
-import org.openmrs.module.callflows.api.Constants;
+import org.hibernate.HibernateException;
+import org.openmrs.api.context.Context;
+import org.openmrs.module.callflows.Constants;
 import org.openmrs.module.callflows.api.domain.Call;
 import org.openmrs.module.callflows.api.domain.CallFlow;
 import org.openmrs.module.callflows.api.domain.Config;
@@ -16,18 +18,12 @@ import org.openmrs.module.callflows.api.service.ConfigService;
 import org.openmrs.module.callflows.api.util.CallAssert;
 import org.openmrs.module.callflows.api.util.TestUtil;
 
-import org.motechproject.testing.osgi.BasePaxIT;
-import org.motechproject.testing.osgi.container.MotechNativeTestContainerFactory;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.ops4j.pax.exam.ExamFactory;
-import org.ops4j.pax.exam.junit.PaxExam;
-import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
-import org.ops4j.pax.exam.spi.reactors.PerSuite;
-import javax.inject.Inject;
+import org.openmrs.test.BaseModuleContextSensitiveTest;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -43,21 +39,18 @@ import static org.junit.Assert.assertThat;
  *
  * @author bramak09
  */
-@RunWith(PaxExam.class)
-@ExamReactorStrategy(PerSuite.class)
-@ExamFactory(MotechNativeTestContainerFactory.class)
-public class CallServiceBundleIT extends BasePaxIT {
+public class CallServiceBundleIT extends BaseModuleContextSensitiveTest {
 
-    @Inject
+    @Autowired
     private CallService callService;
 
-    @Inject
+    @Autowired
     private CallDao callDao;
 
-    @Inject
+    @Autowired
     private ConfigService configService;
 
-    @Inject
+    @Autowired
     private CallFlowDao callFlowDao;
 
     private CallFlow mainFlow;
@@ -107,6 +100,7 @@ public class CallServiceBundleIT extends BasePaxIT {
 
     @After
     public void tearDown() {
+        Context.clearSession();
         callDao.deleteAll();
         callFlowDao.deleteAll();
     }
@@ -222,6 +216,8 @@ public class CallServiceBundleIT extends BasePaxIT {
         // And we update all of it's properties
         Call updatedCall = CallHelper.updateAllPropertiesInOutboundCall(outboundCall);
 
+        Context.flushSession();
+        Context.clearSession();
         // When
         Call returnedCall = callService.update(updatedCall);
 
@@ -237,7 +233,7 @@ public class CallServiceBundleIT extends BasePaxIT {
     public void shouldThrowIllegalArgumentIfInvalidCallWasProvided() {
 
         // Given a invalid call ID
-        outboundCall.setId(-1L);
+        outboundCall.setId(-1);
 
         // When
         Call updatedCall = callService.update(outboundCall);

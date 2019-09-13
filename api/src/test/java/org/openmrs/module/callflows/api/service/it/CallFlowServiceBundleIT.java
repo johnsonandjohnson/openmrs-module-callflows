@@ -1,6 +1,9 @@
 package org.openmrs.module.callflows.api.service.it;
 
-import org.openmrs.module.callflows.api.Constants;
+import com.mchange.util.AlreadyExistsException;
+import org.hibernate.HibernateException;
+import org.openmrs.api.context.Context;
+import org.openmrs.module.callflows.Constants;
 import org.openmrs.module.callflows.api.domain.CallFlow;
 import org.openmrs.module.callflows.api.domain.types.CallFlowStatus;
 import org.openmrs.module.callflows.api.exception.CallFlowAlreadyExistsException;
@@ -8,18 +11,12 @@ import org.openmrs.module.callflows.api.helper.CallFlowHelper;
 import org.openmrs.module.callflows.api.dao.CallFlowDao;
 import org.openmrs.module.callflows.api.service.CallFlowService;
 
-import org.motechproject.testing.osgi.BasePaxIT;
-import org.motechproject.testing.osgi.container.MotechNativeTestContainerFactory;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.ops4j.pax.exam.ExamFactory;
-import org.ops4j.pax.exam.junit.PaxExam;
-import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
-import org.ops4j.pax.exam.spi.reactors.PerSuite;
-import javax.inject.Inject;
+import org.openmrs.test.BaseModuleContextSensitiveTest;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.List;
 
 import static junit.framework.Assert.assertNull;
@@ -32,10 +29,7 @@ import static org.junit.Assert.assertThat;
  *
  * @author bramak09
  */
-@RunWith(PaxExam.class)
-@ExamReactorStrategy(PerSuite.class)
-@ExamFactory(MotechNativeTestContainerFactory.class)
-public class CallFlowServiceBundleIT extends BasePaxIT {
+public class CallFlowServiceBundleIT extends BaseModuleContextSensitiveTest {
 
     private CallFlow mainFlow;
 
@@ -45,10 +39,10 @@ public class CallFlowServiceBundleIT extends BasePaxIT {
 
     private CallFlow badFlow;
 
-    @Inject
+    @Autowired
     private CallFlowService callFlowService;
 
-    @Inject
+    @Autowired
     private CallFlowDao callFlowDao;
 
     @Before
@@ -65,6 +59,7 @@ public class CallFlowServiceBundleIT extends BasePaxIT {
 
     @After
     public void tearDown() {
+        Context.clearSession();
         callFlowDao.deleteAll();
     }
 
@@ -129,7 +124,8 @@ public class CallFlowServiceBundleIT extends BasePaxIT {
         flow2.setName("NewMainFlow");
         callFlowService.create(flow1);
         CallFlow flowToUpdate = callFlowService.create(flow2);
-
+        // Used to detach object from the session cache
+        Context.evictFromSession(flowToUpdate);
         // When we try to update name of NewMainFlow to MainFlow and update
         flowToUpdate.setName(flow1.getName());
         callFlowService.update(flowToUpdate);
@@ -137,16 +133,16 @@ public class CallFlowServiceBundleIT extends BasePaxIT {
         // Then we expect a exception
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void shouldThrowIllegalArgumentIfNameIsNewButIdIsInvalidDuringUpdate()
-            throws CallFlowAlreadyExistsException {
+    @Test(expected = HibernateException.class)
+    public void shouldThrowHibernateExceptionIfNameIsNewButIdIsInvalidDuringUpdate()
+            throws HibernateException, CallFlowAlreadyExistsException {
         // Given  flow named MainFlow
         CallFlow flow1 = CallFlowHelper.createMainFlow();
         callFlowService.create(flow1);
 
         // When we try to update with a brand new name, but a invalid ID
         flow1.setName(Constants.CALLFLOW_MAIN2);
-        flow1.setId(-1L);
+        flow1.setId(-1);
         CallFlow callFlow = callFlowService.update(flow1);
 
         // Then expect a exception
@@ -235,6 +231,6 @@ public class CallFlowServiceBundleIT extends BasePaxIT {
         mainFlow = callFlowService.create(mainFlow);
 
         // When
-        callFlowService.delete(-1L);
+        callFlowService.delete(-1);
     }
 }

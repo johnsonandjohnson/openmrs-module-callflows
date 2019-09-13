@@ -58,6 +58,7 @@ import java.util.Properties;
  * @author bramak09
  */
 @Controller
+@RequestMapping("/callflows")
 public class CallController extends RestController {
 
     private static final Log LOGGER = LogFactory.getLog(CallController.class);

@@ -2,6 +2,7 @@ package org.openmrs.module.callflows.api.dao.impl;
 
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Disjunction;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.api.db.hibernate.DbSessionFactory;
@@ -45,7 +46,7 @@ public class CallDaoImpl extends HibernateOpenmrsDataDAO<Call> implements CallDa
     public long countFindCallsByDirectionAndStatus(CallDirection direction, Set<CallStatus> statusSet) {
         Criteria crit = createCriteriaForFinding(direction, statusSet);
 
-        Number count = (Number) crit.uniqueResult();
+        Number count = (Number) crit.setProjection(Projections.rowCount()).uniqueResult();
         return count.longValue();
     }
 
@@ -75,7 +76,7 @@ public class CallDaoImpl extends HibernateOpenmrsDataDAO<Call> implements CallDa
 
     @Override
     public void deleteAll() {
-        getSession().createQuery("delete from callFlow.Call");
+        getSession().createQuery("delete from callFlow.Call").executeUpdate();
     }
 
     @Override

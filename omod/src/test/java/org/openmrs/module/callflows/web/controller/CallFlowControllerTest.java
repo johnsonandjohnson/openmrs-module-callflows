@@ -108,7 +108,7 @@ public class CallFlowControllerTest extends BaseTest {
         given(callFlowResponseBuilder.createFrom(mainFlow)).willReturn(mainFlowResponse);
 
         // When and Then
-        mockMvc.perform(post("/flows").contentType(MediaType.APPLICATION_JSON).content(jsonBytes(mainFlowRequest)))
+        mockMvc.perform(post("/callflows/flows").contentType(MediaType.APPLICATION_JSON).content(jsonBytes(mainFlowRequest)))
                .andExpect(status().is(HttpStatus.OK.value()))
                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
                .andExpect(content().string(json(mainFlowResponse)));
@@ -122,7 +122,7 @@ public class CallFlowControllerTest extends BaseTest {
         given(callFlowResponseBuilder.createFrom(mainFlow)).willReturn(mainFlowResponse);
 
         // When and Then
-        mockMvc.perform(post("/flows").contentType(MediaType.APPLICATION_JSON).content(jsonBytes(mainFlowRequest)))
+        mockMvc.perform(post("/callflows/flows").contentType(MediaType.APPLICATION_JSON).content(jsonBytes(mainFlowRequest)))
                .andExpect(status().is(HttpStatus.CONFLICT.value()))
                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8));
     }
@@ -134,7 +134,7 @@ public class CallFlowControllerTest extends BaseTest {
         given(callFlowService.create(badFlow)).willThrow(new IllegalArgumentException("bad Callflow ! "));
 
         // When and Then
-        mockMvc.perform(post("/flows").contentType(MediaType.APPLICATION_JSON).content(jsonBytes(mainFlowRequest)))
+        mockMvc.perform(post("/callflows/flows").contentType(MediaType.APPLICATION_JSON).content(jsonBytes(mainFlowRequest)))
                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8));
     }
@@ -148,7 +148,7 @@ public class CallFlowControllerTest extends BaseTest {
         given(callFlowResponseBuilder.createFrom(mainFlow)).willReturn(mainFlowResponse);
 
         // When and Then
-        mockMvc.perform(put("/flows/" + existingMainFlow.getId()).contentType(MediaType.APPLICATION_JSON).content(jsonBytes(mainFlowRequest)))
+        mockMvc.perform(put("/callflows/flows/" + existingMainFlow.getId()).contentType(MediaType.APPLICATION_JSON).content(jsonBytes(mainFlowRequest)))
                .andExpect(status().is(HttpStatus.OK.value()))
                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
                .andExpect(content().string(json(mainFlowResponse)));
@@ -161,7 +161,7 @@ public class CallFlowControllerTest extends BaseTest {
         given(callFlowService.update(existingMainFlow)).willThrow(new CallFlowAlreadyExistsException("Callflow already exists! "));
 
         // When and Then
-        mockMvc.perform(put("/flows/" + existingMainFlow.getId()).contentType(MediaType.APPLICATION_JSON).content(jsonBytes(mainFlowRequest)))
+        mockMvc.perform(put("/callflows/flows/" + existingMainFlow.getId()).contentType(MediaType.APPLICATION_JSON).content(jsonBytes(mainFlowRequest)))
                .andExpect(status().is(HttpStatus.CONFLICT.value()))
                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8));
     }
@@ -173,7 +173,7 @@ public class CallFlowControllerTest extends BaseTest {
         given(callFlowService.update(badFlow)).willThrow(new IllegalArgumentException("bad Callflow ! "));
 
         // When and Then
-        mockMvc.perform(put("/flows/1").contentType(MediaType.APPLICATION_JSON).content(jsonBytes(mainFlowRequest)))
+        mockMvc.perform(put("/callflows/flows/1").contentType(MediaType.APPLICATION_JSON).content(jsonBytes(mainFlowRequest)))
                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8));
     }
@@ -186,7 +186,7 @@ public class CallFlowControllerTest extends BaseTest {
         given(callFlowResponseBuilder.createFrom(flow2)).willReturn(CallFlowContractHelper.createFlow2Response());
 
         // When we search for the same term, Then
-        mockMvc.perform(get("/flows")
+        mockMvc.perform(get("/callflows/flows")
                 .param("lookup", "By Name")
                 .param("term", Constants.CALLFLOW_MAIN_PREFIX))
                 .andExpect(status().is(HttpStatus.OK.value()))
@@ -202,7 +202,7 @@ public class CallFlowControllerTest extends BaseTest {
         given(callFlowResponseBuilder.createFrom(flow2)).willReturn(CallFlowContractHelper.createFlow2Response());
 
         // When we search for a invalid term , Then
-        mockMvc.perform(get("/flows?lookup=By Name&term=" + Constants.CALLFLOW_INVALID_PREFIX))
+        mockMvc.perform(get("/callflows/flows?lookup=By Name&term=" + Constants.CALLFLOW_INVALID_PREFIX))
                .andExpect(status().is(HttpStatus.OK.value()))
                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
                .andExpect(content().string(json(new SearchResponse(new ArrayList<CallFlow>()))));
@@ -214,7 +214,7 @@ public class CallFlowControllerTest extends BaseTest {
         // Given a valid flow by name mainFlow
 
         // When we delete by a valid ID , Then
-        mockMvc.perform(delete("/flows/1"))
+        mockMvc.perform(delete("/callflows/flows/1"))
                .andExpect(status().is(HttpStatus.OK.value()));
 
     }
@@ -225,7 +225,7 @@ public class CallFlowControllerTest extends BaseTest {
         doThrow(new IllegalArgumentException()).when(callFlowService).delete(-1);
 
         // When we delete by a invalid ID , Then
-        mockMvc.perform(delete("/flows/-1"))
+        mockMvc.perform(delete("/callflows/flows/-1"))
                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
     }
 

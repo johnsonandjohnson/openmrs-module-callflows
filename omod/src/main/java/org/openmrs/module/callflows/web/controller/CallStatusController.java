@@ -25,6 +25,7 @@ import java.util.Map;
  * @author nanakapa
  */
 @Controller
+@RequestMapping("/callflows")
 public class CallStatusController {
 
     private static final Log LOGGER = LogFactory.getLog(CallStatusController.class);

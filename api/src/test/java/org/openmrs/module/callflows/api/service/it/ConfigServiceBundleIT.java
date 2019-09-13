@@ -1,6 +1,6 @@
 package org.openmrs.module.callflows.api.service.it;
 
-import org.openmrs.module.callflows.api.Constants;
+import org.openmrs.module.callflows.Constants;
 import org.openmrs.module.callflows.api.domain.Config;
 import org.openmrs.module.callflows.api.domain.Renderer;
 import org.openmrs.module.callflows.api.helper.ConfigHelper;
@@ -9,15 +9,9 @@ import org.openmrs.module.callflows.api.service.ConfigService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.motechproject.testing.osgi.BasePaxIT;
-import org.motechproject.testing.osgi.container.MotechNativeTestContainerFactory;
-import org.ops4j.pax.exam.ExamFactory;
-import org.ops4j.pax.exam.junit.PaxExam;
-import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
-import org.ops4j.pax.exam.spi.reactors.PerSuite;
+import org.openmrs.test.BaseModuleContextSensitiveTest;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.inject.Inject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,12 +25,9 @@ import static org.junit.Assert.assertThat;
  *
  * @author bramak09
  */
-@RunWith(PaxExam.class)
-@ExamReactorStrategy(PerSuite.class)
-@ExamFactory(MotechNativeTestContainerFactory.class)
-public class ConfigServiceBundleIT extends BasePaxIT {
+public class ConfigServiceBundleIT extends BaseModuleContextSensitiveTest {
 
-    @Inject
+    @Autowired
     private ConfigService configService;
 
     private List<Config> configs;

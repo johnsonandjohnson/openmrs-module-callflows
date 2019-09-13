@@ -56,7 +56,7 @@ public class CallFlowDaoImpl extends HibernateOpenmrsDataDAO<CallFlow> implement
 
     @Override
     public void deleteAll() {
-        getSession().createQuery("delete from callFlow.CallFlow");
+        getSession().createQuery("delete from callFlow.CallFlow").executeUpdate();
     }
 
     private DbSession getSession() {
