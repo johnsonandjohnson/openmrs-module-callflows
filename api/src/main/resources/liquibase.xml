@@ -19,7 +19,7 @@
         </preConditions>
         <comment>Created the cfl_callflows table</comment>
         <createTable tableName="cfl_callflows">
-            <column name="cfl_callflows_id">
+            <column name="cfl_callflows_id" type="int" autoIncrement="true">
                 <constraints primaryKey="true" unique="true"/>
             </column>
             <column name="name" type="varchar(255)"></column>
