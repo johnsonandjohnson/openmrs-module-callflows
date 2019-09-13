@@ -49,7 +49,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author bramak09
  */
 @WebAppConfiguration
-public class CallControllerBundleIT extends BaseModuleWebContextSensitiveTest {
+public class CallControllerITTest extends BaseModuleWebContextSensitiveTest {
 
 	private static final String NOT_EXISTING_SERVICE_BEAN_NAME = "not.existing.Service";
 

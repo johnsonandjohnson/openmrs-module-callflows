@@ -25,7 +25,7 @@ import static org.junit.Assert.assertThat;
  *
  * @author bramak09
  */
-public class ConfigServiceBundleIT extends BaseModuleContextSensitiveTest {
+public class ConfigServiceITTest extends BaseModuleContextSensitiveTest {
 
     @Autowired
     private ConfigService configService;

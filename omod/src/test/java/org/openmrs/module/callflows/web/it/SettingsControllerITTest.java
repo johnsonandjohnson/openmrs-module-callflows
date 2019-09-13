@@ -37,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author bramak09
  */
 @WebAppConfiguration
-public class SettingsControllerBundleIT extends BaseModuleWebContextSensitiveTest {
+public class SettingsControllerITTest extends BaseModuleWebContextSensitiveTest {
 
 	@Autowired
 	private ConfigService configService;

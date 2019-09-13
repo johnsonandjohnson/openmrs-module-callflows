@@ -29,7 +29,7 @@ import static org.junit.Assert.assertThat;
  *
  * @author bramak09
  */
-public class CallFlowServiceBundleIT extends BaseModuleContextSensitiveTest {
+public class CallFlowServiceITTest extends BaseModuleContextSensitiveTest {
 
     private CallFlow mainFlow;
 

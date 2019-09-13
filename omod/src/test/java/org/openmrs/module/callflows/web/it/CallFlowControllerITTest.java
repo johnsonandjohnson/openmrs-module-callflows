@@ -35,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author bramak09
  */
 @WebAppConfiguration
-public class CallFlowControllerBundleIT extends BaseModuleWebContextSensitiveTest {
+public class CallFlowControllerITTest extends BaseModuleWebContextSensitiveTest {
 
 	private CallFlow mainFlow;
 

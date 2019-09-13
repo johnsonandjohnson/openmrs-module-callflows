@@ -39,7 +39,7 @@ import static org.junit.Assert.assertThat;
  *
  * @author bramak09
  */
-public class CallServiceBundleIT extends BaseModuleContextSensitiveTest {
+public class CallServiceITTest extends BaseModuleContextSensitiveTest {
 
     @Autowired
     private CallService callService;

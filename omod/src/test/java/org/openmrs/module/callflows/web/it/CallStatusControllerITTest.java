@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Call Status Controller Integration Tests
  */
 @WebAppConfiguration
-public class CallStatusControllerBundleIT extends BaseModuleWebContextSensitiveTest {
+public class CallStatusControllerITTest extends BaseModuleWebContextSensitiveTest {
 
 	@Autowired
 	private CallDao callDao;

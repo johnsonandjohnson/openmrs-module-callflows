@@ -33,7 +33,7 @@ import static org.junit.Assert.assertThat;
  *
  * @author bramak09
  */
-public class FlowServiceBundleIT extends BaseModuleContextSensitiveTest {
+public class FlowServiceITTest extends BaseModuleContextSensitiveTest {
 
     @Autowired
     private FlowService flowService;
