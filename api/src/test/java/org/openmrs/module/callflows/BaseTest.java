@@ -1,6 +1,6 @@
 package org.openmrs.module.callflows;
 
-import org.codehaus.jackson.map.ObjectMapper;
+import com.google.gson.GsonBuilder;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
@@ -44,7 +44,7 @@ public class BaseTest {
      * @throws IOException if not able to convert
      */
     protected String json(Object obj) throws IOException {
-        return new ObjectMapper().writeValueAsString(obj);
+        return new GsonBuilder().disableHtmlEscaping().create().toJson(obj);
     }
 
     /**
@@ -56,6 +56,6 @@ public class BaseTest {
      * @throws IOException if not able to convert
      */
     protected byte[] jsonBytes(Object obj) throws IOException {
-        return new ObjectMapper().writeValueAsString(obj).getBytes("UTF-8");
+        return json(obj).getBytes("UTF-8");
     }
 }

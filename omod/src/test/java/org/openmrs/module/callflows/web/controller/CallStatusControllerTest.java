@@ -59,7 +59,7 @@ public class CallStatusControllerTest extends BaseTest {
 
         //When && Then
         mockMvc.perform(
-                get("/status/" + Constants.INBOUND_CALL_ID.toString() + "?status=ANSWERED&reason=call answered"))
+                get("/callflows/status/" + Constants.INBOUND_CALL_ID.toString() + "?status=ANSWERED&reason=call answered"))
 
                .andExpect(status().is(HttpStatus.OK.value())).andExpect(content().string(Constants.OK_RESPONSE));
 
@@ -76,7 +76,7 @@ public class CallStatusControllerTest extends BaseTest {
 
         //When && Then
         mockMvc.perform(
-                get("/status/" + Constants.INBOUND_CALL_ID.toString() + "?status = ANSWERED & reason = call answered"))
+                get("/callflows/status/" + Constants.INBOUND_CALL_ID.toString() + "?status = ANSWERED & reason = call answered"))
 
                .andExpect(status().is(HttpStatus.OK.value())).andExpect(content().string(Constants.ERROR_RESPONSE));
 
@@ -93,7 +93,7 @@ public class CallStatusControllerTest extends BaseTest {
 
         //When
         mockMvc.perform(
-                get("/status/" + Constants.INBOUND_CALL_ID.toString() + "?status=ANSWERED&reason=call answered&externalId=1234&externalType=extType"))
+                get("/callflows/status/" + Constants.INBOUND_CALL_ID.toString() + "?status=ANSWERED&reason=call answered&externalId=1234&externalType=extType"))
 
                .andExpect(status().is(HttpStatus.OK.value())).andExpect(content().string(Constants.OK_RESPONSE));
 

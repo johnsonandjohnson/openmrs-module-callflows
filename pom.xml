@@ -57,6 +57,17 @@
 				<version>${jodaTimeVersion}</version>
 			</dependency>
 			<dependency>
+				<groupId>org.jadira.usertype</groupId>
+				<artifactId>usertype.core</artifactId>
+				<version>${jodaUsertype.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.hibernate</groupId>
+						<artifactId>hibernate-entitymanager</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
 				<groupId>org.openmrs</groupId>
 				<artifactId>event-api</artifactId>
 				<version>${eventVersion}</version>
@@ -73,8 +84,34 @@
 				<artifactId>guava</artifactId>
 				<version>${guavaVersion}</version>
 			</dependency>
+			<dependency>
+				<groupId>org.openmrs.module</groupId>
+				<artifactId>legacyui-omod</artifactId>
+				<scope>provided</scope>
+				<version>${legacyVersion}</version>
+			</dependency>
+			<dependency>
+				<groupId>javax.servlet</groupId>
+				<artifactId>javax.servlet-api</artifactId>
+				<version>${javax.servlet.version}</version>
+				<scope>provided</scope>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>com.googlecode.maven-java-formatter-plugin</groupId>
+				<artifactId>maven-java-formatter-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>none</phase>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 
 	<repositories>
 		<repository>
@@ -101,7 +138,7 @@
 	</pluginRepositories>
 
 	<properties>
-		<openmrsPlatformVersion>1.11.6</openmrsPlatformVersion>
+		<openmrsPlatformVersion>2.0.1</openmrsPlatformVersion>
 		<javaCompilerSource>1.8</javaCompilerSource>
 		<javaCompilerTarget>1.8</javaCompilerTarget>
 		<gsonVersion>1.7.1</gsonVersion>
@@ -109,6 +146,9 @@
 		<superCsvVersion>2.2.1</superCsvVersion>
 		<apacheHttpClientVersion>4.4.1</apacheHttpClientVersion>
 		<jodaTimeVersion>2.9.1</jodaTimeVersion>
+		<jodaUsertype.version>3.2.0.GA</jodaUsertype.version>
 		<eventVersion>2.6.0</eventVersion>
+		<legacyVersion>1.5.0</legacyVersion>
+		<javax.servlet.version>3.0.1</javax.servlet.version>
 	</properties>
 </project>

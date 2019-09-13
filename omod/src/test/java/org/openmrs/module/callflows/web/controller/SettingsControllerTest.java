@@ -1,5 +1,6 @@
 package org.openmrs.module.callflows.web.controller;
 
+import com.google.gson.Gson;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,7 +50,7 @@ public class SettingsControllerTest extends BaseTest {
     private MockMvc mockMvc;
 
     @InjectMocks
-    private SettingsController settingsController = new SettingsController();
+    private CallFlowSettingsController settingsController = new CallFlowSettingsController();
 
     @Mock
     private ConfigService configService;
@@ -132,10 +133,10 @@ public class SettingsControllerTest extends BaseTest {
         given(configService.allConfigs()).willReturn(configs);
 
         // When and Then
-        mockMvc.perform(get("/configs").contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/callflows/configs").contentType(MediaType.APPLICATION_JSON))
                .andExpect(status().is(HttpStatus.OK.value()))
                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
-               .andExpect(content().string(json(configContracts)));
+               .andExpect(content().string(gsonFormatOfJson(configContracts)));
 
         // Then no incoming, so no builders
         verify(configBuilder, never()).createFrom(any(ConfigContract.class));
@@ -159,10 +160,10 @@ public class SettingsControllerTest extends BaseTest {
         given(configService.allConfigs()).willReturn(configs);
 
         // When and Then
-        mockMvc.perform(post("/configs").contentType(MediaType.APPLICATION_JSON).content(jsonBytes(configContracts)))
+        mockMvc.perform(post("/callflows/configs").contentType(MediaType.APPLICATION_JSON).content(jsonBytes(configContracts)))
                .andExpect(status().is(HttpStatus.OK.value()))
                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
-               .andExpect(content().string(json(configContracts)));
+               .andExpect(content().string(gsonFormatOfJson(configContracts)));
 
         // Then two builders for request
         verify(configBuilder, times(3)).createFrom(any(ConfigContract.class));
@@ -184,10 +185,10 @@ public class SettingsControllerTest extends BaseTest {
         given(configService.allRenderers()).willReturn(renderers);
 
         // When and Then
-        mockMvc.perform(get("/renderers").contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/callflows/renderers").contentType(MediaType.APPLICATION_JSON))
                .andExpect(status().is(HttpStatus.OK.value()))
                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
-               .andExpect(content().string(json(rendererContracts)));
+               .andExpect(content().string(gsonFormatOfJson(rendererContracts)));
 
         // Then no incoming, so no builders
         verify(configBuilder, never()).createFrom(any(ConfigContract.class));
@@ -209,10 +210,10 @@ public class SettingsControllerTest extends BaseTest {
         given(configService.allRenderers()).willReturn(renderers);
 
         // When and Then
-        mockMvc.perform(post("/renderers").contentType(MediaType.APPLICATION_JSON).content(jsonBytes(rendererContracts)))
+        mockMvc.perform(post("/callflows/renderers").contentType(MediaType.APPLICATION_JSON).content(jsonBytes(rendererContracts)))
                .andExpect(status().is(HttpStatus.OK.value()))
                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
-               .andExpect(content().string(json(rendererContracts)));
+               .andExpect(content().string(gsonFormatOfJson(rendererContracts)));
 
         // Then two builders for request
         verify(rendererBuilder, times(2)).createFrom(any(RendererContract.class));
@@ -222,5 +223,9 @@ public class SettingsControllerTest extends BaseTest {
         verify(configService, times(1)).allRenderers();
         // And must call response builder twice
         verify(rendererContractBuilder, times(2)).createFrom(any(Renderer.class));
+    }
+
+    private String gsonFormatOfJson(Object obj) {
+        return new Gson().toJson(obj);
     }
 }

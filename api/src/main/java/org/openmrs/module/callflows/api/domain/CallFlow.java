@@ -57,6 +57,9 @@ public class CallFlow extends AbstractBaseOpenmrsData {
     @Column(columnDefinition = TEXT)
     private String raw;
 
+    public CallFlow() {
+    }
+
     /**
      * Creates a CallFlow instance
      *

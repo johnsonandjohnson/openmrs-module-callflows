@@ -113,7 +113,7 @@ public final class Constants {
 
     public static final String CONFIG_SRVC_CALL = "callSrvc";
 
-    public static final String CONFIG_SRVC_CALL_CLASS = "com.janssen.connectforlife.callflows.service.CallService";
+    public static final String CONFIG_SRVC_CALL_BEAN_NAME = "callService";
 
     public static final String CONFIG_RENDERER_VXML = "vxml";
 

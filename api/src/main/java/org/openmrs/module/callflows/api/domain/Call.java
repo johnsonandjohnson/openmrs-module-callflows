@@ -1,10 +1,14 @@
 package org.openmrs.module.callflows.api.domain;
 
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.Type;
 import org.openmrs.module.callflows.api.dao.converter.MapConverter;
 import org.openmrs.module.callflows.api.domain.types.CallDirection;
 import org.openmrs.module.callflows.api.domain.types.CallStatus;
 
 import org.joda.time.DateTime;
+
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.Convert;
@@ -72,6 +76,7 @@ public class Call extends AbstractBaseOpenmrsData {
      * The call flow we started this call from. Doesn't change once set
      */
     @OneToOne
+    @Cascade(CascadeType.SAVE_UPDATE)
     @JoinColumn(name = "startFlow_id", nullable = false)
     private CallFlow startFlow;
 
@@ -85,12 +90,14 @@ public class Call extends AbstractBaseOpenmrsData {
      * The time we started the call at. Doesn't change once set
      */
     @Column
+    @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime startTime;
 
     /**
      * The flow we ended at for now. This can change as the call continues
      */
     @OneToOne
+    @Cascade(CascadeType.SAVE_UPDATE)
     @JoinColumn(name = "endFlow_id", nullable = false)
     private CallFlow endFlow;
 
@@ -104,6 +111,7 @@ public class Call extends AbstractBaseOpenmrsData {
      * The end time prone to revision as the call continues further
      */
     @Column
+    @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime endTime;
 
     /**
