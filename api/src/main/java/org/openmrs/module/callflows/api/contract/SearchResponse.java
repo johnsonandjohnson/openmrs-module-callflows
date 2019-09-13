@@ -1,7 +1,5 @@
 package org.openmrs.module.callflows.api.contract;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
-
 import java.util.List;
 
 /**
@@ -14,7 +12,6 @@ public class SearchResponse<T> {
     /**
      * The list of response objects
      */
-    @JsonIgnore
     private List<T> results;
 
     /**
