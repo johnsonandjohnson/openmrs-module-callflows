@@ -12,7 +12,7 @@ import java.util.Map;
  *
  * @author bramak09
  */
-@Component
+@Component("callFlow.ConfigBuilder")
 public class ConfigBuilder {
 
     /**
