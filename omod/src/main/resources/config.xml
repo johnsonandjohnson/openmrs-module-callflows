@@ -34,6 +34,15 @@
 	<aware_of_modules>
 		<aware_of_module>org.openmrs.module.legacyui</aware_of_module>
 	</aware_of_modules>
+
+	<filter>
+		<filter-name>CallFlow Module Authorization</filter-name>
+		<filter-class>org.openmrs.module.callflows.filter.AuthorizationFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>CallFlow Module Authorization</filter-name>
+		<url-pattern>/ws/callflows/*</url-pattern>
+	</filter-mapping>
 	
 	
 	<!-- AOP
