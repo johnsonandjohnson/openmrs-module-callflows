@@ -87,6 +87,7 @@ public class CallFlowServiceImpl implements CallFlowService {
     }
 
     @Override
+    @Transactional
     public void delete(Integer id) {
         CallFlow callflow = callFlowDao.findById(id);
         if (callflow == null) {
