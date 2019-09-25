@@ -4,6 +4,8 @@ import org.openmrs.module.callflows.api.domain.types.CallFlowStatus;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -44,6 +46,7 @@ public class CallFlow extends AbstractBaseOpenmrsData {
      * Used to determine whether a call flow is active in the system or being currently worked on (DRAFT) mode
      */
     @Column
+    @Enumerated(EnumType.STRING)
     private CallFlowStatus status;
 
     /**
