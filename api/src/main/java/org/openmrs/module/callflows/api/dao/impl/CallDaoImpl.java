@@ -82,6 +82,11 @@ public class CallDaoImpl extends HibernateOpenmrsDataDAO<Call> implements CallDa
 
     @Override
     public long count() {
+        //We have to write custom implementation of this method because in OpenMRS the same method doesn't work properly.
+        //In OpenMRS is used 'this.mappedClass' and it generates 'class org.openmrs.module.callflows.api.domain' in query
+        //It causes invalid syntax of query because "class" is redundant.
+        //We have to provide explicitly name of class in query or get name of class using getName() method.
+
         String hql = "select count(*) from " + this.mappedClass.getName() + " where voided = false";
 
         Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
