@@ -1,6 +1,7 @@
 package org.openmrs.module.callflows.api.dao.impl;
 
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -81,7 +82,11 @@ public class CallDaoImpl extends HibernateOpenmrsDataDAO<Call> implements CallDa
 
     @Override
     public long count() {
-        return getAllCount(false);
+        String hql = "select count(*) from " + this.mappedClass.getName() + " where voided = false";
+
+        Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
+        Number count = (Number)query.uniqueResult();
+        return count == null ? 0 : count.intValue();
     }
 
     private DbSession getSession() {

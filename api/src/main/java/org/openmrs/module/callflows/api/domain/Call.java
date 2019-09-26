@@ -77,7 +77,7 @@ public class Call extends AbstractBaseOpenmrsData {
      */
     @OneToOne
     @Cascade(CascadeType.SAVE_UPDATE)
-    @JoinColumn(name = "startFlow_id", nullable = false)
+    @JoinColumn(name = "startFlow", nullable = false)
     private CallFlow startFlow;
 
     /**
@@ -98,7 +98,7 @@ public class Call extends AbstractBaseOpenmrsData {
      */
     @OneToOne
     @Cascade(CascadeType.SAVE_UPDATE)
-    @JoinColumn(name = "endFlow_id", nullable = false)
+    @JoinColumn(name = "endFlow", nullable = false)
     private CallFlow endFlow;
 
     /**
