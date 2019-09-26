@@ -1,7 +1,6 @@
 package org.openmrs.module.callflows.api.dao.impl;
 
 import org.hibernate.Criteria;
-import org.hibernate.Query;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -82,16 +81,9 @@ public class CallDaoImpl extends HibernateOpenmrsDataDAO<Call> implements CallDa
 
     @Override
     public long count() {
-        //We have to write custom implementation of this method because in OpenMRS the same method doesn't work properly.
-        //In OpenMRS is used 'this.mappedClass' and it generates 'class org.openmrs.module.callflows.api.domain' in query
-        //It causes invalid syntax of query because "class" is redundant.
-        //We have to provide explicitly name of class in query or get name of class using getName() method.
-
-        String hql = "select count(*) from " + this.mappedClass.getName() + " where voided = false";
-
-        Query query = this.sessionFactory.getCurrentSession().createQuery(hql);
-        Number count = (Number)query.uniqueResult();
-        return count == null ? 0 : count.intValue();
+        Criteria crit = getSession().createCriteria(this.mappedClass);
+        crit.setProjection(Projections.rowCount());
+        return (long)crit.uniqueResult();
     }
 
     private DbSession getSession() {
