@@ -2,12 +2,9 @@ package org.openmrs.module.callflows.api.domain;
 
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.Type;
 import org.openmrs.module.callflows.api.dao.converter.MapConverter;
 import org.openmrs.module.callflows.api.domain.types.CallDirection;
 import org.openmrs.module.callflows.api.domain.types.CallStatus;
-
-import org.joda.time.DateTime;
 
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
@@ -21,6 +18,7 @@ import javax.persistence.MapKeyJoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -90,8 +88,7 @@ public class Call extends AbstractBaseOpenmrsData {
      * The time we started the call at. Doesn't change once set
      */
     @Column
-    @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
-    private DateTime startTime;
+    private Date startTime;
 
     /**
      * The flow we ended at for now. This can change as the call continues
@@ -111,8 +108,7 @@ public class Call extends AbstractBaseOpenmrsData {
      * The end time prone to revision as the call continues further
      */
     @Column
-    @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
-    private DateTime endTime;
+    private Date endTime;
 
     /**
      * Last time of update as per the provider's clock
@@ -207,13 +203,13 @@ public class Call extends AbstractBaseOpenmrsData {
     private Map<String, String> providerData = new HashMap<>();
 
     @Column
-    private DateTime creationDate;
+    private Date creationDate;
 
-    public DateTime getCreationDate() {
+    public Date getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(DateTime creationDate) {
+    public void setCreationDate(Date creationDate) {
         this.creationDate = creationDate;
     }
 
@@ -273,11 +269,11 @@ public class Call extends AbstractBaseOpenmrsData {
         this.startNode = startNode;
     }
 
-    public DateTime getStartTime() {
+    public Date getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(DateTime startTime) {
+    public void setStartTime(Date startTime) {
         this.startTime = startTime;
     }
 
@@ -297,11 +293,11 @@ public class Call extends AbstractBaseOpenmrsData {
         this.endNode = endNode;
     }
 
-    public DateTime getEndTime() {
+    public Date getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(DateTime endTime) {
+    public void setEndTime(Date endTime) {
         this.endTime = endTime;
     }
 

@@ -52,22 +52,6 @@
 				<version>${apacheHttpClientVersion}</version>
 			</dependency>
 			<dependency>
-				<groupId>joda-time</groupId>
-				<artifactId>joda-time</artifactId>
-				<version>${jodaTimeVersion}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.jadira.usertype</groupId>
-				<artifactId>usertype.core</artifactId>
-				<version>${jodaUsertype.version}</version>
-				<exclusions>
-					<exclusion>
-						<groupId>org.hibernate</groupId>
-						<artifactId>hibernate-entitymanager</artifactId>
-					</exclusion>
-				</exclusions>
-			</dependency>
-			<dependency>
 				<groupId>org.openmrs</groupId>
 				<artifactId>event-api</artifactId>
 				<version>${eventVersion}</version>
@@ -145,8 +129,6 @@
 		<guavaVersion>23.0</guavaVersion>
 		<superCsvVersion>2.2.1</superCsvVersion>
 		<apacheHttpClientVersion>4.4.1</apacheHttpClientVersion>
-		<jodaTimeVersion>2.9.1</jodaTimeVersion>
-		<jodaUsertype.version>3.2.0.GA</jodaUsertype.version>
 		<eventVersion>2.6.0</eventVersion>
 		<legacyVersion>1.5.0</legacyVersion>
 		<javax.servlet.version>3.0.1</javax.servlet.version>

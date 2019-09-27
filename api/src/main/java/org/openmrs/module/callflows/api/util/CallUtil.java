@@ -12,9 +12,6 @@ import org.apache.http.message.BasicHeader;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.exception.VelocityException;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.openmrs.module.callflows.api.contract.JsonExecutionResponse;
 import org.openmrs.module.callflows.api.dao.CallDao;
 import org.openmrs.module.callflows.api.domain.Call;
@@ -58,6 +55,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -122,8 +120,9 @@ public class CallUtil {
     private final String[] headers = { "id", "actorId", "phone", "actorType", "callId", "direction", "creationDate",
             "callReference", "status", "statusText", "startTime", "endTime" };
 
-    private static DateTimeFormatter fromFormatter = DateTimeFormat.forPattern("MM/dd/yyyy HH:mm:ss");
-    private static DateTimeFormatter toFormatter = DateTimeFormat.forPattern("yyMMddHHmm");
+    private static final String DATE_TIME_PATTERN_1 = "MM/dd/yyyy HH:mm:ss";
+
+    private static final String DATE_TIME_PATTERN_2 = "yyMMddHHmm";
 
     @Autowired
     private CallDao callDao;
@@ -610,14 +609,14 @@ public class CallUtil {
         callMap.put(headers[3], call.getActorType());
         callMap.put(headers[4], call.getCallId());
         callMap.put(headers[5], call.getDirection());
-        callMap.put(headers[6], null != call.getCreationDate() ? call.getCreationDate().toString(toFormatter) : null);
+        callMap.put(headers[6], null != call.getCreationDate() ?
+                DateUtil.dateToStringWithFormatter(call.getCreationDate(), DATE_TIME_PATTERN_2) : null);
 
         if (null != call.getContext() && null != call.getContext().get(MESSAGE_KEY) &&
                 StringUtils.isNotEmpty(call.getContext().get(MESSAGE_KEY).toString())) {
             try {
-                DateTime dateTimeMessageKey = fromFormatter
-                        .parseDateTime(call.getContext().get(MESSAGE_KEY).toString());
-                callMap.put(headers[7], dateTimeMessageKey.toString(toFormatter));
+                Date dateTimeMessageKey = DateUtil.parse(call.getContext().get(MESSAGE_KEY).toString(), DATE_TIME_PATTERN_1);
+                callMap.put(headers[7], DateUtil.dateToStringWithFormatter(dateTimeMessageKey, DATE_TIME_PATTERN_2));
             } catch (IllegalArgumentException e) {
                 LOGGER.error(String.format(
                         "Invalid input format to parse messageKey to dateTime for calls record having id: %s with messageKey value: %s",
@@ -677,7 +676,7 @@ public class CallUtil {
         eventParams.put(Constants.PARAM_HEADERS, config.getOutgoingCallPostHeadersMap());
         eventParams.put(Constants.PARAM_JOB_ID, callId);
         CallFlowEvent event = new CallFlowEvent(CallFlowEventSubjects.CALLFLOWS_INITIATE_CALL, eventParams);
-        schedulerService.scheduleRunOnceJob(event,
-                DateTime.now().plusSeconds(config.getOutboundCallRetrySeconds()).toDate(),  new CallFlowScheduledTask());
+        schedulerService.scheduleRunOnceJob(event, DateUtil.plusSeconds(DateUtil.now(),
+                config.getOutboundCallRetrySeconds()), new CallFlowScheduledTask());
     }
 }

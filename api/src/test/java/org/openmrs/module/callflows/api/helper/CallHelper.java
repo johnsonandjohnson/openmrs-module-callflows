@@ -6,8 +6,6 @@ import org.openmrs.module.callflows.api.domain.CallFlow;
 import org.openmrs.module.callflows.api.domain.types.CallDirection;
 import org.openmrs.module.callflows.api.domain.types.CallStatus;
 
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,8 +15,6 @@ import java.util.Map;
  * @author bramak09
  */
 public final class CallHelper {
-
-    private static DateTimeFormatter formatter = DateTimeFormat.forPattern(Constants.DATE_FORMAT);
 
     // private constructor
     private CallHelper() {
