@@ -1,8 +1,12 @@
 package org.openmrs.module.callflows.api.service.it;
 
-import org.hibernate.HibernateException;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.callflows.Constants;
+import org.openmrs.module.callflows.api.dao.CallDao;
+import org.openmrs.module.callflows.api.dao.CallFlowDao;
 import org.openmrs.module.callflows.api.domain.Call;
 import org.openmrs.module.callflows.api.domain.CallFlow;
 import org.openmrs.module.callflows.api.domain.Config;
@@ -11,16 +15,10 @@ import org.openmrs.module.callflows.api.domain.types.CallStatus;
 import org.openmrs.module.callflows.api.helper.CallFlowHelper;
 import org.openmrs.module.callflows.api.helper.CallHelper;
 import org.openmrs.module.callflows.api.helper.ConfigHelper;
-import org.openmrs.module.callflows.api.dao.CallDao;
-import org.openmrs.module.callflows.api.dao.CallFlowDao;
 import org.openmrs.module.callflows.api.service.CallService;
 import org.openmrs.module.callflows.api.service.ConfigService;
 import org.openmrs.module.callflows.api.util.CallAssert;
 import org.openmrs.module.callflows.api.util.TestUtil;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -316,5 +314,9 @@ public class CallServiceITTest extends BaseModuleContextSensitiveTest {
         assertThat(call.getStatus(), equalTo(CallStatus.FAILED));
     }
 
+    @Test
+    public void shouldReturnProperCountOfCalls() {
+        assertThat(callService.retrieveCount(), equalTo(2L));
+    }
 }
 

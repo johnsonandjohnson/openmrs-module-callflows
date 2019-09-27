@@ -81,7 +81,9 @@ public class CallDaoImpl extends HibernateOpenmrsDataDAO<Call> implements CallDa
 
     @Override
     public long count() {
-        return getAllCount(false);
+        Criteria crit = getSession().createCriteria(this.mappedClass);
+        crit.setProjection(Projections.rowCount());
+        return (long) crit.uniqueResult();
     }
 
     private DbSession getSession() {
