@@ -41,9 +41,11 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import javax.naming.OperationNotSupportedException;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.UUID;
 
 import static junit.framework.Assert.assertNull;
@@ -105,6 +107,8 @@ public class CallServiceTest extends BaseTest {
     private Config voxeo;
 
     private static final String DATE_FORMAT = "MM/dd/yyyy";
+
+    private Date dateTime;
 
     @Mock
     private DefaultHttpClient client;
@@ -335,8 +339,8 @@ public class CallServiceTest extends BaseTest {
         given(callDao.findById(1)).willReturn(outboundCall);
 
         // Given for create we returned DATE_CURRENT, And for update we return DATE_NEXT_DAY
-        Date date = DateUtil.parse(Constants.DATE_NEXT_DAY, DATE_FORMAT);
-        given(DateUtil.now()).willReturn(date);
+        dateTime = createDate(2015, Calendar.SEPTEMBER, 17, 9, 05, 30);
+        given(DateUtil.now()).willReturn(dateTime);
 
         // When
         callService.update(updatedCall);
@@ -346,8 +350,6 @@ public class CallServiceTest extends BaseTest {
 
         // And let's see what gets sent to the database
         Call returnedCall = callArgumentCaptor.getValue();
-        returnedCall.setStartTime(new Date());
-        returnedCall.setEndTime(new Date());
         assertNotNull(returnedCall);
 
         // And we are ** not ** supposed to update the following properties
@@ -649,5 +651,13 @@ public class CallServiceTest extends BaseTest {
 
     public void assertEventSent(Call call) {
         verify(callUtil, times(1)).sendStatusEvent(call);
+    }
+
+    private Date createDate(int year, int month, int day, int hour, int minute, int second) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(year, month, day, hour, minute, second);
+        calendar.set(Calendar.MILLISECOND, 0);
+        calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return calendar.getTime();
     }
 }
