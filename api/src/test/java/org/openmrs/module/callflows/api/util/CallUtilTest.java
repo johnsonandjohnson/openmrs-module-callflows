@@ -76,7 +76,7 @@ import static org.mockito.internal.verification.VerificationModeFactory.times;
  * @author bramak09
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ CallUtil.class, Date.class, BufferedWriter.class, OutputStreamWriter.class,
+@PrepareForTest({ CallUtil.class, DateUtil.class, BufferedWriter.class, OutputStreamWriter.class,
         FileOutputStream.class, CsvMapWriter.class })
 public class CallUtilTest extends BaseTest {
 
@@ -139,7 +139,7 @@ public class CallUtilTest extends BaseTest {
     public void setUp() throws IOException {
 
         MockitoAnnotations.initMocks(CallUtilTest.class);
-        PowerMockito.mockStatic(Date.class);
+        PowerMockito.mockStatic(DateUtil.class);
         bufferedWriter = PowerMockito.mock(BufferedWriter.class);
         fileOutputStream = PowerMockito.mock(FileOutputStream.class);
         outputStreamWriter = PowerMockito.mock(OutputStreamWriter.class);

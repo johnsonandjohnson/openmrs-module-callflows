@@ -18,8 +18,6 @@ public final class DateUtil {
 
 	private static final String DEFAULT_TIME_ZONE = "UTC";
 
-
-
 	public static Date parse(String dateTime) {
 		return parse(dateTime, null);
 	}

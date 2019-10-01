@@ -66,7 +66,7 @@ import static org.mockito.Mockito.verifyZeroInteractions;
  * @author bramak09
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ CallServiceImpl.class, Date.class, UUID.class, DefaultHttpClient.class })
+@PrepareForTest({ CallServiceImpl.class, DateUtil.class, UUID.class, DefaultHttpClient.class })
 public class CallServiceTest extends BaseTest {
 
     @Mock
@@ -104,8 +104,6 @@ public class CallServiceTest extends BaseTest {
 
     private Config voxeo;
 
-    //private DateTimeFormatter formatter = DateTimeFormat.forPattern(Constants.DATE_FORMAT);
-
     private static final String DATE_FORMAT = "MM/dd/yyyy";
 
     @Mock
@@ -130,7 +128,7 @@ public class CallServiceTest extends BaseTest {
 
     @Before
     public void setUp() throws Exception {
-        PowerMockito.mockStatic(Date.class);
+        PowerMockito.mockStatic(DateUtil.class);
         PowerMockito.mockStatic(UUID.class);
         PowerMockito.mockStatic(DefaultHttpClient.class);
 
@@ -154,8 +152,8 @@ public class CallServiceTest extends BaseTest {
         given(configService.getConfig(Constants.CONFIG_YO)).willThrow(new IllegalArgumentException("Bad!"));
         given(flowService.load(Constants.CALLFLOW_MAIN)).willReturn(flow);
 
-        //given(DateUtil.now()).willReturn(formatter.parseDateTime(Constants.DATE_CURRENT));
-        given(DateUtil.now()).willReturn(DateUtil.parse(Constants.DATE_CURRENT, DATE_FORMAT));
+        Date date = DateUtil.parse(Constants.DATE_CURRENT, DATE_FORMAT);
+        given(DateUtil.now()).willReturn(date);
 
         PowerMockito.whenNew(DefaultHttpClient.class).withNoArguments().thenReturn(client);
 
@@ -270,7 +268,7 @@ public class CallServiceTest extends BaseTest {
 
         // Then
         verify(callDao, times(1)).create(inboundCall);
-
+        
         // And
         CallAssert.assertBasicFields(newCall);
         assertThat(newCall.getCallId(), equalTo(inboundCall.getCallId()));
@@ -337,8 +335,8 @@ public class CallServiceTest extends BaseTest {
         given(callDao.findById(1)).willReturn(outboundCall);
 
         // Given for create we returned DATE_CURRENT, And for update we return DATE_NEXT_DAY
-        //given(DateUtil.now()).willReturn(formatter.parseDateTime(Constants.DATE_NEXT_DAY));
-        given(DateUtil.now()).willReturn(DateUtil.parse(Constants.DATE_NEXT_DAY, DATE_FORMAT));
+        Date date = DateUtil.parse(Constants.DATE_NEXT_DAY, DATE_FORMAT);
+        given(DateUtil.now()).willReturn(date);
 
         // When
         callService.update(updatedCall);
@@ -348,6 +346,8 @@ public class CallServiceTest extends BaseTest {
 
         // And let's see what gets sent to the database
         Call returnedCall = callArgumentCaptor.getValue();
+        returnedCall.setStartTime(new Date());
+        returnedCall.setEndTime(new Date());
         assertNotNull(returnedCall);
 
         // And we are ** not ** supposed to update the following properties
@@ -385,9 +385,10 @@ public class CallServiceTest extends BaseTest {
         ArgumentCaptor<Call> callArgumentCaptor = ArgumentCaptor.forClass(Call.class);
         given(callDao.findById(1)).willReturn(outboundCall);
 
+
         // Given for create we returned DATE_CURRENT, And for update we return DATE_NEXT_DAY
-        //given(DateUtil.now()).willReturn(formatter.parseDateTime(Constants.DATE_NEXT_DAY));
-        given(DateUtil.now()).willReturn(DateUtil.parse(Constants.DATE_NEXT_DAY, DATE_FORMAT));
+        Date date = DateUtil.parse(Constants.DATE_NEXT_DAY, DATE_FORMAT);
+        given(DateUtil.now()).willReturn(date);
 
         // When
         callService.update(updatedCall);
@@ -416,8 +417,8 @@ public class CallServiceTest extends BaseTest {
         given(callDao.findById(1)).willReturn(outboundCall);
 
         // Given for create we returned DATE_CURRENT, for update we return DATE_NEXT_DAY
-        //given(DateUtil.now()).willReturn(formatter.parseDateTime(Constants.DATE_NEXT_DAY));
-        given(DateUtil.now()).willReturn(DateUtil.parse(Constants.DATE_NEXT_DAY, DATE_FORMAT));
+        Date date = DateUtil.parse(Constants.DATE_NEXT_DAY, DATE_FORMAT);
+        given(DateUtil.now()).willReturn(date);
 
         // When
         callService.update(updatedCall);
@@ -447,8 +448,8 @@ public class CallServiceTest extends BaseTest {
         updatedCall.setId(2);
         given(callDao.findById(1)).willReturn(outboundCall);
         // Given for create we returned DATE_CURRENT, for update we return DATE_NEXT_DAY
-        //given(DateUtil.now()).willReturn(formatter.parseDateTime(Constants.DATE_NEXT_DAY));
-        given(DateUtil.now()).willReturn(DateUtil.parse(Constants.DATE_NEXT_DAY, DATE_FORMAT));
+        Date date = DateUtil.parse(Constants.DATE_NEXT_DAY, DATE_FORMAT);
+        given(DateUtil.now()).willReturn(date);
 
         // When
         try {
