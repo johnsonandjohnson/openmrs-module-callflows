@@ -59,23 +59,16 @@ public final class DateUtil {
 		return simpleDateFormat.format(timestamp);
 	}
 
-	public static String dateToString(Date date, String timeZone) {
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(ISO_DATE_TIME_FORMAT);
+	public static String dateToString(Date date, String timeZone, String pattern) {
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
 		if (StringUtils.isNotBlank(timeZone)) {
 			simpleDateFormat.setTimeZone(TimeZone.getTimeZone(timeZone));
 		}
 		return simpleDateFormat.format(date);
 	}
 
-	public static String dateToString(Date date) {
-		return dateToString(date, DEFAULT_TIME_ZONE);
-	}
-
-	public static String dateToStringWithFormatter(Date date, String pattern) {
-		String dateWithoutFormatting = dateToString(date);
-		Date parsedDateWithFormatter = parse(dateWithoutFormatting, pattern);
-
-		return dateToString(parsedDateWithFormatter);
+	public static String dateToString(Date date, String pattern) {
+		return dateToString(date, DEFAULT_TIME_ZONE, pattern);
 	}
 
 	public static TimeZone getLocalTimeZone() {

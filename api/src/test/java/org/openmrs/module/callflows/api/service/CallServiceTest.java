@@ -108,8 +108,6 @@ public class CallServiceTest extends BaseTest {
 
     private static final String DATE_FORMAT = "MM/dd/yyyy";
 
-    private Date dateTime;
-
     @Mock
     private DefaultHttpClient client;
 
@@ -339,8 +337,8 @@ public class CallServiceTest extends BaseTest {
         given(callDao.findById(1)).willReturn(outboundCall);
 
         // Given for create we returned DATE_CURRENT, And for update we return DATE_NEXT_DAY
-        dateTime = createDate(2015, Calendar.SEPTEMBER, 17, 9, 05, 30);
-        given(DateUtil.now()).willReturn(dateTime);
+        Date date = createDate(2015, Calendar.SEPTEMBER, 17, 9, 05, 30);
+        given(DateUtil.now()).willReturn(date);
 
         // When
         callService.update(updatedCall);

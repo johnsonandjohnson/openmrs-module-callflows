@@ -610,13 +610,13 @@ public class CallUtil {
         callMap.put(headers[4], call.getCallId());
         callMap.put(headers[5], call.getDirection());
         callMap.put(headers[6], null != call.getCreationDate() ?
-                DateUtil.dateToStringWithFormatter(call.getCreationDate(), DATE_TIME_PATTERN_2) : null);
+                DateUtil.dateToString(call.getCreationDate(), DATE_TIME_PATTERN_2) : null);
 
         if (null != call.getContext() && null != call.getContext().get(MESSAGE_KEY) &&
                 StringUtils.isNotEmpty(call.getContext().get(MESSAGE_KEY).toString())) {
             try {
                 Date dateTimeMessageKey = DateUtil.parse(call.getContext().get(MESSAGE_KEY).toString(), DATE_TIME_PATTERN_1);
-                callMap.put(headers[7], DateUtil.dateToStringWithFormatter(dateTimeMessageKey, DATE_TIME_PATTERN_2));
+                callMap.put(headers[7], DateUtil.dateToString(dateTimeMessageKey, DATE_TIME_PATTERN_2));
             } catch (IllegalArgumentException e) {
                 LOGGER.error(String.format(
                         "Invalid input format to parse messageKey to dateTime for calls record having id: %s with messageKey value: %s",

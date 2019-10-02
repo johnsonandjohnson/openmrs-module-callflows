@@ -47,9 +47,10 @@ public class DateUtilTest {
 
 	@Test
 	public void shouldReturnConversionResultAsExpected() {
+		String pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
 		String expectedDateAsString = "2012-01-10T00:00:00.000+06:00";
 		Date actual = DateUtil.parse(expectedDateAsString);
-		assertThat(DateUtil.dateToString(actual, "Asia/Almaty"), equalTo(expectedDateAsString));
+		assertThat(DateUtil.dateToString(actual, "Asia/Almaty", pattern), equalTo(expectedDateAsString));
 	}
 
 	@Test
@@ -58,6 +59,15 @@ public class DateUtilTest {
 		Date date = createDate(2010, Calendar.MARCH, 2, 15, 43, 58, "CET");
 		Date actual = DateUtil.plusSeconds(expected, 5);
 		assertThat(actual, equalTo(date));
+	}
+
+	@Test
+	public void shouldSuccessfullyConvertDateToStringUsingDateFormat() {
+		String pattern = "yyMMddHHmm";
+		Date date = createDate(2010, Calendar.SEPTEMBER, 20, 15, 30, 25,"UTC");
+		String expectedDateAsString = "1009201530";
+		String actual = DateUtil.dateToString(date, pattern);
+		assertThat(actual, equalTo(expectedDateAsString));
 	}
 
 	private Date createDate(int year, int month, int day, int hour, int minute, int second, String timezone) {
