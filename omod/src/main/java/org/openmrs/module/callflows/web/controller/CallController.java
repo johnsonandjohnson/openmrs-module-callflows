@@ -24,6 +24,7 @@ import org.openmrs.module.callflows.api.service.CallService;
 import org.openmrs.module.callflows.api.service.ConfigService;
 import org.openmrs.module.callflows.api.service.FlowService;
 import org.openmrs.module.callflows.api.util.CallUtil;
+import org.openmrs.module.callflows.api.util.DateUtil;
 import org.openmrs.module.callflows.api.util.FlowUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -467,6 +468,7 @@ public class CallController extends RestController {
         context.put("Date", Date.class);
         context.put("SimpleDateFormat", SimpleDateFormat.class);
         context.put("Calendar", Calendar.class);
+        context.put("DateUtil", DateUtil.class);
         context.put("Math", Math.class);
 
         loadParams(context, params);
