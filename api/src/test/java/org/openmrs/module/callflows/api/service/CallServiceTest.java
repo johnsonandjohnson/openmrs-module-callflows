@@ -7,9 +7,6 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,6 +32,7 @@ import org.openmrs.module.callflows.api.service.impl.CallServiceImpl;
 import org.openmrs.module.callflows.api.util.CallAssert;
 import org.openmrs.module.callflows.api.util.CallFlowEventSubjects;
 import org.openmrs.module.callflows.api.util.CallUtil;
+import org.openmrs.module.callflows.api.util.DateUtil;
 import org.openmrs.module.callflows.api.util.TestUtil;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -43,8 +41,11 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import javax.naming.OperationNotSupportedException;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.UUID;
 
 import static junit.framework.Assert.assertNull;
@@ -67,7 +68,7 @@ import static org.mockito.Mockito.verifyZeroInteractions;
  * @author bramak09
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ CallServiceImpl.class, DateTime.class, UUID.class, DefaultHttpClient.class })
+@PrepareForTest({ CallServiceImpl.class, DateUtil.class, UUID.class, DefaultHttpClient.class })
 public class CallServiceTest extends BaseTest {
 
     @Mock
@@ -105,7 +106,7 @@ public class CallServiceTest extends BaseTest {
 
     private Config voxeo;
 
-    private DateTimeFormatter formatter = DateTimeFormat.forPattern(Constants.DATE_FORMAT);
+    private static final String DATE_FORMAT = "MM/dd/yyyy";
 
     @Mock
     private DefaultHttpClient client;
@@ -129,7 +130,7 @@ public class CallServiceTest extends BaseTest {
 
     @Before
     public void setUp() throws Exception {
-        PowerMockito.mockStatic(DateTime.class);
+        PowerMockito.mockStatic(DateUtil.class);
         PowerMockito.mockStatic(UUID.class);
         PowerMockito.mockStatic(DefaultHttpClient.class);
 
@@ -153,7 +154,8 @@ public class CallServiceTest extends BaseTest {
         given(configService.getConfig(Constants.CONFIG_YO)).willThrow(new IllegalArgumentException("Bad!"));
         given(flowService.load(Constants.CALLFLOW_MAIN)).willReturn(flow);
 
-        given(DateTime.now()).willReturn(formatter.parseDateTime(Constants.DATE_CURRENT));
+        Date date = DateUtil.parse(Constants.DATE_CURRENT, DATE_FORMAT);
+        given(DateUtil.now()).willReturn(date);
 
         PowerMockito.whenNew(DefaultHttpClient.class).withNoArguments().thenReturn(client);
 
@@ -268,7 +270,7 @@ public class CallServiceTest extends BaseTest {
 
         // Then
         verify(callDao, times(1)).create(inboundCall);
-
+        
         // And
         CallAssert.assertBasicFields(newCall);
         assertThat(newCall.getCallId(), equalTo(inboundCall.getCallId()));
@@ -326,7 +328,8 @@ public class CallServiceTest extends BaseTest {
         outboundCall.setExternalType(Constants.EXTERNAL_TYPE);
         outboundCall.setPlayedMessages(Constants.PLAYED_MESSAGES);
 
-        DateTime oldEndTime = outboundCall.getEndTime();
+        Date oldEndTime = outboundCall.getEndTime();
+
         // And we update all properties
         Call updatedCall = CallHelper.updateAllPropertiesInOutboundCall(outboundCall);
 
@@ -334,7 +337,8 @@ public class CallServiceTest extends BaseTest {
         given(callDao.findById(1)).willReturn(outboundCall);
 
         // Given for create we returned DATE_CURRENT, And for update we return DATE_NEXT_DAY
-        given(DateTime.now()).willReturn(formatter.parseDateTime(Constants.DATE_NEXT_DAY));
+        Date date = createDate(2015, Calendar.SEPTEMBER, 17, 9, 05, 30);
+        given(DateUtil.now()).willReturn(date);
 
         // When
         callService.update(updatedCall);
@@ -381,8 +385,10 @@ public class CallServiceTest extends BaseTest {
         ArgumentCaptor<Call> callArgumentCaptor = ArgumentCaptor.forClass(Call.class);
         given(callDao.findById(1)).willReturn(outboundCall);
 
+
         // Given for create we returned DATE_CURRENT, And for update we return DATE_NEXT_DAY
-        given(DateTime.now()).willReturn(formatter.parseDateTime(Constants.DATE_NEXT_DAY));
+        Date date = DateUtil.parse(Constants.DATE_NEXT_DAY, DATE_FORMAT);
+        given(DateUtil.now()).willReturn(date);
 
         // When
         callService.update(updatedCall);
@@ -402,7 +408,7 @@ public class CallServiceTest extends BaseTest {
     public void shouldNotUpdateActorIfCallWasCreatedWithActorSet() {
         // Given
         outboundCall.setId(1);
-        DateTime oldEndTime = outboundCall.getEndTime();
+        Date oldEndTime = outboundCall.getEndTime();
 
         // And we update all properties
         Call updatedCall = CallHelper.updateAllPropertiesInOutboundCall(outboundCall);
@@ -411,7 +417,8 @@ public class CallServiceTest extends BaseTest {
         given(callDao.findById(1)).willReturn(outboundCall);
 
         // Given for create we returned DATE_CURRENT, for update we return DATE_NEXT_DAY
-        given(DateTime.now()).willReturn(formatter.parseDateTime(Constants.DATE_NEXT_DAY));
+        Date date = DateUtil.parse(Constants.DATE_NEXT_DAY, DATE_FORMAT);
+        given(DateUtil.now()).willReturn(date);
 
         // When
         callService.update(updatedCall);
@@ -441,7 +448,8 @@ public class CallServiceTest extends BaseTest {
         updatedCall.setId(2);
         given(callDao.findById(1)).willReturn(outboundCall);
         // Given for create we returned DATE_CURRENT, for update we return DATE_NEXT_DAY
-        given(DateTime.now()).willReturn(formatter.parseDateTime(Constants.DATE_NEXT_DAY));
+        Date date = DateUtil.parse(Constants.DATE_NEXT_DAY, DATE_FORMAT);
+        given(DateUtil.now()).willReturn(date);
 
         // When
         try {
@@ -641,5 +649,13 @@ public class CallServiceTest extends BaseTest {
 
     public void assertEventSent(Call call) {
         verify(callUtil, times(1)).sendStatusEvent(call);
+    }
+
+    private Date createDate(int year, int month, int day, int hour, int minute, int second) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(year, month, day, hour, minute, second);
+        calendar.set(Calendar.MILLISECOND, 0);
+        calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return calendar.getTime();
     }
 }

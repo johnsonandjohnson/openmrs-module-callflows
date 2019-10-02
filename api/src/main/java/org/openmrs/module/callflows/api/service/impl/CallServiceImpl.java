@@ -1,8 +1,14 @@
 package org.openmrs.module.callflows.api.service.impl;
 
+import com.google.common.collect.Sets;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.HttpStatus;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.openmrs.module.callflows.api.dao.CallDao;
 import org.openmrs.module.callflows.api.domain.Call;
 import org.openmrs.module.callflows.api.domain.CallFlow;
 import org.openmrs.module.callflows.api.domain.Config;
@@ -10,24 +16,16 @@ import org.openmrs.module.callflows.api.domain.Constants;
 import org.openmrs.module.callflows.api.domain.flow.Flow;
 import org.openmrs.module.callflows.api.domain.types.CallDirection;
 import org.openmrs.module.callflows.api.domain.types.CallStatus;
-import org.openmrs.module.callflows.api.dao.CallDao;
 import org.openmrs.module.callflows.api.service.CallFlowService;
 import org.openmrs.module.callflows.api.service.CallService;
-import org.openmrs.module.callflows.api.service.FlowService;
 import org.openmrs.module.callflows.api.service.ConfigService;
+import org.openmrs.module.callflows.api.service.FlowService;
 import org.openmrs.module.callflows.api.util.CallUtil;
-
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.joda.time.DateTime;
-
+import org.openmrs.module.callflows.api.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import javax.naming.OperationNotSupportedException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,8 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-
-import com.google.common.collect.Sets;
 
 /**
  * Call Service Implementation
@@ -173,11 +169,11 @@ public class CallServiceImpl implements CallService {
         //Update the start time when the call is picked/answered
         if (CallStatus.IN_PROGRESS == call.getStatus() && call.getSteps() == 1) {
             // at this time
-            currentCall.setStartTime(DateTime.now());
+            currentCall.setStartTime(DateUtil.now());
         }
         //Update end time only once the call is answered.
         if (call.getSteps() >= 1) {
-            currentCall.setEndTime(DateTime.now());
+            currentCall.setEndTime(DateUtil.now());
         }
 
         //update the external provider information and messages played

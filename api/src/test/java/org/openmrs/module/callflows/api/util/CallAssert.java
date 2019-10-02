@@ -8,8 +8,6 @@ import org.openmrs.module.callflows.api.domain.types.CallStatus;
 import org.openmrs.module.callflows.api.helper.CallFlowHelper;
 import org.openmrs.module.callflows.api.helper.CallHelper;
 
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,8 +25,6 @@ import static org.junit.Assert.assertThat;
  * @author bramak09
  */
 public final class CallAssert {
-
-    private static DateTimeFormatter formatter = DateTimeFormat.forPattern(Constants.DATE_FORMAT);
 
     private static Map<String, String> providerData = new HashMap<>();
 

@@ -1,7 +1,12 @@
 package org.openmrs.module.callflows.web.controller;
 
+import org.apache.commons.collections.map.HashedMap;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.Velocity;
+import org.apache.velocity.runtime.log.Log4JLogChute;
 import org.openmrs.api.context.ServiceContext;
 import org.openmrs.module.callflows.api.contract.OutboundCallResponse;
 import org.openmrs.module.callflows.api.domain.Call;
@@ -16,20 +21,11 @@ import org.openmrs.module.callflows.api.domain.types.CallDirection;
 import org.openmrs.module.callflows.api.domain.types.CallStatus;
 import org.openmrs.module.callflows.api.service.CallFlowService;
 import org.openmrs.module.callflows.api.service.CallService;
-import org.openmrs.module.callflows.api.service.FlowService;
 import org.openmrs.module.callflows.api.service.ConfigService;
+import org.openmrs.module.callflows.api.service.FlowService;
 import org.openmrs.module.callflows.api.util.CallUtil;
+import org.openmrs.module.callflows.api.util.DateUtil;
 import org.openmrs.module.callflows.api.util.FlowUtil;
-
-import org.apache.commons.collections.map.HashedMap;
-import org.apache.commons.lang.StringUtils;
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
-import org.apache.velocity.runtime.log.Log4JLogChute;
-import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -40,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -47,6 +44,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -465,10 +465,10 @@ public class CallController extends RestController {
         context.put("Long", Long.class);
         context.put("Float", Float.class);
         context.put("Double", Double.class);
-        context.put("LocalDate", LocalDate.class);
-        context.put("DateTime", DateTime.class);
-        context.put("DateTimeFormat", DateTimeFormat.class);
-        context.put("DateTimeFormatter", DateTimeFormatter.class);
+        context.put("Date", Date.class);
+        context.put("SimpleDateFormat", SimpleDateFormat.class);
+        context.put("Calendar", Calendar.class);
+        context.put("DateUtil", DateUtil.class);
         context.put("Math", Math.class);
 
         loadParams(context, params);

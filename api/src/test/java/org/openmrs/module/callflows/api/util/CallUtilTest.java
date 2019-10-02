@@ -20,7 +20,6 @@ import org.openmrs.module.callflows.api.service.impl.CallServiceImpl;
 
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.velocity.VelocityContext;
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,6 +48,7 @@ import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -76,7 +76,7 @@ import static org.mockito.internal.verification.VerificationModeFactory.times;
  * @author bramak09
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ CallUtil.class, DateTime.class, BufferedWriter.class, OutputStreamWriter.class,
+@PrepareForTest({ CallUtil.class, DateUtil.class, BufferedWriter.class, OutputStreamWriter.class,
         FileOutputStream.class, CsvMapWriter.class })
 public class CallUtilTest extends BaseTest {
 
@@ -94,7 +94,7 @@ public class CallUtilTest extends BaseTest {
 
     private Call outboundCall;
 
-    private DateTime dateTime;
+    private Date dateTime;
 
     private Map<String, Object> callParams;
 
@@ -139,15 +139,15 @@ public class CallUtilTest extends BaseTest {
     public void setUp() throws IOException {
 
         MockitoAnnotations.initMocks(CallUtilTest.class);
-        PowerMockito.mockStatic(DateTime.class);
+        PowerMockito.mockStatic(DateUtil.class);
         bufferedWriter = PowerMockito.mock(BufferedWriter.class);
         fileOutputStream = PowerMockito.mock(FileOutputStream.class);
         outputStreamWriter = PowerMockito.mock(OutputStreamWriter.class);
         csvMapWriter = PowerMockito.mock(CsvMapWriter.class);
 
 
-        dateTime = new DateTime();
-        given(DateTime.now()).willReturn(dateTime);
+        dateTime = new Date();
+        given(DateUtil.now()).willReturn(dateTime);
 
         mainFlow = CallFlowHelper.createMainFlow();
 
@@ -350,7 +350,7 @@ public class CallUtilTest extends BaseTest {
         verify(callDao, times(1)).countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet);
         assertThat(eventParams.get(Constants.PARAM_RETRY_ATTEMPTS).toString(), equalTo("2"));
         verify(schedulerService, times(1)).scheduleRunOnceJob(callFlowEvent,
-                DateTime.now().plusSeconds(Constants.CONFIG_VOXEO_OUTBOUND_CALL_RETRY_SECONDS).toDate(), new CallFlowScheduledTask());
+               DateUtil.plusSeconds(DateUtil.now(), Constants.CONFIG_VOXEO_OUTBOUND_CALL_RETRY_SECONDS), new CallFlowScheduledTask());
     }
 
     @Test(expected = OperationNotSupportedException.class)
@@ -525,8 +525,7 @@ public class CallUtilTest extends BaseTest {
         verify(callDao, times(1)).countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet);
         assertThat(eventParams.get(Constants.PARAM_RETRY_ATTEMPTS).toString(), equalTo("1"));
         verify(schedulerService, times(1)).scheduleRunOnceJob(callFlowEvent,
-                DateTime.now().plusSeconds(Constants.CONFIG_VOXEO_OUTBOUND_CALL_RETRY_SECONDS).toDate(),
-                new CallFlowScheduledTask());
+                DateUtil.plusSeconds(DateUtil.now(), Constants.CONFIG_VOXEO_OUTBOUND_CALL_RETRY_SECONDS), new CallFlowScheduledTask());
     }
 
     @Test
