@@ -18,8 +18,6 @@ public final class DateUtil {
 
 	private static final String DEFAULT_TIME_ZONE = "UTC";
 
-	private static final String DEFAULT_DATE_TIME_FORMAT = "yyMMddHHmm";
-
 	public static Date parse(String dateTime) {
 		return parse(dateTime, null);
 	}
@@ -63,7 +61,7 @@ public final class DateUtil {
 
 	public static String dateToString(Date date, String timeZone, String pattern) {
 		if (StringUtils.isBlank(pattern)) {
-			pattern = DEFAULT_DATE_TIME_FORMAT;
+			pattern = ISO_DATE_TIME_FORMAT;
 		}
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
 		if (StringUtils.isNotBlank(timeZone)) {
