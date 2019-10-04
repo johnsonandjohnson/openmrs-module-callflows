@@ -38,6 +38,8 @@ public class CallStatusController {
 
     private static final String PARAM_REASON = "reason";
 
+    private static final String EXTERNAL_ID_PARAM_NAME = "externalIdParamName";
+
     @Autowired
     private CallService callService;
 
@@ -64,15 +66,26 @@ public class CallStatusController {
         if (null == call) {
             return ERROR_RESPONSE;
         }
-        // When ever we update the status, we always have to update the reason as well
-        CallStatus status = CallStatus.valueOf(params.get(PARAM_STATUS));
+        // When ever we update the status, we always have to update the reason as well.
+        // convert to upper case in case the status received in lower case
+        CallStatus status = CallStatus.valueOf(params.get(PARAM_STATUS).toUpperCase());
         call.setStatus(status);
+
+        String externalId = null;
+        if (!StringUtils.isBlank(params.get(EXTERNAL_ID_PARAM_NAME))) {
+            externalId = params.get(params.get(EXTERNAL_ID_PARAM_NAME));
+            LOGGER.debug(String.format("Reading external id value using: %s and value is : %s",
+                params.get(EXTERNAL_ID_PARAM_NAME),
+                externalId));
+        } else {
+            externalId = params.get(Constants.PARAM_EXTERNAL_ID);
+        }
 
         call.setStatusText(params.get(PARAM_REASON));
         // The Provider specific id and type, if passed then updated for this call record
-        if (validateExternalIdToUpdateCall(call.getExternalId(), params.get(Constants.PARAM_EXTERNAL_ID),
-                                           params.get(Constants.PARAM_EXTERNAL_TYPE))) {
-            call.setExternalId(params.get(Constants.PARAM_EXTERNAL_ID));
+        if (validateExternalIdToUpdateCall(call.getExternalId(), externalId,
+            params.get(Constants.PARAM_EXTERNAL_TYPE))) {
+            call.setExternalId(externalId);
             call.setExternalType(params.get(Constants.PARAM_EXTERNAL_TYPE));
         }
 

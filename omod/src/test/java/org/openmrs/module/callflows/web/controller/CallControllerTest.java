@@ -704,7 +704,8 @@ public class CallControllerTest extends BaseTest {
         // When we make a outbound call request
         mockMvc.perform(customGet("/callflows/out/voxeo/flows/MainFlow.vxml", "phone", "1234567890"))
                .andExpect(status().is(HttpStatus.OK.value()))
-               .andExpect(content().string("{\"callId\":\"5c8f6f83-567c-4586-a3b6-368397d5aba8\",\"status\":\"MOTECH_INITIATED\"}"));
+               .andExpect(content().string("{\"callId\":\"5c8f6f83-567c-4586-a3b6-368397d5aba8\"," +
+                   "\"status\":\"MOTECH_INITIATED\",\"reason\":null}"));
 
         // Then we should have tried to use the callService to initiate a call
         verify(callService, times(1)).makeCall(eq(Constants.CONFIG_VOXEO), eq(Constants.CALLFLOW_MAIN), any(Map.class));

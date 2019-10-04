@@ -1,5 +1,6 @@
 package org.openmrs.module.callflows.web.controller;
 
+import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -185,13 +186,21 @@ public class CallFlowControllerTest extends BaseTest {
         given(callFlowResponseBuilder.createFrom(flow1)).willReturn(CallFlowContractHelper.createFlow1Response());
         given(callFlowResponseBuilder.createFrom(flow2)).willReturn(CallFlowContractHelper.createFlow2Response());
 
-        // When we search for the same term, Then
+        List<CallFlowResponse> responses = searchedFlows.stream()
+            .map(f ->
+                new CallFlowResponse(f.getId(),
+                    f.getName(),
+                    f.getDescription(),
+                    f.getStatus().toString(),
+                    f.getRaw()))
+            .collect(Collectors.toList());
+
         mockMvc.perform(get("/callflows/flows")
                 .param("lookup", "By Name")
                 .param("term", Constants.CALLFLOW_MAIN_PREFIX))
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
-                .andExpect(content().string(json(new SearchResponse(searchedFlows))));
+                .andExpect(content().string(json(new SearchResponse(responses))));
     }
 
     @Test

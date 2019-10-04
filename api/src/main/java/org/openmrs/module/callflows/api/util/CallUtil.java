@@ -135,6 +135,9 @@ public class CallUtil {
     @Qualifier("callFlow.eventService")
     private CallFlowEventService callFlowEventService;
 
+    @Autowired
+    private AuthUtil authUtil;
+
 
     /**
      * Merge call properties with a context.
@@ -457,14 +460,28 @@ public class CallUtil {
                     // Set headers
                     post.setHeader(entry.getKey(), entry.getValue() == null ? "" : entry.getValue().toString());
                 }
+                boolean hasAuthRequired = config.getHasAuthRequired();
+                LOGGER.debug(String.format("Is authentication required: %s", hasAuthRequired));
+                String postParams = config.getOutgoingCallPostParams();
 
-                StringEntity entity = new StringEntity(
-                        mergeUriAndRemoveParams(config.getOutgoingCallPostParams(), completeParams));
+                // this method throws exception if the authentication configurations are not present in he server
+                if (hasAuthRequired) {
+                    if (isTokenNotValid(config)) {
+                        LOGGER.debug("Generating the token for the first time or when it is expired");
+                        config.setAuthToken(authUtil.generateToken());
+                    }
+                    //set authorization token in the header
+                    post.setHeader("Authorization", "Bearer " + config.getAuthToken());
+                    postParams = mergeUriAndRemoveParams(config.getOutgoingCallPostParams(), completeParams);
+                }
+                StringEntity entity = new StringEntity(mergeUriAndRemoveParams(postParams, completeParams));
                 entity.setContentType(new BasicHeader("Content-Type", "application/x-www-form-urlencoded"));
                 post.setEntity(entity);
 
                 request = post;
             }
+            LOGGER.debug(String.format("Generated headers: %s, request: %s for call %s",
+                request.getAllHeaders(), request.toString(), call.getCallId()));
         } catch (URISyntaxException | UnsupportedEncodingException e) {
             throw new IllegalArgumentException("Unexpected error creating a URI", e);
         }
@@ -678,5 +695,9 @@ public class CallUtil {
         CallFlowEvent event = new CallFlowEvent(CallFlowEventSubjects.CALLFLOWS_INITIATE_CALL, eventParams);
         schedulerService.scheduleRunOnceJob(event, DateUtil.plusSeconds(DateUtil.now(),
                 config.getOutboundCallRetrySeconds()), new CallFlowScheduledTask());
+    }
+
+    private boolean isTokenNotValid(Config config) {
+        return (null == config.getAuthToken() || !authUtil.isTokenValid(config.getAuthToken()));
     }
 }

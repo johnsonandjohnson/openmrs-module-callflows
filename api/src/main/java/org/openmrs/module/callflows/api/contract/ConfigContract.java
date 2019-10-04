@@ -24,6 +24,11 @@ public class ConfigContract {
     private String outgoingCallMethod;
 
     /**
+     * True, if authentication required to connect IVR provider
+     */
+    private Boolean hasAuthRequired;
+
+    /**
      * HTTP POST headers.
      */
     private Map<String, String> outgoingCallPostHeadersMap = new HashMap<>();
@@ -161,6 +166,14 @@ public class ConfigContract {
 
     public void setTestUsersMap(Map<String, String> testUsersMap) {
         this.testUsersMap = testUsersMap;
+    }
+
+    public Boolean getHasAuthRequired() {
+        return hasAuthRequired;
+    }
+
+    public void setHasAuthRequired(Boolean hasAuthRequired) {
+        this.hasAuthRequired = hasAuthRequired;
     }
 
     @Override

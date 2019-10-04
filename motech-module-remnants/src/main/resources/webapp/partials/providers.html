@@ -77,6 +77,14 @@
                         </div>
                     </div>
 
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">Authentication Required (Currently supports JWT)</label>
+                        <div class="col-md-3" data-toggle="tooltip" data-placement="top" data-trigger="hover"
+                             bs-popover="{{msg('callflows.field.outgoingCallMethod.tooltip')}}">
+                            <input type="checkbox" name="hasAuthRequired" id="hasAuthRequired" ng-model="conf.hasAuthRequired">
+                        </div>
+                    </div>
+
                     <div class="form-group" ng-show="conf.outgoingCallMethod == 'POST'">
                         <label class="col-md-3 control-label" for="outgoingCallPostHeadersMap{{$index}}">{{msg('callflows.field.outgoingCallPostHeaders')}}</label>
 

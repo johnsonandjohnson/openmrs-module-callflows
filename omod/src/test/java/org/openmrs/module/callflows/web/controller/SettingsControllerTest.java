@@ -1,6 +1,7 @@
 package org.openmrs.module.callflows.web.controller;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -226,6 +227,10 @@ public class SettingsControllerTest extends BaseTest {
     }
 
     private String gsonFormatOfJson(Object obj) {
-        return new Gson().toJson(obj);
+        return new GsonBuilder()
+            .disableHtmlEscaping()
+            .serializeNulls()
+            .create()
+            .toJson(obj);
     }
 }
