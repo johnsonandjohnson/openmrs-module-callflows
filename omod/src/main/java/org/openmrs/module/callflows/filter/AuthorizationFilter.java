@@ -1,6 +1,10 @@
 package org.openmrs.module.callflows.filter;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.context.Context;
@@ -16,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import org.springframework.util.AntPathMatcher;
 
 /**
  * Filter intended for all /ws/callflows calls that allows the user to authenticate via Basic
@@ -28,12 +33,21 @@ public class AuthorizationFilter implements Filter {
 
 	private static final String BASIC_KEYWORD = "Basic ";
 
+	private FilterConfig config;
+
+	private List<String> ignoredUrls = new ArrayList<>();
+
 	/**
 	 * @see Filter#init(FilterConfig)
 	 */
 	@Override
 	public void init(FilterConfig arg0) throws ServletException {
 		LOGGER.debug("Initializing CallFlow Authorization filter");
+		this.config = arg0;
+		List<String> ignoredUrls =
+			Arrays.asList(arg0.getInitParameter("ignored-urls").split("[\\t\\n]+")
+		);
+		this.ignoredUrls = filterOutBlankUrls(ignoredUrls);
 	}
 
 	/**
@@ -60,12 +74,23 @@ public class AuthorizationFilter implements Filter {
 				httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "Session timed out");
 			}
 			String authorization = httpRequest.getHeader("Authorization");
-			if (authorization != null && authorization.contains(BASIC_KEYWORD)) {
+			String pathWithoutContext = httpRequest.getRequestURI().split(httpRequest.getContextPath())[1];
+			if (authorization != null
+				&& authorization.contains(BASIC_KEYWORD)
+				&& !isUrlIgnored(pathWithoutContext)) {
 				performBasicAuth(authorization);
 			}
 		}
-
 		chain.doFilter(request, response);
+	}
+
+	private boolean isUrlIgnored(String requestURI) {
+		for (String u : ignoredUrls) {
+			if (new AntPathMatcher().match(u, requestURI)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private void performBasicAuth(String authorization) {
@@ -83,5 +108,15 @@ public class AuthorizationFilter implements Filter {
 			// This filter never stops execution. If the user failed to
 			// authenticate, that will be caught later.
 		}
+	}
+
+	private List<String> filterOutBlankUrls(List<String> ignoredUrls) {
+		List<String> list = new ArrayList<>();
+		for (String ignoredUrl : ignoredUrls) {
+			if (StringUtils.isNotBlank(ignoredUrl)) {
+				list.add(ignoredUrl);
+			}
+		}
+		return list;
 	}
 }

@@ -8,6 +8,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.openmrs.api.context.Context;
+import org.openmrs.api.db.UserDAO;
 import org.openmrs.module.callflows.api.dao.CallDao;
 import org.openmrs.module.callflows.api.domain.Call;
 import org.openmrs.module.callflows.api.domain.CallFlow;
@@ -51,6 +53,8 @@ public class CallServiceImpl implements CallService {
     private static final Set<Integer> ACCEPTABLE_IVR_RESPONSE_STATUSES = Sets
             .newHashSet(HttpURLConnection.HTTP_OK, HttpURLConnection.HTTP_ACCEPTED, HttpURLConnection.HTTP_CREATED);
 
+    private static final String ADMIN_USER = "admin";
+
     @Autowired
     private CallDao callDao;
 
@@ -65,6 +69,9 @@ public class CallServiceImpl implements CallService {
 
     @Autowired
     private CallUtil callUtil;
+
+    @Autowired
+    private UserDAO userDAO;
 
     @Override
     @Transactional
@@ -112,6 +119,11 @@ public class CallServiceImpl implements CallService {
 
         // and finally the call status
         call.setStatus(determineStatus(direction));
+
+        if (Context.isSessionOpen() && !Context.isAuthenticated()) {
+            call.setCreator(userDAO.getUserByUsername(ADMIN_USER));
+        }
+
         return callDao.create(call);
     }
 

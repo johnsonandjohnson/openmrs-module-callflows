@@ -38,6 +38,15 @@
 	<filter>
 		<filter-name>CallFlow Module Authorization</filter-name>
 		<filter-class>org.openmrs.module.callflows.filter.AuthorizationFilter</filter-class>
+		<init-param>
+			<param-name>ignored-urls</param-name>
+			<param-value>
+				/ws/callflows/in/{conf}/flows/{flowName}.{extension}
+				/ws/callflows/calls/{callId}.{extension}
+				/ws/callflows/out/{configName}/flows/{name}.{extension}
+				/ws/callflows/calls/export-details
+			</param-value>
+		</init-param>
 	</filter>
 	<filter-mapping>
 		<filter-name>CallFlow Module Authorization</filter-name>
