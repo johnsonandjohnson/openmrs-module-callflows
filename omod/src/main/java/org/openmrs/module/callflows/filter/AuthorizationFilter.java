@@ -3,7 +3,6 @@ package org.openmrs.module.callflows.filter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -48,9 +47,7 @@ public class AuthorizationFilter implements Filter {
 		List<String> ignoredUrls =
 			Arrays.asList(arg0.getInitParameter("ignored-urls").split("[\\t\\n]+")
 		);
-		this.ignoredUrls = ignoredUrls.stream()
-			.filter(StringUtils::isNotBlank)
-			.collect(Collectors.toList());
+		this.ignoredUrls = filterOutBlankUrls(ignoredUrls);
 	}
 
 	/**
@@ -88,8 +85,12 @@ public class AuthorizationFilter implements Filter {
 	}
 
 	private boolean isUrlIgnored(String requestURI) {
-		return ignoredUrls.stream()
-			.anyMatch(u -> new AntPathMatcher().match(u,requestURI));
+		for (String u : ignoredUrls) {
+			if (new AntPathMatcher().match(u, requestURI)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private void performBasicAuth(String authorization) {
@@ -107,5 +108,15 @@ public class AuthorizationFilter implements Filter {
 			// This filter never stops execution. If the user failed to
 			// authenticate, that will be caught later.
 		}
+	}
+
+	private List<String> filterOutBlankUrls(List<String> ignoredUrls) {
+		List<String> list = new ArrayList<>();
+		for (String ignoredUrl : ignoredUrls) {
+			if (StringUtils.isNotBlank(ignoredUrl)) {
+				list.add(ignoredUrl);
+			}
+		}
+		return list;
 	}
 }
