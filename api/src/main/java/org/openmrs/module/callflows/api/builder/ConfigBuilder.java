@@ -25,6 +25,7 @@ public class ConfigBuilder {
         Config config = new Config();
         config.setName(configContract.getName());
         config.setOutgoingCallMethod(configContract.getOutgoingCallMethod());
+        config.setHasAuthRequired(configContract.getHasAuthRequired());
         config.setOutgoingCallPostParams(configContract.getOutgoingCallPostParams());
 
         Map<String, String> headersMap = new LinkedHashMap<>();

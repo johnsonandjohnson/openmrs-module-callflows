@@ -2,6 +2,7 @@ package org.openmrs.module.callflows.api.util;
 
 import org.openmrs.module.callflows.BaseTest;
 import org.openmrs.module.callflows.Constants;
+import org.openmrs.module.callflows.api.dao.CallDao;
 import org.openmrs.module.callflows.api.domain.Call;
 import org.openmrs.module.callflows.api.domain.CallFlow;
 import org.openmrs.module.callflows.api.domain.Config;
@@ -13,10 +14,10 @@ import org.openmrs.module.callflows.api.helper.CallFlowHelper;
 import org.openmrs.module.callflows.api.helper.CallHelper;
 import org.openmrs.module.callflows.api.helper.ConfigHelper;
 import org.openmrs.module.callflows.api.helper.FlowHelper;
-import org.openmrs.module.callflows.api.dao.CallDao;
 import org.openmrs.module.callflows.api.service.CallFlowEventService;
 import org.openmrs.module.callflows.api.service.CallFlowSchedulerService;
 import org.openmrs.module.callflows.api.service.impl.CallServiceImpl;
+import org.openmrs.module.callflows.api.task.CallFlowScheduledTask;
 
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.velocity.VelocityContext;
@@ -28,8 +29,8 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.openmrs.module.callflows.api.task.CallFlowScheduledTask;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -79,6 +80,10 @@ import static org.mockito.internal.verification.VerificationModeFactory.times;
 @PrepareForTest({ CallUtil.class, DateUtil.class, BufferedWriter.class, OutputStreamWriter.class,
         FileOutputStream.class, CsvMapWriter.class })
 public class CallUtilTest extends BaseTest {
+
+    private static final String AUTH_TOKEN = "2323232wewewe";
+
+    private static final String NEW_AUTH_TOKEN = "734343efererere93";
 
     private CallFlowEvent callFlowEvent;
 
@@ -131,6 +136,9 @@ public class CallUtilTest extends BaseTest {
 
     @Mock
     private Call call;
+
+    @Mock
+    private AuthUtil authUtil;
 
     @Captor
     private ArgumentCaptor<LinkedHashMap> csvArgumentCaptor;
@@ -260,6 +268,98 @@ public class CallUtilTest extends BaseTest {
                    equalTo(new URI("http://i-should-override-everything?callId=" + inboundCall.getCallId() +
                                            "&myParam=testValue")));
 
+    }
+
+    @Test
+    public void shouldGenerateTokenForTheFirstTime() throws URISyntaxException {
+        // Given
+        voxeo.setOutgoingCallUriTemplate("http://to-outer-space?callId=[internal.callId]&myParam=[testParam]");
+        voxeo.setOutgoingCallMethod("POST");
+        voxeo.setHasAuthRequired(true);
+        voxeo.setAuthToken(null);
+
+        given(authUtil.generateToken()).willReturn(NEW_AUTH_TOKEN);
+
+        // When
+        HttpUriRequest uriRequest = callUtil.buildOutboundRequest("1234567890", inboundCall, voxeo, callParams);
+
+        // Then
+        assertNotNull(uriRequest);
+        assertThat(uriRequest.getMethod(), equalTo("POST"));
+        assertThat(uriRequest.getURI(),
+            equalTo(new URI("http://to-outer-space?callId=" + inboundCall.getCallId() + "&myParam=testValue")));
+        assertThat(voxeo.getAuthToken(), equalTo(NEW_AUTH_TOKEN));
+
+        verify(authUtil, times(1)).generateToken();
+    }
+
+    @Test
+    public void shouldGenerateTokenIfTheTokenIsExpired() throws URISyntaxException {
+        // Given
+        voxeo.setOutgoingCallUriTemplate("http://to-outer-space?callId=[internal.callId]&myParam=[testParam]");
+        voxeo.setOutgoingCallMethod("POST");
+        voxeo.setHasAuthRequired(true);
+        voxeo.setAuthToken(AUTH_TOKEN);
+
+        given(authUtil.isTokenValid(AUTH_TOKEN)).willReturn(false);
+        given(authUtil.generateToken()).willReturn(NEW_AUTH_TOKEN);
+
+        // When
+        HttpUriRequest uriRequest = callUtil.buildOutboundRequest("1234567890", inboundCall, voxeo, callParams);
+
+        // Then
+        assertNotNull(uriRequest);
+        assertThat(uriRequest.getMethod(), equalTo("POST"));
+        assertThat(uriRequest.getURI(),
+            equalTo(new URI("http://to-outer-space?callId=" + inboundCall.getCallId() + "&myParam=testValue")));
+        assertThat(voxeo.getAuthToken(), equalTo(NEW_AUTH_TOKEN));
+
+        verify(authUtil, times(1)).isTokenValid(anyString());
+        verify(authUtil, times(1)).generateToken();
+    }
+
+    @Test
+    public void shouldNotGenerateTokenForSubsequentRequests() throws URISyntaxException {
+        // Given
+        voxeo.setOutgoingCallUriTemplate("http://to-outer-space?callId=[internal.callId]&myParam=[testParam]");
+        voxeo.setOutgoingCallMethod("POST");
+        voxeo.setHasAuthRequired(true);
+        voxeo.setAuthToken(AUTH_TOKEN);
+
+        given(authUtil.isTokenValid(AUTH_TOKEN)).willReturn(true);
+
+        // When
+        HttpUriRequest uriRequest = callUtil.buildOutboundRequest("1234567890", inboundCall, voxeo, callParams);
+
+        // Then
+        assertNotNull(uriRequest);
+        assertThat(uriRequest.getMethod(), equalTo("POST"));
+        assertThat(uriRequest.getURI(),
+            equalTo(new URI("http://to-outer-space?callId=" + inboundCall.getCallId() + "&myParam=testValue")));
+        assertThat(voxeo.getAuthToken(), equalTo(AUTH_TOKEN));
+
+        verify(authUtil, times(1)).isTokenValid(anyString());
+        verify(authUtil, Mockito.never()).generateToken();
+    }
+
+    @Test
+    public void shouldNotTriggerGenerateTokenIfAuthFlagIsDisabled() throws URISyntaxException {
+        // Given
+        voxeo.setOutgoingCallUriTemplate("http://to-outer-space?callId=[internal.callId]&myParam=[testParam]");
+        voxeo.setOutgoingCallMethod("POST");
+        voxeo.setHasAuthRequired(false);
+
+        // When
+        HttpUriRequest uriRequest = callUtil.buildOutboundRequest("1234567890", inboundCall, voxeo, callParams);
+
+        // Then
+        assertNotNull(uriRequest);
+        assertThat(uriRequest.getMethod(), equalTo("POST"));
+        assertThat(uriRequest.getURI(),
+            equalTo(new URI("http://to-outer-space?callId=" + inboundCall.getCallId() + "&myParam=testValue")));
+
+        verify(authUtil, Mockito.never()).isTokenValid(anyString());
+        verify(authUtil, Mockito.never()).generateToken();
     }
 
     @Test

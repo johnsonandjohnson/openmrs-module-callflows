@@ -43,6 +43,10 @@ public class Config {
 
     private Boolean callAllowed;
 
+    private String authToken;
+
+    private boolean hasAuthRequired;
+
     /**
      * A map of OSGI services that can be used in the callflows
      * The key is the friendly name to use in the templates and the value is the fully qualified name of the OSGI interface
@@ -144,6 +148,22 @@ public class Config {
 
     public void setOutgoingCallPostParams(String outgoingCallPostParams) {
         this.outgoingCallPostParams = outgoingCallPostParams;
+    }
+
+    public String getAuthToken() {
+        return authToken;
+    }
+
+    public void setAuthToken(String authToken) {
+        this.authToken = authToken;
+    }
+
+    public boolean getHasAuthRequired() {
+        return hasAuthRequired;
+    }
+
+    public void setHasAuthRequired(Boolean hasAuthRequired) {
+        this.hasAuthRequired = hasAuthRequired;
     }
 
     @Override
