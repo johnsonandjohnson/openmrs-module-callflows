@@ -19,6 +19,7 @@ import org.openmrs.User;
 import org.openmrs.api.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
  */
 @Controller("${rootrootArtifactId}.CallflowsController")
 @RequestMapping(value = "module/callflows/callflows.form")
+@Transactional
 public class CallflowsController {
 	
 	/** Logger for this class and subclasses */
