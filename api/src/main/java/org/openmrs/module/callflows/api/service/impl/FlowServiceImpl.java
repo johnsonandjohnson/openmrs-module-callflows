@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Flow Service Implementation
@@ -26,6 +27,7 @@ import java.util.List;
  * @author bramak09
  */
 @Service("flowService")
+@Transactional
 public class FlowServiceImpl implements FlowService {
 
     private static final Log LOGGER = LogFactory.getLog(FlowServiceImpl.class);
