@@ -12,7 +12,6 @@ import org.openmrs.module.callflows.api.service.CallFlowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,7 +29,6 @@ import java.util.List;
  */
 @Controller
 @RequestMapping("/callflows")
-@Transactional
 public class CallFlowController extends RestController {
 
     private static final String LOOKUP_BY_NAME_PREFIX = "By Name";
