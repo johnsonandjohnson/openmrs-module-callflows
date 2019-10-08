@@ -18,6 +18,7 @@ import java.util.regex.Pattern;
  * @author bramak09
  */
 @Service("callFlowService")
+@Transactional
 public class CallFlowServiceImpl implements CallFlowService {
 
     private static final Pattern ALPHA_NUMERIC = Pattern.compile("^[a-zA-Z0-9]+$");
@@ -26,7 +27,6 @@ public class CallFlowServiceImpl implements CallFlowService {
     private CallFlowDao callFlowDao;
 
     @Override
-    @Transactional
     public CallFlow create(CallFlow callflow) throws CallFlowAlreadyExistsException {
         if (StringUtils.isEmpty(callflow.getName()) || !ALPHA_NUMERIC.matcher(callflow.getName()).matches()) {
             throw new IllegalArgumentException(
@@ -40,7 +40,6 @@ public class CallFlowServiceImpl implements CallFlowService {
     }
 
     @Override
-    @Transactional
     public CallFlow update(CallFlow callflow) throws CallFlowAlreadyExistsException {
         if (StringUtils.isEmpty(callflow.getName()) || !ALPHA_NUMERIC.matcher(callflow.getName()).matches()) {
             throw new IllegalArgumentException(
@@ -71,7 +70,6 @@ public class CallFlowServiceImpl implements CallFlowService {
     }
 
     @Override
-    @Transactional
     public List<CallFlow> findAllByNamePrefix(String prefix) {
         return callFlowDao.findAllByName(prefix);
     }
@@ -87,7 +85,6 @@ public class CallFlowServiceImpl implements CallFlowService {
     }
 
     @Override
-    @Transactional
     public void delete(Integer id) {
         CallFlow callflow = callFlowDao.findById(id);
         if (callflow == null) {
