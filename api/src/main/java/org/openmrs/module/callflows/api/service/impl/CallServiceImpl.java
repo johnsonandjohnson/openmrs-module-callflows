@@ -44,7 +44,6 @@ import java.util.UUID;
  * @author bramak09
  */
 @Service("callService")
-@Transactional
 public class CallServiceImpl implements CallService {
 
     private static final Log LOGGER = LogFactory.getLog(CallServiceImpl.class);
@@ -75,6 +74,7 @@ public class CallServiceImpl implements CallService {
     private UserDAO userDAO;
 
     @Override
+    @Transactional
     public Call create(String config, CallFlow start, String startNode, CallDirection direction, String actorId,
                        String actorType, String externalId, String externalType, String playedMessages, String refKey,
                        Map<String, Object> params) {
@@ -128,12 +128,14 @@ public class CallServiceImpl implements CallService {
     }
 
     @Override
+    @Transactional
     public Call create(String config, CallFlow start, String startNode, CallDirection direction,
                        Map<String, Object> params) {
         return create(config, start, startNode, direction, null, null, null, null, null, null, params);
     }
 
     @Override
+    @Transactional
     public Call update(Call call) {
         Call currentCall = callDao.findById(call.getId());
 
@@ -198,11 +200,13 @@ public class CallServiceImpl implements CallService {
     }
 
     @Override
+    @Transactional
     public Call findByCallId(String callId) {
         return callDao.findByCallId(callId);
     }
 
     @Override
+    //transaction disabled
     public Call makeCall(String configName, String flowName, Map<String, Object> params) {
         Call call = null;
         CallFlow callFlow = null;
@@ -249,11 +253,13 @@ public class CallServiceImpl implements CallService {
     }
 
     @Override
+    @Transactional
     public List<Call> findAll(int startingRecord, int recordsAmount) {
         return callDao.retrieveAll((startingRecord - 1) * recordsAmount, recordsAmount);
     }
 
     @Override
+    @Transactional
     public long retrieveCount() {
         return callDao.count();
     }

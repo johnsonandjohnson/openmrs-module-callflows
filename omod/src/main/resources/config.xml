@@ -45,6 +45,7 @@
 				/ws/callflows/calls/{callId}.{extension}
 				/ws/callflows/out/{configName}/flows/{name}.{extension}
 				/ws/callflows/calls/export-details
+				/ws/callflows/status/*
 			</param-value>
 		</init-param>
 	</filter>

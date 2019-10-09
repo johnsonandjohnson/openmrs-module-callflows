@@ -69,12 +69,14 @@ public class AuthorizationFilter implements Filter {
 		// skip if the session has timed out, we're already authenticated, or it's not an HTTP request
 		if (request instanceof HttpServletRequest) {
 			HttpServletRequest httpRequest = (HttpServletRequest) request;
-			if (httpRequest.getRequestedSessionId() != null && !httpRequest.isRequestedSessionIdValid()) {
+			String pathWithoutContext = httpRequest.getRequestURI().split(httpRequest.getContextPath())[1];
+			if (httpRequest.getRequestedSessionId() != null
+				&& !httpRequest.isRequestedSessionIdValid()
+				&& !isUrlIgnored(pathWithoutContext)) {
 				HttpServletResponse httpResponse = (HttpServletResponse) response;
 				httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "Session timed out");
 			}
 			String authorization = httpRequest.getHeader("Authorization");
-			String pathWithoutContext = httpRequest.getRequestURI().split(httpRequest.getContextPath())[1];
 			if (authorization != null
 				&& authorization.contains(BASIC_KEYWORD)
 				&& !isUrlIgnored(pathWithoutContext)) {
