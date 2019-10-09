@@ -220,6 +220,10 @@ public class CallController extends RestController {
             } else {
                 // we arrived here from a outbound Call
                 call = callService.findByCallId(callId);
+
+                if (call == null) {
+                    throw new IllegalArgumentException(String.format("Call with id %s cannot be found", callId));
+                }
                 // merge back
                 callUtil.mergeCallWithContext(call, context);
             }
@@ -254,6 +258,8 @@ public class CallController extends RestController {
 
         } catch (Exception e) {
             error = e;
+            LOGGER.error(String.format("ERROR has been caused by request: \n" +
+                    "handleIncoming(name=%s, params=%s, headers=%s", flowName, params, headers));
             handleError(call, error);
         }
         return buildOutput(error, output, currentNode, call, extension, config);
@@ -362,6 +368,8 @@ public class CallController extends RestController {
 
         } catch (Exception e) {
             error = e;
+            LOGGER.error(String.format("ERROR has been caused by request: \n" +
+                "handleContinuation(callId=%s, params=%s, headers=%s", callId, params, headers));
             handleError(call, error);
         }
         return buildOutput(error, output, currentNode, call, extension, config);

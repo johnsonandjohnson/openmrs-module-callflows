@@ -678,7 +678,7 @@ public class CallUtil {
         } else if (error instanceof IllegalArgumentException) {
             return String.format(ERROR_RESPONSE, "BAD_INPUT", error.getMessage());
         } else {
-            return String.format(ERROR_RESPONSE, "SYSTEM", "system error");
+            return String.format(ERROR_RESPONSE, "SYSTEM", error.getMessage());
         }
     }
 
