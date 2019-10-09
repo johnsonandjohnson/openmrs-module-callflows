@@ -401,7 +401,7 @@ public class CallControllerTest extends BaseTest {
         mockMvc.perform(customGet("/callflows/in/voxeo/flows/MainFlow.vxml"))
                .andExpect(status().is(HttpStatus.INTERNAL_SERVER_ERROR.value()))
                .andExpect(content().contentType(Constants.PLAIN_TEXT))
-               .andExpect(content().string(Constants.ERROR_SYSTEM));
+               .andExpect(content().string(containsString("error:SYSTEM")));
 
         //TODO: Can possibly replace this with a standard error response in VXML itself by changing config and register a error template?
 
@@ -661,7 +661,7 @@ public class CallControllerTest extends BaseTest {
         mockMvc.perform(customGet("/callflows/calls/" + inboundCall.getCallId() + ".vxml"))
                .andExpect(status().is(HttpStatus.INTERNAL_SERVER_ERROR.value()))
                .andExpect(content().contentType(Constants.PLAIN_TEXT))
-               .andExpect(content().string("error:SYSTEM:system error"));
+               .andExpect(content().string("error:SYSTEM:Cyclic Loop!"));
         // Then
         assertCallConfigFlowLoaded(inboundCall, Constants.CONFIG_VOXEO, mainFlow.getName());
         // And we evaluated the next node
