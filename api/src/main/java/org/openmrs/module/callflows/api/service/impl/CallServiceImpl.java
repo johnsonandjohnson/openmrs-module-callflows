@@ -44,7 +44,6 @@ import java.util.UUID;
  * @author bramak09
  */
 @Service("callService")
-@Transactional
 public class CallServiceImpl implements CallService {
 
     private static final Log LOGGER = LogFactory.getLog(CallServiceImpl.class);
@@ -75,6 +74,7 @@ public class CallServiceImpl implements CallService {
     private UserDAO userDAO;
 
     @Override
+    @Transactional
     public Call create(String config, CallFlow start, String startNode, CallDirection direction, String actorId,
                        String actorType, String externalId, String externalType, String playedMessages, String refKey,
                        Map<String, Object> params) {
@@ -128,12 +128,14 @@ public class CallServiceImpl implements CallService {
     }
 
     @Override
+    @Transactional
     public Call create(String config, CallFlow start, String startNode, CallDirection direction,
                        Map<String, Object> params) {
         return create(config, start, startNode, direction, null, null, null, null, null, null, params);
     }
 
     @Override
+    @Transactional
     public Call update(Call call) {
         Call currentCall = callDao.findById(call.getId());
 
@@ -198,11 +200,15 @@ public class CallServiceImpl implements CallService {
     }
 
     @Override
+    @Transactional
     public Call findByCallId(String callId) {
         return callDao.findByCallId(callId);
     }
 
     @Override
+    // Transactional approach is disabled here because a call entity is created in this method and
+    // it's id is passed via HTTP request to the external provider, so it shouldn't be in one
+    // transaction (otherwise the entity won't be saved yet during POST request)
     public Call makeCall(String configName, String flowName, Map<String, Object> params) {
         Call call = null;
         CallFlow callFlow = null;
@@ -249,11 +255,13 @@ public class CallServiceImpl implements CallService {
     }
 
     @Override
+    @Transactional
     public List<Call> findAll(int startingRecord, int recordsAmount) {
         return callDao.retrieveAll((startingRecord - 1) * recordsAmount, recordsAmount);
     }
 
     @Override
+    @Transactional
     public long retrieveCount() {
         return callDao.count();
     }

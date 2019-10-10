@@ -16,8 +16,10 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Set;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository("callFlow.CallDao")
+@Transactional
 public class CallDaoImpl extends HibernateOpenmrsDataDAO<Call> implements CallDao {
 
     @Autowired
