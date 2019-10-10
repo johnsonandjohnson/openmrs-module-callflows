@@ -206,7 +206,9 @@ public class CallServiceImpl implements CallService {
     }
 
     @Override
-    //transaction disabled
+    // Transactional approach is disabled here because a call entity is created in this method and
+    // it's id is passed via HTTP request to the external provider, so it shouldn't be in one
+    // transaction (otherwise the entity won't be saved yet during POST request)
     public Call makeCall(String configName, String flowName, Map<String, Object> params) {
         Call call = null;
         CallFlow callFlow = null;
