@@ -227,7 +227,7 @@ public class CallUtil {
         url.append("://");
         url.append(request.getHeader("Host"));
         url.append(request.getContextPath());
-        url.append("/callflows/calls/");
+        url.append("/ws/callflows/calls/");
         url.append(call.getCallId());
         url.append(DOT).append(extension);
         return url.toString();
@@ -245,6 +245,7 @@ public class CallUtil {
         url.append("://");
         url.append(request.getHeader("Host"));
         url.append(request.getContextPath());
+        url.append("/ws");
         return url.toString();
     }
 
