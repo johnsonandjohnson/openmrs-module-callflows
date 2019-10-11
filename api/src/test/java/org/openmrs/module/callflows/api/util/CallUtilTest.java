@@ -198,8 +198,8 @@ public class CallUtilTest extends BaseTest {
 
         // Then
         assertNotNull(url);
-        assertThat(url, equalTo("http://localhost/motech-platform-server/modules/callflows/calls/" +
-                                        inboundCall.getCallId() + ".vxml"));
+        assertThat(url, equalTo("http://localhost/motech-platform-server/modules/ws/callflows" +
+            "/calls/" + inboundCall.getCallId() + ".vxml"));
 
     }
 

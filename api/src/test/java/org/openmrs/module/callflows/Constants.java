@@ -179,9 +179,11 @@ public final class Constants {
 
     public static final String STATUS_TEXT = "was busy";
 
-    public static final String NEXT_URL_JSON = "http://localhost/motech-platform-server/modules/callflows/calls/6acafc03-3818-4e36-b40a-8881fe5ac71b.json";
+    public static final String NEXT_URL_JSON = "http://localhost/motech-platform-server/modules/ws/callflows/calls" +
+        "/6acafc03-3818-4e36-b40a-8881fe5ac71b.json";
 
-    public static final String NEXT_URL_VXML = "http://localhost/motech-platform-server/modules/callflows/calls/6acafc03-3818-4e36-b40a-8881fe5ac71b.vxml";
+    public static final String NEXT_URL_VXML = "http://localhost/motech-platform-server/modules/ws/callflows/calls" +
+        "/6acafc03-3818-4e36-b40a-8881fe5ac71b.vxml";
 
     public static final String ERROR_SCRIPT = "error:SCRIPT:error in script";
 

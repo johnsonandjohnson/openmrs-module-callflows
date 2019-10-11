@@ -134,11 +134,11 @@ public class CallControllerTest extends BaseTest {
 
     private Call inboundCall;
 
-    private String nextURLFormat = "http://localhost/motech-platform-server/modules/callflows/calls/%s.%s";
+    private String nextURLFormat = "http://localhost/motech-platform-server/modules/ws/callflows/calls/%s.%s";
 
     private String inboundNextURLVxml;
 
-    private String baseURL = "http://localhost/motech-platform-server/modules";
+    private String baseURL = "http://localhost/motech-platform-server/modules/ws";
 
     private String inboundNextURLJson;
 
