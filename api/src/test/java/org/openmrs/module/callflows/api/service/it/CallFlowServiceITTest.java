@@ -31,6 +31,8 @@ import static org.junit.Assert.assertThat;
  */
 public class CallFlowServiceITTest extends BaseModuleContextSensitiveTest {
 
+    private static final String SUPER_USER_ADMIN_DISPLAY_STRING = "Super User (admin)";
+
     private CallFlow mainFlow;
 
     private CallFlow mainFlow2;
@@ -96,6 +98,16 @@ public class CallFlowServiceITTest extends BaseModuleContextSensitiveTest {
             throws CallFlowAlreadyExistsException {
         // Given, When And Then
         CallFlow callFlow = callFlowService.create(badFlow);
+    }
+
+    @Test
+    public void showSetDefaultCreator()
+        throws CallFlowAlreadyExistsException {
+        // Given And When
+        CallFlow callFlow = callFlowService.create(mainFlow);
+
+        // Then
+        assertThat(callFlow.getCreator().getDisplayString(), equalTo(SUPER_USER_ADMIN_DISPLAY_STRING));
     }
 
     @Test

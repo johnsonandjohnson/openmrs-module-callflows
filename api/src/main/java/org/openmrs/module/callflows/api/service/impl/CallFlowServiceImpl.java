@@ -1,5 +1,7 @@
 package org.openmrs.module.callflows.api.service.impl;
 
+import org.openmrs.api.context.Context;
+import org.openmrs.api.db.UserDAO;
 import org.openmrs.module.callflows.api.domain.CallFlow;
 import org.openmrs.module.callflows.api.exception.CallFlowAlreadyExistsException;
 import org.openmrs.module.callflows.api.dao.CallFlowDao;
@@ -23,8 +25,13 @@ public class CallFlowServiceImpl implements CallFlowService {
 
     private static final Pattern ALPHA_NUMERIC = Pattern.compile("^[a-zA-Z0-9]+$");
 
+    private static final String ADMIN_USER = "admin";
+
     @Autowired
     private CallFlowDao callFlowDao;
+
+    @Autowired
+    private UserDAO userDAO;
 
     @Override
     public CallFlow create(CallFlow callflow) throws CallFlowAlreadyExistsException {
@@ -35,6 +42,10 @@ public class CallFlowServiceImpl implements CallFlowService {
         // check for duplicates in database
         if (null != callFlowDao.findByName(callflow.getName())) {
             throw new CallFlowAlreadyExistsException("CallFlow already exists! :" + callflow.getName());
+        }
+
+        if (Context.isSessionOpen() && !Context.isAuthenticated()) {
+            callflow.setCreator(userDAO.getUserByUsername(ADMIN_USER));
         }
         return callFlowDao.create(callflow);
     }
