@@ -42,6 +42,9 @@ public class AuthUtil {
 
     public static final String PRIVATE_KEY_FILE_NAME = "private.key";
     public static final String IVR_PROPERTIES_FILE_NAME = "ivr.properties";
+    public static final String APPLICATION_ID_CLAIM = "application_id";
+    public static final String APPLICATION_ID_PROP = "applicationId";
+    public static final String TYPE = "JWT";
 
     private static final Log LOGGER = LogFactory.getLog(CallUtil.class);
     private static final Pattern PEM_PATTERN = Pattern.compile("-----BEGIN PRIVATE KEY-----" +
@@ -52,19 +55,14 @@ public class AuthUtil {
             // Optional trailing line break
         Pattern.MULTILINE | Pattern.DOTALL);
 
-    private static final String ISSUER_PROP = "issuer";
-    private static final String SUBJECT_PROP = "subject";
-    private static final String APPLICATION_ID_PROP = "applicationId";
-    private static final String EXP_TIME_IN_HRS_PROP = "expTimeInHrs";
     private static final String DEFAULT_EXPIRY_TIME = "1";
     private static final String CHARSET_NAME = StandardCharsets.UTF_8.name();
-
-    private static final String APPLICATION_ID_CLAIM = "application_id";
     private static final String JTI_CLAIM = "jti";
+    private static final String TYPE_HEADER = "typ";
+
+    private static final String EXP_TIME_IN_HRS_PROP = "expTimeInHrs";
 
     private PrivateKey key;
-    private String issuer;
-    private String subject;
     private String applicationId;
     private int expTimeInHrs;
 
@@ -115,18 +113,15 @@ public class AuthUtil {
 
     public void loadProperties() throws IOException {
         Properties properties = getProperties(settingsManagerService.getRawConfig(IVR_PROPERTIES_FILE_NAME));
-        issuer = properties.getProperty(ISSUER_PROP);
-        subject = properties.getProperty(SUBJECT_PROP);
         applicationId = properties.getProperty(APPLICATION_ID_PROP);
         expTimeInHrs = Integer.parseInt(properties.getProperty(EXP_TIME_IN_HRS_PROP, DEFAULT_EXPIRY_TIME));
     }
 
-    protected String generateToken() {
+    public String generateToken() {
         LOGGER.info("Generating JWT");
         Date now = new Date();
         return Jwts.builder()
-            .setIssuer(issuer)
-            .setSubject(subject)
+            .setHeaderParam(TYPE_HEADER, TYPE)
             .setIssuedAt(now)
             .setExpiration(DateUtils.addHours(now, expTimeInHrs))
             .claim(APPLICATION_ID_CLAIM, applicationId)
@@ -142,8 +137,6 @@ public class AuthUtil {
             try {
                 Jws<Claims> claimsJws = Jwts.parser()
                     .setSigningKey(key)
-                    .requireIssuer(issuer)
-                    .requireSubject(subject)
                     .require(APPLICATION_ID_CLAIM, applicationId)
                     .parseClaimsJws(jwt);
                 if (claimsJws.getBody().getExpiration().before(new Date())) {
