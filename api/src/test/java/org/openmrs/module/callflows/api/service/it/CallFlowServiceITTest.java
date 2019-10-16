@@ -1,6 +1,5 @@
 package org.openmrs.module.callflows.api.service.it;
 
-import com.mchange.util.AlreadyExistsException;
 import org.hibernate.HibernateException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.callflows.Constants;
@@ -23,6 +22,7 @@ import static junit.framework.Assert.assertNull;
 import static junit.framework.TestCase.assertNotNull;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
+import static org.openmrs.module.callflows.Constants.SUPER_USER_ADMIN_DISPLAY_STRING;
 
 /**
  * Call Flow Service Integration Tests
@@ -96,6 +96,16 @@ public class CallFlowServiceITTest extends BaseModuleContextSensitiveTest {
             throws CallFlowAlreadyExistsException {
         // Given, When And Then
         CallFlow callFlow = callFlowService.create(badFlow);
+    }
+
+    @Test
+    public void showSetDefaultCreator()
+        throws CallFlowAlreadyExistsException {
+        // Given And When
+        CallFlow callFlow = callFlowService.create(mainFlow);
+
+        // Then
+        assertThat(callFlow.getCreator().getDisplayString(), equalTo(SUPER_USER_ADMIN_DISPLAY_STRING));
     }
 
     @Test
