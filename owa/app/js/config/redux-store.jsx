@@ -10,13 +10,17 @@
 import {
   createStore, applyMiddleware, compose,
 } from 'redux';
+import createSagaMiddleware from 'redux-saga';
 import promiseMiddleware from 'redux-promise-middleware';
+import thunkMiddleware from 'redux-thunk';
 import { createLogger } from 'redux-logger';
 import { createHashHistory } from 'history';
 import { connectRouter, routerMiddleware } from 'connected-react-router';
-import reducers from '../reducers'
 
-const promiseTypeSuffixes = ['LOADING', 'SUCCESS', 'FAILURE'];
+import reducers from '../reducers';
+import initSagas from '../sagas';
+
+const sagaMiddleware = createSagaMiddleware();
 
 export const history = createHashHistory({
   basename: '/',
@@ -24,7 +28,9 @@ export const history = createHashHistory({
 
 const middlewares = [
   routerMiddleware(history),
-  promiseMiddleware({ promiseTypeSuffixes })
+  thunkMiddleware,
+  promiseMiddleware(),
+  sagaMiddleware
 ];
 
 if (process.env.NODE_ENV !== 'production') {
@@ -40,5 +46,6 @@ export default function () {
         ? window.devToolsExtension() : f => f,
     ),
   );
+  initSagas(sagaMiddleware);
   return store;
 }

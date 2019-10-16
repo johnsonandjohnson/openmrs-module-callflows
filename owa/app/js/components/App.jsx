@@ -7,13 +7,20 @@
  * graphic logo is a trademark of OpenMRS Inc.
  */
 import React from 'react';
+import { connect } from 'react-redux';
 
-export default class App extends React.Component {
+class App extends React.Component {
   render() {
     return (
-      <div>
-        <h1>Hello, world</h1>
-      </div>
-    )
+      <div className="body-wrapper">
+        <div className="row">
+          <div className="col-md-12 col-xs-12">
+            <h2>Callflows</h2>
+          </div>
+        </div>
+        <div className="panel-body"></div>
+      </div>);
   }
 }
+
+export default connect()(App);
