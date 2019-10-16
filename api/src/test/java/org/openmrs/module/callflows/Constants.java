@@ -220,4 +220,6 @@ public final class Constants {
     public static final String PARAM_PLAYED_MESSAGES = "playedMessages";
 
     public static final String PARAM_REF_KEY = "refKey";
+
+    public static final String SUPER_USER_ADMIN_DISPLAY_STRING = "Super User (admin)";
 }
