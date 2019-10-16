@@ -3,6 +3,7 @@ package org.openmrs.module.callflows.api.service.it;
 import org.hibernate.HibernateException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.callflows.Constants;
+import org.openmrs.module.callflows.api.domain.Call;
 import org.openmrs.module.callflows.api.domain.CallFlow;
 import org.openmrs.module.callflows.api.domain.types.CallFlowStatus;
 import org.openmrs.module.callflows.api.exception.CallFlowAlreadyExistsException;
@@ -35,6 +36,8 @@ public class CallFlowServiceITTest extends BaseModuleContextSensitiveTest {
 
     private CallFlow mainFlow2;
 
+    private CallFlow mainFlow3;
+
     private CallFlow nonMainFlow;
 
     private CallFlow badFlow;
@@ -52,6 +55,9 @@ public class CallFlowServiceITTest extends BaseModuleContextSensitiveTest {
 
         mainFlow2 = CallFlowHelper.createMainFlow();
         mainFlow2.setName("MainFlow2");
+
+        mainFlow3 = CallFlowHelper.createMainFlow();
+        mainFlow3.setName("MainFlow3");
 
         nonMainFlow = CallFlowHelper.createMainFlow();
         nonMainFlow.setName("NonMainFlow");
@@ -106,6 +112,20 @@ public class CallFlowServiceITTest extends BaseModuleContextSensitiveTest {
 
         // Then
         assertThat(callFlow.getCreator().getDisplayString(), equalTo(SUPER_USER_ADMIN_DISPLAY_STRING));
+    }
+
+    @Test
+    public void showSaveLargeRawField()
+        throws CallFlowAlreadyExistsException {
+        // Given
+        int rawFieldSize = 10000000;
+        mainFlow3.setRaw(new String(new char[rawFieldSize]));
+
+        // When
+        CallFlow callFlow = callFlowService.create(mainFlow3);
+
+        // Then
+        assertThat(callFlow.getRaw().length(), equalTo(rawFieldSize));
     }
 
     @Test
