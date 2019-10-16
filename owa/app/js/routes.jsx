@@ -8,11 +8,16 @@
  */
 import React from 'react';
 import { Route, Switch } from 'react-router-dom';
+import { Header } from '@openmrs/react-components';
 
-import App from './components/App'
+import App from './components/App';
+import BreadCrumb from './components/BreadCrumb';
 
 export default (store) => (
-  <Switch>
-    <Route exact path="/" component={App} />
-  </Switch>
-);
+  <div>
+    <Header />
+    <BreadCrumb />
+    <Switch>
+      <Route exact path="/" component={App} />
+    </Switch>
+  </div>);

@@ -13,11 +13,14 @@ import { HashRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { ConnectedRouter } from 'connected-react-router';
 import 'babel-polyfill';
+import '@openmrs/style-referenceapplication/lib/referenceapplication.css';
 
 import { history } from './config/redux-store';
 import exportStore from './config/export-store';
-
+import { loadIcons } from './config/icon-loader';
 import routes from './routes';
+
+loadIcons();
 
 render((
   <Provider store={exportStore}>

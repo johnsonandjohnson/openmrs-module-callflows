@@ -7,12 +7,20 @@
  * graphic logo is a trademark of OpenMRS Inc.
  */
 
-import { combineReducers } from 'redux';
-import { reducers as openmrs } from '@openmrs/react-components';
+/**
+ * Appends REQUEST async action type
+ */
 
-import exampleReducer from './exampleReducer';
+export const REQUEST = (actionType) => `${actionType}_PENDING`;
 
-export default combineReducers({
-  openmrs,
-  exampleReducer
-});
+/**
+ * Appends SUCCESS async action type
+ */
+
+export const SUCCESS = (actionType) => `${actionType}_FULFILLED`;
+
+/**
+ * Appends FAILURE async action type
+ */
+
+export const FAILURE = (actionType) => `${actionType}_REJECTED`;
