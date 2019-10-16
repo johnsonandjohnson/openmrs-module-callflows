@@ -174,4 +174,11 @@
                                  baseTableName="cfl_calls_providerdata" baseColumnNames="id_oid"
                                  referencedTableName="cfl_calls" referencedColumnNames="cfl_calls_id"/>
     </changeSet>
+
+    <changeSet id="callFlow-2019-10-16-11:23" author="Paweł Cieszko">
+        <comment>Changing Callflows Raw column type to support large configurations</comment>
+        <sql>
+            ALTER TABLE cfl_callflows MODIFY raw LONGTEXT;
+        </sql>
+    </changeSet>
 </databaseChangeLog>
