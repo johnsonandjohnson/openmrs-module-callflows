@@ -8,6 +8,7 @@ package org.openmrs.module.callflows.api.util;
  */
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.InvalidClaimException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -45,6 +46,11 @@ public class AuthUtil {
     public static final String APPLICATION_ID_CLAIM = "application_id";
     public static final String APPLICATION_ID_PROP = "applicationId";
     public static final String TYPE = "JWT";
+    public static final String DEFAULT_EXPIRY_TIME = "1";
+    public static final String CHARSET_NAME = StandardCharsets.UTF_8.name();
+    public static final String JTI_CLAIM = "jti";
+    public static final String TYPE_HEADER = "typ";
+    public static final String EXP_TIME_IN_HRS_PROP = "expTimeInHrs";
 
     private static final Log LOGGER = LogFactory.getLog(CallUtil.class);
     private static final Pattern PEM_PATTERN = Pattern.compile("-----BEGIN PRIVATE KEY-----" +
@@ -54,13 +60,6 @@ public class AuthUtil {
             "\\n?",
             // Optional trailing line break
         Pattern.MULTILINE | Pattern.DOTALL);
-
-    private static final String DEFAULT_EXPIRY_TIME = "1";
-    private static final String CHARSET_NAME = StandardCharsets.UTF_8.name();
-    private static final String JTI_CLAIM = "jti";
-    private static final String TYPE_HEADER = "typ";
-
-    private static final String EXP_TIME_IN_HRS_PROP = "expTimeInHrs";
 
     private PrivateKey key;
     private String applicationId;
@@ -130,7 +129,7 @@ public class AuthUtil {
             .compact();
     }
 
-    protected boolean isTokenValid(String jwt) {
+    public boolean isTokenValid(String jwt) {
         boolean isTokenValid = false;
 
         if (jwt != null) {
@@ -140,13 +139,15 @@ public class AuthUtil {
                     .require(APPLICATION_ID_CLAIM, applicationId)
                     .parseClaimsJws(jwt);
                 if (claimsJws.getBody().getExpiration().before(new Date())) {
-                    LOGGER.error("Token has expired");
+                    LOGGER.debug("Token has expired");
                 } else {
                     isTokenValid = true;
                 }
             } catch (InvalidClaimException ice) {
                 LOGGER.error(String.format("Token is invalid for the following parameter (claim): %s",
                     ice.getClaimName()));
+            } catch (ExpiredJwtException ex) {
+                LOGGER.debug("Token has expired.");
             }
         }
         return isTokenValid;

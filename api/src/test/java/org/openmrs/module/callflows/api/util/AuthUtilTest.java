@@ -4,18 +4,28 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
+import static org.openmrs.module.callflows.api.util.AuthUtil.APPLICATION_ID_CLAIM;
+import static org.openmrs.module.callflows.api.util.AuthUtil.JTI_CLAIM;
+import static org.openmrs.module.callflows.api.util.AuthUtil.TYPE;
+import static org.openmrs.module.callflows.api.util.AuthUtil.TYPE_HEADER;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jwt;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.InvalidKeyException;
+import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Date;
 import java.util.Properties;
+import java.util.UUID;
+import org.apache.commons.lang3.reflect.FieldUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,9 +50,11 @@ public class AuthUtilTest {
 
     private String applicationId;
 
+    private Key key;
+
     @Before
     public void setUp() throws IOException, NoSuchAlgorithmException, InvalidKeyException,
-        InvalidKeySpecException {
+        InvalidKeySpecException, IllegalAccessException {
         when(settingsManagerService.getRawConfig(AuthUtil.PRIVATE_KEY_FILE_NAME))
             .thenReturn(loadConfigFile(TEST_PRIVATE_KEY));
         authUtil.loadPrivateKey();
@@ -54,6 +66,8 @@ public class AuthUtilTest {
         Properties properties = new Properties();
         properties.load(loadConfigFile(TEST_IVR_PROPS));
         applicationId = properties.getProperty(AuthUtil.APPLICATION_ID_PROP);
+
+        key = (Key) FieldUtils.readField(authUtil, "key", true);
     }
 
     @Test
@@ -67,12 +81,44 @@ public class AuthUtilTest {
         Header header = parsedToken.getHeader();
         Claims body = parsedToken.getBody();
 
-        assertThat(header.getType(), equalTo(AuthUtil.TYPE));
+        assertThat(header.getType(), equalTo(TYPE));
         assertThat(header.get(ALG_PARAM), equalTo(RS_256_ENCRYPTION_ALGORITHM));
-        assertThat(body.get(AuthUtil.APPLICATION_ID_CLAIM), equalTo(applicationId));
+        assertThat(body.get(APPLICATION_ID_CLAIM), equalTo(applicationId));
 
         assertNotNull(body.getExpiration());
         assertNotNull(body.getIssuedAt());
+    }
+
+    @Test
+    public void shouldReturnInvalidTokenStatus() {
+        Date now = new Date();
+        String token = Jwts.builder()
+            .setHeaderParam(TYPE_HEADER, TYPE)
+            .setIssuedAt(now)
+            .setExpiration(DateUtils.addDays(now, -1))
+            .claim(APPLICATION_ID_CLAIM, applicationId)
+            .claim(JTI_CLAIM, UUID.randomUUID().toString())
+            .signWith(SignatureAlgorithm.RS256, key)
+            .compact();
+
+        boolean tokenValid = authUtil.isTokenValid(token);
+        assertThat(tokenValid, equalTo(false));
+    }
+
+    @Test
+    public void shouldReturnValidTokenStatus() {
+        Date now = new Date();
+        String token = Jwts.builder()
+            .setHeaderParam(TYPE_HEADER, TYPE)
+            .setIssuedAt(now)
+            .setExpiration(DateUtils.addDays(now, 1))
+            .claim(APPLICATION_ID_CLAIM, applicationId)
+            .claim(JTI_CLAIM, UUID.randomUUID().toString())
+            .signWith(SignatureAlgorithm.RS256, key)
+            .compact();
+
+        boolean tokenValid = authUtil.isTokenValid(token);
+        assertThat(tokenValid, equalTo(true));
     }
 
     private InputStream loadConfigFile(String filename) throws IOException {
