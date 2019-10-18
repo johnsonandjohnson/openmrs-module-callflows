@@ -9,16 +9,19 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
+import Tile from './Tile';
+import IconModel from '../shared/model/Icon.model';
+
 class App extends React.Component {
   render() {
     return (
       <div className="body-wrapper">
-        <div className="row">
-          <div className="col-md-12 col-xs-12">
-            <h2>Callflows</h2>
-          </div>
+        <div className="panel-body">
+          <Tile name='Providers'
+            href='#/providers'
+            icons={[new IconModel(['fas', 'phone-alt'], '2x'),
+              new IconModel(['fas', 'globe'])]} />
         </div>
-        <div className="panel-body"></div>
       </div>);
   }
 }

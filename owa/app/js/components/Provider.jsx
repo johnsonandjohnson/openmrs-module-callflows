@@ -7,12 +7,30 @@
  * graphic logo is a trademark of OpenMRS Inc.
  */
 
-import { combineReducers } from 'redux';
-import { reducers as openmrs } from '@openmrs/react-components';
+import React from 'react';
+import {
+  Form,
+  Button,
+  FormGroup,
+  ControlLabel,
+  FormControl
+} from 'react-bootstrap';
 
-import providersReducer from './providers.reducer';
+const Provider = (props) => {
 
-export default combineReducers({
-  openmrs,
-  providersReducer
-});
+  const handleChange = (event) => {
+  };
+
+  const handleSubmit = (event) => {
+  };
+
+  const handleDelete = (event) => {
+  }
+  
+  return (
+    <div>
+    </div>
+  );
+};
+
+export default Provider;
