@@ -1,8 +1,8 @@
 [
   {
       "id": "callflowsapp.basicCallflows",
-      "label": "Callflows module",
-      "description": "Callflows management page",
+      "label": "Call flows module",
+      "description": "Call flows management page",
       "extensions": [
           {
               "id": "callflowsapp.basicCallflows.homepageLink",
@@ -11,8 +11,8 @@
               "order": 10,
               "label": "callflows.title",
               "url": "owa/callflows/index.html",
-              "icon": "icon-wrench",
-              "requiredPrivilege": "Callflows module Privilege"
+              "icon": "icon-phone",
+              "requiredPrivilege": "Call flows module Privilege"
           }
       ]
   }
