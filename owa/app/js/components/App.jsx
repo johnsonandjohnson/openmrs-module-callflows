@@ -21,6 +21,9 @@ class App extends React.Component {
             href='#/providers'
             icons={[new IconModel(['fas', 'phone-alt'], '2x'),
               new IconModel(['fas', 'globe'])]} />
+          <Tile name='Renderers' href='#/renderers'
+            icons={[new IconModel(['fas', 'phone-alt'], '2x'),
+                new IconModel(['fas', 'globe'])]} />
         </div>
       </div>);
   }

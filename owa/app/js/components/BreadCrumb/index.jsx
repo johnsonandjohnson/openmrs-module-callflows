@@ -17,6 +17,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import './bread-crumb.scss';
 
 const PROVIDER_ROUTE = '/providers';
+const RENDERERS_ROUTE = '/renderers';
 const MODULE_ROUTE = '/';
 const OMRS_ROUTE = '../../';
 const MODULE_NAME = 'Call flows';
@@ -77,6 +78,14 @@ class BreadCrumb extends React.Component {
           {this.renderDelimiter()}
           {this.renderLastCrumb('Providers')}
         </div>);
+        case RENDERERS_ROUTE:
+                return (<div className="breadcrumb">
+                  {this.renderHomeCrumb()}
+                  {this.renderDelimiter()}
+                  {this.renderCrumb(MODULE_ROUTE, MODULE_NAME)}
+                  {this.renderDelimiter()}
+                  {this.renderLastCrumb('Renderers')}
+                </div>);
       default:
         return (
           <div className="breadcrumb">

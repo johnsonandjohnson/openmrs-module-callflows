@@ -12,6 +12,7 @@ import { Header } from '@openmrs/react-components';
 
 import App from './components/App';
 import Providers from './components/Providers';
+import Renderers from './components/Renderers';
 import BreadCrumb from './components/BreadCrumb';
 
 export default (store) => (
@@ -21,5 +22,6 @@ export default (store) => (
     <Switch>
       <Route exact path="/" component={App} />
       <Route path="/providers" component={Providers} />
+      <Route path="/renderers" components={Renderers} />
     </Switch>
   </div>);
