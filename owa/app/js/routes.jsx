@@ -22,6 +22,6 @@ export default (store) => (
     <Switch>
       <Route exact path="/" component={App} />
       <Route path="/providers" component={Providers} />
-      <Route path="/renderers" components={Renderers}/>
+      <Route path="/renderers" component={Renderers} />
     </Switch>
   </div>);

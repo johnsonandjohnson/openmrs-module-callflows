@@ -13,7 +13,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Accordion } from '@openmrs/react-components';
 import { Button } from 'react-bootstrap';
 
-import AddButton from './AddButton';
+import {reset, getRenderers, postRenderer } from '../reducers/renderersReducer';
 
 export class Renderers extends React.Component {
 
@@ -27,52 +27,38 @@ export class Renderers extends React.Component {
     return null;
   }
   
-// render() {
-//   return (
-//     <h1>ABCDE</h1>
-//   );
-// }
-
-  // render() {
-  //   return( 
-  //     <div>
-  //        <h1>AAAAAAAAAAAAAA</h1>
-  //     </div>
-  //   );
    
-  render () {
-    return (
-      <div className="body-wrapper">
-       <h1>TEST TEXT</h1>
-      </div>
-    );
-  
-
-  // render() {
-  //   const buttonLabel = 'Add Renderer';
-  //   const title = 'Renderers';
+  // render () {
   //   return (
   //     <div className="body-wrapper">
-  //       <div className="row">
-  //         <div className="col-md-12 col-xs-12">
-  //           <h2>{title}</h2>
-  //         </div>
-  //       </div>
-  //       <div className="row">
-  //         <AddButton handleAdd={this.handleAdd} txt={buttonLabel} />
-  //       </div>
-  //       <div className="panel-body">
-  //         <Accordion title="test" border="true">
-  //           <div>form</div>
-  //         </Accordion>
-  //       </div>
-  //       <Button className="btn cancel btn-xs" >CANCEL</Button>
-  //       <Button className="btn confirm btn-xs">SAVE</Button>
+  //      <h1>TEST TEXT</h1>
   //     </div>
   //   );
   // }
+  
+  render() {
+    return (
+        <div className="body-wrapper">
+          <h1>Renderers</h1>
+          <Button className="btn btn-success btn-md" onClick={this.handleAdd}><i className="fa fa-plus"></i>Add Renderer</Button>
+        
+      
+        </div>
+    );
   }
 }
 
-// export default connect()
-// (Renderers);
+export const mapStateToProps = state => ({
+  renderers: state.renderersReducer.renderers
+});
+
+const mapDispatchToProps = {
+  reset,
+  getRenderers,
+  postRenderer
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Renderers);
