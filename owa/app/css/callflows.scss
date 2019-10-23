@@ -70,3 +70,33 @@ header .logo img {
     align-self: center;
 }
 
+.accordion .content.close {
+    float: none;
+}
+
+.form-control {
+    border-radius: 3px;
+}
+
+.accordion .content.open {
+    max-height: 1200px;
+    background-color: #f3f3f3;
+}
+
+.accordion .content .form {
+    width: 95%;
+    margin: 20px auto;
+}
+
+.accordion .content .control-label {
+    margin: 0;
+}
+
+.accordion .content .form-tooltip {
+    margin: 0;
+}
+
+.btn {
+    margin: 5px;
+}
+

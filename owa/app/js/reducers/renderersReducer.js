@@ -1,10 +1,14 @@
 import axiosInstance from '../config/axios';
 import { SUCCESS, REQUEST, FAILURE } from './action-type.util';
+import { RendererModel } from '../shared/model/Renderer.model';
 
 export const ACTION_TYPES = {
     RESET: 'renderersReducer/RESET',
     FETCH_RENDERERS: 'renderersReducer/FETCH_RENDERERS',
-    CREATE_RENDERER: 'renderersReducer/CREATE_RENDERER'
+    CREATE_RENDERER: 'renderersReducer/CREATE_RENDERER',
+    ADD_NEW_EMPTY: 'rendererReducer/ADD_NEW_EMPTY',
+    UPDATE_RENDERER_AFTER_CHANGE: 'rendererReducer/UPDATE_RENDERER_AFTER_CHANGE',
+    UPDATE_RENDERER: 'rendererReducer/UPDATE_RENDERER'
   };
 
   const initialState = {
@@ -22,10 +26,19 @@ export default (state = initialState, action) => {
                 ...state
             };
         case SUCCESS(ACTION_TYPES.CREATE_RENDERER):
+          let newValue = new RendererModel(action.payload.data, action.isOpen);
+          newValue.uiLocalUuid = action.uiLocalUuid;
             return {
                 ...state,
-                renderers: action.payload.data
+                renderers: replaceRenderer(state.renderers, newValue)
             };
+        // case SUCCESS(ACTION_TYPES.CREATE_RENDERER):
+        //     return {
+        //         ...state,
+        //         renderers: action.payload.data
+        //     }
+
+
         case REQUEST(ACTION_TYPES.FETCH_RENDERERS):
             return {
                 ...state
@@ -37,8 +50,34 @@ export default (state = initialState, action) => {
         case SUCCESS(ACTION_TYPES.FETCH_RENDERERS):
             return {
                 ...state,
-                renderers: action.payload.data
+                renderers: action.payload.data.map((rendererResponse) => {return new RendererModel(rendererResponse, false)})
             };
+
+
+        case REQUEST(ACTION_TYPES.UPDATE_RENDERER):
+            return {
+                ...state
+            }     
+        case FAILURE(ACTION_TYPES.UPDATE_RENDERER):
+            return {
+                ...state
+            }   
+        case SUCCESS(ACTION_TYPES.UPDATE_RENDERER):
+            return {
+                ...state
+            }
+
+        case ACTION_TYPES.ADD_NEW_EMPTY:
+            return {
+                ...state,
+                renderers: state.renderers.concat(new RendererModel(null, true))
+            }
+            
+        case ACTION_TYPES.UPDATE_RENDERER_AFTER_CHANGE:
+            return {
+                ...state,
+                renderers: replaceRenderer(state.renderers, action.payload)
+            }
         case ACTION_TYPES.RESET: {
             return {
                 ...state,
@@ -51,10 +90,32 @@ export default (state = initialState, action) => {
 };
 
 
+// const removeFromRenderers = (renderers, uiLocalUuid) => {
+//     return renderers.filter((item) => item.uiLocalUuid !== uiLocalUuid);
+// }
+
 const callflowsPath = 'ws/callflows';
+
+const replaceRenderer = (renderers, changedRenderer) => {
+    return renderers.map((item) => {
+        if (item.uiLocalUuid === changedRenderer.uiLocalUuid) {
+            item = changedRenderer;
+        }
+        return item;
+    });
+}
 
 export const reset = () => ({
     type: ACTION_TYPES.RESET 
+});
+
+export const addNew = () => ({
+    type: ACTION_TYPES.ADD_NEW_EMPTY
+});
+
+export const changeRenderer = (newRenderer) => ({
+    type: ACTION_TYPES.UPDATE_RENDERER_AFTER_CHANGE,
+    payload: newRenderer
 });
 
 export const getRenderers = () => async (dispatch) => {
@@ -65,17 +126,54 @@ export const getRenderers = () => async (dispatch) => {
     });
 };
 
-export const postRenderer = () => async (dispatch) => {
-    const requestUrl = callflowsPath + 'renderers';
+export const createRenderer = (rendererRequest) => async (dispatch) => {
+    const requestUrl = callflowsPath + '/renderers';
     const data = [
         {
-            name: 'test1',
-            mimeType: 'testMimeType',
-            template: 'testTemplate'
+            name: rendererRequest.name,
+            mimeType: rendererRequest.mimeType,
+            template: rendererRequest.template
         }
     ];
     await dispatch({
-      type: ACTION_TYPES.CREATE_RENDERER,
-      payload: axiosInstance.post(requestUrl, data)  
+        type: ACTION_TYPES.CREATE_RENDERER,
+        isOpen: rendererRequest.isOpen,
+        uiLocalUuid: rendererRequest.uiLocalUuid,
+        //payload: axiosInstance.post(requestUrl, rendererRequest.toRequest())
+        payload: axiosInstance.post(requestUrl, data)
     });
 };
+
+// export const createRenderer = () => async (dispatch) => {
+//     const requestUrl = callflowsPath + '/renderers';
+//     const data = [
+//         {
+//             name: 'firstA',
+//             mimeType: 'secondA',
+//             template: 'thirdA'
+//         }
+//     ];
+//     await dispatch({
+//         type: ACTION_TYPES.CREATE_RENDERER,
+//         payload: axiosInstance.post(requestUrl, data)
+//     });
+// };
+
+export const updateRenderer = (rendererRequest) => async (dispatch) => {
+    const requestUrl = callflowsPath + '/renderers';
+    const data = [
+        {
+            name: rendererRequest.name,
+            mimeType: rendererRequest.mimeType,
+            template: rendererRequest.template
+        }
+    ];
+    await dispatch({
+        type: ACTION_TYPES.CREATE_RENDERER,
+        isOpen: rendererRequest.isOpen,
+        uiLocalUuid: rendererRequest.uiLocalUuid,
+        //payload: axiosInstance.post(requestUrl, rendererRequest.toRequest())
+        payload: axiosInstance.post(requestUrl, data)
+    });
+};
+    
