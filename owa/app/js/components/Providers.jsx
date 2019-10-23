@@ -14,12 +14,17 @@ import { Accordion } from '@openmrs/react-components';
 import { Button } from 'react-bootstrap';
 
 import AddButton from './AddButton';
-import { reset, getConfigs, postConfig } from '../reducers/providers.reducer';
+import { reset, getConfigs, postConfigs, updateConfigForm } from '../reducers/providers.reducer';
+import ConfigForm from './ConfigForm';
 
 export class Providers extends React.Component {
 
+  componentDidMount = () => {
+    this.props.getConfigs();
+  }
+
   handleAdd = () => {
-    return null;
+    return this.props.postConfigs();
   }
 
   render() {
@@ -32,29 +37,40 @@ export class Providers extends React.Component {
             <h2>{title}</h2>
           </div>
         </div>
-        <div className="row">
-          <AddButton handleAdd={this.handleAdd} txt={buttonLabel} />
-        </div>
         <div className="panel-body">
-          <Accordion title="test" border="true">
-            <div>form</div>
-          </Accordion>
+        <div className="row">
+          <div className="col-md-12 col-xs-12">
+            <AddButton handleAdd={this.handleAdd} txt={buttonLabel} buttonClass='confirm' />
+          </div>
         </div>
-        <Button className="btn cancel btn-xs" onClick={this.props.reset} >CANCEL</Button>
-        <Button className="btn confirm btn-xs" onClick={this.props.postConfig} >SAVE</Button>
+          {this.props.configForms.map(item => {
+            return (
+              <Accordion title={item.config.name}
+                border={true}
+                key={item.localId}
+                open={item.isOpen}>
+                <ConfigForm config={item.config}
+                  isOpen={item.isOpen}
+                  localId={item.localId}
+                  parentUpdater={this.props.updateConfigForm} />
+              </Accordion>
+            );
+          })}
+        </div>
       </div>
     );
   }
 }
 
 export const mapStateToProps = state => ({
-  configs: state.providersReducer.configs
+  configForms: state.providersReducer.configForms
 });
 
 const mapDispatchToProps = {
   reset,
   getConfigs,
-  postConfig
+  postConfigs,
+  updateConfigForm
 };
 
 export default connect(
