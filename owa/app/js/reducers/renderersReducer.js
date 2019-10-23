@@ -8,7 +8,8 @@ export const ACTION_TYPES = {
     CREATE_RENDERER: 'renderersReducer/CREATE_RENDERER',
     ADD_NEW_EMPTY: 'rendererReducer/ADD_NEW_EMPTY',
     UPDATE_RENDERER_AFTER_CHANGE: 'rendererReducer/UPDATE_RENDERER_AFTER_CHANGE',
-    UPDATE_RENDERER: 'rendererReducer/UPDATE_RENDERER'
+    UPDATE_RENDERER: 'rendererReducer/UPDATE_RENDERER',
+    DELETE_FROM_FRONT_RENDERER: 'rendererReducer/DELETE_FROM_FRONT_RENDERER'
   };
 
   const initialState = {
@@ -72,6 +73,12 @@ export default (state = initialState, action) => {
                 ...state,
                 renderers: state.renderers.concat(new RendererModel(null, true))
             }
+
+        case ACTION_TYPES.DELETE_FROM_FRONT_RENDERER:
+            return {
+                ...state,
+                renderers: removeFromRenderers(state.renderers, action.uiLocalUuid)
+            }    
             
         case ACTION_TYPES.UPDATE_RENDERER_AFTER_CHANGE:
             return {
@@ -89,11 +96,6 @@ export default (state = initialState, action) => {
     }
 };
 
-
-// const removeFromRenderers = (renderers, uiLocalUuid) => {
-//     return renderers.filter((item) => item.uiLocalUuid !== uiLocalUuid);
-// }
-
 const callflowsPath = 'ws/callflows';
 
 const replaceRenderer = (renderers, changedRenderer) => {
@@ -103,6 +105,10 @@ const replaceRenderer = (renderers, changedRenderer) => {
         }
         return item;
     });
+}
+
+const removeFromRenderers = (renderers, uiLocalUuid) => {
+    return renderers.filter((item) => item.uiLocalUuid !== uiLocalUuid);
 }
 
 export const reset = () => ({
@@ -143,6 +149,15 @@ export const createRenderer = (rendererRequest) => async (dispatch) => {
         payload: axiosInstance.post(requestUrl, data)
     });
 };
+
+
+export const deleteRendererFromFE = (rendererRequest) => async (dispatch) => {
+    await dispatch({
+        type: ACTION_TYPES.DELETE_FROM_FRONT_RENDERER,
+        uiLocalUuid: rendererRequest.uiLocalUuid
+    });
+};
+
 
 // export const createRenderer = () => async (dispatch) => {
 //     const requestUrl = callflowsPath + '/renderers';

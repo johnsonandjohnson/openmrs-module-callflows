@@ -26,7 +26,11 @@ const Renderer = (props) => {
   };
 
   const handleDelete = (event) => {
-  
+    event.preventDefault();
+    if (props.renderer.id) {
+      props.deleteRendererFromBE(props.renderer);
+    }
+    props.deleteRendererFromFE(props.renderer);
   }
   
 

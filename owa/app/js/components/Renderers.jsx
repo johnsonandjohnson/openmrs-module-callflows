@@ -13,7 +13,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Accordion } from '@openmrs/react-components';
 import { Button } from 'react-bootstrap';
 
-import {reset, getRenderers, createRenderer, addNew, changeRenderer, updateRenderer} from '../reducers/renderersReducer';
+import {reset, getRenderers, createRenderer, addNew, changeRenderer, updateRenderer, deleteRendererFromBE, deleteRendererFromFE} from '../reducers/renderersReducer';
 import Renderer from './Renderer';
 
 export class Renderers extends React.Component {
@@ -54,9 +54,8 @@ export class Renderers extends React.Component {
       this.newEntry = null;
     }
   }
-   
 
-  
+
   render() {
     return (
         <div className="body-wrapper">
@@ -76,6 +75,7 @@ export class Renderers extends React.Component {
                     createRenderer={this.props.createRenderer}
                     getRenderers={this.props.getRenderers}
                     updateRenderer={this.props.updateRenderer}
+                    deleteRendererFromFE={this.props.deleteRendererFromFE}
                  />
               </div>
             </Accordion>
@@ -97,6 +97,8 @@ const mapDispatchToProps = {
   addNew,
   changeRenderer,
   updateRenderer,
+  deleteRendererFromBE,
+  deleteRendererFromFE
 };
 
 export default connect(
