@@ -1,5 +1,6 @@
 import axiosInstance from '../config/axios';
 import { SUCCESS, REQUEST, FAILURE } from './action-type.util';
+import _ from 'lodash';
 
 import ConfigFormData from '../components/ConfigForm/ConfigFormData';
 
@@ -8,7 +9,9 @@ export const ACTION_TYPES = {
   RESET: 'providersReducer/RESET',
   UPDATE_CONFIG_FORMS: 'providersReducer/UPDATE_CONFIG_FORMS',
   FETCH_CONFIGS: 'providersReducer/FETCH_CONFIGS',
-  POST_CONFIG: 'providersReducer/POST_CONFIG'
+  POST_CONFIG: 'providersReducer/POST_CONFIG',
+  ADD_NEW_FORM: 'providersReducer/ADD_NEW_FORM',
+  REMOVE_FORM: 'providersReducer/REMOVE_FORM'
 };
 
 const initialState = {
@@ -51,6 +54,20 @@ export default (state = initialState, action) => {
         configForms: updateConfigForms(state.configForms, action.payload)
       };
     }
+    case ACTION_TYPES.ADD_NEW_FORM: {
+      let configForms = Array.from(state.configForms);
+      configForms.push(new ConfigFormData());
+      return {
+        ...state,
+        configForms
+      };
+    }
+    case ACTION_TYPES.REMOVE_FORM: {
+      return {
+        ...state,
+        configForms: action.payload
+      };
+    }
     case ACTION_TYPES.RESET: {
       return {
         ...state,
@@ -75,6 +92,18 @@ export const updateConfigForm = (updated) => ({
   type: ACTION_TYPES.UPDATE_CONFIG_FORMS,
   payload: updated
 });
+
+export const addNewForm = () => ({
+  type: ACTION_TYPES.ADD_NEW_FORM
+});
+
+export const removeForm = (id, configForms) => {
+  const payload = _.filter(configForms, form => { return form.localId !== id });
+  return {
+    type: ACTION_TYPES.REMOVE_FORM,
+    payload
+  }
+};
 
 export const reset = () => ({
   type: ACTION_TYPES.RESET
