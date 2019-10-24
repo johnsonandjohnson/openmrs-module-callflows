@@ -1,7 +1,7 @@
 import axiosInstance from '../config/axios';
 import { SUCCESS, REQUEST, FAILURE } from './action-type.util';
 
-import ConfigFormData from '../components/Providers/ConfigFormData';
+import ConfigFormData from '../components/ConfigForm/ConfigFormData';
 
 
 export const ACTION_TYPES = {

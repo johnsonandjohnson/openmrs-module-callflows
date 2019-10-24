@@ -9,13 +9,16 @@
 
 import React from 'react';
 import { connect } from 'react-redux';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Accordion } from '@openmrs/react-components';
-import { Button } from 'react-bootstrap';
 
 import AddButton from '../AddButton';
-import { reset, getConfigs, postConfigs, updateConfigForm } from '../../reducers/providers.reducer';
-import ConfigForm from './ConfigForm';
+import {
+  reset,
+  getConfigs,
+  postConfigs,
+  updateConfigForm
+} from '../../reducers/providers.reducer';
+import ConfigForm from '../ConfigForm';
 
 export class Providers extends React.Component {
 
@@ -27,7 +30,7 @@ export class Providers extends React.Component {
     //ToDo
   }
 
-  saveConfigs = () => {
+  submitConfigs = () => {
     this.props.postConfigs(this.props.configForms);
   }
 
@@ -57,7 +60,7 @@ export class Providers extends React.Component {
                   isOpen={item.isOpen}
                   localId={item.localId}
                   updateValues={this.props.updateConfigForm} 
-                  save={this.saveConfigs}/>
+                  submit={this.submitConfigs}/>
               </Accordion>
             );
           })}

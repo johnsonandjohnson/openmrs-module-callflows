@@ -106,5 +106,3 @@ export default class ConfigUI {
     return model;
   }
 }
-
-
