@@ -13,8 +13,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Accordion } from '@openmrs/react-components';
 import { Button } from 'react-bootstrap';
 
-import AddButton from './AddButton';
-import { reset, getConfigs, postConfigs, updateConfigForm } from '../reducers/providers.reducer';
+import AddButton from '../AddButton';
+import { reset, getConfigs, postConfigs, updateConfigForm } from '../../reducers/providers.reducer';
 import ConfigForm from './ConfigForm';
 
 export class Providers extends React.Component {
@@ -24,7 +24,11 @@ export class Providers extends React.Component {
   }
 
   handleAdd = () => {
-    return this.props.postConfigs();
+    //ToDo
+  }
+
+  saveConfigs = () => {
+    this.props.postConfigs(this.props.configForms);
   }
 
   render() {
@@ -52,7 +56,8 @@ export class Providers extends React.Component {
                 <ConfigForm config={item.config}
                   isOpen={item.isOpen}
                   localId={item.localId}
-                  parentUpdater={this.props.updateConfigForm} />
+                  updateValues={this.props.updateConfigForm} 
+                  save={this.saveConfigs}/>
               </Accordion>
             );
           })}

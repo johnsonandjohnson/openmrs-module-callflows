@@ -2,44 +2,63 @@ import _ from 'lodash';
 
 export default class ConfigModel {
   constructor(fetched) {
-    this.name = fetched.name;
-    this.outgoingCallUriTemplate = (!!fetched.outgoingCallUriTemplate)
-      ? fetched.outgoingCallUriTemplate
-      : null;
-    this.outgoingCallPostHeadersMap = fetched.outgoingCallPostHeadersMap
-      ? fetched.outgoingCallPostHeadersMap
-      : null;
-    this.outgoingCallPostParams = fetched.outgoingCallPostParams
-      ? fetched.outgoingCallPostParams
-      : null;
-    this.outgoingCallMethod = fetched.outgoingCallMethod
-      ? fetched.outgoingCallMethod
-      : null;
-    this.outboundCallLimit = fetched.outboundCallLimit
-      ? fetched.outboundCallLimit
-      : null;
-    this.outboundCallRetrySeconds = fetched.outboundCallRetrySeconds
-      ? fetched.outboundCallRetrySeconds
-      : null;
-    this.outboundCallRetryAttempts = fetched.outboundCallRetryAttempts
-      ? fetched.outboundCallRetryAttempts
-      : null;
-    this.callAllowed = fetched.callAllowed
-      ? fetched.callAllowed
-      : null;
-    this.authToken = fetched.authToken
-      ? fetched.authToken
-      : null;
-    this.hasAuthRequired = fetched.hasAuthRequired
-      ? fetched.hasAuthRequired
-      : null;
-    this.servicesMap = fetched.servicesMap
-      ? _.map(fetched.servicesMap, (value, prop) => ({ prop, value }))
-      : [];
-    this.testUsersMap = fetched.testUsersMap
-      ? fetched.testUsersMap
-      : null;
+    this.initDefault();
+    this.mergeWithFetched(fetched);
+  }
+
+  initDefault = () => {
+    this.name = null;
+    this.outgoingCallUriTemplate = null;
+    this.outgoingCallPostHeadersMap = {};
+    this.outgoingCallPostParams = {};
+    this.outgoingCallMethod = null;
+    this.outboundCallLimit = 0;
+    this.outboundCallRetrySeconds = 0;
+    this.outboundCallRetryAttempts = 0;
+    this.callAllowed = false;
+    this.servicesMap = {};
+    this.testUsersMap = {};
+    this.hasAuthRequired = false;
+  }
+
+  mergeWithFetched = (fetched) => {
+    if (!!fetched) {
+      if (!!fetched.name) {
+        this.name = fetched.name;
+      }
+      if (!!fetched.outgoingCallUriTemplate) {
+        this.outgoingCallUriTemplate = fetched.outgoingCallUriTemplate;
+      }
+      if (!!fetched.outgoingCallPostHeadersMap) {
+        this.outgoingCallPostHeadersMap = fetched.outgoingCallPostHeadersMap;
+      }
+      if (!!fetched.outgoingCallPostParams) {
+        this.outgoingCallPostParams = fetched.outgoingCallPostParams;
+      }
+      if (!!fetched.outgoingCallMethod) {
+        this.outgoingCallMethod = fetched.outgoingCallMethod;
+      }
+      if (!!fetched.outboundCallLimit) {
+        this.outboundCallLimit = fetched.outboundCallLimit;
+      }
+      if (!!fetched.outboundCallRetrySeconds) {
+        this.outboundCallRetrySeconds = fetched.outboundCallRetrySeconds;
+      }
+      if (!!fetched.outboundCallRetryAttempts) {
+        this.outboundCallRetryAttempts = fetched.outboundCallRetryAttempts;
+      }
+      if (!!fetched.callAllowed) {
+        this.callAllowed = fetched.callAllowed;
+      }
+      if (!!fetched.servicesMap) {
+        this.servicesMap = fetched.servicesMap;
+      }
+      if (!!fetched.testUsersMap) {
+        this.testUsersMap = fetched.testUsersMap;
+      }
+      if (!!fetched.hasAuthRequired) {
+        this.hasAuthRequired = fetched.hasAuthRequired;
+      }
+    }
   }
 }
-
-
