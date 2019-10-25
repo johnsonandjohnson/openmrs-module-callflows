@@ -23,9 +23,13 @@ import {
   postConfigs,
   updateConfigForm,
   addNewForm,
-  removeForm
+  removeForm,
+  openModal,
+  closeModal
 } from '../reducers/providers.reducer';
+import RemoveButton from './RemoveButton';
 import ConfigForm from './ConfigForm';
+import OpenMRSModal from './OpenMRSModal';
 
 export class Providers extends React.Component {
 
@@ -44,7 +48,15 @@ export class Providers extends React.Component {
   }
 
   handleRemove = (event) => {
-    this.props.removeForm(event.target.id, this.props.configForms);
+    this.props.openModal(event.target.id);
+  }
+
+  handleClose = () => {
+    this.props.closeModal();
+  }
+
+  handleConfirm = () => {
+    this.props.removeForm(this.props.toDeleteId, this.props.configForms);
   }
 
   render() {
@@ -52,6 +64,12 @@ export class Providers extends React.Component {
     const title = 'Providers';
     return (
       <div className="body-wrapper">
+        <OpenMRSModal
+          deny={this.handleClose}
+          confirm={this.handleConfirm}
+          show={this.props.showModal}
+          title="Delete Provider"
+          txt="Are you sure you want to delete this Provider?" />
         <div className="row">
           <div className="col-md-12 col-xs-12">
             <h2>{title}</h2>
@@ -60,7 +78,10 @@ export class Providers extends React.Component {
         <div className="panel-body">
           <div className="row">
             <div className="col-md-12 col-xs-12">
-              <AddButton handleAdd={this.props.addNewForm} txt={buttonLabel} buttonClass='confirm' />
+              <AddButton
+                handleAdd={this.props.addNewForm}
+                txt={buttonLabel}
+                buttonClass="confirm" />
             </div>
           </div>
           {this.props.configForms.map(item => {
@@ -78,7 +99,10 @@ export class Providers extends React.Component {
                   </Accordion>
                 </Col>
                 <Col sm={1}>
-                  <i className="medium icon-remove" id={item.localId} onClick={this.handleRemove} />
+                  <RemoveButton
+                    handleRemove={this.handleRemove}
+                    localId={item.localId}
+                    tooltip="Delete Provider" />
                 </Col>
               </Row>
             );
@@ -90,7 +114,9 @@ export class Providers extends React.Component {
 }
 
 export const mapStateToProps = state => ({
-  configForms: state.providersReducer.configForms
+  configForms: state.providersReducer.configForms,
+  showModal: state.providersReducer.showModal,
+  toDeleteId: state.providersReducer.toDeleteId
 });
 
 const mapDispatchToProps = {
@@ -99,7 +125,9 @@ const mapDispatchToProps = {
   postConfigs,
   updateConfigForm,
   addNewForm,
-  removeForm
+  removeForm,
+  openModal,
+  closeModal
 };
 
 export default connect(

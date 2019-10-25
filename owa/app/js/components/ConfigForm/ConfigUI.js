@@ -12,15 +12,15 @@ export default class ConfigUI {
   initDefault = () => {
     this.name = 'New config';
     this.outgoingCallUriTemplate = '';
-    this.outgoingCallPostHeadersMap = [];
-    this.outgoingCallPostParams = [];
+    this.outgoingCallPostHeadersMap = [ new MapEntry('', '') ];
+    this.outgoingCallPostParams = [ new MapEntry('', '') ];
     this.outgoingCallMethod = null;
     this.outboundCallLimit = 0;
     this.outboundCallRetrySeconds = 0;
     this.outboundCallRetryAttempts = 0;
     this.callAllowed = false;
     this.servicesMap = [];
-    this.testUsersMap = [];
+    this.testUsersMap = [ new MapEntry('', '') ];
     this.hasAuthRequired = false;
   }
 
@@ -32,10 +32,10 @@ export default class ConfigUI {
       if (!!configModel.outgoingCallUriTemplate) {
         this.outgoingCallUriTemplate = configModel.outgoingCallUriTemplate;
       }
-      if (!!configModel.outgoingCallPostHeadersMap) {
+      if (!_.isEmpty(configModel.outgoingCallPostHeadersMap)) {
         this.outgoingCallPostHeadersMap = MapEntry.jsonToList(configModel.outgoingCallPostHeadersMap);
       }
-      if (!!configModel.outgoingCallPostParams) {
+      if (!_.isEmpty(configModel.outgoingCallPostParams_)) {
         this.outgoingCallPostParams = MapEntry.paramsToArray(configModel.outgoingCallPostParams);
       }
       if (!!configModel.outgoingCallMethod) {
@@ -53,10 +53,10 @@ export default class ConfigUI {
       if (!!configModel.callAllowed) {
         this.callAllowed = configModel.callAllowed;
       }
-      if (!!configModel.servicesMap) {
+      if (!_.isEmpty(configModel.servicesMap)) {
         this.servicesMap = MapEntry.jsonToList(configModel.servicesMap);
       }
-      if (!!configModel.testUsersMap) {
+      if (!_.isEmpty(configModel.testUsersMap)) {
         this.testUsersMap = MapEntry.jsonToList(configModel.testUsersMap);
       }
       if (!!configModel.hasAuthRequired) {

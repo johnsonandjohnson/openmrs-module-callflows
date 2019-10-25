@@ -8,6 +8,7 @@
  */
 
 import React from 'react';
+import { Col, Row } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 
@@ -15,6 +16,8 @@ import MapField, {
   columnSizesType,
   defaultColumnSizes
 } from './MapField';
+import AddButton from '../AddButton';
+import MapEntry from '../../shared/utils/MapEntry';
 
 const MapFields = (props) => {
 
@@ -24,7 +27,28 @@ const MapFields = (props) => {
     const entryId = _.split(input.id, '_')[1];
     let entries = getUpdatedEntry(input, entryId);
     props.updateValues(fieldName, entries);
-  }
+  };
+
+  const handleAdd = () => {
+    props.entries.push(new MapEntry('', ''));
+    props.updateValues(fieldName, entries);
+  };
+
+  const handleRemove = (event) => {
+    const input = event.target;
+    _.pull(props.entries, find(input.id));
+    props.updateValues(fieldName, entries);
+  };
+
+  const find = (id) => {
+    let result = null;
+    props.entries.map(entry => {
+      if (entry.id === id) {
+        result = entry;
+      }
+    });
+    return result;
+  };
 
   const getUpdatedEntry = (input, entryId) => {
     return props.entries.map(entry => {
@@ -33,9 +57,10 @@ const MapFields = (props) => {
       }
       return entry;
     });
-  }
+  };
 
-  const { fieldName, entries, columnSizes, keyLabel, valueLabel } = props;
+  const { fieldName, entries, columnSizes,
+    keyLabel, valueLabel, addLabel } = props;
   return (
     <div>
       {entries.map(entry => {
@@ -43,19 +68,26 @@ const MapFields = (props) => {
           key={entry.id}
           fieldName={fieldName}
           handleChange={handleChange}
+          handleRemove={handleRemove}
           entry={entry}
           columnSizes={columnSizes}
           keyLabel={keyLabel}
           valueLabel={valueLabel} />;
       })}
+      <Row>
+        <Col sm={columnSizes.key}>
+          <AddButton handleAdd={handleAdd} txt={addLabel} />
+        </Col>
+      </Row>
     </div>
   );
-}
+};
 
 MapFields.defaultProps = {
   entries: [],
-  columnSizes: defaultColumnSizes
-}
+  columnSizes: defaultColumnSizes,
+  addLabel: 'Add more'
+};
 
 MapFields.propTypes = {
   fieldName: PropTypes.string.isRequired,
@@ -63,7 +95,8 @@ MapFields.propTypes = {
   entries: PropTypes.array,
   columnSizes: columnSizesType,
   keyLabel: PropTypes.string,
-  valueLabel: PropTypes.string
+  valueLabel: PropTypes.string,
+  addLabel: PropTypes.string
 };
 
 export default MapFields;
