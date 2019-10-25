@@ -78,7 +78,10 @@ export class Providers extends React.Component {
         <div className="panel-body">
           <div className="row">
             <div className="col-md-12 col-xs-12">
-              <AddButton handleAdd={this.props.addNewForm} txt={buttonLabel} buttonClass='confirm' />
+              <AddButton
+                handleAdd={this.props.addNewForm}
+                txt={buttonLabel}
+                buttonClass="confirm" />
             </div>
           </div>
           {this.props.configForms.map(item => {

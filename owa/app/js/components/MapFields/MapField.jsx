@@ -19,14 +19,18 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 
 import MapEntry from '../../shared/utils/MapEntry';
+import RemoveButton from '../RemoveButton';
 
 const MapField = (props) => {
   const { fieldName, handleChange, keyLabel, valueLabel, entry, columnSizes } = props;
   return (
     <FormGroup controlId={`${fieldName}_${entry.id}`}>
       <Row>
-        <Col componentClass={HelpBlock} sm={4}>{keyLabel}</Col>
-        <Col componentClass={HelpBlock} sm={6}>{valueLabel}</Col>
+        <Col componentClass={HelpBlock} sm={columnSizes.key}>{keyLabel}</Col>
+        <Col componentClass={HelpBlock} sm={columnSizes.value}>{valueLabel}</Col>
+        {(columnSizes.button === 0)
+          ? null
+          : <Col componentClass={HelpBlock} sm={columnSizes.button} />}
       </Row>
       <Row>
         <Col sm={columnSizes.key}>
@@ -41,18 +45,26 @@ const MapField = (props) => {
             value={entry.value}
             onChange={handleChange} />
         </Col>
+        {(columnSizes.button === 0)
+          ? null
+          : <Col sm={columnSizes.button}>
+            <RemoveButton handleRemove={props.handleRemove} localId={entry.id} />
+          </Col>}
       </Row>
-    </FormGroup>);
+    </FormGroup>
+  );
 };
 
 export const defaultColumnSizes = {
   key: 4,
-  value: 6
+  value: 7,
+  button: 1
 };
 
 export const columnSizesType = PropTypes.shape({
   key: PropTypes.number,
-  value: PropTypes.number
+  value: PropTypes.number,
+  button: PropTypes.number
 });
 
 MapField.defaultProps = {
@@ -65,6 +77,7 @@ MapField.defaultProps = {
 MapField.propTypes = {
   fieldName: PropTypes.string.isRequired,
   handleChange: PropTypes.func.isRequired,
+  handleRemove: PropTypes.func.isRequired,
   keyLabel: PropTypes.string,
   valueLabel: PropTypes.string,
   entry: PropTypes.instanceOf(MapEntry),

@@ -22,11 +22,9 @@ import {
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 
-import AddButton from '../AddButton';
 import ConfigUI from './ConfigUI';
 import MapFields from '../MapFields';
 import ParamsField from '../ParamsField';
-
 
 const ConfigForm = (props) => {
 
@@ -88,11 +86,6 @@ const ConfigForm = (props) => {
           entries={props.config.outgoingCallPostHeadersMap}
           fieldName="outgoingCallPostHeadersMap"
           updateValues={handleArrayChange} />
-        <Row>
-          <Col sm={2}>
-            <AddButton handleAdd={handleAdd} txt='Add more' />
-          </Col>
-        </Row>
       </FormGroup>
       <FormGroup controlId={`outgoingCallPostParams_${props.localId}`}>
         <ControlLabel><b>POST parameters</b></ControlLabel>
@@ -101,11 +94,6 @@ const ConfigForm = (props) => {
           entries={props.config.outgoingCallPostParams}
           fieldName="outgoingCallPostParams"
           updateValues={handleArrayChange} />
-        <Row>
-          <Col sm={2}>
-            <AddButton handleAdd={handleAdd} txt='Add more' />
-          </Col>
-        </Row>
       </FormGroup>
       <FormGroup controlId={`queue_${props.localId}`}>
         <ControlLabel><b>Outbound Call Queue Configuration</b></ControlLabel>
@@ -156,11 +144,6 @@ const ConfigForm = (props) => {
           updateValues={handleArrayChange}
           keyLabel="Phone number"
           valueLabel="Outbound URL" />
-        <Row>
-          <Col sm={2}>
-            <AddButton handleAdd={handleAdd} txt='Add more' />
-          </Col>
-        </Row>
       </FormGroup>
       <Button className="btn confirm btn-xs" onClick={props.submit}>SAVE</Button>
     </Form>
@@ -174,7 +157,5 @@ ConfigForm.propTypes = {
   updateValues: PropTypes.func.isRequired,
   submit: PropTypes.func.isRequired
 };
-
-
 
 export default ConfigForm;
