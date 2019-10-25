@@ -11,9 +11,12 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Accordion } from '@openmrs/react-components';
-import { Button } from 'react-bootstrap';
+import { Button, Col, Row } from 'react-bootstrap';
 
-import {reset, getRenderers, createRenderer, addNew, changeRenderer, updateRenderer, deleteRendererFromBE, deleteRendererFromFE} from '../reducers/renderersReducer';
+import {reset, getRenderers, createRenderer, addNew, changeRenderer, 
+        updateRenderer, deleteRendererFromBE, deleteRendererFromFE,
+        removeForm
+      } from '../reducers/renderersReducer';
 import Renderer from './Renderer';
 
 export class Renderers extends React.Component {
@@ -38,6 +41,7 @@ export class Renderers extends React.Component {
     this.focusDiv();
   }
 
+
   getOffsetTop(element) {
     let offsetTop = 0;
     while(element) {
@@ -55,6 +59,10 @@ export class Renderers extends React.Component {
     }
   }
 
+  handleRemove = (event) => {
+    this.props.removeForm(event.target.id, this.props.renderers);
+  }
+
 
   render() {
     return (
@@ -64,6 +72,8 @@ export class Renderers extends React.Component {
         
           {this.props.renderers.map(item => {
           return (
+            <Row key={item.uiLocalUuid}>
+              <Col sm={11}>
             <Accordion title={`Renderer: ${item.name ? item.name : 'not saved'}`} border={true} open={item.isOpen} key={item.uiLocalUuid} >
               <div ref={(div) => {
                 if (item.isOpen) {
@@ -79,6 +89,11 @@ export class Renderers extends React.Component {
                  />
               </div>
             </Accordion>
+             </Col>
+             <Col sm={1}>
+               <i className="medium icon-remove" id={item.uiLocalUuid} onClick={this.handleRemove} />
+             </Col>
+             </Row>
           );
         })}
         </div>
@@ -98,7 +113,8 @@ const mapDispatchToProps = {
   changeRenderer,
   updateRenderer,
   deleteRendererFromBE,
-  deleteRendererFromFE
+  deleteRendererFromFE,
+  removeForm
 };
 
 export default connect(

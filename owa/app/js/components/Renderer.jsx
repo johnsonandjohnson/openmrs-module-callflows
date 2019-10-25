@@ -23,7 +23,11 @@ const Renderer = (props) => {
     } else {
       props.createRenderer(props.renderer);
     }
-  };
+  }; 
+  //  const handleSubmit = (event) => {
+  //   event.preventDefault();
+  //     props.createRenderer(props.renderer);
+  // };
 
   const handleDelete = (event) => {
     event.preventDefault();

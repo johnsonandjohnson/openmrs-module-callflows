@@ -9,12 +9,15 @@ export const ACTION_TYPES = {
     ADD_NEW_EMPTY: 'rendererReducer/ADD_NEW_EMPTY',
     UPDATE_RENDERER_AFTER_CHANGE: 'rendererReducer/UPDATE_RENDERER_AFTER_CHANGE',
     UPDATE_RENDERER: 'rendererReducer/UPDATE_RENDERER',
-    DELETE_FROM_FRONT_RENDERER: 'rendererReducer/DELETE_FROM_FRONT_RENDERER'
+    DELETE_FROM_FRONT_RENDERER: 'rendererReducer/DELETE_FROM_FRONT_RENDERER',
+    REMOVE_FORM: 'rendererReducer/REMOVE_FORM'
+
   };
 
   const initialState = {
       renderers: []
   };
+
 
 export default (state = initialState, action) => {
     switch (action.type) {
@@ -27,11 +30,20 @@ export default (state = initialState, action) => {
                 ...state
             };
         case SUCCESS(ACTION_TYPES.CREATE_RENDERER):
+                // const data = [
+                //     {
+                //         name: "temp",
+                //         mimeType: "temp2",
+                //         template: "temp3"
+                //     }
+                // ];
+                // let tempRenderers = [];
           let newValue = new RendererModel(action.payload.data, action.isOpen);
           newValue.uiLocalUuid = action.uiLocalUuid;
             return {
                 ...state,
-                renderers: replaceRenderer(state.renderers, newValue)
+                renderers: replaceRenderer(state.renderers, newValue),
+                // tempRenderers: renderers.concat(data)
             };
         // case SUCCESS(ACTION_TYPES.CREATE_RENDERER):
         //     return {
@@ -85,6 +97,14 @@ export default (state = initialState, action) => {
                 ...state,
                 renderers: replaceRenderer(state.renderers, action.payload)
             }
+            
+        case ACTION_TYPES.REMOVE_FORM: {
+            return {
+                ...state,
+                renderers: action.payload
+            };
+        }
+
         case ACTION_TYPES.RESET: {
             return {
                 ...state,
@@ -141,6 +161,30 @@ export const createRenderer = (rendererRequest) => async (dispatch) => {
             template: rendererRequest.template
         }
     ];
+    
+//   const data = [
+//         {
+//             name: 'firstA',
+//             mimeType: 'secondA',
+//             template: 'thirdA'
+//         },
+//         {
+//             name: 'dasd',
+//             mimeType: 'secondA',
+//             template: 'thirdA'
+//         },
+//         {
+//             name: 'firssdastA',
+//             mimeType: 'secondA',
+//             template: 'thirdA'
+//         },
+//         {
+//             name: rendererRequest.name,
+//             mimeType: rendererRequest.mimeType,
+//             template: rendererRequest.template
+//         }
+//     ];
+
     await dispatch({
         type: ACTION_TYPES.CREATE_RENDERER,
         isOpen: rendererRequest.isOpen,
@@ -158,21 +202,13 @@ export const deleteRendererFromFE = (rendererRequest) => async (dispatch) => {
     });
 };
 
-
-// export const createRenderer = () => async (dispatch) => {
-//     const requestUrl = callflowsPath + '/renderers';
-//     const data = [
-//         {
-//             name: 'firstA',
-//             mimeType: 'secondA',
-//             template: 'thirdA'
-//         }
-//     ];
-//     await dispatch({
-//         type: ACTION_TYPES.CREATE_RENDERER,
-//         payload: axiosInstance.post(requestUrl, data)
-//     });
-// };
+export const removeForm = (id, rendererForms) => {
+    const payload = _.filter(rendererForms, form => { return form.uiLocalUuid !== id });
+    return {
+        type: ACTION_TYPES.REMOVE_FORM,
+        payload
+    }
+};
 
 export const updateRenderer = (rendererRequest) => async (dispatch) => {
     const requestUrl = callflowsPath + '/renderers';
