@@ -1,56 +1,38 @@
 import axiosInstance from '../config/axios';
 import { SUCCESS, REQUEST, FAILURE } from './action-type.util';
-import { RendererModel } from '../shared/model/Renderer.model';
+import _ from 'lodash';
+
+import RendererFormData from '../components/RendererForm/RendererFormData';
 
 export const ACTION_TYPES = {
     RESET: 'renderersReducer/RESET',
+    UPDATE_RENDERER_FORMS: 'renderersReducer/UPDATE_RENDERER_FORMS',
     FETCH_RENDERERS: 'renderersReducer/FETCH_RENDERERS',
-    CREATE_RENDERER: 'renderersReducer/CREATE_RENDERER',
-    ADD_NEW_EMPTY: 'rendererReducer/ADD_NEW_EMPTY',
-    UPDATE_RENDERER_AFTER_CHANGE: 'rendererReducer/UPDATE_RENDERER_AFTER_CHANGE',
-    UPDATE_RENDERER: 'rendererReducer/UPDATE_RENDERER',
-    DELETE_FROM_FRONT_RENDERER: 'rendererReducer/DELETE_FROM_FRONT_RENDERER',
-    REMOVE_FORM: 'rendererReducer/REMOVE_FORM'
+    POST_RENDERER: 'renderersReducer/POST_RENDERER',
+    ADD_NEW_FORM: 'renderersReducer/ADD_NEW_FORM',
+    REMOVE_FORM: 'renderersReducer/REMOVE_FORM'
+};
 
-  };
-
-  const initialState = {
-      renderers: []
-  };
-
+const initialState = {
+    rendererForms: []
+};
 
 export default (state = initialState, action) => {
     switch (action.type) {
-        case REQUEST(ACTION_TYPES.CREATE_RENDERER):
+        case REQUEST(ACTION_TYPES.POST_RENDERER):
             return {
                 ...state
             };
-        case FAILURE(ACTION_TYPES.CREATE_RENDERER):
+        case FAILURE(ACTION_TYPES.POST_RENDERER):
             return {
                 ...state
-            };
-        case SUCCESS(ACTION_TYPES.CREATE_RENDERER):
-                // const data = [
-                //     {
-                //         name: "temp",
-                //         mimeType: "temp2",
-                //         template: "temp3"
-                //     }
-                // ];
-                // let tempRenderers = [];
-          let newValue = new RendererModel(action.payload.data, action.isOpen);
-          newValue.uiLocalUuid = action.uiLocalUuid;
+            }
+        case SUCCESS(ACTION_TYPES.POST_RENDERER):
             return {
                 ...state,
-                renderers: replaceRenderer(state.renderers, newValue),
-                // tempRenderers: renderers.concat(data)
+                rendererForms: action.payload.data
             };
-        // case SUCCESS(ACTION_TYPES.CREATE_RENDERER):
-        //     return {
-        //         ...state,
-        //         renderers: action.payload.data
-        //     }
-
+        
 
         case REQUEST(ACTION_TYPES.FETCH_RENDERERS):
             return {
@@ -63,52 +45,35 @@ export default (state = initialState, action) => {
         case SUCCESS(ACTION_TYPES.FETCH_RENDERERS):
             return {
                 ...state,
-                renderers: action.payload.data.map((rendererResponse) => {return new RendererModel(rendererResponse, false)})
+                rendererForms: action.payload.data.map((fetched) => {
+                    return new RendererFormData(fetched);
+                })
             };
 
-
-        case REQUEST(ACTION_TYPES.UPDATE_RENDERER):
-            return {
-                ...state
-            }     
-        case FAILURE(ACTION_TYPES.UPDATE_RENDERER):
-            return {
-                ...state
-            }   
-        case SUCCESS(ACTION_TYPES.UPDATE_RENDERER):
-            return {
-                ...state
-            }
-
-        case ACTION_TYPES.ADD_NEW_EMPTY:
+        case ACTION_TYPES.UPDATE_RENDERER_FORMS: {
             return {
                 ...state,
-                renderers: state.renderers.concat(new RendererModel(null, true))
-            }
-
-        case ACTION_TYPES.DELETE_FROM_FRONT_RENDERER:
-            return {
-                ...state,
-                renderers: removeFromRenderers(state.renderers, action.uiLocalUuid)
-            }    
-            
-        case ACTION_TYPES.UPDATE_RENDERER_AFTER_CHANGE:
-            return {
-                ...state,
-                renderers: replaceRenderer(state.renderers, action.payload)
-            }
-            
-        case ACTION_TYPES.REMOVE_FORM: {
-            return {
-                ...state,
-                renderers: action.payload
+                rendererForms: updateRendererForms(state.rendererForms, action.payload)
             };
         }
-
+        case ACTION_TYPES.ADD_NEW_FORM: {
+            let rendererForms = Array.from(state.rendererForms);
+            rendererForms.push(new RendererFormData());
+            return {
+                ...state,
+                rendererForms
+            };
+        }
+        case ACTION_TYPES.REMOVE_FORM: {
+            return {
+                ...state, 
+                rendererForms: action.payload
+            };
+        }
         case ACTION_TYPES.RESET: {
             return {
                 ...state,
-                renderers: []
+                rendererForms: []
             };
         }
         default:
@@ -116,33 +81,48 @@ export default (state = initialState, action) => {
     }
 };
 
-const callflowsPath = 'ws/callflows';
-
-const replaceRenderer = (renderers, changedRenderer) => {
-    return renderers.map((item) => {
-        if (item.uiLocalUuid === changedRenderer.uiLocalUuid) {
-            item = changedRenderer;
+const updateRendererForms = (rendererForms, updated) => {
+    return rendererForms.map((item) => {
+        if (item.localId === updated.localId) {
+            item = updated;
         }
         return item;
     });
 }
 
-const removeFromRenderers = (renderers, uiLocalUuid) => {
-    return renderers.filter((item) => item.uiLocalUuid !== uiLocalUuid);
-}
+export const updateRendererForm = (updated) => ({
+    type: ACTION_TYPES.UPDATE_RENDERER_FORMS,
+    payload: updated
+});
+
+export const addNewForm = () => ({
+    type: ACTION_TYPES.ADD_NEW_FORM
+});
+
+export const removeForm = (id, rendererForms) => {
+    const payload = _.filter(rendererForms, form => { return form.localId !== id});
+    return {
+        type: ACTION_TYPES.REMOVE_FORM,
+        payload
+    }
+};
 
 export const reset = () => ({
-    type: ACTION_TYPES.RESET 
+    type: ACTION_TYPES.RESET
 });
 
-export const addNew = () => ({
-    type: ACTION_TYPES.ADD_NEW_EMPTY
-});
+const callflowsPath = 'ws/callflows';
 
-export const changeRenderer = (newRenderer) => ({
-    type: ACTION_TYPES.UPDATE_RENDERER_AFTER_CHANGE,
-    payload: newRenderer
-});
+export const postRenderers = (rendererForms) => async (dispatch) => {
+    const requestUrl = callflowsPath + '/renderers';
+    let data = rendererForms.map((form) => {
+        return form.renderer.getModel();
+    });
+    await dispatch({
+        type: ACTION_TYPES.FETCH_RENDERERS,
+        payload: axiosInstance.post(requestUrl, data)
+    });
+};
 
 export const getRenderers = () => async (dispatch) => {
     const requestUrl = callflowsPath + '/renderers';
@@ -151,80 +131,3 @@ export const getRenderers = () => async (dispatch) => {
         payload: axiosInstance.get(requestUrl)
     });
 };
-
-export const createRenderer = (rendererRequest) => async (dispatch) => {
-    const requestUrl = callflowsPath + '/renderers';
-    const data = [
-        {
-            name: rendererRequest.name,
-            mimeType: rendererRequest.mimeType,
-            template: rendererRequest.template
-        }
-    ];
-    
-//   const data = [
-//         {
-//             name: 'firstA',
-//             mimeType: 'secondA',
-//             template: 'thirdA'
-//         },
-//         {
-//             name: 'dasd',
-//             mimeType: 'secondA',
-//             template: 'thirdA'
-//         },
-//         {
-//             name: 'firssdastA',
-//             mimeType: 'secondA',
-//             template: 'thirdA'
-//         },
-//         {
-//             name: rendererRequest.name,
-//             mimeType: rendererRequest.mimeType,
-//             template: rendererRequest.template
-//         }
-//     ];
-
-    await dispatch({
-        type: ACTION_TYPES.CREATE_RENDERER,
-        isOpen: rendererRequest.isOpen,
-        uiLocalUuid: rendererRequest.uiLocalUuid,
-        //payload: axiosInstance.post(requestUrl, rendererRequest.toRequest())
-        payload: axiosInstance.post(requestUrl, data)
-    });
-};
-
-
-export const deleteRendererFromFE = (rendererRequest) => async (dispatch) => {
-    await dispatch({
-        type: ACTION_TYPES.DELETE_FROM_FRONT_RENDERER,
-        uiLocalUuid: rendererRequest.uiLocalUuid
-    });
-};
-
-export const removeForm = (id, rendererForms) => {
-    const payload = _.filter(rendererForms, form => { return form.uiLocalUuid !== id });
-    return {
-        type: ACTION_TYPES.REMOVE_FORM,
-        payload
-    }
-};
-
-export const updateRenderer = (rendererRequest) => async (dispatch) => {
-    const requestUrl = callflowsPath + '/renderers';
-    const data = [
-        {
-            name: rendererRequest.name,
-            mimeType: rendererRequest.mimeType,
-            template: rendererRequest.template
-        }
-    ];
-    await dispatch({
-        type: ACTION_TYPES.CREATE_RENDERER,
-        isOpen: rendererRequest.isOpen,
-        uiLocalUuid: rendererRequest.uiLocalUuid,
-        //payload: axiosInstance.post(requestUrl, rendererRequest.toRequest())
-        payload: axiosInstance.post(requestUrl, data)
-    });
-};
-    

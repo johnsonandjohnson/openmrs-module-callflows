@@ -11,7 +11,6 @@ import { Route, Switch } from 'react-router-dom';
 import { Header } from '@openmrs/react-components';
 
 import App from './components/App';
-import Providers from './components/Providers';
 import Renderers from './components/Renderers';
 import BreadCrumb from './components/BreadCrumb';
 
@@ -21,7 +20,6 @@ export default (store) => (
     <BreadCrumb />
     <Switch>
       <Route exact path="/" component={App} />
-      <Route path="/providers" component={Providers} />
       <Route path="/renderers" component={Renderers} />
     </Switch>
   </div>);

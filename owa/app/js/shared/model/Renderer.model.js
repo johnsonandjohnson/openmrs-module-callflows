@@ -1,20 +1,29 @@
-import uuid from "uuid";
+import _ from 'lodash';
 
-export class RendererModel {
-    constructor(rendererResponse, isOpen) {
-        this.uiLocalUuid = uuid.v4();
-        this.id = rendererResponse ? rendererResponse.id : null;
-        this.name = rendererResponse && rendererResponse.name ? rendererResponse.name : '';
-        this.mimeType = rendererResponse && rendererResponse.mimeType ? rendererResponse.mimeType : '';
-        this.template = rendererResponse && rendererResponse.template ? rendererResponse.template : '';
-        this.isOpen = isOpen;
+export default class RendererModel {
+    constructor(fetched) {
+        this.initDefault();
+        this.mergeWithFetched(fetched);
     }
 
-    toRequest() {
-        return({
-            name: this.name,
-            mimeType: this.mimeType, 
-            template: this.template
-        });
+
+initDefault = () => {
+    this.name = null;
+    this.mimeType = null;
+    this.template = null;
+}
+
+mergeWithFetched = (fetched) => {
+        if (!!fetched) {
+            if (!!fetched.name) {
+                    this.name = fetched.name;
+            }
+            if (!!fetched.mimeType) {
+                    this.mimeType = fetched.mimeType;
+            }
+            if (!!fetched.template) {
+                    this.template = fetched.template;
+            }
+        }
     }
 }
