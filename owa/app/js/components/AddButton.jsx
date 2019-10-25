@@ -14,17 +14,22 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 
 const AddButton = (props) => {
-  const { handleAdd, txt } = props;
+  const { handleAdd, txt, buttonClass } = props;
   return (
-    <Button className="btn confirm btn-xs" onClick={handleAdd} >
-      <FontAwesomeIcon  size="1x" icon={['fas', 'plus']} />
-      { (!!txt) ? ' ' + txt : null }
-  </Button>);
+    <Button className={buttonClass} onClick={handleAdd} >
+      <FontAwesomeIcon size="1x" icon={['fas', 'plus']} />
+      {(txt === null) ? null : ' ' + txt}
+    </Button>);
 }
 
+AddButton.defaultProps = {
+  buttonClass: 'button',
+  txt: null
+}
 
 AddButton.propTypes = {
   handleAdd: PropTypes.func.isRequired,
+  buttonClass: PropTypes.string,
   txt: PropTypes.string
 };
 

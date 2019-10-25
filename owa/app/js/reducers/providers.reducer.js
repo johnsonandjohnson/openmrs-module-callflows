@@ -1,14 +1,20 @@
 import axiosInstance from '../config/axios';
 import { SUCCESS, REQUEST, FAILURE } from './action-type.util';
+import _ from 'lodash';
+
+import ConfigFormData from '../components/ConfigForm/ConfigFormData';
 
 export const ACTION_TYPES = {
   RESET: 'providersReducer/RESET',
+  UPDATE_CONFIG_FORMS: 'providersReducer/UPDATE_CONFIG_FORMS',
   FETCH_CONFIGS: 'providersReducer/FETCH_CONFIGS',
-  POST_CONFIG: 'providersReducer/POST_CONFIG'
+  POST_CONFIG: 'providersReducer/POST_CONFIG',
+  ADD_NEW_FORM: 'providersReducer/ADD_NEW_FORM',
+  REMOVE_FORM: 'providersReducer/REMOVE_FORM'
 };
 
 const initialState = {
-  configs: []
+  configForms: []
 };
 
 export default (state = initialState, action) => {
@@ -24,7 +30,7 @@ export default (state = initialState, action) => {
     case SUCCESS(ACTION_TYPES.POST_CONFIG):
       return {
         ...state,
-        configs: action.payload.data
+        configForms: action.payload.data
       };
     case REQUEST(ACTION_TYPES.FETCH_CONFIGS):
       return {
@@ -37,12 +43,34 @@ export default (state = initialState, action) => {
     case SUCCESS(ACTION_TYPES.FETCH_CONFIGS):
       return {
         ...state,
-        configs: action.payload.data
+        configForms: action.payload.data.map((fetched) => {
+          return new ConfigFormData(fetched);
+        })
       };
+    case ACTION_TYPES.UPDATE_CONFIG_FORMS: {
+      return {
+        ...state,
+        configForms: updateConfigForms(state.configForms, action.payload)
+      };
+    }
+    case ACTION_TYPES.ADD_NEW_FORM: {
+      let configForms = Array.from(state.configForms);
+      configForms.push(new ConfigFormData());
+      return {
+        ...state,
+        configForms
+      };
+    }
+    case ACTION_TYPES.REMOVE_FORM: {
+      return {
+        ...state,
+        configForms: action.payload
+      };
+    }
     case ACTION_TYPES.RESET: {
       return {
         ...state,
-        configs: []
+        configForms: []
       };
     }
     default:
@@ -50,30 +78,43 @@ export default (state = initialState, action) => {
   }
 };
 
-const callflowsPath = 'ws/callflows';
+const updateConfigForms = (configForms, updated) => {
+  return configForms.map((item) => {
+    if (item.localId === updated.localId) {
+      item = updated;
+    }
+    return item;
+  });
+}
+
+export const updateConfigForm = (updated) => ({
+  type: ACTION_TYPES.UPDATE_CONFIG_FORMS,
+  payload: updated
+});
+
+export const addNewForm = () => ({
+  type: ACTION_TYPES.ADD_NEW_FORM
+});
+
+export const removeForm = (id, configForms) => {
+  const payload = _.filter(configForms, form => { return form.localId !== id });
+  return {
+    type: ACTION_TYPES.REMOVE_FORM,
+    payload
+  }
+};
 
 export const reset = () => ({
   type: ACTION_TYPES.RESET
 });
 
-export const postConfig = () => async (dispatch) => {
+const callflowsPath = 'ws/callflows';
+
+export const postConfigs = (configForms) => async (dispatch) => {
   const requestUrl = callflowsPath + '/configs';
-  const data = [
-    {
-    name: 'test1',
-    outgoingCallMethod: 'GET',
-    outgoingCallPostHeadersMap: {},
-    outgoingCallPostParams: '',
-    outgoingCallUriTemplate: '',
-    servicesMap: {},
-    outboundCallLimit: 0,
-    outboundCallRetryAttempts: 0,
-    outboundCallRetrySeconds: 0,
-    callAllowed: true,
-    testUsersMap: {},
-    hasAuthRequired: false
-  }
-]; // ToDo add real data data
+  let data = configForms.map((form) => {
+    return form.config.getModel();
+  });
   await dispatch({
     type: ACTION_TYPES.FETCH_CONFIGS,
     payload: axiosInstance.post(requestUrl, data)

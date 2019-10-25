@@ -9,17 +9,42 @@
 
 import React from 'react';
 import { connect } from 'react-redux';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  Col,
+  Row
+} from 'react-bootstrap';
 import { Accordion } from '@openmrs/react-components';
-import { Button } from 'react-bootstrap';
+import _ from 'lodash';
 
 import AddButton from './AddButton';
-import { reset, getConfigs, postConfig } from '../reducers/providers.reducer';
+import {
+  reset,
+  getConfigs,
+  postConfigs,
+  updateConfigForm,
+  addNewForm,
+  removeForm
+} from '../reducers/providers.reducer';
+import ConfigForm from './ConfigForm';
 
 export class Providers extends React.Component {
 
-  handleAdd = () => {
-    return null;
+  componentDidMount = () => {
+    this.props.getConfigs();
+  }
+
+  componentDidUpdate = (prev) => {
+    if (prev.configForms.length > this.props.configForms.length) {
+      this.props.postConfigs(this.props.configForms);
+    }
+  }
+
+  submitConfigs = () => {
+    this.props.postConfigs(this.props.configForms);
+  }
+
+  handleRemove = (event) => {
+    this.props.removeForm(event.target.id, this.props.configForms);
   }
 
   render() {
@@ -32,29 +57,49 @@ export class Providers extends React.Component {
             <h2>{title}</h2>
           </div>
         </div>
-        <div className="row">
-          <AddButton handleAdd={this.handleAdd} txt={buttonLabel} />
-        </div>
         <div className="panel-body">
-          <Accordion title="test" border="true">
-            <div>form</div>
-          </Accordion>
+          <div className="row">
+            <div className="col-md-12 col-xs-12">
+              <AddButton handleAdd={this.props.addNewForm} txt={buttonLabel} buttonClass='confirm' />
+            </div>
+          </div>
+          {this.props.configForms.map(item => {
+            return (
+              <Row key={item.localId}>
+                <Col sm={11}>
+                  <Accordion title={item.config.name}
+                    border={true}
+                    open={item.isOpen}>
+                    <ConfigForm config={item.config}
+                      isOpen={item.isOpen}
+                      localId={item.localId}
+                      updateValues={this.props.updateConfigForm}
+                      submit={this.submitConfigs} />
+                  </Accordion>
+                </Col>
+                <Col sm={1}>
+                  <i className="medium icon-remove" id={item.localId} onClick={this.handleRemove} />
+                </Col>
+              </Row>
+            );
+          })}
         </div>
-        <Button className="btn cancel btn-xs" onClick={this.props.reset} >CANCEL</Button>
-        <Button className="btn confirm btn-xs" onClick={this.props.postConfig} >SAVE</Button>
       </div>
     );
   }
 }
 
 export const mapStateToProps = state => ({
-  configs: state.providersReducer.configs
+  configForms: state.providersReducer.configForms
 });
 
 const mapDispatchToProps = {
   reset,
   getConfigs,
-  postConfig
+  postConfigs,
+  updateConfigForm,
+  addNewForm,
+  removeForm
 };
 
 export default connect(
