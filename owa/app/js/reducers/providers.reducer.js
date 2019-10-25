@@ -4,7 +4,6 @@ import _ from 'lodash';
 
 import ConfigFormData from '../components/ConfigForm/ConfigFormData';
 
-
 export const ACTION_TYPES = {
   RESET: 'providersReducer/RESET',
   UPDATE_CONFIG_FORMS: 'providersReducer/UPDATE_CONFIG_FORMS',
@@ -44,9 +43,9 @@ export default (state = initialState, action) => {
     case SUCCESS(ACTION_TYPES.FETCH_CONFIGS):
       return {
         ...state,
-        configForms: action.payload.data.map((fetched) => { 
+        configForms: action.payload.data.map((fetched) => {
           return new ConfigFormData(fetched);
-         })
+        })
       };
     case ACTION_TYPES.UPDATE_CONFIG_FORMS: {
       return {

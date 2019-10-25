@@ -46,17 +46,9 @@ const ConfigForm = (props) => {
   };
 
   const handleDelete = (event) => {
-    //ToDo
   };
 
-  const handleAddService = () => {
-    props.config.servicesMap.push({ key: '', value: '' });
-    //handleArrayChange
-  };
-
-  const handleAddTester = () => {
-    props.config.testUsersMap.push({ key: '', value: '' });
-    //handleArrayChange
+  const handleAdd = () => {
   }
 
   return (
@@ -98,7 +90,7 @@ const ConfigForm = (props) => {
           updateValues={handleArrayChange} />
         <Row>
           <Col sm={2}>
-            <AddButton handleAdd={handleAddService} txt='Add more' />
+            <AddButton handleAdd={handleAdd} txt='Add more' />
           </Col>
         </Row>
       </FormGroup>
@@ -111,7 +103,7 @@ const ConfigForm = (props) => {
           updateValues={handleArrayChange} />
         <Row>
           <Col sm={2}>
-            <AddButton handleAdd={handleAddService} txt='Add more' />
+            <AddButton handleAdd={handleAdd} txt='Add more' />
           </Col>
         </Row>
       </FormGroup>
@@ -166,7 +158,7 @@ const ConfigForm = (props) => {
           valueLabel="Outbound URL" />
         <Row>
           <Col sm={2}>
-            <AddButton handleAdd={handleAddTester} txt='Add more' />
+            <AddButton handleAdd={handleAdd} txt='Add more' />
           </Col>
         </Row>
       </FormGroup>

@@ -17,9 +17,9 @@ const AddButton = (props) => {
   const { handleAdd, txt, buttonClass } = props;
   return (
     <Button className={buttonClass} onClick={handleAdd} >
-      <FontAwesomeIcon  size="1x" icon={['fas', 'plus']} />
-      { (txt === null) ? null :  ' ' + txt }
-  </Button>);
+      <FontAwesomeIcon size="1x" icon={['fas', 'plus']} />
+      {(txt === null) ? null : ' ' + txt}
+    </Button>);
 }
 
 AddButton.defaultProps = {

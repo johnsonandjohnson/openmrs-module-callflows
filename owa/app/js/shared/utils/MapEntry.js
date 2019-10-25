@@ -3,6 +3,8 @@ import uuid from 'uuid';
 
 const KEY = 'key';
 const VALUE = 'value';
+const EQUAL_SIGN = '=';
+const AMPERSAND  = '&';
 
 export default class MapEntry {
   constructor(key, value, id) {
@@ -23,15 +25,15 @@ export default class MapEntry {
   }
 
   static paramsToArray = (str) => {
-    const params = _.split(str, '&').map(param => { return _.split(param, '=') });
+    const params = _.split(str, AMPERSAND).map(param => { return _.split(param, EQUAL_SIGN) });
     return params.map(item => { return new MapEntry(item[0], item[1]); });
   }
 
   static arrayToParams = (arr) => {
     let params = arr.map(entry => {
-      return entry.key + '=' + entry.value;
+      return entry.key + EQUAL_SIGN + entry.value;
     });
-    return _.join(params, '&');
+    return _.join(params, AMPERSAND);
   }
 
   toString = () => {

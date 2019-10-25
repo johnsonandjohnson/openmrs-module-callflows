@@ -52,7 +52,6 @@ const MapFields = (props) => {
   );
 }
 
-
 MapFields.defaultProps = {
   entries: [],
   columnSizes: defaultColumnSizes

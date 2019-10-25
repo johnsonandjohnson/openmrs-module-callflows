@@ -23,26 +23,26 @@ import MapEntry from '../../shared/utils/MapEntry';
 const MapField = (props) => {
   const { fieldName, handleChange, keyLabel, valueLabel, entry, columnSizes } = props;
   return (
-  <FormGroup controlId={`${fieldName}_${entry.id}`}>
-  <Row>
-    <Col componentClass={HelpBlock} sm={4}>{keyLabel}</Col>
-    <Col componentClass={HelpBlock} sm={6}>{valueLabel}</Col>
-  </Row>
-  <Row>
-    <Col sm={columnSizes.key}>
-      <FormControl type="text"
-        name="key"
-        value={entry.key}
-        onChange={handleChange} />
-    </Col>
-    <Col sm={columnSizes.value}>
-      <FormControl type="text"
-        name="value"
-        value={entry.value}
-        onChange={handleChange} />
-    </Col>
-  </Row>
-</FormGroup>);
+    <FormGroup controlId={`${fieldName}_${entry.id}`}>
+      <Row>
+        <Col componentClass={HelpBlock} sm={4}>{keyLabel}</Col>
+        <Col componentClass={HelpBlock} sm={6}>{valueLabel}</Col>
+      </Row>
+      <Row>
+        <Col sm={columnSizes.key}>
+          <FormControl type="text"
+            name="key"
+            value={entry.key}
+            onChange={handleChange} />
+        </Col>
+        <Col sm={columnSizes.value}>
+          <FormControl type="text"
+            name="value"
+            value={entry.value}
+            onChange={handleChange} />
+        </Col>
+      </Row>
+    </FormGroup>);
 };
 
 export const defaultColumnSizes = {

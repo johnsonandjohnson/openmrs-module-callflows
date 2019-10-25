@@ -16,7 +16,7 @@ import {
 import { Accordion } from '@openmrs/react-components';
 import _ from 'lodash';
 
-import AddButton from '../AddButton';
+import AddButton from './AddButton';
 import {
   reset,
   getConfigs,
@@ -24,8 +24,8 @@ import {
   updateConfigForm,
   addNewForm,
   removeForm
-} from '../../reducers/providers.reducer';
-import ConfigForm from '../ConfigForm';
+} from '../reducers/providers.reducer';
+import ConfigForm from './ConfigForm';
 
 export class Providers extends React.Component {
 

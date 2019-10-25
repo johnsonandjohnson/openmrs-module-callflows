@@ -16,7 +16,7 @@ import {
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 
-import MapEntry from '../../shared/utils/MapEntry';
+import MapEntry from '../shared/utils/MapEntry';
 
 const ParamsField = (props) => {
   const handleChange = (event) => {
