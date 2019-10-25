@@ -24,6 +24,7 @@ const ParamsField = (props) => {
     const params = MapEntry.paramsToArray(input.value);
     props.updateValues(props.fieldName, params);
   }
+
   const { fieldName, params, label } = props;
   const strParams = MapEntry.arrayToParams(params);
   return (
@@ -35,12 +36,12 @@ const ParamsField = (props) => {
         value={strParams}
         onChange={handleChange} />
     </FormGroup>);
-}
+};
 
 ParamsField.defaultProps = {
   labels: 'Map',
   params: []
-}
+};
 
 ParamsField.propTypes = {
   fieldName: PropTypes.string.isRequired,

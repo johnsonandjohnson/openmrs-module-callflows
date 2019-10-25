@@ -10,11 +10,15 @@ export const ACTION_TYPES = {
   FETCH_CONFIGS: 'providersReducer/FETCH_CONFIGS',
   POST_CONFIG: 'providersReducer/POST_CONFIG',
   ADD_NEW_FORM: 'providersReducer/ADD_NEW_FORM',
-  REMOVE_FORM: 'providersReducer/REMOVE_FORM'
+  REMOVE_FORM: 'providersReducer/REMOVE_FORM',
+  OPEN_MODAL: 'providersReducer/OPEN_MODAL',
+  CLOSE_MODAL: 'providersReducer/CLOSE_MODAL'
 };
 
 const initialState = {
-  configForms: []
+  configForms: [],
+  showModal: false,
+  toDeleteId: null
 };
 
 export default (state = initialState, action) => {
@@ -64,13 +68,29 @@ export default (state = initialState, action) => {
     case ACTION_TYPES.REMOVE_FORM: {
       return {
         ...state,
-        configForms: action.payload
+        configForms: action.payload,
+        showModal: false,
+        toDeleteId: null
       };
     }
     case ACTION_TYPES.RESET: {
       return {
         ...state,
         configForms: []
+      };
+    }
+    case ACTION_TYPES.OPEN_MODAL: {
+      return {
+        ...state,
+        showModal: true,
+        toDeleteId: action.payload
+      };
+    }
+    case ACTION_TYPES.CLOSE_MODAL: {
+      return {
+        ...state,
+        showModal: false,
+        toDeleteId: null
       };
     }
     default:
@@ -106,6 +126,15 @@ export const removeForm = (id, configForms) => {
 
 export const reset = () => ({
   type: ACTION_TYPES.RESET
+});
+
+export const openModal = (id) => ({
+  type: ACTION_TYPES.OPEN_MODAL,
+  payload: id
+});
+
+export const closeModal = () => ({
+  type: ACTION_TYPES.CLOSE_MODAL
 });
 
 const callflowsPath = 'ws/callflows';
