@@ -10,11 +10,15 @@ export const ACTION_TYPES = {
     FETCH_RENDERERS: 'renderersReducer/FETCH_RENDERERS',
     POST_RENDERER: 'renderersReducer/POST_RENDERER',
     ADD_NEW_FORM: 'renderersReducer/ADD_NEW_FORM',
-    REMOVE_FORM: 'renderersReducer/REMOVE_FORM'
+    REMOVE_FORM: 'renderersReducer/REMOVE_FORM',
+    OPEN_MODAL: 'renderersReducer/OPEN_MODAL',
+    CLOSE_MODAL: 'renderersReducer/CLOSE_MODAL'
 };
 
 const initialState = {
-    rendererForms: []
+    rendererForms: [],
+    showModal: false,
+    toDeleteId: null
 };
 
 export default (state = initialState, action) => {
@@ -67,13 +71,29 @@ export default (state = initialState, action) => {
         case ACTION_TYPES.REMOVE_FORM: {
             return {
                 ...state, 
-                rendererForms: action.payload
+                rendererForms: action.payload,
+                showModal: false,
+                toDeleteId: null
             };
         }
         case ACTION_TYPES.RESET: {
             return {
                 ...state,
                 rendererForms: []
+            };
+        }
+        case ACTION_TYPES.OPEN_MODAL: {
+            return {
+                ...state,
+                showModal: true,
+                toDeleteId: action.payload
+            };
+        }
+        case ACTION_TYPES.CLOSE_MODAL: {
+            return {
+                ...state,
+                showModal: false,
+                toDeleteId: null
             };
         }
         default:
@@ -109,6 +129,15 @@ export const removeForm = (id, rendererForms) => {
 
 export const reset = () => ({
     type: ACTION_TYPES.RESET
+});
+
+export const openModal = (id) => ({
+    type: ACTION_TYPES.OPEN_MODAL,
+    payload: id
+});
+
+export const closeModal = () => ({
+    type: ACTION_TYPES.CLOSE_MODAL
 });
 
 const callflowsPath = 'ws/callflows';

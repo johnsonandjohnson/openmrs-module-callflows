@@ -21,9 +21,13 @@ import {
     postRenderers,
     updateRendererForm,
     addNewForm,
-    removeForm
+    removeForm,
+    openModal,
+    closeModal
 } from '../../reducers/renderersReducer';
 import RendererForm from '../RendererForm';
+import RemoveButton from '../RemoveButton';
+import OpenMRSModal from '../OpenMRSModal';
 
 export class Renderers extends React.Component {
 
@@ -42,7 +46,15 @@ submitRenderers = () => {
 }
 
 handleRemove = (event) => {
-    this.props.removeForm(event.target.id, this.props.rendererForms);
+    //this.props.removeForm(event.target.id, this.props.rendererForms);
+    this.props.openModal(event.target.id);
+}
+handleClose = () => {
+  this.props.closeModal();
+}
+
+handleConfirm = () => {
+  this.props.removeForm(this.props.toDeleteId, this.props.rendererForms);
 }
 
 
@@ -51,6 +63,12 @@ handleRemove = (event) => {
       const title = 'Renderers';
     return (
         <div className="body-wrapper">
+          <OpenMRSModal
+            deny={this.handleClose}
+            confirm={this.handleConfirm}
+            show={this.props.showModal}
+            title="Delete Renderer"
+            txt="Are you sure you want to delete this Renderer?" />
           <div className="row">
               <div className="col-md-12 col-xs-12">
                   <h2>{title}</h2>
@@ -78,7 +96,10 @@ handleRemove = (event) => {
             </Accordion>
              </Col>
              <Col sm={1}>
-               <i className="medium icon-remove" id={item.localId} onClick={this.handleRemove} />
+               <RemoveButton
+                handleRemove={this.handleRemove}
+                localId={item.localId}
+                tooltip="Delete Renderer" />
              </Col>
              </Row>
           );
@@ -90,7 +111,9 @@ handleRemove = (event) => {
 }
 
 export const mapStateToProps = state => ({
-  rendererForms: state.renderersReducer.rendererForms
+  rendererForms: state.renderersReducer.rendererForms,
+  showModal: state.renderersReducer.showModal,
+  toDeleteId: state.renderersReducer.toDeleteId
 });
 
 const mapDispatchToProps = {
@@ -99,7 +122,9 @@ const mapDispatchToProps = {
   postRenderers,
   updateRendererForm,
   addNewForm,
-  removeForm
+  removeForm,
+  openModal,
+  closeModal
 };
 
 export default connect(
