@@ -22,7 +22,8 @@ import {
           <div>
               <Form className="form" onSubmit={e => e.preventDefault()}>
                 <FormGroup controlId={`name_${props.localId}`}>
-                    <ControlLabel>Name:</ControlLabel>
+                    <ControlLabel>Renderer Name:</ControlLabel>
+                    <p className="form-tooltip">It is usually a file extension, eg. vxml, ccxml</p>
                     <FormControl type="text"
                     name="name"
                     value={props.renderer.name}
@@ -31,6 +32,7 @@ import {
 
                 <FormGroup controlId={`mimeType_${props.localId}`}>
                     <ControlLabel>MIME type:</ControlLabel>
+                    <p className="form-tooltip">Provide the MIME type for given file extension</p>
                     <FormControl type="text"
                     name="mimeType"
                     value={props.renderer.mimeType}
