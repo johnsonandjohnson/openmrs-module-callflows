@@ -3,7 +3,8 @@ import {
   faChevronRight,
   faPhoneAlt,
   faGlobe,
-  faPlus
+  faPlus,
+  faRandom
 } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 
@@ -14,6 +15,7 @@ export const loadIcons = () => {
     faChevronRight,
     faPhoneAlt,
     faGlobe,
-    faPlus
+    faPlus,
+    faRandom
   );
 };

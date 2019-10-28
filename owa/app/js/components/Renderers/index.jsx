@@ -46,7 +46,6 @@ submitRenderers = () => {
 }
 
 handleRemove = (event) => {
-    //this.props.removeForm(event.target.id, this.props.rendererForms);
     this.props.openModal(event.target.id);
 }
 handleClose = () => {
