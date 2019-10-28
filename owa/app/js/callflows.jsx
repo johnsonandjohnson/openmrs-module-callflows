@@ -14,6 +14,7 @@ import { Provider } from 'react-redux';
 import { ConnectedRouter } from 'connected-react-router';
 import 'babel-polyfill';
 import '@openmrs/style-referenceapplication/lib/referenceapplication.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 import { history } from './config/redux-store';
 import exportStore from './config/export-store';
