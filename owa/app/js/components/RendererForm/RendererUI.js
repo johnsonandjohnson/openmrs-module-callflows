@@ -3,32 +3,32 @@ import _ from 'lodash';
 import RendererModel from '../../shared/model/Renderer.model';
 
 export default class RendererUI {
-    constructor(rendererModel) {
-        this.initDefault();
-        this.mergeWithModel(rendererModel);
-    }
+  constructor(rendererModel) {
+    this.initDefault();
+    this.mergeWithModel(rendererModel);
+  }
 
-initDefault = () => {
+  initDefault = () => {
     this.name = 'New renderer';
     this.mimeType = '';
     this.template = '';
-}
+  }
 
-mergeWithModel = (rendererModel) => {
+  mergeWithModel = (rendererModel) => {
     if (!!rendererModel) {
-        if (rendererModel.name) {
-            this.name = rendererModel.name;
-        }
-        if (rendererModel.mimeType) {
-            this.mimeType = rendererModel.mimeType;
-        }
-        if (rendererModel.template) {
-            this.template = rendererModel.template;
-        }
+      if (rendererModel.name) {
+          this.name = rendererModel.name;
+      }
+      if (rendererModel.mimeType) {
+          this.mimeType = rendererModel.mimeType;
+      }
+      if (rendererModel.template) {
+          this.template = rendererModel.template;
+      }
     }
-}
+  }
 
-getModel = () => {
+  getModel = () => {
     let model = new RendererModel();
     if (!!this.name) {
         model.name = this.name;
@@ -40,6 +40,5 @@ getModel = () => {
         model.template = this.template;
     }
     return model;
-}
-
+  }
 }

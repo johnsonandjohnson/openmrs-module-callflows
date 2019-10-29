@@ -9,102 +9,101 @@
 
 import React from 'react';
 import { connect } from 'react-redux';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Accordion } from '@openmrs/react-components';
-import { Button, Col, Row } from 'react-bootstrap';
+import { Col, Row } from 'react-bootstrap';
 
 
 import AddButton from '../AddButton';
 import {
-    reset,
-    getRenderers,
-    postRenderers,
-    updateRendererForm,
-    addNewForm,
-    removeForm,
-    openModal,
-    closeModal
+  reset,
+  getRenderers,
+  postRenderers,
+  updateRendererForm,
+  addNewForm,
+  removeForm,
+  openModal,
+  closeModal
 } from '../../reducers/renderersReducer';
+
 import RendererForm from '../RendererForm';
 import RemoveButton from '../RemoveButton';
 import OpenMRSModal from '../OpenMRSModal';
 
 export class Renderers extends React.Component {
 
-componentDidMount = () => {
+  componentDidMount = () => {
     this.props.getRenderers();
-}
+  }
 
-componentDidUpdate = (prev) => {
+  componentDidUpdate = (prev) => {
     if (prev.rendererForms.length > this.props.rendererForms.length) {
         this.props.postRenderers(this.props.rendererForms);
     }
-}
+  }
 
-submitRenderers = () => {
+  submitRenderers = () => {
     this.props.postRenderers(this.props.rendererForms);
-}
+  }
 
-handleRemove = (event) => {
+  handleRemove = (event) => {
     this.props.openModal(event.target.id);
-}
-handleClose = () => {
-  this.props.closeModal();
-}
+  }
+  handleClose = () => {
+    this.props.closeModal();
+  }
 
-handleConfirm = () => {
-  this.props.removeForm(this.props.toDeleteId, this.props.rendererForms);
-}
+  handleConfirm = () => {
+    this.props.removeForm(this.props.toDeleteId, this.props.rendererForms);
+  }
 
 
   render() {
-      const buttonLabel = 'Add Renderer';
-      const title = 'Renderers';
+    const buttonLabel = 'Add Renderer';
+    const title = 'Renderers';
     return (
-        <div className="body-wrapper">
-          <OpenMRSModal
-            deny={this.handleClose}
-            confirm={this.handleConfirm}
-            show={this.props.showModal}
-            title="Delete Renderer"
-            txt="Are you sure you want to delete this Renderer?" />
-          <div className="row">
-              <div className="col-md-12 col-xs-12">
-                  <h2>{title}</h2>
-              </div>
+      <div className="body-wrapper">
+        <OpenMRSModal
+          deny={this.handleClose}
+          confirm={this.handleConfirm}
+          show={this.props.showModal}
+          title="Delete Renderer"
+          txt="Are you sure you want to delete this Renderer?" />
+        <div className="row">
+          <div className="col-md-12 col-xs-12">
+              <h2>{title}</h2>
           </div>
-          <div className="panel-body">
-              <div className="row">
-                <div className="col-md-12 col-xs-12">
-                      <AddButton handleAdd={this.props.addNewForm} txt={buttonLabel} buttonClass='confirm' />
-                </div>
-              </div>
+        </div>
+        <div className="panel-body">
+          <div className="row">
+            <div className="col-md-12 col-xs-12">
+              <AddButton handleAdd={this.props.addNewForm} txt={buttonLabel} buttonClass='confirm' />
+            </div>
+          </div>
           {this.props.rendererForms.map(item => {
           return (
             <Row key={item.localId}>
               <Col sm={11}>
-              <Accordion title={item.renderer.name}
+                <Accordion title={item.renderer.name}
                   border={true}
                   open={item.isOpen}>
-                 <RendererForm renderer = {item.renderer}
+                  <RendererForm renderer = {item.renderer}
                     isOpen = {item.isOpen}
                     localId = {item.localId}
                     updateValues={this.props.updateRendererForm}
-                    submit={this.submitRenderers}
-                 />
-            </Accordion>
-             </Col>
-             <Col sm={1}>
-               <RemoveButton
-                handleRemove={this.handleRemove}
-                localId={item.localId}
-                tooltip="Delete Renderer" />
-             </Col>
-             </Row>
-          );
-        })}
-            </div>
+                    submit={this.submitRenderers}/>
+                </Accordion>
+              </Col>
+              <Col sm={1}>
+                <RemoveButton
+                  handleRemove={this.handleRemove}
+                  localId={item.localId}
+                  tooltip="Delete Renderer" />
+              </Col>
+            </Row>
+            );
+          })}
         </div>
+      </div>
     );
   }
 }
