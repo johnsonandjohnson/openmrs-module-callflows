@@ -3,6 +3,8 @@ import { SUCCESS, REQUEST, FAILURE } from './action-type.util';
 import _ from 'lodash';
 
 import ConfigFormData from '../components/ConfigForm/ConfigFormData';
+import * as Msg from '../shared/utils/messages';
+import { handleRequest } from '../shared/utils/request-status-util';
 
 export const ACTION_TYPES = {
   RESET: 'providersReducer/RESET',
@@ -34,7 +36,9 @@ export default (state = initialState, action) => {
     case SUCCESS(ACTION_TYPES.POST_CONFIG):
       return {
         ...state,
-        configForms: action.payload.data
+        configForms: action.payload.data.map((fetched) => {
+          return new ConfigFormData(fetched);
+        })
       };
     case REQUEST(ACTION_TYPES.FETCH_CONFIGS):
       return {
@@ -144,10 +148,12 @@ export const postConfigs = (configForms) => async (dispatch) => {
   let data = configForms.map((form) => {
     return form.config.getModel();
   });
-  await dispatch({
-    type: ACTION_TYPES.FETCH_CONFIGS,
+
+  let body = {
+    type: ACTION_TYPES.POST_CONFIG,
     payload: axiosInstance.post(requestUrl, data)
-  });
+  };
+  handleRequest(dispatch, body, Msg.GENERIC_SUCCESS, Msg.GENERIC_FAILURE);
 };
 
 export const getConfigs = () => async (dispatch) => {

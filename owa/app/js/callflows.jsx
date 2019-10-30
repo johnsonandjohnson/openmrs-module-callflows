@@ -12,7 +12,9 @@ import { render } from 'react-dom';
 import { HashRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { ConnectedRouter } from 'connected-react-router';
+import { toast } from 'react-toastify';
 import 'babel-polyfill';
+import 'react-toastify/dist/ReactToastify.css';
 import '@openmrs/style-referenceapplication/lib/referenceapplication.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -22,6 +24,7 @@ import { loadIcons } from './config/icon-loader';
 import routes from './routes';
 
 loadIcons();
+toast.configure();
 
 render((
   <Provider store={exportStore}>
