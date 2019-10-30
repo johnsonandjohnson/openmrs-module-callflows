@@ -11,8 +11,10 @@ import { combineReducers } from 'redux';
 import { reducers as openmrs } from '@openmrs/react-components';
 
 import providersReducer from './providers.reducer';
+import renderersReducer from './renderersReducer';
 
 export default combineReducers({
   openmrs,
-  providersReducer
+  providersReducer,
+  renderersReducer
 });
