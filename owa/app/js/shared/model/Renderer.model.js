@@ -2,8 +2,8 @@ import _ from 'lodash';
 
 export default class RendererModel {
   constructor(fetched) {
-      this.initDefault();
-      this.mergeWithFetched(fetched);
+    this.initDefault();
+    this.mergeWithFetched(fetched);
   }
 
 
@@ -16,13 +16,13 @@ export default class RendererModel {
   mergeWithFetched = (fetched) => {
     if (!!fetched) {
       if (!!fetched.name) {
-              this.name = fetched.name;
+        this.name = fetched.name;
       }
       if (!!fetched.mimeType) {
-              this.mimeType = fetched.mimeType;
+        this.mimeType = fetched.mimeType;
       }
       if (!!fetched.template) {
-              this.template = fetched.template;
+        this.template = fetched.template;
       }
     }
   }

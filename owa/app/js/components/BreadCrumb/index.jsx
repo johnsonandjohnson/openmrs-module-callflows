@@ -79,13 +79,13 @@ class BreadCrumb extends React.Component {
           {this.renderLastCrumb('Providers')}
         </div>);
       case RENDERERS_ROUTE:
-          return (<div className="breadcrumb">
-            {this.renderHomeCrumb()}
-            {this.renderDelimiter()}
-            {this.renderCrumb(MODULE_ROUTE, MODULE_NAME)}
-            {this.renderDelimiter()}
-            {this.renderLastCrumb('Renderers')}
-          </div>);
+        return (<div className="breadcrumb">
+          {this.renderHomeCrumb()}
+          {this.renderDelimiter()}
+          {this.renderCrumb(MODULE_ROUTE, MODULE_NAME)}
+          {this.renderDelimiter()}
+          {this.renderLastCrumb('Renderers')}
+        </div>);
       default:
         return (
           <div className="breadcrumb">
