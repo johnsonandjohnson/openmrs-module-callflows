@@ -87,7 +87,8 @@ export class Providers extends React.Component {
           {this.props.configForms.map(item => {
             return (
               <Row key={item.localId}>
-                <Col sm={11}>
+                <Col sm={11}
+                  className="cfl-col-field-left">
                   <Accordion title={item.config.name}
                     border={true}
                     open={item.isOpen}>
@@ -98,8 +99,10 @@ export class Providers extends React.Component {
                       submit={this.submitConfigs} />
                   </Accordion>
                 </Col>
-                <Col sm={1}>
+                <Col sm={1}
+                  className="cfl-col-field">
                   <RemoveButton
+                    buttonClass="col-remove-button"
                     handleRemove={this.handleRemove}
                     localId={item.localId}
                     tooltip="Delete Provider" />

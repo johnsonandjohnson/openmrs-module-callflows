@@ -20,6 +20,7 @@ import _ from 'lodash';
 
 import MapEntry from '../../shared/utils/MapEntry';
 import RemoveButton from '../RemoveButton';
+import './index.scss';
 
 const MapField = (props) => {
   const { fieldName, handleChange, keyLabel, valueLabel, entry, columnSizes } = props;
@@ -33,13 +34,15 @@ const MapField = (props) => {
           : <Col componentClass={HelpBlock} sm={columnSizes.button} />}
       </Row>
       <Row>
-        <Col sm={columnSizes.key}>
+        <Col sm={columnSizes.key}
+          className="map-field-left">
           <FormControl type="text"
             name="key"
             value={entry.key}
             onChange={handleChange} />
         </Col>
-        <Col sm={columnSizes.value}>
+        <Col sm={columnSizes.value}
+          className="map-field">
           <FormControl type="text"
             name="value"
             value={entry.value}
@@ -47,8 +50,12 @@ const MapField = (props) => {
         </Col>
         {(columnSizes.button === 0)
           ? null
-          : <Col sm={columnSizes.button}>
-            <RemoveButton handleRemove={props.handleRemove} localId={entry.id} />
+          : <Col sm={columnSizes.button}
+            className="map-field">
+            <RemoveButton
+              buttonClass="col-remove-button"
+              handleRemove={props.handleRemove}
+              localId={entry.id} />
           </Col>}
       </Row>
     </FormGroup>

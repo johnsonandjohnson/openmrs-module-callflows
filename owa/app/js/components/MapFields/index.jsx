@@ -18,6 +18,7 @@ import MapField, {
 } from './MapField';
 import AddButton from '../AddButton';
 import MapEntry from '../../shared/utils/MapEntry';
+import './index.scss';
 
 const MapFields = (props) => {
 
