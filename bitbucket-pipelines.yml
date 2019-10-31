@@ -13,11 +13,11 @@ definitions:
 
 pipelines:
   default:
-    - <<: *build-step
+    - step: *build-step
          
   branches:
     master:
-      - <<: *build-step
+      - step: *build-step
       - step:
           name: Push to OpenMRS repository
           script:
