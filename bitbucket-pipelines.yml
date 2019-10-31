@@ -10,3 +10,21 @@ pipelines:
           - mvn clean install
         artifacts:
           - omod/target/*.omod
+    - step:
+        name: Push to OpenMRS repository
+        script:
+          # clone and checkout the dev branch
+          - git clone --depth 1 $OPENMRS_REPO_URL repo
+          - cd repo
+          - git checkout dev
+          # replace the module in the repository
+          - cp ../omod/target/*.omod cfl/web/cfl-modules
+          # set up git author
+          - git config --global user.email $PIPELINES_GIT_EMAIL
+          - git config --global user.name $PIPELINES_GIT_NAME
+          # commit the new module
+          - git add .
+          - git commit -m "Automated CallFlow module update"
+          # push to the repository
+          - git push origin dev
+
