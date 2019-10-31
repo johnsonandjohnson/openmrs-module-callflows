@@ -74,8 +74,8 @@ var browserSyncTarget = resolveBrowserSyncTarget();
 
 const rules = [
   {
-    test: /\.jsx?$/,
-    loader: "babel-loader",
+    test: /\.(t|j)sx?$/,
+    loader: "awesome-typescript-loader",
     exclude: /node_modules/,
     query: {
       presets: ["env", "react"],
@@ -107,7 +107,8 @@ const rules = [
       "postcss-loader",
       "sass-loader?sourcemap&sourceMapContents&outputStyle=expanded"
     ]
-  }
+  },
+  { enforce: "pre", test: /\.js$/, loader: "source-map-loader" }
 ];
 
 /** Minify for production */
@@ -244,10 +245,11 @@ var webpackConfig = {
   },
   resolve: {
     modules: [path.resolve(__dirname), "node_modules"],
-    extensions: [".js", ".jsx", ".css", ".scss"]
+    extensions: [".ts", ".tsx", ".js", ".jsx", ".css", ".scss"]
   },
   plugins,
-  externals: nodeModules
+  externals: nodeModules,
+  devtool: "source-map"
 };
 
 module.exports = webpackConfig;
