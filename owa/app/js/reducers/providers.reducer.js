@@ -20,7 +20,8 @@ export const ACTION_TYPES = {
 const initialState = {
   configForms: [],
   showModal: false,
-  toDeleteId: null
+  toDeleteId: null,
+  newEntry: null
 };
 
 export default (state = initialState, action) => {
@@ -38,7 +39,8 @@ export default (state = initialState, action) => {
         ...state,
         configForms: action.payload.data.map((fetched) => {
           return new ConfigFormData(fetched);
-        })
+        }),
+        newEntry: null
       };
     case REQUEST(ACTION_TYPES.FETCH_CONFIGS):
       return {
@@ -63,10 +65,12 @@ export default (state = initialState, action) => {
     }
     case ACTION_TYPES.ADD_NEW_FORM: {
       let configForms = Array.from(state.configForms);
-      configForms.push(new ConfigFormData());
+      let form = new ConfigFormData();
+      configForms.push(form);
       return {
         ...state,
-        configForms
+        configForms,
+        newEntry: form.localId
       };
     }
     case ACTION_TYPES.REMOVE_FORM: {

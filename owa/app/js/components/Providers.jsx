@@ -33,14 +33,21 @@ import OpenMRSModal from './OpenMRSModal';
 
 export class Providers extends React.Component {
 
+  constructor(props) {
+    super(props);
+    this.focusRef = null;
+  }
+
   componentDidMount = () => {
     this.props.getConfigs();
+    this.focusDiv();
   }
 
   componentDidUpdate = (prev) => {
     if (prev.configForms.length > this.props.configForms.length) {
       this.props.postConfigs(this.props.configForms);
     }
+    this.focusDiv();
   }
 
   submitConfigs = () => {
@@ -57,6 +64,24 @@ export class Providers extends React.Component {
 
   handleConfirm = () => {
     this.props.removeForm(this.props.toDeleteId, this.props.configForms);
+  }
+
+  getOffsetTop(element) {
+    let offsetTop = 0;
+    console.log(element);
+    while (element) {
+      offsetTop += element.offsetTop;
+      element = element.offsetParent;
+    }
+    return offsetTop;
+  }
+
+  focusDiv() {
+    if (!_.isEmpty(this.focusRef)) {
+      console.log(this.focusRef);
+      window.scrollTo({ left: 0, top: this.getOffsetTop(this.focusRef), behavior: 'smooth' });
+      this.focusRef = null;
+    }
   }
 
   render() {
@@ -92,11 +117,18 @@ export class Providers extends React.Component {
                   <Accordion title={item.config.name}
                     border={true}
                     open={item.isOpen}>
-                    <ConfigForm config={item.config}
-                      isOpen={item.isOpen}
-                      localId={item.localId}
-                      updateValues={this.props.updateConfigForm}
-                      submit={this.submitConfigs} />
+                    <div ref={(div) => {
+                      if (item.localId === this.props.newEntry) {
+                        this.focusRef = div;
+                      }
+                    }}>
+                      <ConfigForm
+                        config={item.config}
+                        isOpen={item.isOpen}
+                        localId={item.localId}
+                        updateValues={this.props.updateConfigForm}
+                        submit={this.submitConfigs} />
+                    </div>
                   </Accordion>
                 </Col>
                 <Col sm={1}
@@ -119,7 +151,8 @@ export class Providers extends React.Component {
 export const mapStateToProps = state => ({
   configForms: state.providersReducer.configForms,
   showModal: state.providersReducer.showModal,
-  toDeleteId: state.providersReducer.toDeleteId
+  toDeleteId: state.providersReducer.toDeleteId,
+  newEntry: state.providersReducer.newEntry
 });
 
 const mapDispatchToProps = {
