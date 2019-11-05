@@ -23,7 +23,8 @@ import RemoveButton from '../RemoveButton';
 import './index.scss';
 
 const MapField = (props) => {
-  const { fieldName, handleChange, keyLabel, valueLabel, entry, columnSizes } = props;
+  const { fieldName, handleChange, keyLabel,
+    valueLabel, entry, columnSizes, removeable } = props;
   return (
     <FormGroup controlId={`${fieldName}_${entry.id}`}>
       <Row>
@@ -48,7 +49,7 @@ const MapField = (props) => {
             value={entry.value}
             onChange={handleChange} />
         </Col>
-        {(columnSizes.button === 0)
+        {(columnSizes.button === 0 || !removeable)
           ? null
           : <Col sm={columnSizes.button}
             className="map-field">
@@ -78,7 +79,8 @@ MapField.defaultProps = {
   keyLabel: 'Key',
   valueLabel: 'Value',
   entry: new MapEntry('', ''),
-  columnSizes: defaultColumnSizes
+  columnSizes: defaultColumnSizes,
+  removeable: true
 };
 
 MapField.propTypes = {
@@ -88,7 +90,8 @@ MapField.propTypes = {
   keyLabel: PropTypes.string,
   valueLabel: PropTypes.string,
   entry: PropTypes.instanceOf(MapEntry),
-  columnSizes: columnSizesType
+  columnSizes: columnSizesType,
+  removeable: PropTypes.bool
 };
 
 export default MapField;

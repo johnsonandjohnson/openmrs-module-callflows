@@ -68,7 +68,6 @@ export class Providers extends React.Component {
 
   getOffsetTop(element) {
     let offsetTop = 0;
-    console.log(element);
     while (element) {
       offsetTop += element.offsetTop;
       element = element.offsetParent;
@@ -78,7 +77,6 @@ export class Providers extends React.Component {
 
   focusDiv() {
     if (!_.isEmpty(this.focusRef)) {
-      console.log(this.focusRef);
       window.scrollTo({ left: 0, top: this.getOffsetTop(this.focusRef), behavior: 'smooth' });
       this.focusRef = null;
     }

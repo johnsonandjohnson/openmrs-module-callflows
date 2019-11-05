@@ -43,12 +43,6 @@ const ConfigForm = (props) => {
     props.updateValues(props);
   };
 
-  const handleDelete = (event) => {
-  };
-
-  const handleAdd = () => {
-  }
-
   return (
     <Form className="form" onSubmit={e => e.preventDefault()}>
       <FormGroup controlId={`name_${props.localId}`}>
