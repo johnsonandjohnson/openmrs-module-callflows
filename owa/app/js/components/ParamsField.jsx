@@ -9,13 +9,15 @@
 
 import React from 'react';
 import {
+  ControlLabel,
   FormControl,
   FormGroup,
-  ControlLabel
+  HelpBlock
 } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 
+import * as Msg from '../shared/utils/messages';
 import MapEntry from '../shared/utils/MapEntry';
 
 const ParamsField = (props) => {
@@ -25,11 +27,12 @@ const ParamsField = (props) => {
     props.updateValues(props.fieldName, params);
   }
 
-  const { fieldName, params, label } = props;
+  const { fieldName, params, header, note } = props;
   const strParams = MapEntry.arrayToParams(params);
   return (
     <FormGroup controlId={`${fieldName}_${props.localId}`}>
-      <ControlLabel><b>{label}</b></ControlLabel>
+      <ControlLabel>{header}</ControlLabel>
+      { (!!note) && <HelpBlock>{note}</HelpBlock>}
       <FormControl type="text"
         componentClass="textarea"
         name={fieldName}
@@ -39,14 +42,15 @@ const ParamsField = (props) => {
 };
 
 ParamsField.defaultProps = {
-  labels: 'Map',
+  header: Msg.PARAM_FIELDS_DEFAULT_HEADER,
   params: []
 };
 
 ParamsField.propTypes = {
   fieldName: PropTypes.string.isRequired,
   updateValues: PropTypes.func.isRequired,
-  labels: PropTypes.string,
+  header: PropTypes.string,
+  note: PropTypes.string,
   params: PropTypes.array
 };
 

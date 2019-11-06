@@ -23,6 +23,7 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 
 import ConfigUI from './ConfigUI';
+import * as Msg from '../../shared/utils/messages';
 import MapFields from '../MapFields';
 import ParamsField from '../ParamsField';
 
@@ -46,15 +47,15 @@ const ConfigForm = (props) => {
   return (
     <Form className="form" onSubmit={e => e.preventDefault()}>
       <FormGroup controlId={`name_${props.localId}`}>
-        <ControlLabel>Name:</ControlLabel>
+        <ControlLabel>{Msg.CONFIG_FORM_NAME_HEADER}</ControlLabel>
         <FormControl type="text"
           name="name"
           value={props.config.name}
           onChange={handleChange} />
       </FormGroup>
       <FormGroup controlId={`outgoingCallUriTemplate_${props.localId}`}>
-        <ControlLabel><b>Outgoing call URI template</b> (optional)</ControlLabel>
-        <HelpBlock>We'll never share your email with anyone else.</HelpBlock>
+        <ControlLabel>{Msg.CONFIG_FORM_TEMPLATE_HEADER}</ControlLabel>
+        <HelpBlock>{Msg.CONFIG_FORM_TEMPLATE_NOTE}</HelpBlock>
         <FormControl type="text"
           componentClass="textarea"
           name="outgoingCallUriTemplate"
@@ -62,40 +63,41 @@ const ConfigForm = (props) => {
           onChange={handleChange} />
       </FormGroup>
       <FormGroup controlId={`outgoingCallMethod_${props.localId}`}>
-        <ControlLabel><b>Outgoing call HTTP method</b></ControlLabel>
+        <ControlLabel>{Msg.CONFIG_FORM_METHOD_HEADER}</ControlLabel>
         <Radio name="outgoingCallMethod"
           title="POST"
           value="POST"
           onChange={handleChange}
-          checked={'POST' === props.config.outgoingCallMethod}>POST</Radio>
+          checked={'POST' === props.config.outgoingCallMethod}>{Msg.CONFIG_FORM_METHOD_RADIO_POST}</Radio>
         <Radio name="outgoingCallMethod"
           title="GET"
           value="GET"
           onChange={handleChange}
-          checked={'GET' === props.config.outgoingCallMethod}>GET</Radio>
+          checked={'GET' === props.config.outgoingCallMethod}>{Msg.CONFIG_FORM_METHOD_RADIO_GET}</Radio>
       </FormGroup>
       <FormGroup controlId={`outgoingCallPostHeadersMap_${props.localId}`}>
-        <ControlLabel><b>POST header parameters</b></ControlLabel>
+        <ControlLabel>{Msg.CONFIG_FORM_HEADERS_HEADER}</ControlLabel>
+        <HelpBlock>{Msg.CONFIG_FORM_HEADERS_NOTE}</HelpBlock>
         <MapFields
           entries={props.config.outgoingCallPostHeadersMap}
           fieldName="outgoingCallPostHeadersMap"
           updateValues={handleArrayChange} />
       </FormGroup>
       <FormGroup controlId={`outgoingCallPostParams_${props.localId}`}>
-        <ControlLabel><b>POST parameters</b></ControlLabel>
-        <HelpBlock>Type HTTP POST parameters</HelpBlock>
+        <ControlLabel>{Msg.CONFIG_FORM_TYPE_HEADER}</ControlLabel>
+        <HelpBlock>{Msg.CONFIG_FORM_TYPE_NOTE}</HelpBlock>
         <MapFields
           entries={props.config.outgoingCallPostParams}
           fieldName="outgoingCallPostParams"
           updateValues={handleArrayChange} />
       </FormGroup>
       <FormGroup controlId={`queue_${props.localId}`}>
-        <ControlLabel><b>Outbound Call Queue Configuration</b></ControlLabel>
+        <ControlLabel>{Msg.CONFIG_FORM_QUEUE_HEADER}</ControlLabel>
         <Row>
-          <Col componentClass={HelpBlock} sm={2}>Call Limit</Col>
-          <Col componentClass={HelpBlock} sm={2}>Retry Sec</Col>
-          <Col componentClass={HelpBlock} sm={2}>Retry Attempts</Col>
-          <Col componentClass={HelpBlock} xs={2} sm={4}>Call after all Retry Attempts?</Col>
+          <Col componentClass={HelpBlock} sm={2}>{Msg.CONFIG_FORM_QUEUE_LIMIT}</Col>
+          <Col componentClass={HelpBlock} sm={2}>{Msg.CONFIG_FORM_QUEUE_SEC}</Col>
+          <Col componentClass={HelpBlock} sm={2}>{Msg.CONFIG_FORM_QUEUE_ATTEMPTS}</Col>
+          <Col componentClass={HelpBlock} xs={2} sm={4}>{Msg.CONFIG_FORM_QUEUE_CALL}</Col>
         </Row>
         <Row>
           <Col sm={2}>
@@ -126,20 +128,20 @@ const ConfigForm = (props) => {
       <ParamsField
         fieldName="servicesMap"
         updateValues={handleArrayChange}
-        labels="Injected services map"
+        header={Msg.CONFIG_FORM_SERVICE_MAP_HEADER}
+        note={Msg.CONFIG_FORM_SERVICE_MAP_NOTE}
         params={props.config.servicesMap} />
       <FormGroup controlId={`testUsersMap_${props.localId}`}>
-        <ControlLabel><b>Test users</b> (optional)</ControlLabel>
-        <HelpBlock>Add test users for testing with simulation programs. The provided Outbound URLs will over-ride the above
-          Outgoing call URI template for those users' phone numbers.</HelpBlock>
+        <ControlLabel>{Msg.CONFIG_FORM_USERS_HEADER}</ControlLabel>
+        <HelpBlock>{Msg.CONFIG_FORM_USERS_NOTE}</HelpBlock>
         <MapFields
           entries={props.config.testUsersMap}
           fieldName="testUsersMap"
           updateValues={handleArrayChange}
-          keyLabel="Phone number"
-          valueLabel="Outbound URL" />
+          keyLabel={Msg.CONFIG_FORM_USERS_KEY_LABEL}
+          valueLabel={Msg.CONFIG_FORM_USERS_VALUE_LABEL} />
       </FormGroup>
-      <Button className="btn confirm btn-xs" onClick={props.submit}>SAVE</Button>
+      <Button className="btn confirm btn-xs" onClick={props.submit}>{Msg.CONFIG_FORM_SAVE_BUTTON}</Button>
     </Form>
   );
 };
