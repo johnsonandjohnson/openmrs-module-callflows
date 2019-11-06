@@ -49,9 +49,8 @@ const MapField = (props) => {
             value={entry.value}
             onChange={handleChange} />
         </Col>
-        {(columnSizes.button === 0 || !removeable)
-          ? null
-          : <Col sm={columnSizes.button}
+        {(columnSizes.button >= 0 && removeable) &&
+          <Col sm={columnSizes.button}
             className="map-field">
             <RemoveButton
               buttonClass="col-remove-button"
