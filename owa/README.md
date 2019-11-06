@@ -60,10 +60,10 @@ Build the callflows module
 cd $CALLFLOWS_REPO
 mvn clean install
 ```
-Replace the callflows module file `CFL_REPO/cfl/web/modules/CALLFLOWS_OMOD` by `CALLFLOWS_REPO/omod/target/CALLFLOWS_OMOD`
+Replace the callflows module file `CFL_REPO/cfl/web/cfl-modules/CALLFLOWS_OMOD` by `CALLFLOWS_REPO/omod/target/CALLFLOWS_OMOD`
 ```bash
-rm $CFL_REPO/cfl/web/modules/callflows*
-mv $CALLFLOWS_REPO/omod/target/$CALLFLOWS_OMOD $CFL_REPO/cfl/web/modules
+rm $CFL_REPO/cfl/web/cfl-modules/callflows*
+mv $CALLFLOWS_REPO/omod/target/$CALLFLOWS_OMOD $CFL_REPO/cfl/web/cfl-modules
 ```
 Run docker-compose
 ```bash

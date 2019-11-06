@@ -3,7 +3,78 @@ Callflows
 
 Description
 -----------
-This module will contain functionality related to Callflows
+The Callflows module allows to integrate with the API of IVR providers through the HTTP(s) protocol. Voice interactions 
+with a caller and the Callflow module works around the web's HTTP request response model with a IVR provider's server
+as a intermediary node. Application should respond to HTTP requests and send back HTTP responses. The translation of 
+these requests and responses from voice and to voice is handled by the technology at the IVR provider's end.
+
+At a minimum, one provider (e.g. Voxeo, IMI_Mobile, Nexmo) needs to be configured in order for call flows to be run 
+properly.
+
+For creating flows velocity templates are used in both user and system nodes. While designing call flows OpenMRS
+services provided in configuration are used.
+
+### Prerequisites
+### JDK 1.7 and/or JDK 1.8
+To make sure that you have JDK installed properly enter in console or terminal:
+
+on Windows:
+
+`"%JAVA_HOME%/bin/java.exe" -version`
+
+on Linux/Mac:
+
+`"$JAVA_HOME/bin/java" -version`
+
+It should display your java version. If you do not have installed Java please follow 
+[Oracle's guide](https://docs.oracle.com/cd/E19182-01/820-7851/inst_cli_jdk_javahome_t/) to install.
+
+
+### Maven 3.x
+To make sure that you have Apache Maven 3.x installed, open a console/terminal and enter:
+
+`mvn -v`
+
+You should see your Maven version. If you do not have installed please go ahead and install it. 
+Here are tutorials for [Winodws](https://docs.oracle.com/cd/E19182-01/820-7851/inst_cli_jdk_javahome_t/), 
+[MacOSX](https://www.journaldev.com/2348/how-to-install-maven-on-mac-os-x-mavericks-10-9), 
+[Ubuntu](https://www.mkyong.com/maven/how-to-install-maven-in-ubuntu/).
+
+### OpenMRS SDK
+
+To start work with OpenMRS modules you will need to setup the OpenMRS SDK. In terminal or console enter a command:
+
+`mvn org.openmrs.maven.plugins:openmrs-sdk-maven-plugin:setup-sdk`
+
+After proper command executing you can make sure the OpenMRS SDK works fine.
+
+`mvn openmrs-sdk:help`
+
+It should produce the following output:
+
+[INFO] Scanning for projects...
+
+[INFO]
+
+[INFO] ------------------------------------------------------------------------
+
+[INFO] Building Maven Stub Project (No POM) 1
+
+[INFO] ------------------------------------------------------------------------
+
+[INFO]
+
+[INFO] --- openmrs-sdk-maven-plugin:3.0.0:help (default-cli) @ standalone-pom ---
+
+
+ 
+OpenMRS SDK *your-version-of-OpenMRS-SDK*
+
+For more info, see SDK documentation: https://wiki.openmrs.org/display/docs/OpenMRS+SDK
+
+...
+
+If that is the case, you have successfully installed the SDK.
 
 Building from Source
 --------------------
@@ -21,10 +92,20 @@ where OpenMRS is deployed.
 
 Installation
 ------------
-1. Build the module to produce the .omod file.
-2. Use the OpenMRS Administration > Manage Modules screen to upload and install the .omod file.
+1.Build the module to produce the .omod file using:
+
+`mvn clean install`
+
+You can build .omod file with skip tests:
+
+`mvn clean install -DskipTests`
+
+It creates *.omod file in omod/target directory.
+
+2.Use the OpenMRS Administration > Manage Modules screen to upload and install the .omod file.
 
 If uploads are not allowed from the web (changable via a runtime property), you can drop the omod
 into the ~/.OpenMRS/modules folder.  (Where ~/.OpenMRS is assumed to be the Application 
 Data Directory that the running openmrs is currently using.)  After putting the file in there 
 simply restart OpenMRS/tomcat and the module will be loaded and started.
+
