@@ -111,7 +111,7 @@ public class CallUtil {
     private ObjectMapper objectMapper = new ObjectMapper();
 
     private static final Collection<CallStatus> ACTIVE_OUTBOUND_CALL_STATUSES = Arrays
-            .asList(CallStatus.INITIATED, CallStatus.IN_PROGRESS, CallStatus.MOTECH_INITIATED);
+            .asList(CallStatus.INITIATED, CallStatus.IN_PROGRESS, CallStatus.OPENMRS_INITIATED);
 
     private static final String MESSAGE_KEY = "messageKey";
     private static final String CSV = ".csv";
@@ -515,7 +515,7 @@ public class CallUtil {
     }
 
     /**
-     * Responsible for sending the call status of a call via the MOTECH event system
+     * Responsible for sending the call status of a call via the OpenMRS event system
      *
      * @param call that is the current call
      */

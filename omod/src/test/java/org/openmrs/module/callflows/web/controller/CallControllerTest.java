@@ -82,7 +82,7 @@ public class CallControllerTest extends BaseTest {
 
     private static final String LOCALHOST = "localhost";
 
-    private static final String CONTEXT_PATH = "/motech-platform-server/modules";
+    private static final String CONTEXT_PATH = "/openmrs";
 
     private MockMvc mockMvc;
 
@@ -134,11 +134,11 @@ public class CallControllerTest extends BaseTest {
 
     private Call inboundCall;
 
-    private String nextURLFormat = "http://localhost/motech-platform-server/modules/ws/callflows/calls/%s.%s";
+    private String nextURLFormat = "http://localhost/openmrs/ws/callflows/calls/%s.%s";
 
     private String inboundNextURLVxml;
 
-    private String baseURL = "http://localhost/motech-platform-server/modules/ws";
+    private String baseURL = "http://localhost/openmrs/ws";
 
     private String inboundNextURLJson;
 
@@ -705,7 +705,7 @@ public class CallControllerTest extends BaseTest {
         mockMvc.perform(customGet("/callflows/out/voxeo/flows/MainFlow.vxml", "phone", "1234567890"))
                .andExpect(status().is(HttpStatus.OK.value()))
                .andExpect(content().string("{\"callId\":\"5c8f6f83-567c-4586-a3b6-368397d5aba8\"," +
-                   "\"status\":\"MOTECH_INITIATED\",\"reason\":null}"));
+                   "\"status\":\"OPENMRS_INITIATED\",\"reason\":null}"));
 
         // Then we should have tried to use the callService to initiate a call
         verify(callService, times(1)).makeCall(eq(Constants.CONFIG_VOXEO), eq(Constants.CALLFLOW_MAIN), any(Map.class));
