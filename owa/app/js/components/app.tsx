@@ -17,6 +17,8 @@ class App extends React.Component {
     return (
       <div className="body-wrapper">
         <div className="panel-body">
+          <Tile name='Designer' href='#/designer'
+            icons={[new IconModel(['fas', 'magic'], '2x') ]} />
           <Tile name='Providers'
             href='#/providers'
             icons={[new IconModel(['fas', 'phone-alt'], '2x'),

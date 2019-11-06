@@ -10,10 +10,11 @@ import React from 'react';
 import { Route, Switch } from 'react-router-dom';
 import { Header } from '@openmrs/react-components';
 
-import App from './components/App';
+import App from './components/app';
 import Providers from './components/Providers';
 import Renderers from './components/Renderers';
 import BreadCrumb from './components/BreadCrumb';
+import Designer from './components/designer/designer';
 
 export default (store) => (
   <div>
@@ -23,5 +24,6 @@ export default (store) => (
       <Route exact path="/" component={App} />
       <Route path="/providers" component={Providers} />
       <Route path="/renderers" component={Renderers} />
+      <Route path="/designer" component={Designer} />
     </Switch>
   </div>);

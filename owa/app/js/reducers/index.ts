@@ -10,11 +10,20 @@
 import { combineReducers } from 'redux';
 import { reducers as openmrs } from '@openmrs/react-components';
 
-import providersReducer from './providers.reducer';
-import renderersReducer from './renderersReducer';
+import designerReducer, { DesignerState } from './designer.reducer';
+import providersReducer, { ProvidersState } from './providers.reducer';
+import renderersReducer, { RenderersState } from './renderersReducer';
+
+export interface IRootState {
+  readonly designerReducer: DesignerState;
+  readonly providersReducer: ProvidersState;
+  readonly renderersReducer: RenderersState; 
+  readonly openmrs: any;
+}
 
 export default combineReducers({
   openmrs,
+  designerReducer,
   providersReducer,
   renderersReducer
 });

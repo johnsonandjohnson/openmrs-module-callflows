@@ -16,10 +16,12 @@ export const ACTION_TYPES = {
 };
 
 const initialState = {
-  configForms: [],
+  configForms: [] as ReadonlyArray<any>,
   showModal: false,
   toDeleteId: null
 };
+
+export type ProvidersState = Readonly<typeof initialState>;
 
 export default (state = initialState, action) => {
   switch (action.type) {
