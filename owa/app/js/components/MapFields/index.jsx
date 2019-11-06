@@ -18,8 +18,12 @@ import MapField, {
 } from './MapField';
 import AddButton from '../AddButton';
 import MapEntry from '../../shared/utils/MapEntry';
+import './index.scss';
 
 const MapFields = (props) => {
+
+  const { fieldName, entries, columnSizes,
+    keyLabel, valueLabel, addLabel, removeable } = props;
 
   const handleChange = (event) => {
     const input = event.target;
@@ -36,7 +40,12 @@ const MapFields = (props) => {
 
   const handleRemove = (event) => {
     const input = event.target;
-    _.pull(props.entries, find(input.id));
+    if (_.size(entries) > 1) {
+      _.pull(props.entries, find(input.id));
+    } else {
+      props.entries[0] = new MapEntry('', '');
+    }
+
     props.updateValues(fieldName, entries);
   };
 
@@ -59,8 +68,15 @@ const MapFields = (props) => {
     });
   };
 
-  const { fieldName, entries, columnSizes,
-    keyLabel, valueLabel, addLabel } = props;
+  const setRemove = () => {
+    return {
+      key: columnSizes.key,
+      value: removeable ? columnSizes.value :  columnSizes.button + columnSizes.value,
+      button: removeable ? columnSizes.button : 0
+    };
+  };
+
+  const sizes = setRemove();
   return (
     <div>
       {entries.map(entry => {
@@ -70,12 +86,12 @@ const MapFields = (props) => {
           handleChange={handleChange}
           handleRemove={handleRemove}
           entry={entry}
-          columnSizes={columnSizes}
+          columnSizes={sizes}
           keyLabel={keyLabel}
           valueLabel={valueLabel} />;
       })}
       <Row>
-        <Col sm={columnSizes.key}>
+        <Col sm={sizes.key}>
           <AddButton handleAdd={handleAdd} txt={addLabel} />
         </Col>
       </Row>
@@ -86,7 +102,8 @@ const MapFields = (props) => {
 MapFields.defaultProps = {
   entries: [],
   columnSizes: defaultColumnSizes,
-  addLabel: 'Add more'
+  addLabel: 'Add more',
+  removeable: true
 };
 
 MapFields.propTypes = {
@@ -96,7 +113,8 @@ MapFields.propTypes = {
   columnSizes: columnSizesType,
   keyLabel: PropTypes.string,
   valueLabel: PropTypes.string,
-  addLabel: PropTypes.string
+  addLabel: PropTypes.string,
+  removeable: PropTypes.bool
 };
 
 export default MapFields;

@@ -20,9 +20,11 @@ import _ from 'lodash';
 
 import MapEntry from '../../shared/utils/MapEntry';
 import RemoveButton from '../RemoveButton';
+import './index.scss';
 
 const MapField = (props) => {
-  const { fieldName, handleChange, keyLabel, valueLabel, entry, columnSizes } = props;
+  const { fieldName, handleChange, keyLabel,
+    valueLabel, entry, columnSizes, removeable } = props;
   return (
     <FormGroup controlId={`${fieldName}_${entry.id}`}>
       <Row>
@@ -33,22 +35,27 @@ const MapField = (props) => {
           : <Col componentClass={HelpBlock} sm={columnSizes.button} />}
       </Row>
       <Row>
-        <Col sm={columnSizes.key}>
+        <Col sm={columnSizes.key}
+          className="map-field-left">
           <FormControl type="text"
             name="key"
             value={entry.key}
             onChange={handleChange} />
         </Col>
-        <Col sm={columnSizes.value}>
+        <Col sm={columnSizes.value}
+          className="map-field">
           <FormControl type="text"
             name="value"
             value={entry.value}
             onChange={handleChange} />
         </Col>
-        {(columnSizes.button === 0)
-          ? null
-          : <Col sm={columnSizes.button}>
-            <RemoveButton handleRemove={props.handleRemove} localId={entry.id} />
+        {(columnSizes.button >= 0 && removeable) &&
+          <Col sm={columnSizes.button}
+            className="map-field">
+            <RemoveButton
+              buttonClass="col-remove-button"
+              handleRemove={props.handleRemove}
+              localId={entry.id} />
           </Col>}
       </Row>
     </FormGroup>
@@ -71,7 +78,8 @@ MapField.defaultProps = {
   keyLabel: 'Key',
   valueLabel: 'Value',
   entry: new MapEntry('', ''),
-  columnSizes: defaultColumnSizes
+  columnSizes: defaultColumnSizes,
+  removeable: true
 };
 
 MapField.propTypes = {
@@ -81,7 +89,8 @@ MapField.propTypes = {
   keyLabel: PropTypes.string,
   valueLabel: PropTypes.string,
   entry: PropTypes.instanceOf(MapEntry),
-  columnSizes: columnSizesType
+  columnSizes: columnSizesType,
+  removeable: PropTypes.bool
 };
 
 export default MapField;
