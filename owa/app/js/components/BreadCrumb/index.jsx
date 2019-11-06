@@ -16,6 +16,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import './bread-crumb.scss';
 
+const DESIGNER_ROUTE = '/designer';
 const PROVIDER_ROUTE = '/providers';
 const RENDERERS_ROUTE = '/renderers';
 const MODULE_ROUTE = '/';
@@ -70,6 +71,14 @@ class BreadCrumb extends React.Component {
     const { current } = this.state;
 
     switch (current) {
+      case DESIGNER_ROUTE:
+        return (<div className="breadcrumb">
+          {this.renderHomeCrumb()}
+          {this.renderDelimiter()}
+          {this.renderCrumb(MODULE_ROUTE, MODULE_NAME)}
+          {this.renderDelimiter()}
+          {this.renderLastCrumb('Designer')}
+        </div>);
       case PROVIDER_ROUTE:
         return (<div className="breadcrumb">
           {this.renderHomeCrumb()}

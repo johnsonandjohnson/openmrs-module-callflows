@@ -16,10 +16,12 @@ export const ACTION_TYPES = {
 };
 
 const initialState = {
-  rendererForms: [],
+  rendererForms: [] as ReadonlyArray<any>,
   showModal: false,
   toDeleteId: null
 };
+
+export type RenderersState = Readonly<typeof initialState>;
 
 export default (state = initialState, action) => {
   switch (action.type) {
