@@ -5,7 +5,7 @@
 		<field name="input" type="number">
 			<prompt bargein="true">Please enter a input</prompt>
 		</field>
-	<filled mode="all" namelist="input">	<submit next="http://localhost/motech-platform-server/modules/ws/callflows/calls/6acafc03-3818-4e36-b40a-8881fe5ac71b.vxml" />
+	<filled mode="all" namelist="input">	<submit next="http://localhost/openmrs/ws/callflows/calls/6acafc03-3818-4e36-b40a-8881fe5ac71b.vxml" />
 	</filled>
 	</form>
 </vxml>

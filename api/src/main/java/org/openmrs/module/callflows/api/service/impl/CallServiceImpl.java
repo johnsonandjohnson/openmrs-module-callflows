@@ -274,7 +274,7 @@ public class CallServiceImpl implements CallService {
             call.setStatus(CallStatus.FAILED);
             call.setStatusText(reason);
             callDao.update(call);
-            // send a motech event with all params as received, so that the module that called this
+            // send a OpenMRS event with all params as received, so that the module that called this
             // could inspect the error and retry if so desired
             callUtil.sendStatusEvent(call);
         } else {
@@ -343,7 +343,7 @@ public class CallServiceImpl implements CallService {
 
     private CallStatus determineStatus(CallDirection direction) {
         if (direction == CallDirection.OUTGOING) {
-            return CallStatus.MOTECH_INITIATED;
+            return CallStatus.OPENMRS_INITIATED;
         } else {
             return CallStatus.INITIATED;
         }

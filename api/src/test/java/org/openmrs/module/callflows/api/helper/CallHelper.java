@@ -44,7 +44,7 @@ public final class CallHelper {
 
     public static Call createOutboundCall() {
         Call call = createCall();
-        call.setStatus(CallStatus.MOTECH_INITIATED);
+        call.setStatus(CallStatus.OPENMRS_INITIATED);
         call.setDirection(CallDirection.OUTGOING);
         call.setCallId(Constants.OUTBOUND_CALL_ID.toString());
         return call;

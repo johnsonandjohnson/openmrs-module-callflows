@@ -5,7 +5,7 @@ import java.util.List;
 
 /**
  * The master settings domain manages both IVR configurations and renderers and represents the object that is serialized
- * in the database using MOTECH configuration service
+ * in the database using OpenMRS configuration service
  *
  * @author bramak09
  */

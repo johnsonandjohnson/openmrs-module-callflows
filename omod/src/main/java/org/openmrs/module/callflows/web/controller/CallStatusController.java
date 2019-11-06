@@ -51,7 +51,7 @@ public class CallStatusController {
      * IVR Providers like voxeo accept a string response for CCXML status handlers.
      * The response is used to typically transition to another section of the CCXML document,
      * and hence this status handler returns a string containing "error" in case of an error
-     * Sends out a call status event via the MOTECH event system
+     * Sends out a call status event via the OpenMRS event system
      *
      * @param callId callId to lookup by
      * @param params call status parameters

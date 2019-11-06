@@ -50,7 +50,7 @@ public final class Constants {
     public static final String CALLFLOW_INVALID_PREFIX = "Xu";
 
     public static final Collection<CallStatus> ACTIVE_OUTBOUND_CALL_STATUSES = Arrays
-            .asList(CallStatus.INITIATED, CallStatus.IN_PROGRESS, CallStatus.MOTECH_INITIATED);
+            .asList(CallStatus.INITIATED, CallStatus.IN_PROGRESS, CallStatus.OPENMRS_INITIATED);
     public static final String UPDATED = "-updated";
 
     public static final String VELOCITY = "velocity";
@@ -179,10 +179,10 @@ public final class Constants {
 
     public static final String STATUS_TEXT = "was busy";
 
-    public static final String NEXT_URL_JSON = "http://localhost/motech-platform-server/modules/ws/callflows/calls" +
+    public static final String NEXT_URL_JSON = "http://localhost/openmrs/ws/callflows/calls" +
         "/6acafc03-3818-4e36-b40a-8881fe5ac71b.json";
 
-    public static final String NEXT_URL_VXML = "http://localhost/motech-platform-server/modules/ws/callflows/calls" +
+    public static final String NEXT_URL_VXML = "http://localhost/openmrs/ws/callflows/calls" +
         "/6acafc03-3818-4e36-b40a-8881fe5ac71b.vxml";
 
     public static final String ERROR_SCRIPT = "error:SCRIPT:error in script";

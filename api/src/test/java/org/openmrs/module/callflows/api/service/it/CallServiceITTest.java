@@ -251,7 +251,7 @@ public class CallServiceITTest extends BaseModuleContextSensitiveTest {
 
         // Then
         assertNotNull(call);
-        assertThat(call.getStatus(), equalTo(CallStatus.MOTECH_INITIATED));
+        assertThat(call.getStatus(), equalTo(CallStatus.OPENMRS_INITIATED));
     }
 
     @Test
