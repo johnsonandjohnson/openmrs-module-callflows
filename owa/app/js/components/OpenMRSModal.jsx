@@ -20,7 +20,7 @@ const OpenMRSModal = (props) => {
   const { title, txt, confirmLabel, cancelLabel } = props;
   return (
     <Modal show={props.show} onHide={props.handleClose}>
-      <Modal.Header>
+      <Modal.Header bsClass="cfl-dialog-header">
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
       <Modal.Body>

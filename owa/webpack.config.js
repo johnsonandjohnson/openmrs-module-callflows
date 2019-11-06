@@ -230,7 +230,8 @@ var webpackConfig = {
       "react-redux",
       "redux-saga",
       "redux-logger",
-      "redux-thunk"
+      "redux-thunk",
+      "react-toastify"
     ]
   },
   devtool: devtool,

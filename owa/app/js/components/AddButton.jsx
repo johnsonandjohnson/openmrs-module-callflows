@@ -15,8 +15,9 @@ import _ from 'lodash';
 
 const AddButton = (props) => {
   const { handleAdd, txt, buttonClass } = props;
+  const clazz = buttonClass + ' add-button';
   return (
-    <Button className={buttonClass} onClick={handleAdd} >
+    <Button className={clazz} onClick={handleAdd} >
       <FontAwesomeIcon size="1x" icon={['fas', 'plus']} />
       {(txt === null) ? null : ' ' + txt}
     </Button>);

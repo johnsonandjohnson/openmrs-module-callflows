@@ -6,75 +6,138 @@
  * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
  * graphic logo is a trademark of OpenMRS Inc.
  */
+
 body {
-    font-family: "OpenSans", Arial, sans-serif;
-    -webkit-font-smoothing: subpixel-antialiased;
-    max-width: 1000px;
-    margin: 10px auto;
-    background: #eeeeee;
-    color: #363463;
-    font-size: 16px;
+  font-family: "OpenSans", Arial, sans-serif;
+  -webkit-font-smoothing: subpixel-antialiased;
+  max-width: 1000px;
+  margin: 10px auto;
+  background: #eeeeee;
+  color: #363463;
+  font-size: 16px;
 }
 
 header {
-    position: relative;
-    background-color: #00463f;
-    color: #CCC;
-    line-height: 1em;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-    -o-border-radius: 5px;
-    -ms-border-radius: 5px;
-    -khtml-border-radius: 5px;
-    border-radius: 5px;
-    display: block;
-    min-height: 48px;
+  position: relative;
+  background-color: #00463f;
+  color: #CCC;
+  line-height: 1em;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -o-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -khtml-border-radius: 5px;
+  border-radius: 5px;
+  display: block;
+  min-height: 48px;
 }
 
 header .logo {
-    float: left;
-    margin: 4px;
-    display: block;
+  float: left;
+  margin: 4px;
+  display: block;
 }
 
 header .logo img {
-    width: 120px;
+  width: 120px;
 }
 
 .body-wrapper {
-    margin-top: 10px;
-    padding: 10px;
-    background-color: white;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-    -o-border-radius: 5px;
-    -ms-border-radius: 5px;
-    -khtml-border-radius: 5px;
-    border-radius: 5px;
-    min-height: 500px;
-    justify-content: center;
+  margin-top: 10px;
+  padding: 10px;
+  background-color: white;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -o-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -khtml-border-radius: 5px;
+  border-radius: 5px;
+  min-height: 500px;
+  justify-content: center;
 }
 
 .app-title {
-    display: block;
-    float: right;
-    color: #eeeeee;
-    font-size: 32px;
-    margin: 4px;
-    height: 100%;
-    padding-top: 12px;
-    padding-right: 5px;
+  display: block;
+  float: right;
+  color: #eeeeee;
+  font-size: 32px;
+  margin: 4px;
+  height: 100%;
+  padding-top: 12px;
+  padding-right: 5px;
 }
 
 .instructions {
-    align-self: center;
+  align-self: center;
 }
 
 .accordion .content.close {
-    float: none;
+  float: none;
+  min-height: 0px;
+  max-height: 0px;
+}
+
+.accordion .content.open {
+  min-height: 500px;
+  max-height: 1500px;
+  background-color: #f3f3f3;
+}
+
+.accordion .content .form {
+  width: 95%;
+  margin: 20px auto;
+}
+
+.accordion .content .control-label {
+  margin: 0;
+}
+
+.accordion .content .form-tooltip {
+  margin: 0;
 }
 
 .form-control {
-    border: 1px solid #53545eda;
+  border: 1px solid #53545eda;
 }
 
+.add-button {
+  margin: 5px;
+}
+
+.col-remove-button {
+  align-self: center;
+  display: block;
+}
+
+.cfl-col-field {
+  padding: 1px;
+}
+
+.cfl-col-field-left {
+  @extend .cfl-col-field;
+  padding-left: 15px;
+}
+
+$highlight: darken(#009384, 15%);
+.cfl-dialog-header {
+  background: $highlight;
+  color: white;
+  padding: 0 20px;
+  padding-top: 5px;
+  border-bottom: darken($highlight, 20%) 1px solid;
+
+  i {
+    font-size: 1.5em;
+    color: white;
+    vertical-align: middle;
+    display: inline-block;
+    margin-bottom: 4px;
+  }
+
+  h3 {
+    display: inline-block;
+    color: white;
+    margin: 5px 0;
+    vertical-align: middle;
+  }
+}

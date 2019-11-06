@@ -1,0 +1,8 @@
+.map-field {
+  padding: 1px !important;
+}
+
+.map-field-left {
+  @extend .map-field;
+  padding-left: 15px !important;
+}
