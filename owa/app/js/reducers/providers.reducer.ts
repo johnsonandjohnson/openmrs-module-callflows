@@ -14,14 +14,15 @@ export const ACTION_TYPES = {
   ADD_NEW_FORM: 'providersReducer/ADD_NEW_FORM',
   REMOVE_FORM: 'providersReducer/REMOVE_FORM',
   OPEN_MODAL: 'providersReducer/OPEN_MODAL',
-  CLOSE_MODAL: 'providersReducer/CLOSE_MODAL'
+  CLOSE_MODAL: 'providersReducer/CLOSE_MODAL',
+  CLEAR_FOCUS: 'providersReducer/CLEAR_FOCUS'
 };
 
 const initialState = {
   configForms: [] as ReadonlyArray<any>,
   showModal: false,
   toDeleteId: null,
-  newEntry: null
+  focusEntry: null
 };
 
 export type ProvidersState = Readonly<typeof initialState>;
@@ -42,7 +43,7 @@ export default (state = initialState, action) => {
         configForms: action.payload.data.map((fetched) => {
           return new ConfigFormData(fetched);
         }),
-        newEntry: null
+        focusEntry: null
       };
     case REQUEST(ACTION_TYPES.FETCH_CONFIGS):
       return {
@@ -72,7 +73,7 @@ export default (state = initialState, action) => {
       return {
         ...state,
         configForms,
-        newEntry: form.localId
+        focusEntry: form.localId
       };
     }
     case ACTION_TYPES.REMOVE_FORM: {
@@ -81,6 +82,12 @@ export default (state = initialState, action) => {
         configForms: action.payload,
         showModal: false,
         toDeleteId: null
+      };
+    }
+    case ACTION_TYPES.CLEAR_FOCUS: {
+      return {
+        ...state,
+        focusEntry: null
       };
     }
     case ACTION_TYPES.RESET: {
@@ -133,6 +140,10 @@ export const removeForm = (id, configForms) => {
     payload
   }
 };
+
+export const clearFocus = () => ({
+  type: ACTION_TYPES.CLEAR_FOCUS
+});
 
 export const reset = () => ({
   type: ACTION_TYPES.RESET

@@ -25,7 +25,8 @@ import {
   addNewForm,
   removeForm,
   openModal,
-  closeModal
+  closeModal,
+  clearFocus
 } from '../reducers/providers.reducer';
 import RemoveButton from './RemoveButton';
 import ConfigForm from './ConfigForm';
@@ -47,7 +48,10 @@ export class Providers extends React.Component {
     if (prev.configForms.length > this.props.configForms.length) {
       this.props.postConfigs(this.props.configForms);
     }
-    this.focusDiv();
+
+    if (!!this.focusRef) {
+      this.focusDiv();
+    }
   }
 
   submitConfigs = () => {
@@ -66,7 +70,7 @@ export class Providers extends React.Component {
     this.props.removeForm(this.props.toDeleteId, this.props.configForms);
   }
 
-  getOffsetTop(element) {
+  getOffsetTop = (element) => {
     let offsetTop = 0;
     while (element) {
       offsetTop += element.offsetTop;
@@ -75,10 +79,11 @@ export class Providers extends React.Component {
     return offsetTop;
   }
 
-  focusDiv() {
+  focusDiv = () => {
     if (!_.isEmpty(this.focusRef)) {
       window.scrollTo({ left: 0, top: this.getOffsetTop(this.focusRef), behavior: 'smooth' });
       this.focusRef = null;
+      this.props.clearFocus();
     }
   }
 
@@ -116,7 +121,7 @@ export class Providers extends React.Component {
                     border={true}
                     open={item.isOpen}>
                     <div ref={(div) => {
-                      if (item.localId === this.props.newEntry) {
+                      if (item.localId === this.props.focusEntry) {
                         this.focusRef = div;
                       }
                     }}>
@@ -150,7 +155,7 @@ export const mapStateToProps = state => ({
   configForms: state.providersReducer.configForms,
   showModal: state.providersReducer.showModal,
   toDeleteId: state.providersReducer.toDeleteId,
-  newEntry: state.providersReducer.newEntry
+  focusEntry: state.providersReducer.focusEntry
 });
 
 const mapDispatchToProps = {
@@ -161,7 +166,8 @@ const mapDispatchToProps = {
   addNewForm,
   removeForm,
   openModal,
-  closeModal
+  closeModal,
+  clearFocus
 };
 
 export default connect(
