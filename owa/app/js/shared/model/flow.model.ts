@@ -1,7 +1,7 @@
 export interface IFlow {
   id?: number;
   name?: string;
-  raw?: string;
+  raw?: any;
   status?: string;
   description?: string;
 }

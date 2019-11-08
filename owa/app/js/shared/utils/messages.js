@@ -15,3 +15,8 @@ export const FIELD_REQUIRED = 'This field is required';
 export const GENERIC_FAILURE = 'An error occurred.';
 export const GENERIC_PROCESSING = 'Processing...';
 export const GENERIC_SUCCESS = 'Success.';
+
+// Designer flow test
+export const DESIGNER_FLOW_TEST_CONFIGURATION_LABEL = 'Configuration';
+export const DESIGNER_FLOW_TEST_EXTENSION_LABEL = 'Extension';
+export const DESIGNER_FLOW_TEST_PHONE_NUMBER_LABEL = 'Phone Number';

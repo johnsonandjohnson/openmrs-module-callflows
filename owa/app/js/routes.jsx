@@ -14,7 +14,7 @@ import App from './components/app';
 import Providers from './components/Providers';
 import Renderers from './components/Renderers';
 import BreadCrumb from './components/BreadCrumb';
-import Designer from './components/designer/designer';
+import Designer from './components/designer/index';
 
 export default (store) => (
   <div>
