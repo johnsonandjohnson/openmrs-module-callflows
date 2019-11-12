@@ -47,11 +47,46 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
     //TODO: Add name changing via redux
   }
 
+  renderStepElement = (node: any, elementName: string, label: string) => {
+    if (!!node.templates[elementName]) {
+      return (
+        <div>
+          <label>{label}:</label>
+          <p>{node.templates[elementName].content}</p>
+        </div>
+      );
+    } else return null;
+  }
+
+  renderStepSeparator = () => {
+    //TODO: Temporary solution, group user and system steps into pairs
+    return <br />;
+  }
+
+  renderSteps = () => {
+    let { flow } = this.props;
+    if (!!flow.raw) {
+      console.log(flow.raw);
+      return JSON.parse(flow.raw).nodes.map((node: any) => {
+        return (
+          <div>
+            <Accordion title={node.step}
+              border={true}
+              open={false}>
+              {this.renderStepElement(node, 'text', 'text')}
+              {this.renderStepElement(node, 'vxml', 'vxml')}
+              {this.renderStepElement(node, 'kookoo', 'kookoo')}
+              {this.renderStepElement(node, 'velocity', 'velocity')}
+            </Accordion>
+            {node.nodeType === 'system' ? this.renderStepSeparator() : ''}
+          </div>
+        );
+      });
+    } else return null;
+  }
 
   render() {
-    const title = 'Designer';
     const { flow } = this.props;
-
     const formClass = 'form-control';
     const errorFormClass = formClass + ' error-field';
     return (
@@ -77,14 +112,7 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
         </div>
         <hr />
         <div className="panel-body">
-          {JSON.parse(flow.raw).nodes.map((node: any) => {
-            <Accordion title={node.step}
-              border={true}
-              open={false}>
-              {node}
-            </Accordion>
-          })}
-
+          {this.renderSteps()}
         </div>
       </div>
     );

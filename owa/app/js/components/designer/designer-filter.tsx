@@ -41,7 +41,7 @@ export default class DesignerFilters extends React.PureComponent<IDesignerFilter
       <Col sm="7">
         <Row sm="8">
           <Col sm="6">
-            Search Recipient phone number
+            Search by flow name:
           </Col>
         </Row>
         <Row className="u-mb-10" sm="8">

@@ -29,14 +29,13 @@ export class DesignerTable extends React.PureComponent<IDesignerTableProps, IDes
   render = () => {
     const columns = [
       {
-        Header: 'Name',
         accessor: 'name',
         Cell: props => {
           const link = `#designer/${props.value}`;
           return ( //TODO: use Link
             <span>
               {props.value}
-              <a href={link}>Edit</a>
+              <a href={link} className ="pull-right" >Edit</a>
             </span>
           );
         }
@@ -51,6 +50,7 @@ export class DesignerTable extends React.PureComponent<IDesignerTableProps, IDes
         loading={this.props.loading}
         pages={this.props.pages}
         fetchDataCallback={this.props.getFlows}
+        showPagination={false}
       />
     );
   }

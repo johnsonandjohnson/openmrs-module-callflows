@@ -29,6 +29,7 @@ export interface ITableProps {
   pages: number;
   filtersComponent: any;
   filterProps?: {};
+  showPagination: boolean;
   fetchDataCallback(filters: {}): void;
 };
 
@@ -99,6 +100,7 @@ export default class Table extends React.PureComponent<ITableProps, IPaginationB
           ofText={ofText}
           noDataText={<span className="sortableTable-noDataText">{noDataText}</span>}
           pageText={pageText}
+          showPagination={this.props.showPagination}
         />
       </div>
     );
