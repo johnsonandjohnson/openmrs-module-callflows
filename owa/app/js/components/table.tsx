@@ -47,8 +47,6 @@ export default class Table extends React.PureComponent<ITableProps, IPaginationB
   }
 
   fetchData = (state, instance) => {
-    console.log('test');
-    console.log(this.props);
     this.setState(
       {
         activePage: state.page,

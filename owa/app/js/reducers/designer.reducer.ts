@@ -40,35 +40,27 @@ export default (state: DesignerState = initialState, action): DesignerState => {
         })
       };
     case REQUEST(ACTION_TYPES.FETCH_FLOWS):
-      console.log('Fetching flows..');
       return {
         ...state
       };
     case FAILURE(ACTION_TYPES.FETCH_FLOWS):
-      console.log('Fetching flows failure');
       return {
         ...state
       };
     case SUCCESS(ACTION_TYPES.FETCH_FLOWS):
-      console.log('Fetching flows success');
-      console.log(action.payload.data.results);
       return {
         ...state,
         data: action.payload.data.results
       }
     case REQUEST(ACTION_TYPES.FETCH_FLOW):
-      console.log('Fetching flows..');
       return {
         ...state
       };
     case FAILURE(ACTION_TYPES.FETCH_FLOW):
-      console.log('Fetching flow failure');
       return {
         ...state
       };
     case SUCCESS(ACTION_TYPES.FETCH_FLOW):
-      console.log('Fetching flows success');
-      console.log(action.payload.data.results);
       return {
         ...state,
         flow: action.payload.data.results[0]
@@ -101,7 +93,6 @@ export const getConfigs = () => async (dispatch) => {
     type: ACTION_TYPES.FETCH_CONFIGS,
     payload: axiosInstance.get(requestUrl)
   });
-  console.log('test');
 };
 
 export const getFlows = (filters: any = {}) => async (dispatch) => {

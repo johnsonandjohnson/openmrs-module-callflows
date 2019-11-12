@@ -65,7 +65,6 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
   renderSteps = () => {
     let { flow } = this.props;
     if (!!flow.raw) {
-      console.log(flow.raw);
       return JSON.parse(flow.raw).nodes.map((node: any) => {
         return (
           <div>
