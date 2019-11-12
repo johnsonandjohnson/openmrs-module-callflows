@@ -9,7 +9,6 @@
 
 import React from 'react';
 import ReactTable from 'react-table';
-
 import { LocalizedMessage } from '@openmrs/react-components';
 import { withFiltersChangedCallback } from './with-filters-changed-callback';
 import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_SORT, DEFAULT_ORDER, MIN_ROWS, PAGE_SIZE_OPTIONS } from '../constants';

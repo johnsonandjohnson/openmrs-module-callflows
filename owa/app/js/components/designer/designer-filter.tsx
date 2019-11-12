@@ -6,14 +6,11 @@
  * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
  * graphic logo is a trademark of OpenMRS Inc.
  */
-import moment from 'moment';
 import React from 'react';
 import {
   Col,
   Row
 } from 'react-bootstrap';
-
-
 
 export interface IDesignerFiltersProps {
   filtersChangedCallback?(filters: {}): void;

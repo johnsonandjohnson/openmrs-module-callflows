@@ -8,10 +8,6 @@
  */
 
 import React from 'react';
-import {
-  Col,
-  Row
-} from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 import {
@@ -23,7 +19,6 @@ import {
 
 } from '../../reducers/designer.reducer';
 import { IRootState } from '../../reducers';
-import DesignerTable from './designer-table';
 import {
   Form,
   Button,
@@ -31,18 +26,15 @@ import {
   FormControl
 } from 'react-bootstrap';
 import TextLabel from '../text-label';
-import Tooltip from '../tooltip';
 import * as Msg from '../../shared/utils/messages';
 import { validateForm, validateField } from '../../shared/utils/validation-util'
 import { IFlowTestError, validationSchema } from '../../shared/model/flow-test.model';
 import ErrorDesc from '../error-desc';
 
-
-
-
 export interface IDesignerFlowTestProps extends StateProps, DispatchProps, RouteComponentProps<{ flowName: string }> {
   flowName?: string
 };
+
 export interface IDesignerFlowTestState {
   configuration: string, //TODO: move to form
   extension: string,
@@ -153,15 +145,10 @@ export class DesignerFlowTest extends React.PureComponent<IDesignerFlowTestProps
     }
   }
 
-
   render() {
-    const title = 'Designer';
-    const { flow } = this.props;
-
     const formClass = 'form-control';
-
     const errorFormClass = formClass + ' error-field';
-    const {errors} = this.state;
+    const { errors } = this.state;
 
     return (
       <Form className="form" onSubmit={this.handleSubmit}>
@@ -218,4 +205,3 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(DesignerFlowTest);
-

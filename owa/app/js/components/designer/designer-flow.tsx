@@ -18,7 +18,6 @@ import {
   getFlow
 } from '../../reducers/designer.reducer';
 import { IRootState } from '../../reducers';
-import DesignerTable from './designer-table';
 import DesignerFlowTest from './designer-flow-test';
 import {
   Form,
@@ -31,8 +30,8 @@ import { Accordion } from '@openmrs/react-components';
 
 export interface IDesignerFlowProps extends StateProps, DispatchProps, RouteComponentProps<{ flowName: string }> {
 };
-export interface IDesignerFlowState {
 
+export interface IDesignerFlowState {
 };
 
 export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesignerFlowState> {
@@ -136,4 +135,3 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(DesignerFlow);
-

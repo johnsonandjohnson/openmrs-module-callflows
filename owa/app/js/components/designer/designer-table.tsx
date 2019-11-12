@@ -9,7 +9,6 @@
 
 import React from 'react';
 import { connect } from 'react-redux';
-
 import { getFlows } from '../../reducers/designer.reducer';
 import { IRootState } from '../../reducers';
 import Table from '../table';
