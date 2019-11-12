@@ -191,14 +191,14 @@ public class CallUtilTest extends BaseTest {
         // Given a call
         given(request.getScheme()).willReturn("http");
         given(request.getHeader("Host")).willReturn("localhost");
-        given(request.getContextPath()).willReturn("/motech-platform-server/modules");
+        given(request.getContextPath()).willReturn("/openmrs");
 
         // When
         String url = callUtil.buildContinuationUrl(request, inboundCall, Constants.CONFIG_RENDERER_VXML);
 
         // Then
         assertNotNull(url);
-        assertThat(url, equalTo("http://localhost/motech-platform-server/modules/ws/callflows" +
+        assertThat(url, equalTo("http://localhost/openmrs/ws/callflows" +
             "/calls/" + inboundCall.getCallId() + ".vxml"));
 
     }

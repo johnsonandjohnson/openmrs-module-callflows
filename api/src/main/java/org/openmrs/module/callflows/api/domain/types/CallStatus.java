@@ -9,9 +9,9 @@ package org.openmrs.module.callflows.api.domain.types;
 public enum CallStatus {
 
     /**
-     * Motech received an request to initiate an outbound call
+     * OpenMRS received an request to initiate an outbound call
      */
-    MOTECH_INITIATED,
+    OPENMRS_INITIATED,
 
     /**
      * A call was initiated at the IVR provider

@@ -475,7 +475,7 @@ public class CallServiceTest extends BaseTest {
         // And we shouldn't have to update the call status, since we are creating it
         verify(callDao, never()).update(any(Call.class));
         verify(callUtil, times(1)).buildOutboundRequest("1234567890", outboundCall, voxeo, params);
-        // And no failure , so no motech event to be sent
+        // And no failure , so no OpenMRS event to be sent
         assertNoEventSent();
     }
 

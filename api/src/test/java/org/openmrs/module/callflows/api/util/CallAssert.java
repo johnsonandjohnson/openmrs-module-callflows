@@ -135,7 +135,7 @@ public final class CallAssert {
     }
 
     public static void assertOutgoingCall(Call call) {
-        assertThat(call.getStatus(), equalTo(CallStatus.MOTECH_INITIATED));
+        assertThat(call.getStatus(), equalTo(CallStatus.OPENMRS_INITIATED));
         assertThat(call.getDirection(), equalTo(CallDirection.OUTGOING));
     }
 
