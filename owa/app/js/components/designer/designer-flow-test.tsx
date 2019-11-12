@@ -154,7 +154,6 @@ export class DesignerFlowTest extends React.PureComponent<IDesignerFlowTestProps
       <Form className="form" onSubmit={this.handleSubmit}>
         <FormGroup controlId={"formName"}>
           <TextLabel text={Msg.DESIGNER_FLOW_TEST_CONFIGURATION_LABEL} isMandatory={false} isWithColon={true} />
-          {/* <Tooltip message={Msg.MAPPING_NAME_DESC} /> */}
           <FormControl type="text"
             name='name'
             value={this.state.configuration}
@@ -164,7 +163,6 @@ export class DesignerFlowTest extends React.PureComponent<IDesignerFlowTestProps
         </FormGroup>
         <FormGroup controlId={"formName"}>
           <TextLabel text={Msg.DESIGNER_FLOW_TEST_EXTENSION_LABEL} isMandatory={false} isWithColon={true} />
-          {/* <Tooltip message={Msg.MAPPING_NAME_DESC} /> */}
           <FormControl type="text"
             name='name'
             value={this.state.extension}
@@ -174,7 +172,6 @@ export class DesignerFlowTest extends React.PureComponent<IDesignerFlowTestProps
         </FormGroup>
         <FormGroup controlId={"formName"}>
           <TextLabel text={Msg.DESIGNER_FLOW_TEST_PHONE_NUMBER_LABEL} isMandatory={false} isWithColon={true} />
-          {/* <Tooltip message={Msg.MAPPING_NAME_DESC} /> */}
           <FormControl type="text"
             name='name'
             value={this.state.phoneNumber}
