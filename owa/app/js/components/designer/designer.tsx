@@ -23,6 +23,7 @@ import {
 
 } from '../../reducers/designer.reducer';
 import { IRootState } from '../../reducers';
+import DesignerTable from './designer-table';
 
 export interface IDesignerProps extends StateProps, DispatchProps {
 };
@@ -55,22 +56,7 @@ export class Designer extends React.PureComponent<IDesignerProps, IDesignerState
           </div>
         </div>
         <div className="panel-body">
-          
-          { this.props.flows.map(item => {
-            return (
-              <Row key={item.id}>
-                <Col sm={11}>
-                  {item.name}
-                </Col>
-                <Col sm={1}>
-                  <RemoveButton
-                    handleRemove={()=>alert('t')}
-                    localId={'test'}
-                    tooltip="Delete Provider" />
-                </Col>
-              </Row>
-            );
-          })}
+          <DesignerTable />
         </div>
       </div>
     );

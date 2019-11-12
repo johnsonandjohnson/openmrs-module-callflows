@@ -1,19 +1,23 @@
 import axiosInstance from '../config/axios';
 import { SUCCESS, REQUEST, FAILURE } from './action-type.util';
 import ConfigFormData from '../components/ConfigForm/ConfigFormData';
-import { IFlow } from '../shared/model/flow.model';
+import { IFlow, defaultValue } from '../shared/model/flow.model';
 
 export const ACTION_TYPES = {
   RESET: 'designerReducer/RESET',
   FETCH_CONFIGS: 'designerReducer/FETCH_CONFIGS',
-  FETCH_FLOWS: 'designerReducer/FETCH_FLOWS'
+  FETCH_FLOWS: 'designerReducer/FETCH_FLOWS',
+  FETCH_FLOW: 'designerReducer/FETCH_FLOW'
 };
 
 const initialState = {
   configForms: [] as ReadonlyArray<any>,
   showModal: false,
   toDeleteId: null,
-  flows: [] as ReadonlyArray<IFlow>
+  pages: 0,
+  loading: false,
+  data: [],
+  flow: defaultValue as unknown as IFlow
 };
 
 export type DesignerState = Readonly<typeof initialState>;
@@ -36,21 +40,30 @@ export default (state: DesignerState = initialState, action): DesignerState => {
         })
       };
     case REQUEST(ACTION_TYPES.FETCH_FLOWS):
-      console.log('Fetching flows..');
       return {
         ...state
       };
     case FAILURE(ACTION_TYPES.FETCH_FLOWS):
-      console.log('Fetching flows failure');
       return {
         ...state
       };
     case SUCCESS(ACTION_TYPES.FETCH_FLOWS):
-      console.log('Fetching flows success');
-      console.log(action.payload.data.results);
       return {
         ...state,
-        flows: action.payload.data.results
+        data: action.payload.data.results
+      }
+    case REQUEST(ACTION_TYPES.FETCH_FLOW):
+      return {
+        ...state
+      };
+    case FAILURE(ACTION_TYPES.FETCH_FLOW):
+      return {
+        ...state
+      };
+    case SUCCESS(ACTION_TYPES.FETCH_FLOW):
+      return {
+        ...state,
+        flow: action.payload.data.results[0]
       }
     default:
       return state;
@@ -80,13 +93,22 @@ export const getConfigs = () => async (dispatch) => {
     type: ACTION_TYPES.FETCH_CONFIGS,
     payload: axiosInstance.get(requestUrl)
   });
-  console.log('test');
 };
 
-export const getFlows = (flowName = '') => async (dispatch) => {
-  const requestUrl = callflowsPath + `/flows?lookup=By+Name&term=${flowName}`;
+export const getFlows = (filters: any = {}) => async (dispatch) => {
+  const term = filters.flowName ? filters.flowName : '';
+  const requestUrl = callflowsPath + `/flows?lookup=By+Name&term=${term}`;
   await dispatch({
     type: ACTION_TYPES.FETCH_FLOWS,
+    payload: axiosInstance.get(requestUrl)
+  });
+};
+
+export const getFlow = (flowName: string) => async (dispatch) => {
+  //currently there is no endpoint for fetching one instance
+  const requestUrl = callflowsPath + `/flows?lookup=By+Name&term=${flowName}`;
+  await dispatch({
+    type: ACTION_TYPES.FETCH_FLOW,
     payload: axiosInstance.get(requestUrl)
   });
 };
