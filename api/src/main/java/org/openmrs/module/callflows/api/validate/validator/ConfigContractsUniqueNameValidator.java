@@ -2,9 +2,9 @@ package org.openmrs.module.callflows.api.validate.validator;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import org.apache.commons.lang.StringUtils;
@@ -16,7 +16,6 @@ import org.openmrs.module.callflows.api.validate.annotation.UniqueName;
 public class ConfigContractsUniqueNameValidator implements ConstraintValidator<UniqueName, ConfigContracts> {
 
     private static final String PROPERTY_PATH = "configContracts.name";
-    private static final long ONE = 1;
 
     /**
      * Validates the name uniqueness.
@@ -43,21 +42,19 @@ public class ConfigContractsUniqueNameValidator implements ConstraintValidator<U
     }
 
     private List<String> findNotUniqueNames(ConfigContracts configContracts) {
-        Map<String, Long> map = new HashMap<>();
+        List<String> notUniqueNames = new ArrayList<>();
+        Set<String> uniqueNames = new HashSet<>();
         for (ConfigContract configContract : configContracts.getConfigContracts()) {
             String name = configContract.getName();
             if (name != null) { // it should be validate by another constraint
-                map.merge(name, ONE, Long::sum);
+                boolean added = uniqueNames.add(name);
+                if (!added) {
+                    notUniqueNames.add(name);
+                }
             }
         }
-        List<String> list = new ArrayList<>();
-        for (Map.Entry<String, Long> e : map.entrySet()) {
-            if (e.getValue() > ONE) {
-                list.add(e.getKey());
-            }
-        }
-        Collections.sort(list);
-        return list;
+        Collections.sort(notUniqueNames);
+        return notUniqueNames;
     }
 
     @Override
