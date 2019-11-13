@@ -1,6 +1,6 @@
 import axiosInstance from '../config/axios';
 import { SUCCESS, REQUEST, FAILURE } from './action-type.util';
-import ConfigFormData from '../components/ConfigForm/ConfigFormData';
+import ConfigFormData from '../components/config-form/config-form-data';
 import { IFlow, defaultValue } from '../shared/model/flow.model';
 
 export const ACTION_TYPES = {

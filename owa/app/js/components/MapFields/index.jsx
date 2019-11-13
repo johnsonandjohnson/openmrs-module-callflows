@@ -17,7 +17,7 @@ import MapField, {
   defaultColumnSizes
 } from './MapField';
 import AddButton from '../AddButton';
-import MapEntry from '../../shared/utils/MapEntry';
+import MapEntry from '../../shared/utils/map-entry-util';
 import './index.scss';
 
 const MapFields = (props) => {

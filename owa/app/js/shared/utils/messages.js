@@ -48,5 +48,3 @@ export const CONFIG_FORM_SAVE_BUTTON = 'SAVE';
 export const CONFIG_FORM_SERVICE_MAP_HEADER = 'Injected services map';
 export const CONFIG_FORM_SERVICE_MAP_NOTE = 'Map of services that can be injected in IVR templates. ' +
   'Key is the name used in Velocity, Value is the class of OSGi service';
-
-export const PARAM_FIELDS_DEFAULT_HEADER = 'Map';

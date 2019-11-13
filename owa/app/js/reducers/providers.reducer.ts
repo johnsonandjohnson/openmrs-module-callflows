@@ -2,9 +2,10 @@ import axiosInstance from '../config/axios';
 import { SUCCESS, REQUEST, FAILURE } from './action-type.util';
 import _ from 'lodash';
 
-import ConfigFormData from '../components/ConfigForm/ConfigFormData';
+import ConfigFormData from '../components/config-form/config-form-data';
 import * as Msg from '../shared/utils/messages';
 import { handleRequest } from '../shared/utils/request-status-util';
+import IConfig from '../shared/model/config.model';
 
 export const ACTION_TYPES = {
   RESET: 'providersReducer/RESET',
@@ -19,7 +20,7 @@ export const ACTION_TYPES = {
 };
 
 const initialState = {
-  configForms: [] as ReadonlyArray<any>,
+  configForms: [] as ReadonlyArray<ConfigFormData>,
   showModal: false,
   toDeleteId: null,
   focusEntry: null
@@ -67,7 +68,7 @@ export default (state = initialState, action) => {
       };
     }
     case ACTION_TYPES.ADD_NEW_FORM: {
-      let configForms = Array.from(state.configForms);
+      let configForms: ConfigFormData[] = Array.from(state.configForms);
       let form = new ConfigFormData();
       configForms.push(form);
       return {
@@ -160,12 +161,11 @@ export const closeModal = () => ({
 
 const callflowsPath = 'ws/callflows';
 
-export const postConfigs = (configForms) => async (dispatch) => {
+export const postConfigs = (configForms: ConfigFormData[]) => async (dispatch) => {
   const requestUrl = callflowsPath + '/configs';
-  let data = configForms.map((form) => {
+  let data: IConfig[] = configForms.map((form: ConfigFormData) => {
     return form.config.getModel();
   });
-
   let body = {
     type: ACTION_TYPES.POST_CONFIG,
     payload: axiosInstance.post(requestUrl, data)

@@ -22,10 +22,9 @@ import {
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 
-import ConfigUI from './ConfigUI';
+import ConfigUI from './config-ui';
 import * as Msg from '../../shared/utils/messages';
 import MapFields from '../MapFields';
-import ParamsField from '../ParamsField';
 
 const ConfigForm = (props) => {
 
@@ -125,12 +124,15 @@ const ConfigForm = (props) => {
           </Col>
         </Row>
       </FormGroup>
-      <ParamsField
-        fieldName="servicesMap"
-        updateValues={handleArrayChange}
-        header={Msg.CONFIG_FORM_SERVICE_MAP_HEADER}
-        note={Msg.CONFIG_FORM_SERVICE_MAP_NOTE}
-        params={props.config.servicesMap} />
+      <FormGroup controlId={`servicesMap_${props.localId}`}>
+        <ControlLabel>{Msg.CONFIG_FORM_SERVICE_MAP_HEADER}</ControlLabel>
+        <HelpBlock>{Msg.CONFIG_FORM_SERVICE_MAP_NOTE}</HelpBlock>
+        <FormControl type="text"
+          componentClass="textarea"
+          name="servicesMap"
+          value={props.config.servicesMap}
+          onChange={handleChange} />
+      </FormGroup>
       <FormGroup controlId={`testUsersMap_${props.localId}`}>
         <ControlLabel>{Msg.CONFIG_FORM_USERS_HEADER}</ControlLabel>
         <HelpBlock>{Msg.CONFIG_FORM_USERS_NOTE}</HelpBlock>

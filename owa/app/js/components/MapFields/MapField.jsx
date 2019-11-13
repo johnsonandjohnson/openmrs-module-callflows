@@ -18,7 +18,7 @@ import {
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 
-import MapEntry from '../../shared/utils/MapEntry';
+import MapEntry from '../../shared/utils/map-entry-util';
 import RemoveButton from '../RemoveButton';
 import './index.scss';
 

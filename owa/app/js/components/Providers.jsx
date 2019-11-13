@@ -29,7 +29,7 @@ import {
   clearFocus
 } from '../reducers/providers.reducer';
 import RemoveButton from './RemoveButton';
-import ConfigForm from './ConfigForm';
+import ConfigForm from './config-form';
 import OpenMRSModal from './OpenMRSModal';
 
 export class Providers extends React.Component {
