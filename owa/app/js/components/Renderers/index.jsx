@@ -11,7 +11,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Accordion } from '@openmrs/react-components';
 import { Col, Row } from 'react-bootstrap';
-
+import _ from 'lodash';
 
 import AddButton from '../AddButton';
 import {
@@ -22,7 +22,8 @@ import {
   addNewForm,
   removeForm,
   openModal,
-  closeModal
+  closeModal,
+  clearFocus
 } from '../../reducers/renderersReducer';
 
 import RendererForm from '../RendererForm';
@@ -31,13 +32,22 @@ import OpenMRSModal from '../OpenMRSModal';
 
 export class Renderers extends React.Component {
 
+  constructor(props) {
+    super(props);
+    this.focusRef = null;
+  }
+
   componentDidMount = () => {
     this.props.getRenderers();
+    this.focusDiv();
   }
 
   componentDidUpdate = (prev) => {
     if (prev.rendererForms.length > this.props.rendererForms.length) {
-        this.props.postRenderers(this.props.rendererForms);
+      this.props.postRenderers(this.props.rendererForms);
+    }
+    if (!!this.focusRef) {
+      this.focusDiv();
     }
   }
 
@@ -54,6 +64,23 @@ export class Renderers extends React.Component {
 
   handleConfirm = () => {
     this.props.removeForm(this.props.toDeleteId, this.props.rendererForms);
+  }
+
+  getOffsetTop = (element) => {
+    let offsetTop = 0;
+    while (element) {
+      offsetTop += element.offsetTop;
+      element = element.offsetParent;
+    }
+    return offsetTop;
+  }
+
+  focusDiv = () => {
+    if (!_.isEmpty(this.focusRef)) {
+      window.scrollTo({ left: 0, top: this.getOffsetTop(this.focusRef), behavior: 'smooth' });
+      this.focusRef = null;
+      this.props.clearFocus();
+    }
   }
 
 
@@ -76,25 +103,38 @@ export class Renderers extends React.Component {
         <div className="panel-body">
           <div className="row">
             <div className="col-md-12 col-xs-12">
-              <AddButton handleAdd={this.props.addNewForm} txt={buttonLabel} buttonClass='confirm' />
+              <AddButton 
+                handleAdd={this.props.addNewForm} 
+                txt={buttonLabel} 
+                buttonClass='confirm' />
             </div>
           </div>
           {this.props.rendererForms.map(item => {
           return (
             <Row key={item.localId}>
-              <Col sm={11}>
+              <Col sm={11}
+              className="cfl-col-field-left">
                 <Accordion title={item.renderer.name}
                   border={true}
                   open={item.isOpen}>
-                  <RendererForm renderer = {item.renderer}
-                    isOpen = {item.isOpen}
-                    localId = {item.localId}
-                    updateValues={this.props.updateRendererForm}
-                    submit={this.submitRenderers}/>
+                  <div ref={(div) => {
+                    if (item.localId === this.props.focusEntry) {
+                      this.focusRef = div;
+                    }
+                  }}>
+                    <RendererForm
+                      renderer={item.renderer}
+                      isOpen={item.isOpen}
+                      localId={item.localId}
+                      updateValues={this.props.updateRendererForm}
+                      submit={this.submitRenderers} />
+                  </div>
                 </Accordion>
               </Col>
-              <Col sm={1}>
+              <Col sm={1}
+              className="cfl-col-field">
                 <RemoveButton
+                  buttonClass="col-remove-button"
                   handleRemove={this.handleRemove}
                   localId={item.localId}
                   tooltip="Delete Renderer" />
@@ -111,7 +151,8 @@ export class Renderers extends React.Component {
 export const mapStateToProps = state => ({
   rendererForms: state.renderersReducer.rendererForms,
   showModal: state.renderersReducer.showModal,
-  toDeleteId: state.renderersReducer.toDeleteId
+  toDeleteId: state.renderersReducer.toDeleteId,
+  focusEntry: state.renderersReducer.focusEntry
 });
 
 const mapDispatchToProps = {
@@ -122,7 +163,8 @@ const mapDispatchToProps = {
   addNewForm,
   removeForm,
   openModal,
-  closeModal
+  closeModal,
+  clearFocus
 };
 
 export default connect(

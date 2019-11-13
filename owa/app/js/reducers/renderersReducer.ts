@@ -3,6 +3,8 @@ import { SUCCESS, REQUEST, FAILURE } from './action-type.util';
 import _ from 'lodash';
 
 import RendererFormData from '../components/RendererForm/RendererFormData';
+import * as Msg from '../shared/utils/messages';
+import { handleRequest } from '../shared/utils/request-status-util';
 
 export const ACTION_TYPES = {
   RESET: 'renderersReducer/RESET',
@@ -12,13 +14,15 @@ export const ACTION_TYPES = {
   ADD_NEW_FORM: 'renderersReducer/ADD_NEW_FORM',
   REMOVE_FORM: 'renderersReducer/REMOVE_FORM',
   OPEN_MODAL: 'renderersReducer/OPEN_MODAL',
-  CLOSE_MODAL: 'renderersReducer/CLOSE_MODAL'
+  CLOSE_MODAL: 'renderersReducer/CLOSE_MODAL',
+  CLEAR_FOCUS: 'renderersReducer/CLEAR_FOCUS'
 };
 
 const initialState = {
   rendererForms: [] as ReadonlyArray<any>,
   showModal: false,
-  toDeleteId: null
+  toDeleteId: null,
+  focusEntry: null
 };
 
 export type RenderersState = Readonly<typeof initialState>;
@@ -36,7 +40,10 @@ export default (state = initialState, action) => {
     case SUCCESS(ACTION_TYPES.POST_RENDERER):
       return {
         ...state,
-        rendererForms: action.payload.data
+        rendererForms: action.payload.data.map((fetched) => {
+          return new RendererFormData(fetched);
+        }),
+        focusEntry: null
       };
     case REQUEST(ACTION_TYPES.FETCH_RENDERERS):
       return {
@@ -61,10 +68,12 @@ export default (state = initialState, action) => {
     }
     case ACTION_TYPES.ADD_NEW_FORM: {
       let rendererForms = Array.from(state.rendererForms);
-      rendererForms.push(new RendererFormData());
+      let form = new RendererFormData();
+      rendererForms.push(form);
       return {
         ...state,
-        rendererForms
+        rendererForms,
+        focusEntry: form.localId
       };
     }
     case ACTION_TYPES.REMOVE_FORM: {
@@ -73,6 +82,12 @@ export default (state = initialState, action) => {
         rendererForms: action.payload,
         showModal: false,
         toDeleteId: null
+      };
+    }
+    case ACTION_TYPES.CLEAR_FOCUS: {
+      return {
+        ...state,
+        focusEntry: null
       };
     }
     case ACTION_TYPES.RESET: {
@@ -126,6 +141,10 @@ export const removeForm = (id, rendererForms) => {
   }
 };
 
+export const clearFocus = () => ({
+  type: ACTION_TYPES.CLEAR_FOCUS
+});
+
 export const reset = () => ({
   type: ACTION_TYPES.RESET
 });
@@ -146,10 +165,12 @@ export const postRenderers = (rendererForms) => async (dispatch) => {
   let data = rendererForms.map((form) => {
     return form.renderer.getModel();
   });
-  await dispatch({
-    type: ACTION_TYPES.FETCH_RENDERERS,
+
+  let body = {
+    type: ACTION_TYPES.POST_RENDERER,
     payload: axiosInstance.post(requestUrl, data)
-  });
+  };
+  handleRequest(dispatch, body, Msg.GENERIC_SUCCESS, Msg.GENERIC_FAILURE);
 };
 
 export const getRenderers = () => async (dispatch) => {
