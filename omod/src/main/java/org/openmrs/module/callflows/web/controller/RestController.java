@@ -1,10 +1,14 @@
 package org.openmrs.module.callflows.web.controller;
 
+import static org.openmrs.module.callflows.ValidationMessages.SENT_DATA_IS_NOT_VALID;
+import static org.openmrs.module.callflows.ValidationMessages.VALIDATION_ERROR_OCCURS;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.callflows.api.contract.ErrorResponse;
+import org.openmrs.module.callflows.api.contract.ValidationErrorResponse;
 import org.openmrs.module.callflows.api.exception.CallFlowAlreadyExistsException;
-
+import org.openmrs.module.callflows.api.exception.ValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -16,7 +20,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  *
  * @author bramak09
  */
-public class RestController {
+public abstract class RestController {
 
     private static final Log LOGGER = LogFactory.getLog(RestController.class);
 
@@ -40,6 +44,19 @@ public class RestController {
         return new ErrorResponse(ERR_BAD_PARAM, e.getMessage());
     }
 
+    /**
+     * Exception handler for validation bad request - Http status code of 400
+     *
+     * @param e the exception throw
+     * @return a error response
+     */
+    @ExceptionHandler(ValidationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ErrorResponse handleException(ValidationException e) {
+        LOGGER.debug(SENT_DATA_IS_NOT_VALID, e);
+        return new ValidationErrorResponse(ERR_BAD_PARAM, VALIDATION_ERROR_OCCURS, e.getConstraintViolations());
+    }
 
     /**
      * Exception handler for conflict request or entity already exists exception - Http status code of 409

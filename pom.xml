@@ -70,6 +70,12 @@
 				<version>${guavaVersion}</version>
 			</dependency>
 			<dependency>
+				<groupId>com.jayway.jsonpath</groupId>
+				<artifactId>json-path-assert</artifactId>
+				<version>${jsonPathAssertVersion}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
 				<groupId>org.openmrs.module</groupId>
 				<artifactId>legacyui-omod</artifactId>
 				<scope>provided</scope>
@@ -139,5 +145,6 @@
 		<legacyVersion>1.5.0</legacyVersion>
 		<javax.servlet.version>3.0.1</javax.servlet.version>
 		<jjwtVersion>0.9.1</jjwtVersion>
+		<jsonPathAssertVersion>0.8.1</jsonPathAssertVersion>
 	</properties>
 </project>

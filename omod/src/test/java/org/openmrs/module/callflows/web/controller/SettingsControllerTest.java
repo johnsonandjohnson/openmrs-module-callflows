@@ -25,19 +25,24 @@ import org.openmrs.module.callflows.api.service.ConfigService;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
 
+import static com.sun.org.apache.xerces.internal.util.PropertyState.is;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.contains;
+import static org.mockito.Matchers.matches;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
@@ -100,7 +105,9 @@ public class SettingsControllerTest extends BaseTest {
 
     @Before
     public void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(settingsController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(settingsController)
+                .setMessageConverters(new MappingJacksonHttpMessageConverter())
+                .build();
 
         settings = GenericHelper.createSettings();
         configs = settings.getConfigs();
@@ -176,6 +183,20 @@ public class SettingsControllerTest extends BaseTest {
         verify(configContractBuilder, times(3)).createFrom(any(Config.class));
     }
 
+    @Test
+    public void shouldReturnValidationErrorIfConfigsHaveNotUniqueNames() throws Exception {
+        // Given
+        List<ConfigContract> configContracts = buildNotUniqueConfigContacts();
+
+        // When and Then
+        mockMvc.perform(post("/callflows/configs")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonBytes(configContracts)))
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$.constraintViolations['configContracts.name']")
+                        .value("Names of configs are not unique: voxeo"));
+    }
 
     @Test
     public void shouldReturnAllRenderersAsJSON() throws Exception {
@@ -232,5 +253,11 @@ public class SettingsControllerTest extends BaseTest {
             .serializeNulls()
             .create()
             .toJson(obj);
+    }
+
+    private List<ConfigContract> buildNotUniqueConfigContacts() {
+        List<ConfigContract> configContracts = ConfigHelper.createConfigContracts();
+        configContracts.add(configContracts.get(0));
+        return configContracts;
     }
 }

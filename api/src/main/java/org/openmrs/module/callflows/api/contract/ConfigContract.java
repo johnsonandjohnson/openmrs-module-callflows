@@ -3,6 +3,9 @@ package org.openmrs.module.callflows.api.contract;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import org.hibernate.validator.constraints.NotBlank;
 
 /**
  * Configuration Contract, used in both requests and responses
@@ -16,11 +19,14 @@ public class ConfigContract {
     /**
      * The configuration name, say voxeo
      */
+    @NotBlank
     private String name;
 
     /**
      * The request method that is used when connecting to the IVR provider
      */
+    @NotNull
+    @Pattern(regexp = "^(POST|GET)$")
     private String outgoingCallMethod;
 
     /**

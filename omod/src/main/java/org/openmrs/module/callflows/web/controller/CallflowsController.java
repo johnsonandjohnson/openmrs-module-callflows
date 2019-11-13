@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
  */
 @Controller("${rootrootArtifactId}.CallflowsController")
 @RequestMapping(value = "module/callflows/callflows.form")
-public class CallflowsController {
+public class CallflowsController extends RestController {
 	
 	/** Logger for this class and subclasses */
 	protected final Log log = LogFactory.getLog(getClass());

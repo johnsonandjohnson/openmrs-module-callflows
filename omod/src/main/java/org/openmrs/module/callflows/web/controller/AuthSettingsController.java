@@ -23,7 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Controller
 @RequestMapping(value = "/callflows/auth")
-public class AuthSettingsController {
+public class AuthSettingsController extends RestController {
 
     private static final Log LOGGER = LogFactory.getLog(AuthSettingsController.class);
 
