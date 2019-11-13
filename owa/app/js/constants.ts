@@ -5,3 +5,7 @@ export const DEFAULT_SORT = 'id';
 export const DEFAULT_ORDER = 'desc';
 export const MIN_ROWS = 0;
 export const PAGE_SIZE_OPTIONS = [10, 20, 25, 50, 100];
+export const CONFIG_EXTENSIONS = ['vxml', 'ccxml', 'nexmo'];
+export const CLOSE_DELAY = 5000;
+export const TOAST_CLASS = 'toast-item';
+export const CALLFLOW_TEST_SUCCESS_STATUS = 'OPENMRS_INITIATED';

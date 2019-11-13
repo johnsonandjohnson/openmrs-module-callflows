@@ -5,7 +5,8 @@ import {
   faGlobe,
   faPlus,
   faRandom,
-  faMagic
+  faMagic,
+  faPencilAlt
 } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 
@@ -18,6 +19,7 @@ export const loadIcons = () => {
     faGlobe,
     faPlus,
     faRandom,
-    faMagic
+    faMagic,
+    faPencilAlt
   );
 };

@@ -29,6 +29,9 @@ export interface ITableProps {
   filtersComponent: any;
   filterProps?: {};
   showPagination: boolean;
+  sortable: boolean,
+  multiSort: boolean,
+  resizable: boolean,
   fetchDataCallback(filters: {}): void;
 };
 
@@ -98,6 +101,9 @@ export default class Table extends React.PureComponent<ITableProps, IPaginationB
           noDataText={<span className="sortableTable-noDataText">{noDataText}</span>}
           pageText={pageText}
           showPagination={this.props.showPagination}
+          sortable={this.props.sortable}
+          multiSort={this.props.multiSort}
+          resizable={this.props.resizable}
         />
       </div>
     );

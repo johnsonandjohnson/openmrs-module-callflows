@@ -43,7 +43,7 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
 
   handleNameChange = () => {
     alert('Not implemented yet.');
-    //TODO: Add name changing via redux
+    //TODO: OCALL-50: Add name changing via redux
   }
 
   renderStepElement = (node: any, elementName: string, label: string) => {
@@ -58,28 +58,34 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
   }
 
   renderStepSeparator = () => {
-    //TODO: Temporary solution, group user and system steps into pairs
+    //TODO: OCALL-50: Temporary solution, group user and system steps into pairs
     return <br />;
   }
 
   renderSteps = () => {
     let { flow } = this.props;
     if (!!flow.raw) {
-      return JSON.parse(flow.raw).nodes.map((node: any) => {
+      try {
+        return JSON.parse(flow.raw).nodes.map((node: any) => {
+          return (
+            <div>
+              <Accordion title={node.step}
+                border={true}
+                open={false}>
+                {this.renderStepElement(node, 'text', 'text')}
+                {this.renderStepElement(node, 'vxml', 'vxml')}
+                {this.renderStepElement(node, 'kookoo', 'kookoo')}
+                {this.renderStepElement(node, 'velocity', 'velocity')}
+              </Accordion>
+              {node.nodeType === 'system' ? this.renderStepSeparator() : ''}
+            </div>
+          );
+        });
+      } catch (ex) {
         return (
-          <div>
-            <Accordion title={node.step}
-              border={true}
-              open={false}>
-              {this.renderStepElement(node, 'text', 'text')}
-              {this.renderStepElement(node, 'vxml', 'vxml')}
-              {this.renderStepElement(node, 'kookoo', 'kookoo')}
-              {this.renderStepElement(node, 'velocity', 'velocity')}
-            </Accordion>
-            {node.nodeType === 'system' ? this.renderStepSeparator() : ''}
-          </div>
+          <div>Unable to parse flow steps</div>
         );
-      });
+      }
     } else return null;
   }
 
@@ -93,6 +99,7 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
           <h2>Test Call Flow</h2>
           <DesignerFlowTest />
         </div>
+        <hr />
         <div className="panel-body">
           <Form>
             <FormGroup>

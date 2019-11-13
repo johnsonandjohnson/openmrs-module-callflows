@@ -34,18 +34,12 @@ export default class DesignerFilters extends React.PureComponent<IDesignerFilter
   }
 
   render = () =>
-    <Row>
-      <Col sm="7">
-        <Row sm="8">
-          <Col sm="6">
-            Search by flow name:
-          </Col>
-        </Row>
-        <Row className="u-mb-10" sm="8">
-          <Col sm="6">
-            <input className="u-fill-col" type="text" onChange={this.onFlowNameFilterChange} value={this.state.flowName} />
-          </Col>
-        </Row>
-      </Col>
-    </Row>;
+    <div className="search-bar">
+      <div className="search-label">
+        Search for Call Flow
+      </div>
+      <div className="search-input">
+        <input type="text" onChange={this.onFlowNameFilterChange} value={this.state.flowName} />
+      </div>
+    </div>;
 }

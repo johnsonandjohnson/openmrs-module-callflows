@@ -13,6 +13,8 @@ import { getFlows } from '../../reducers/designer.reducer';
 import { IRootState } from '../../reducers';
 import Table from '../table';
 import DesignerFilters from './designer-filter';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import './designer-table.scss';
 
 export interface IDesignerTableProps extends StateProps, DispatchProps {
 };
@@ -28,17 +30,31 @@ export class DesignerTable extends React.PureComponent<IDesignerTableProps, IDes
   render = () => {
     const columns = [
       {
+        Header: 'Name',
         accessor: 'name',
         Cell: props => {
           const link = `#designer/${props.value}`;
-          return ( //TODO: use Link
+          return (
             <span>
               {props.value}
-              <a href={link} className ="pull-right" >Edit</a>
             </span>
           );
         }
       },
+      {
+        Header: 'Actions',
+        accessor: 'name',
+        Cell: props => {
+          const link = `#designer/${props.value}`;
+          return (
+            <span>
+              <a href={link} className="pull-right" >
+                <FontAwesomeIcon icon={['fas', 'pencil-alt']} size="1x" />
+              </a>
+            </span>
+          );
+        }
+      }
     ];
 
     return (
@@ -50,6 +66,9 @@ export class DesignerTable extends React.PureComponent<IDesignerTableProps, IDes
         pages={this.props.pages}
         fetchDataCallback={this.props.getFlows}
         showPagination={false}
+        sortable={false}
+        multiSort={false}
+        resizable={false}
       />
     );
   }

@@ -20,6 +20,8 @@ export const GENERIC_SUCCESS = 'Success.';
 export const DESIGNER_FLOW_TEST_CONFIGURATION_LABEL = 'Configuration';
 export const DESIGNER_FLOW_TEST_EXTENSION_LABEL = 'Extension';
 export const DESIGNER_FLOW_TEST_PHONE_NUMBER_LABEL = 'Phone Number';
+export const DESIGNER_FLOW_TEST_INITIATION_SUCCESS = 'Successfully initiated the test call.';
+export const DESIGNER_FLOW_TEST_INITIATION_FAILURE = 'The test call initiation failed.';
 
 // Config form
 export const CONFIG_FORM_NAME_HEADER = 'Name';

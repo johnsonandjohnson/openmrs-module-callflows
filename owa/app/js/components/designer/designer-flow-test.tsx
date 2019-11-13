@@ -16,7 +16,7 @@ import {
   postConfigs,
   getFlows,
   getFlow,
-
+  makeTestCall
 } from '../../reducers/designer.reducer';
 import { IRootState } from '../../reducers';
 import {
@@ -30,13 +30,15 @@ import * as Msg from '../../shared/utils/messages';
 import { validateForm, validateField } from '../../shared/utils/validation-util'
 import { IFlowTestError, validationSchema } from '../../shared/model/flow-test.model';
 import ErrorDesc from '../error-desc';
+import { CONFIG_EXTENSIONS } from '../../constants';
+import { handleCarret } from '../../shared/utils/form-handling-util';
 
 export interface IDesignerFlowTestProps extends StateProps, DispatchProps, RouteComponentProps<{ flowName: string }> {
   flowName?: string
 };
 
 export interface IDesignerFlowTestState {
-  configuration: string, //TODO: move to form
+  configuration: string,
   extension: string,
   phoneNumber: string
   errors?: IFlowTestError,
@@ -57,6 +59,7 @@ export class DesignerFlowTest extends React.PureComponent<IDesignerFlowTestProps
     if (!!this.props.flowName) { //by default this.props.flow from parent is used
       this.props.getFlow(this.props.flowName);
     }
+    this.props.getConfigs();
   }
 
   handleConfigurationChange = (e) => {
@@ -103,7 +106,8 @@ export class DesignerFlowTest extends React.PureComponent<IDesignerFlowTestProps
       });
   }
 
-  handlePhoneNumberChange = (e) => {
+  handlePhoneNumberChange = (e: any) => {
+    handleCarret(e);
     const newValue = e.target.value;
     const form = {
       phoneNumber: newValue
@@ -129,7 +133,13 @@ export class DesignerFlowTest extends React.PureComponent<IDesignerFlowTestProps
     e.preventDefault();
     validateForm(this.state, validationSchema)
       .then(() => {
-        //TODO: make AXIOS request in reducer
+        const flowName = this.props.flowName ? this.props.flowName : this.props.flow.name as string;
+        this.props.makeTestCall(
+          this.state.configuration,
+          flowName,
+          this.state.phoneNumber,
+          this.state.extension
+        );
       })
       .catch((errors) => {
         this.setState({
@@ -149,31 +159,38 @@ export class DesignerFlowTest extends React.PureComponent<IDesignerFlowTestProps
     const formClass = 'form-control';
     const errorFormClass = formClass + ' error-field';
     const { errors } = this.state;
-
     return (
       <Form className="form" onSubmit={this.handleSubmit}>
         <FormGroup controlId={"formName"}>
           <TextLabel text={Msg.DESIGNER_FLOW_TEST_CONFIGURATION_LABEL} isMandatory={false} isWithColon={true} />
-          <FormControl type="text"
-            name='name'
+          <FormControl componentClass="select" name="configuration"
             value={this.state.configuration}
             onChange={this.handleConfigurationChange}
-            className={errors && errors.configuration ? errorFormClass : formClass} />
+            className={errors && errors.configuration ? errorFormClass : formClass}>
+            <option hidden />
+            {this.props.configForms.map(item => {
+              return (<option value={item.config.name} key={item.config.name}>{item.config.name}</option>);
+            })}
+          </FormControl>
           {this.renderError('configuration')}
         </FormGroup>
         <FormGroup controlId={"formName"}>
           <TextLabel text={Msg.DESIGNER_FLOW_TEST_EXTENSION_LABEL} isMandatory={false} isWithColon={true} />
-          <FormControl type="text"
-            name='name'
+          <FormControl componentClass="select" name="extension"
             value={this.state.extension}
             onChange={this.handleExtensionChange}
-            className={errors && errors.extension ? errorFormClass : formClass} />
+            className={errors && errors.extension ? errorFormClass : formClass}>
+            <option hidden />
+            {CONFIG_EXTENSIONS.map(extension => {
+              return (<option value={extension} key={extension}>{extension}</option>);
+            })}
+          </FormControl>
           {this.renderError('extension')}
         </FormGroup>
         <FormGroup controlId={"formName"}>
           <TextLabel text={Msg.DESIGNER_FLOW_TEST_PHONE_NUMBER_LABEL} isMandatory={false} isWithColon={true} />
           <FormControl type="text"
-            name='name'
+            name="phoneNumber"
             value={this.state.phoneNumber}
             onChange={this.handlePhoneNumberChange}
             className={errors && errors.phoneNumber ? errorFormClass : formClass} />
@@ -192,7 +209,8 @@ const mapDispatchToProps = ({
   getConfigs,
   postConfigs,
   getFlows,
-  getFlow
+  getFlow,
+  makeTestCall
 });
 
 type StateProps = ReturnType<typeof mapStateToProps>;

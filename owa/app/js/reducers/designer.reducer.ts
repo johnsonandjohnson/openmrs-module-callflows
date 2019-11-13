@@ -2,12 +2,14 @@ import axiosInstance from '../config/axios';
 import { SUCCESS, REQUEST, FAILURE } from './action-type.util';
 import ConfigFormData from '../components/config-form/config-form-data';
 import { IFlow, defaultValue } from '../shared/model/flow.model';
+import { handleTestCallRequest, handleSuccessMessage } from '../components/designer/designer-flow-test.util';
 
 export const ACTION_TYPES = {
   RESET: 'designerReducer/RESET',
   FETCH_CONFIGS: 'designerReducer/FETCH_CONFIGS',
   FETCH_FLOWS: 'designerReducer/FETCH_FLOWS',
-  FETCH_FLOW: 'designerReducer/FETCH_FLOW'
+  FETCH_FLOW: 'designerReducer/FETCH_FLOW',
+  MAKE_TEST_CALL: 'designerReducer/MAKE_TEST_CALL'
 };
 
 const initialState = {
@@ -65,6 +67,19 @@ export default (state: DesignerState = initialState, action): DesignerState => {
         ...state,
         flow: action.payload.data.results[0]
       }
+    case REQUEST(ACTION_TYPES.MAKE_TEST_CALL):
+      return {
+        ...state
+      };
+    case FAILURE(ACTION_TYPES.MAKE_TEST_CALL):
+      return {
+        ...state
+      };
+    case SUCCESS(ACTION_TYPES.MAKE_TEST_CALL):
+      handleSuccessMessage(action.payload.data, action.meta);
+      return {
+        ...state,
+      }
     default:
       return state;
   }
@@ -97,7 +112,7 @@ export const getConfigs = () => async (dispatch) => {
 
 export const getFlows = (filters: any = {}) => async (dispatch) => {
   const term = filters.flowName ? filters.flowName : '';
-  const requestUrl = callflowsPath + `/flows?lookup=By+Name&term=${term}`;
+  const requestUrl = `${callflowsPath}/flows?lookup=By+Name&term=${term}`;
   await dispatch({
     type: ACTION_TYPES.FETCH_FLOWS,
     payload: axiosInstance.get(requestUrl)
@@ -106,9 +121,22 @@ export const getFlows = (filters: any = {}) => async (dispatch) => {
 
 export const getFlow = (flowName: string) => async (dispatch) => {
   //currently there is no endpoint for fetching one instance
-  const requestUrl = callflowsPath + `/flows?lookup=By+Name&term=${flowName}`;
+  const requestUrl = `${callflowsPath}/flows?lookup=By+Name&term=${flowName}`;
   await dispatch({
     type: ACTION_TYPES.FETCH_FLOW,
     payload: axiosInstance.get(requestUrl)
   });
 };
+
+export const makeTestCall = (config: string, flow: string, phone: string, extension: string) => async (dispatch) => {
+  const requestUrl = `${callflowsPath}/out/${config}/flows/${flow}.${extension}`
+  const body = {
+    type: ACTION_TYPES.MAKE_TEST_CALL,
+    payload: axiosInstance.get(requestUrl, {
+      params: {
+        phone
+      }
+    })
+  };
+  handleTestCallRequest(dispatch, body);
+}
