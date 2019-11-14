@@ -15,10 +15,13 @@ import { Link, withRouter } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import './bread-crumb.scss';
+import UrlPattern from 'url-pattern';
 
+const DESIGNER_PATTERN = new UrlPattern('/designer*');
 const DESIGNER_ROUTE = '/designer';
-const PROVIDER_ROUTE = '/providers';
-const RENDERERS_ROUTE = '/renderers';
+const DESIGNER_NAME = 'Designer';
+const PROVIDER_PATTERN = new UrlPattern('/providers*');
+const RENDERERS_PATTERN = new UrlPattern('/renderers*');
 const MODULE_ROUTE = '/';
 const OMRS_ROUTE = '../../';
 const MODULE_NAME = 'Call flows';
@@ -67,41 +70,84 @@ class BreadCrumb extends React.Component {
     return <span className="breadcrumb-last-item">{txt}</span>;
   }
 
+  renderCrumbs = elements => {
+    const delimiter = this.renderDelimiter();
+    const lastElementId = elements.length - 1;
+    return (
+      <React.Fragment>
+        {this.renderHomeCrumb()}
+        {elements.map((e, i) =>
+          <React.Fragment key={`crumb-${i}`}>
+            {e}
+            {i !== lastElementId && delimiter}
+          </React.Fragment>)}
+      </React.Fragment>
+    );
+  }
+
+  buildPathDynamically = (pattern, path) => {
+    return pattern.match(path)._.split('/')
+      .filter(e => !!e)
+      .map((e) => {
+        return (
+          <span>
+            {this.renderLastCrumb(e)}
+          </span>
+        );
+      });
+  }
+
+  buildDesignerBreadCrumb = (path) => {
+    const designerCrumbs = [
+      this.renderCrumb(MODULE_ROUTE, MODULE_NAME)
+    ];
+
+    if (DESIGNER_PATTERN.match(path)._) {
+      designerCrumbs.push(this.renderCrumb(DESIGNER_ROUTE, DESIGNER_NAME));
+      designerCrumbs.push(this.buildPathDynamically(DESIGNER_PATTERN, path));
+    } else {
+      designerCrumbs.push(this.renderLastCrumb(DESIGNER_NAME));
+    }
+    return (
+      <div className="breadcrumb">
+        {this.renderCrumbs(designerCrumbs)}
+      </div>
+    );
+  }
+
   buildBreadCrumb = () => {
     const { current } = this.state;
 
-    switch (current) {
-      case DESIGNER_ROUTE:
-        return (<div className="breadcrumb">
-          {this.renderHomeCrumb()}
-          {this.renderDelimiter()}
-          {this.renderCrumb(MODULE_ROUTE, MODULE_NAME)}
-          {this.renderDelimiter()}
-          {this.renderLastCrumb('Designer')}
-        </div>);
-      case PROVIDER_ROUTE:
-        return (<div className="breadcrumb">
-          {this.renderHomeCrumb()}
-          {this.renderDelimiter()}
-          {this.renderCrumb(MODULE_ROUTE, MODULE_NAME)}
-          {this.renderDelimiter()}
-          {this.renderLastCrumb('Providers')}
-        </div>);
-      case RENDERERS_ROUTE:
-        return (<div className="breadcrumb">
-          {this.renderHomeCrumb()}
-          {this.renderDelimiter()}
-          {this.renderCrumb(MODULE_ROUTE, MODULE_NAME)}
-          {this.renderDelimiter()}
-          {this.renderLastCrumb('Renderers')}
-        </div>);
-      default:
-        return (
-          <div className="breadcrumb">
-            {this.renderHomeCrumb()}
-            {this.renderDelimiter()}
-            {this.renderLastCrumb(MODULE_NAME)}
-          </div>);
+    const providerCrumbs = [
+      this.renderCrumb(MODULE_ROUTE, MODULE_NAME),
+      this.renderLastCrumb('Providers')
+    ];
+
+    const rendererCrumbs = [
+      this.renderCrumb(MODULE_ROUTE, MODULE_NAME),
+      this.renderLastCrumb('Renderers')
+    ];
+
+    if (!!DESIGNER_PATTERN.match(current)) {
+      return this.buildDesignerBreadCrumb(current);
+    } else if (!!PROVIDER_PATTERN.match(current)) {
+      return (
+        <div className="breadcrumb">
+          {this.renderCrumbs(providerCrumbs)}
+        </div>
+      );
+    } else if (!!RENDERERS_PATTERN.match(current)) {
+      return (
+        <div className="breadcrumb">
+          {this.renderCrumbs(rendererCrumbs)}
+        </div>
+      );
+    } else {
+      return (
+        <div className="breadcrumb">
+          {this.renderCrumbs([this.renderLastCrumb(MODULE_NAME)])}
+        </div>
+      );
     }
   }
 

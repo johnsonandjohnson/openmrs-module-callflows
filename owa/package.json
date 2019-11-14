@@ -58,6 +58,7 @@
     "sinon": "^4.4.6",
     "sweetalert": "^2.1.0",
     "toastr": "^2.1.4",
+    "url-pattern": "^1.0.3",
     "yup": "^0.27.0"
   },
   "devDependencies": {
