@@ -22,6 +22,11 @@ import { history } from './config/redux-store';
 import exportStore from './config/export-store';
 import { loadIcons } from './config/icon-loader';
 import routes from './routes';
+import 'codemirror/lib/codemirror.css';
+import 'codemirror/mode/velocity/velocity';
+import 'codemirror/mode/javascript/javascript';
+import 'codemirror/mode/xml/xml';
+import 'codemirror/mode/sql/sql';
 
 loadIcons();
 toast.configure();

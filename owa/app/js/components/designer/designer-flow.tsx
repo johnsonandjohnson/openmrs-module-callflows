@@ -27,6 +27,7 @@ import {
 } from 'react-bootstrap';
 
 import { Accordion } from '@openmrs/react-components';
+import SystemNode from './flow-node/system-node';
 
 export interface IDesignerFlowProps extends StateProps, DispatchProps, RouteComponentProps<{ flowName: string }> {
 };
@@ -52,8 +53,9 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
         <div>
           <label>{label}:</label>
           <p>{node.templates[elementName].content}</p>
+          <SystemNode node={node.templates[elementName].content} />
         </div>
-      );
+      ); //TODO OCALL-73: Fix rendering for SystemNode
     } else return null;
   }
 
