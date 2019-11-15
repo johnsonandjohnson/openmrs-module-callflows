@@ -15,13 +15,16 @@ import {
   getConfigs,
   postConfigs,
   getFlows,
-  getFlow
+  getFlow,
+  updateNode
 } from '../../../reducers/designer.reducer';
 import { IRootState } from '../../../reducers';
 import { Controlled as CodeMirror } from 'react-codemirror2';
+import { ISystemNode } from '../../../shared/model/system-node.model';
 
 export interface ISystemNodeProps extends StateProps, DispatchProps, RouteComponentProps<{ flowName: string }> {
-  node: any; //TODO OCALL-73: Specify Node interface
+  node: ISystemNode,
+  nodeIndex: number
 };
 
 export interface ISystemNodeState {
@@ -32,7 +35,7 @@ export class SystemNode extends React.PureComponent<ISystemNodeProps, ISystemNod
   constructor(props) {
     super(props);
     this.state = {
-      nodeValue: this.props.node
+      nodeValue: this.props.node.templates.velocity.content
     };
   }
 
@@ -50,23 +53,42 @@ export class SystemNode extends React.PureComponent<ISystemNodeProps, ISystemNod
   }
 
   componentDidMount = () => {
+  }
 
+  handleNodeValueChange = (editor, data, value) => {
+    let node = this.props.node;
+    node.templates.velocity.content = value;
+    this.props.updateNode(node, this.props.nodeIndex);
+  }
+
+  handleNodeNameChange = (event: any) => {
+    let node = this.props.node;
+    node.step = event.target.value;
+    this.props.updateNode(node, this.props.nodeIndex);
   }
 
   render() {
-    const formClass = 'form-control';
+    const systemNodeClass = 'system-node';
     return (
+      <div className={systemNodeClass}>
+        <div className="input-group">
+          <span className="input-group-addon"> Step </span>
+          <input
+            className="form-control"
+            value={this.props.node.step}
+            onChange={this.handleNodeNameChange}
+          />
+        </div>
         <CodeMirror
           value={this.state.nodeValue}
           options={this.options}
           onBeforeChange={(editor, data, value) => {
             this.setState({ nodeValue: value });
           }}
-          onChange={(editor, data, value) => {
-          }}
+          onChange={this.handleNodeValueChange}
         />
+      </div>
     );
-   
   }
 }
 
@@ -77,7 +99,8 @@ const mapDispatchToProps = ({
   getConfigs,
   postConfigs,
   getFlows,
-  getFlow
+  getFlow,
+  updateNode
 });
 
 type StateProps = ReturnType<typeof mapStateToProps>;

@@ -78,8 +78,8 @@ header .logo img {
 }
 
 .accordion .content.open {
-  min-height: 500px;
-  max-height: 1500px;
+  min-height: 100px;
+  max-height: fit-content;
   background-color: #f3f3f3;
 }
 
@@ -97,7 +97,7 @@ header .logo img {
 }
 
 .form-control {
-  border: 1px solid #53545eda;
+  border: 1px solid #DDD;
 }
 
 .add-button {

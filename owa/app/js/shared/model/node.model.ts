@@ -1,7 +1,9 @@
 import { IBlock } from './block.model';
+import { NodeType } from './node-type.model';
 
 export interface INode {
-  nodeType: string; // todo maybe we can define an enum
+  nodeType: NodeType;
   templates: any;
   blocks: ReadonlyArray<IBlock>;
+  step: string
 }

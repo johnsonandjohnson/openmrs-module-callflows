@@ -28,6 +28,9 @@ import {
 
 import { Accordion } from '@openmrs/react-components';
 import SystemNode from './flow-node/system-node';
+import { ISystemNode } from '../../shared/model/system-node.model';
+import { NodeType } from '../../shared/model/node-type.model';
+import { INode } from '../../shared/model/node.model';
 
 export interface IDesignerFlowProps extends StateProps, DispatchProps, RouteComponentProps<{ flowName: string }> {
 };
@@ -53,33 +56,29 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
         <div>
           <label>{label}:</label>
           <p>{node.templates[elementName].content}</p>
-          <SystemNode node={node.templates[elementName].content} />
         </div>
       ); //TODO OCALL-73: Fix rendering for SystemNode
     } else return null;
   }
 
-  renderStepSeparator = () => {
-    //TODO: OCALL-50: Temporary solution, group user and system steps into pairs
-    return <br />;
+  renderSystemNode = (node: ISystemNode, nodeIndex: number) => {
+    return <SystemNode node={node} nodeIndex={nodeIndex} />
   }
 
   renderSteps = () => {
     let { flow } = this.props;
     if (!!flow.raw) {
       try {
-        return JSON.parse(flow.raw).nodes.map((node: any) => {
+        return this.props.nodes.map((node: INode, index: number) => {
           return (
             <div>
-              <Accordion title={node.step}
+              <Accordion 
+                key={`node${index}`}
+                title={node.step}
                 border={true}
                 open={false}>
-                {this.renderStepElement(node, 'text', 'text')}
-                {this.renderStepElement(node, 'vxml', 'vxml')}
-                {this.renderStepElement(node, 'kookoo', 'kookoo')}
-                {this.renderStepElement(node, 'velocity', 'velocity')}
+                {node.nodeType === NodeType.SYSTEM ? this.renderSystemNode(node as ISystemNode, index) : ''}
               </Accordion>
-              {node.nodeType === 'system' ? this.renderStepSeparator() : ''}
             </div>
           );
         });

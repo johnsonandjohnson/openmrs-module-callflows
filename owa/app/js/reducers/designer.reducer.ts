@@ -2,6 +2,7 @@ import axiosInstance from '../config/axios';
 import { SUCCESS, REQUEST, FAILURE } from './action-type.util';
 import ConfigFormData from '../components/config-form/config-form-data';
 import { IFlow, defaultValue } from '../shared/model/flow.model';
+import { INode } from '../shared/model/node.model';
 import { handleTestCallRequest, handleSuccessMessage } from '../components/designer/designer-flow-test.util';
 
 export const ACTION_TYPES = {
@@ -9,7 +10,8 @@ export const ACTION_TYPES = {
   FETCH_CONFIGS: 'designerReducer/FETCH_CONFIGS',
   FETCH_FLOWS: 'designerReducer/FETCH_FLOWS',
   FETCH_FLOW: 'designerReducer/FETCH_FLOW',
-  MAKE_TEST_CALL: 'designerReducer/MAKE_TEST_CALL'
+  MAKE_TEST_CALL: 'designerReducer/MAKE_TEST_CALL',
+  UPDATE_NODE: 'designerReducer/UPDATE_NODE'
 };
 
 const initialState = {
@@ -19,7 +21,8 @@ const initialState = {
   pages: 0,
   loading: false,
   data: [],
-  flow: defaultValue as unknown as IFlow
+  flow: defaultValue as unknown as IFlow,
+  nodes: [] as Array<INode>
 };
 
 export type DesignerState = Readonly<typeof initialState>;
@@ -62,11 +65,20 @@ export default (state: DesignerState = initialState, action): DesignerState => {
       return {
         ...state
       };
-    case SUCCESS(ACTION_TYPES.FETCH_FLOW):
+    case SUCCESS(ACTION_TYPES.FETCH_FLOW): {
+      const flow = action.payload.data.results[0] as IFlow;
+      let nodes = [];
+      try {
+        nodes = JSON.parse(flow.raw).nodes;
+      } catch(ex) {
+        console.error('Cannot parse nodes');
+      }
       return {
         ...state,
-        flow: action.payload.data.results[0]
+        flow,
+        nodes
       }
+    }
     case REQUEST(ACTION_TYPES.MAKE_TEST_CALL):
       return {
         ...state
@@ -80,6 +92,12 @@ export default (state: DesignerState = initialState, action): DesignerState => {
       return {
         ...state,
       }
+    case ACTION_TYPES.UPDATE_NODE: {
+      return {
+        ...state,
+        nodes: replaceNode(state.nodes, action.payload, action.meta)
+      }
+    }
     default:
       return state;
   }
@@ -128,6 +146,12 @@ export const getFlow = (flowName: string) => async (dispatch) => {
   });
 };
 
+export const updateNode = (node: any, nodeIndex: number) => ({
+  type: ACTION_TYPES.UPDATE_NODE,
+  payload: node,
+  meta: nodeIndex
+});
+
 export const makeTestCall = (config: string, flow: string, phone: string, extension: string) => async (dispatch) => {
   const requestUrl = `${callflowsPath}/out/${config}/flows/${flow}.${extension}`
   const body = {
@@ -139,4 +163,13 @@ export const makeTestCall = (config: string, flow: string, phone: string, extens
     })
   };
   handleTestCallRequest(dispatch, body);
+}
+
+const replaceNode = (nodes: Array<any>, node: any, nodeIndex: number) => {
+  return nodes.map((item, index: number) => {
+    if (index === nodeIndex) {
+      item = node;
+    }
+    return item;
+  });
 }
