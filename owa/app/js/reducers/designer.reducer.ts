@@ -70,7 +70,7 @@ export default (state: DesignerState = initialState, action): DesignerState => {
       let nodes = [];
       try {
         nodes = JSON.parse(flow.raw).nodes;
-      } catch(ex) {
+      } catch (ex) {
         console.error('Cannot parse nodes');
       }
       return {
@@ -97,6 +97,9 @@ export default (state: DesignerState = initialState, action): DesignerState => {
         ...state,
         nodes: replaceNode(state.nodes, action.payload, action.meta)
       }
+    }
+    case ACTION_TYPES.RESET: {
+      return initialState;
     }
     default:
       return state;

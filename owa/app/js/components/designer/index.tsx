@@ -7,8 +7,9 @@ import DesignerFlow from './designer-flow';
 const Routes = ({ match }) => (
   <>
     <Switch>
-      <Route exact path={`${match.url}`} component={Designer} />
+      <Route exact path={`${match.url}/new`} component={DesignerFlow} />
       <Route exact path={`${match.url}/:flowName`} component={DesignerFlow} />
+      <Route exact path={`${match.url}`} component={Designer} />
     </Switch>
   </>
 );

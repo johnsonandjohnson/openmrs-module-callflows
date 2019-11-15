@@ -10,28 +10,28 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button } from 'react-bootstrap';
-import PropTypes from 'prop-types';
 import _ from 'lodash';
 
-const AddButton = (props) => {
+
+interface IAddButton {
+  handleAdd: Function,
+  buttonClass?: string,
+  txt?: string
+}
+
+const AddButton = (props: IAddButton) => {
   const { handleAdd, txt, buttonClass } = props;
   const clazz = buttonClass + ' add-button';
   return (
-    <Button className={clazz} onClick={handleAdd} >
-      <FontAwesomeIcon size="1x" icon={['fas', 'plus']} />
-      {(txt === null) ? null : ' ' + txt}
-    </Button>);
+      <Button className={clazz} onClick={handleAdd} >
+        <FontAwesomeIcon size="1x" icon={['fas', 'plus']} />
+        {(txt === null) ? null : ' ' + txt}
+      </Button>);
 }
 
 AddButton.defaultProps = {
   buttonClass: 'button',
   txt: null
 }
-
-AddButton.propTypes = {
-  handleAdd: PropTypes.func.isRequired,
-  buttonClass: PropTypes.string,
-  txt: PropTypes.string
-};
 
 export default AddButton;

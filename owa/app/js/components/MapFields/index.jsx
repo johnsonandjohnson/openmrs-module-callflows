@@ -16,7 +16,7 @@ import MapField, {
   columnSizesType,
   defaultColumnSizes
 } from './MapField';
-import AddButton from '../AddButton';
+import AddButton from '../add-button';
 import MapEntry from '../../shared/utils/map-entry-util';
 import './index.scss';
 

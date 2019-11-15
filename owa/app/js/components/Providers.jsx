@@ -17,7 +17,7 @@ import {
 import { Accordion } from '@openmrs/react-components';
 import _ from 'lodash';
 
-import AddButton from './AddButton';
+import AddButton from './add-button';
 import {
   reset,
   getConfigs,

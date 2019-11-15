@@ -11,6 +11,8 @@
 
 export const FIELD_REQUIRED = 'This field is required';
 
+export const MODULE_NAME = 'Call flows';
+
 // Generic messages
 export const GENERIC_FAILURE = 'An error occurred.';
 export const GENERIC_PROCESSING = 'Processing...';
@@ -23,6 +25,10 @@ export const DESIGNER_FLOW_TEST_EXTENSION_LABEL = 'Extension';
 export const DESIGNER_FLOW_TEST_PHONE_NUMBER_LABEL = 'Phone Number';
 export const DESIGNER_FLOW_TEST_INITIATION_SUCCESS = 'Successfully initiated the test call.';
 export const DESIGNER_FLOW_TEST_INITIATION_FAILURE = 'The test call initiation failed.';
+export const DESIGNER_FLOW_TEST_TITLE = 'Designer';
+export const DESIGNER_FLOW_TEST_CREATE_BTN = 'Create';
+export const DESIGNER_NEW_FLOW_BREADCRUMB = 'Designer';
+export const DESIGNER_NEW_FLOW_BREADCRUMB_NEW = 'New';
 
 // Config form
 export const CONFIG_FORM_NAME_HEADER = 'Name';

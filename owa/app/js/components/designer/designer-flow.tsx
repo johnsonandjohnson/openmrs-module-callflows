@@ -36,13 +36,22 @@ export interface IDesignerFlowProps extends StateProps, DispatchProps, RouteComp
 };
 
 export interface IDesignerFlowState {
+  isNew: boolean;
 };
 
 export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesignerFlowState> {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isNew: !this.props.match.params || !this.props.match.params.flowName
+    };
+  }
 
   componentDidMount = () => {
-    const { flowName } = this.props.match.params;
-    this.props.getFlow(flowName);
+    if (!this.state.isNew) {
+      const { flowName } = this.props.match.params;
+      this.props.getFlow(flowName);
+    }
   }
 
   handleNameChange = () => {

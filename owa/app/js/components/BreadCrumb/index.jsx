@@ -13,18 +13,20 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Link, withRouter } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import UrlPattern from 'url-pattern';
+import _ from 'lodash';
 
 import './bread-crumb.scss';
-import UrlPattern from 'url-pattern';
+import * as Msg from '../../shared/utils/messages';
 
-const DESIGNER_PATTERN = new UrlPattern('/designer*');
+export const DESIGNER_NEW_FLOW_ROUTE = '#/designer/new';
+const DESIGNER_NEW_FLOW_PATTERN = new UrlPattern('/designer/new$');
 const DESIGNER_ROUTE = '/designer';
-const DESIGNER_NAME = 'Designer';
+const DESIGNER_PATTERN = new UrlPattern('/designer*');
 const PROVIDER_PATTERN = new UrlPattern('/providers*');
 const RENDERERS_PATTERN = new UrlPattern('/renderers*');
 const MODULE_ROUTE = '/';
 const OMRS_ROUTE = '../../';
-const MODULE_NAME = 'Call flows';
 
 class BreadCrumb extends React.Component {
   constructor(props) {
@@ -86,27 +88,29 @@ class BreadCrumb extends React.Component {
   }
 
   buildPathDynamically = (pattern, path) => {
-    return pattern.match(path)._.split('/')
-      .filter(e => !!e)
-      .map((e) => {
-        return (
-          <span>
-            {this.renderLastCrumb(e)}
-          </span>
-        );
-      });
+    let matched = path.match(pattern);
+    let res = _.split(matched, '/');
+    return (
+      <span>
+        {this.renderLastCrumb(_.last(res))}
+      </span>
+    );
   }
 
   buildDesignerBreadCrumb = (path) => {
+    const designerName = Msg.DESIGNER_NEW_FLOW_BREADCRUMB;
     const designerCrumbs = [
-      this.renderCrumb(MODULE_ROUTE, MODULE_NAME)
+      this.renderCrumb(MODULE_ROUTE, Msg.MODULE_NAME)
     ];
 
-    if (DESIGNER_PATTERN.match(path)._) {
-      designerCrumbs.push(this.renderCrumb(DESIGNER_ROUTE, DESIGNER_NAME));
+    if (path.match(DESIGNER_NEW_FLOW_PATTERN)) {
+      designerCrumbs.push(this.renderCrumb(DESIGNER_ROUTE, designerName));
+      designerCrumbs.push(this.renderLastCrumb(Msg.DESIGNER_NEW_FLOW_BREADCRUMB_NEW));
+    } else if (path.match(DESIGNER_PATTERN)._) {
+      designerCrumbs.push(this.renderCrumb(DESIGNER_ROUTE, designerName));
       designerCrumbs.push(this.buildPathDynamically(DESIGNER_PATTERN, path));
     } else {
-      designerCrumbs.push(this.renderLastCrumb(DESIGNER_NAME));
+      designerCrumbs.push(this.renderLastCrumb(designerName));
     }
     return (
       <div className="breadcrumb">
@@ -119,24 +123,24 @@ class BreadCrumb extends React.Component {
     const { current } = this.state;
 
     const providerCrumbs = [
-      this.renderCrumb(MODULE_ROUTE, MODULE_NAME),
+      this.renderCrumb(MODULE_ROUTE, Msg.MODULE_NAME),
       this.renderLastCrumb('Providers')
     ];
 
     const rendererCrumbs = [
-      this.renderCrumb(MODULE_ROUTE, MODULE_NAME),
+      this.renderCrumb(MODULE_ROUTE, Msg.MODULE_NAME),
       this.renderLastCrumb('Renderers')
     ];
 
-    if (!!DESIGNER_PATTERN.match(current)) {
+    if (!!current.match(DESIGNER_PATTERN)) {
       return this.buildDesignerBreadCrumb(current);
-    } else if (!!PROVIDER_PATTERN.match(current)) {
+    } else if (!!current.match(PROVIDER_PATTERN)) {
       return (
         <div className="breadcrumb">
           {this.renderCrumbs(providerCrumbs)}
         </div>
       );
-    } else if (!!RENDERERS_PATTERN.match(current)) {
+    } else if (!!current.match(RENDERERS_PATTERN)) {
       return (
         <div className="breadcrumb">
           {this.renderCrumbs(rendererCrumbs)}
@@ -145,7 +149,7 @@ class BreadCrumb extends React.Component {
     } else {
       return (
         <div className="breadcrumb">
-          {this.renderCrumbs([this.renderLastCrumb(MODULE_NAME)])}
+          {this.renderCrumbs([this.renderLastCrumb(Msg.MODULE_NAME)])}
         </div>
       );
     }

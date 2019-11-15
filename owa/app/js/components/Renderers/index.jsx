@@ -13,7 +13,7 @@ import { Accordion } from '@openmrs/react-components';
 import { Col, Row } from 'react-bootstrap';
 import _ from 'lodash';
 
-import AddButton from '../AddButton';
+import AddButton from '../add-button';
 import {
   reset,
   getRenderers,

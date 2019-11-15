@@ -8,22 +8,18 @@
  */
 
 import React from 'react';
-import {
-  Col,
-  Row
-} from 'react-bootstrap';
 import { connect } from 'react-redux';
-import RemoveButton from '../RemoveButton';
 import {
   reset,
   getConfigs,
   postConfigs,
-  getFlows,
-  DesignerState
-
+  getFlows
 } from '../../reducers/designer.reducer';
 import { IRootState } from '../../reducers';
 import DesignerTable from './designer-table';
+import LinkAddButton from '../link-add-button';
+import * as Msg from '../../shared/utils/messages';
+import { DESIGNER_NEW_FLOW_ROUTE as createLink} from '../BreadCrumb/index';
 
 export interface IDesignerProps extends StateProps, DispatchProps {
 };
@@ -47,12 +43,19 @@ export class Designer extends React.PureComponent<IDesignerProps, IDesignerState
   }
 
   render() {
-    const title = 'Designer';
     return (
       <div className="body-wrapper">
         <div className="row">
           <div className="col-md-12 col-xs-12">
-            <h2>{title}</h2>
+            <h2>{Msg.DESIGNER_FLOW_TEST_TITLE}</h2>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-md-2 col-md-offset-10 col-xs-2 col-xs-offset-10">
+            <LinkAddButton
+              link={createLink}
+              buttonClass="confirm"
+              txt={Msg.DESIGNER_FLOW_TEST_CREATE_BTN} />
           </div>
         </div>
         <div className="panel-body">
@@ -79,4 +82,3 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(Designer);
-
