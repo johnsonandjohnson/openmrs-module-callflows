@@ -15,7 +15,8 @@ import {
   getConfigs,
   postConfigs,
   getFlows,
-  getFlow
+  getFlow,
+  updateFlow
 } from '../../reducers/designer.reducer';
 import { IRootState } from '../../reducers';
 import DesignerFlowTest from './designer-flow-test';
@@ -59,14 +60,19 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
     //TODO: OCALL-50: Add name changing via redux
   }
 
+  handleSave = () => {
+    this.props.updateFlow(this.props.flow, this.props.nodes);
+  }
+
   renderStepElement = (node: any, elementName: string, label: string) => {
+    //TODO: OCALL-70: Refactor or remove it, it's unused
     if (!!node.templates[elementName]) {
       return (
         <div>
           <label>{label}:</label>
           <p>{node.templates[elementName].content}</p>
         </div>
-      ); //TODO OCALL-73: Fix rendering for SystemNode
+      );
     } else return null;
   }
 
@@ -81,7 +87,7 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
         return this.props.nodes.map((node: INode, index: number) => {
           return (
             <div>
-              <Accordion 
+              <Accordion
                 key={`node${index}`}
                 title={node.step}
                 border={true}
@@ -129,6 +135,11 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
         <div className="panel-body">
           {this.renderSteps()}
         </div>
+        <div className="body-wrapper">
+          <div className="panel-body">
+          <Button className="btn btn-success btn-md" onClick={this.handleSave}>Save</Button>
+          </div>
+        </div>
       </div>
     );
   }
@@ -141,7 +152,8 @@ const mapDispatchToProps = ({
   getConfigs,
   postConfigs,
   getFlows,
-  getFlow
+  getFlow,
+  updateFlow
 });
 
 type StateProps = ReturnType<typeof mapStateToProps>;

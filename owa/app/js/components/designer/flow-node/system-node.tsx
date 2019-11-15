@@ -45,11 +45,15 @@ export class SystemNode extends React.PureComponent<ISystemNodeProps, ISystemNod
     addModeClass: true,
     tabSize: 2,
     mode: 'velocity', //may be: javascript,xml,sql,velocity
-    theme: 'default'
-    // extraKeys: {
-    //     "F11": fullscreenOn,
-    //     "Esc": fullScreenOff
-    // } //TODO OCALL-73: Add support
+    theme: 'default',
+    extraKeys: {
+      'F11': function (cm) {
+        cm.setOption('fullScreen', !cm.getOption('fullScreen'));
+      },
+      'Esc': function (cm) {
+        if (cm.getOption('fullScreen')) cm.setOption('fullScreen', false);
+      }
+    }
   }
 
   componentDidMount = () => {
@@ -68,9 +72,8 @@ export class SystemNode extends React.PureComponent<ISystemNodeProps, ISystemNod
   }
 
   render() {
-    const systemNodeClass = 'system-node';
     return (
-      <div className={systemNodeClass}>
+      <div className="system-node">
         <div className="input-group">
           <span className="input-group-addon"> Step </span>
           <input

@@ -52,7 +52,7 @@ header .logo img {
   -ms-border-radius: 5px;
   -khtml-border-radius: 5px;
   border-radius: 5px;
-  min-height: 500px;
+  min-height: 50px;
   justify-content: center;
 }
 
@@ -78,7 +78,7 @@ header .logo img {
 }
 
 .accordion .content.open {
-  min-height: 100px;
+  min-height: 50px;
   max-height: fit-content;
   background-color: #f3f3f3;
 }

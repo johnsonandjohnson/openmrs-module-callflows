@@ -4,6 +4,8 @@ import ConfigFormData from '../components/config-form/config-form-data';
 import { IFlow, defaultValue } from '../shared/model/flow.model';
 import { INode } from '../shared/model/node.model';
 import { handleTestCallRequest, handleSuccessMessage } from '../components/designer/designer-flow-test.util';
+import * as Msg from '../shared/utils/messages';
+import { handleRequest } from '../shared/utils/request-status-util';
 
 export const ACTION_TYPES = {
   RESET: 'designerReducer/RESET',
@@ -11,7 +13,8 @@ export const ACTION_TYPES = {
   FETCH_FLOWS: 'designerReducer/FETCH_FLOWS',
   FETCH_FLOW: 'designerReducer/FETCH_FLOW',
   MAKE_TEST_CALL: 'designerReducer/MAKE_TEST_CALL',
-  UPDATE_NODE: 'designerReducer/UPDATE_NODE'
+  UPDATE_NODE: 'designerReducer/UPDATE_NODE',
+  UPDATE_FLOW: 'designerReducer/UPDATE_FLOW'
 };
 
 const initialState = {
@@ -29,6 +32,24 @@ export type DesignerState = Readonly<typeof initialState>;
 
 export default (state: DesignerState = initialState, action): DesignerState => {
   switch (action.type) {
+    case REQUEST(ACTION_TYPES.UPDATE_FLOW):
+      return {
+        ...state,
+        loading: true
+      };
+    case FAILURE(ACTION_TYPES.UPDATE_FLOW):
+      return {
+        ...state,
+        loading: false
+      };
+    case SUCCESS(ACTION_TYPES.UPDATE_FLOW):
+      let flow = action.payload.data;
+      let nodes = extractNodes(flow);
+      return {
+        ...state,
+        flow,
+        nodes
+      };
     case REQUEST(ACTION_TYPES.FETCH_CONFIGS):
       return {
         ...state
@@ -67,12 +88,7 @@ export default (state: DesignerState = initialState, action): DesignerState => {
       };
     case SUCCESS(ACTION_TYPES.FETCH_FLOW): {
       const flow = action.payload.data.results[0] as IFlow;
-      let nodes = [];
-      try {
-        nodes = JSON.parse(flow.raw).nodes;
-      } catch (ex) {
-        console.error('Cannot parse nodes');
-      }
+      let nodes = extractNodes(flow);
       return {
         ...state,
         flow,
@@ -149,6 +165,20 @@ export const getFlow = (flowName: string) => async (dispatch) => {
   });
 };
 
+export const updateFlow = (flow: IFlow, nodes: Array<INode>) => async (dispatch) => {
+  const requestUrl = `${callflowsPath}/flows/${flow.id}`;
+  const data = {
+    ...flow,
+    raw: JSON.stringify({ nodes: nodes })
+  }
+  delete data.id;
+  let body = {
+    type: ACTION_TYPES.UPDATE_FLOW,
+    payload: axiosInstance.put(requestUrl, data)
+  };
+  handleRequest(dispatch, body, Msg.DESIGNER_FLOW_UPDATE_SUCCESS, Msg.DESIGNER_FLOW_UPDATE_FAILURE);
+};
+
 export const updateNode = (node: any, nodeIndex: number) => ({
   type: ACTION_TYPES.UPDATE_NODE,
   payload: node,
@@ -175,4 +205,14 @@ const replaceNode = (nodes: Array<any>, node: any, nodeIndex: number) => {
     }
     return item;
   });
+}
+
+const extractNodes = (flow: IFlow) => {
+  let nodes = [];
+  try {
+    nodes = JSON.parse(flow.raw).nodes;
+  } catch (ex) {
+    console.error('Cannot parse nodes');
+  }
+  return nodes;
 }

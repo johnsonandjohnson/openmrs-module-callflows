@@ -27,6 +27,8 @@ import 'codemirror/mode/velocity/velocity';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/mode/xml/xml';
 import 'codemirror/mode/sql/sql';
+import 'codemirror/addon/display/fullscreen';
+import 'codemirror/addon/display/fullscreen.css';
 
 loadIcons();
 toast.configure();
