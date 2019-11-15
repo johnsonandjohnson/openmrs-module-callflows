@@ -25,22 +25,49 @@ import _ from 'lodash';
 import ConfigUI from './config-ui';
 import * as Msg from '../../shared/utils/messages';
 import MapFields from '../MapFields';
+import ErrorDesc from '../error-desc';
+import { validateField } from '../../shared/utils/validation-util';
 
 const ConfigForm = (props) => {
+  const { validationSchema } = props;
+  const { errors } = props.config;
+
+  const fieldClass = 'form-control';
+  const errorFieldClass = fieldClass + ' error-field';
+
+  const validateAndUpdate = (fieldName) => {
+    validateField(props.config, fieldName, validationSchema)
+      .then(() => {
+        props.config.errors && delete props.config.errors[fieldName];
+        props.updateValues(props);
+      })
+      .catch((errors) => {
+        props.config.errors = _.merge({}, props.config.errors, errors)
+        props.updateValues(props);
+      });
+  }
 
   const handleChange = (event) => {
-    props.config[event.target.name] = event.target.value;
-    props.updateValues(props);
+    const fieldName = event.target.name;
+    props.config[fieldName] = event.target.value;
+    validateAndUpdate(fieldName);
   };
 
   const handleChecboxChange = (event) => {
-    props.config[event.target.name] = event.target.checked;
-    props.updateValues(props);
+    const fieldName = event.target.name;
+    props.config[fieldName] = event.target.checked;
+    validateAndUpdate(fieldName);
   };
 
   const handleArrayChange = (fieldName, list) => {
     props.config[fieldName] = list;
-    props.updateValues(props);
+    validateAndUpdate(fieldName);
+  };
+
+  const renderError = (fieldName) => {
+    if (errors) {
+      return <ErrorDesc field={errors[fieldName]} />
+    }
   };
 
   return (
@@ -50,7 +77,9 @@ const ConfigForm = (props) => {
         <FormControl type="text"
           name="name"
           value={props.config.name}
-          onChange={handleChange} />
+          onChange={handleChange}
+          className={errors && errors.name ? errorFieldClass : fieldClass} />
+        {renderError("name")}
       </FormGroup>
       <FormGroup controlId={`outgoingCallUriTemplate_${props.localId}`}>
         <ControlLabel>{Msg.CONFIG_FORM_TEMPLATE_HEADER}</ControlLabel>
@@ -143,7 +172,6 @@ const ConfigForm = (props) => {
           keyLabel={Msg.CONFIG_FORM_USERS_KEY_LABEL}
           valueLabel={Msg.CONFIG_FORM_USERS_VALUE_LABEL} />
       </FormGroup>
-      <Button className="btn confirm btn-xs" onClick={props.submit}>{Msg.CONFIG_FORM_SAVE_BUTTON}</Button>
     </Form>
   );
 };
@@ -151,9 +179,9 @@ const ConfigForm = (props) => {
 ConfigForm.propTypes = {
   config: PropTypes.instanceOf(ConfigUI).isRequired,
   localId: PropTypes.string.isRequired,
-  isOpen: PropTypes.bool.isRequired,
+  isOpenOnInit: PropTypes.bool.isRequired,
   updateValues: PropTypes.func.isRequired,
-  submit: PropTypes.func.isRequired
+  validationSchema: PropTypes.object.isRequired
 };
 
 export default ConfigForm;

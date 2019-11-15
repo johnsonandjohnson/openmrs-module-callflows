@@ -11,7 +11,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 import {
   Col,
-  Row
+  Row,
+  Button
 } from 'react-bootstrap';
 import { Accordion } from '@openmrs/react-components';
 import _ from 'lodash';
@@ -21,18 +22,34 @@ import {
   reset,
   getConfigs,
   postConfigs,
+  updateAllConfigForms,
   updateConfigForm,
   addNewForm,
   removeForm,
   openModal,
   closeModal,
+  focus,
   clearFocus
 } from '../reducers/providers.reducer';
 import RemoveButton from './RemoveButton';
 import ConfigForm from './config-form';
 import OpenMRSModal from './OpenMRSModal';
+import * as Yup from "yup";
+import * as Msg from '../shared/utils/messages';
+import { validateForm } from '../shared/utils/validation-util';
+import { errorToast } from '../shared/utils/toast-display-util';
 
 export class Providers extends React.Component {
+  validationSchema = Yup.object().shape({
+    name: Yup.string()
+      .required(Msg.FIELD_REQUIRED)
+      .test('unique check', Msg.CONFIG_FORM_NAME_IS_NOT_UNIQUE, nameToValidate => {
+        const { configForms } = this.props;
+        return _(configForms)
+          .filter(configForm => configForm.config.name === nameToValidate)
+          .size() === 1;
+      }),
+  });
 
   constructor(props) {
     super(props);
@@ -54,8 +71,31 @@ export class Providers extends React.Component {
     }
   }
 
-  submitConfigs = () => {
-    this.props.postConfigs(this.props.configForms);
+  handleSubmitConfigs = (event) => {
+    event.preventDefault();
+
+    const { updateAllConfigForms, postConfigs, configForms } = this.props;
+    const newConfigForms = _.clone(configForms);
+
+    const validationPromises = newConfigForms.map(configFormData => {
+      const { config } = configFormData;
+      return validateForm(config, this.validationSchema)
+        .then(() => {
+          config.errors = null;
+        })
+        .catch((errors) => {
+          config.errors = errors;
+          return Promise.reject();
+        })
+    });
+    Promise.all(validationPromises)
+      .then(() => {
+        postConfigs(newConfigForms);
+      })
+      .catch(() => {
+        updateAllConfigForms(newConfigForms);
+        errorToast(Msg.GENERIC_INVALID_FORM);
+      })
   }
 
   handleRemove = (event) => {
@@ -119,7 +159,7 @@ export class Providers extends React.Component {
                   className="cfl-col-field-left">
                   <Accordion title={item.config.name}
                     border={true}
-                    open={item.isOpen}>
+                    open={item.isOpenOnInit}>
                     <div ref={(div) => {
                       if (item.localId === this.props.focusEntry) {
                         this.focusRef = div;
@@ -127,10 +167,10 @@ export class Providers extends React.Component {
                     }}>
                       <ConfigForm
                         config={item.config}
-                        isOpen={item.isOpen}
+                        isOpenOnInit={item.isOpenOnInit}
                         localId={item.localId}
                         updateValues={this.props.updateConfigForm}
-                        submit={this.submitConfigs} />
+                        validationSchema={this.validationSchema} />
                     </div>
                   </Accordion>
                 </Col>
@@ -145,6 +185,11 @@ export class Providers extends React.Component {
               </Row>
             );
           })}
+          <Button className="btn confirm btn-xs"
+              disabled={this.props.loading}
+              onClick={this.handleSubmitConfigs}>
+            {Msg.CONFIG_FORM_SAVE_BUTTON}
+          </Button>
         </div>
       </div>
     );
@@ -155,18 +200,21 @@ export const mapStateToProps = state => ({
   configForms: state.providersReducer.configForms,
   showModal: state.providersReducer.showModal,
   toDeleteId: state.providersReducer.toDeleteId,
-  focusEntry: state.providersReducer.focusEntry
+  focusEntry: state.providersReducer.focusEntry,
+  loading: state.providersReducer.loading
 });
 
 const mapDispatchToProps = {
   reset,
   getConfigs,
   postConfigs,
+  updateAllConfigForms,
   updateConfigForm,
   addNewForm,
   removeForm,
   openModal,
   closeModal,
+  focus,
   clearFocus
 };
 

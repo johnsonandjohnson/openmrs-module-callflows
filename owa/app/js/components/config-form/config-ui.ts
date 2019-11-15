@@ -16,6 +16,7 @@ export default class ConfigUI {
   servicesMap?: string;
   testUsersMap?: MapEntry[];
   hasAuthRequired?: boolean;
+  errors?: { [key:string]:string; };
 
   constructor(model?: IConfig) {
     this.init();
@@ -29,7 +30,7 @@ export default class ConfigUI {
     this.outgoingCallUriTemplate = '';
     this.outgoingCallPostHeadersMap = [new MapEntry()];
     this.outgoingCallPostParams = [new MapEntry()];
-    this.outgoingCallMethod = null;
+    this.outgoingCallMethod = 'POST';
     this.outboundCallLimit = 0;
     this.outboundCallRetrySeconds = 0;
     this.outboundCallRetryAttempts = 0;

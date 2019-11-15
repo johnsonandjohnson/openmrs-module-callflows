@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 // Form validation method based on Yup schema validation
 
 export const validateForm = (form, schema) => new Promise((resolve, reject) => {
@@ -19,6 +21,9 @@ export const validateForm = (form, schema) => new Promise((resolve, reject) => {
 });
 
 export const validateField  = (form, fieldPath, schema) => new Promise((resolve, reject) => {
+  if (_.get(schema.fields, fieldPath) === undefined) {
+    return resolve(fieldPath);
+  }
   schema.validateAt(fieldPath, form)
     .then(() => {
       resolve(fieldPath);
@@ -28,4 +33,4 @@ export const validateField  = (form, fieldPath, schema) => new Promise((resolve,
       errors[ex.path] = ex.errors[0];
       reject(errors);
     });
-}); 
+});

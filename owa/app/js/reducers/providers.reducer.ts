@@ -9,6 +9,7 @@ import IConfig from '../shared/model/config.model';
 
 export const ACTION_TYPES = {
   RESET: 'providersReducer/RESET',
+  UPDATE_ALL_CONFIG_FORMS: 'providersReducer/UPDATE_ALL_CONFIG_FORMS',
   UPDATE_CONFIG_FORMS: 'providersReducer/UPDATE_CONFIG_FORMS',
   FETCH_CONFIGS: 'providersReducer/FETCH_CONFIGS',
   POST_CONFIG: 'providersReducer/POST_CONFIG',
@@ -16,6 +17,7 @@ export const ACTION_TYPES = {
   REMOVE_FORM: 'providersReducer/REMOVE_FORM',
   OPEN_MODAL: 'providersReducer/OPEN_MODAL',
   CLOSE_MODAL: 'providersReducer/CLOSE_MODAL',
+  FOCUS: 'providersReducer/FOCUS',
   CLEAR_FOCUS: 'providersReducer/CLEAR_FOCUS'
 };
 
@@ -23,7 +25,8 @@ const initialState = {
   configForms: [] as ReadonlyArray<ConfigFormData>,
   showModal: false,
   toDeleteId: null,
-  focusEntry: null
+  focusEntry: null,
+  loading: false
 };
 
 export type ProvidersState = Readonly<typeof initialState>;
@@ -32,11 +35,13 @@ export default (state = initialState, action) => {
   switch (action.type) {
     case REQUEST(ACTION_TYPES.POST_CONFIG):
       return {
-        ...state
+        ...state,
+        loading: true
       };
     case FAILURE(ACTION_TYPES.POST_CONFIG):
       return {
-        ...state
+        ...state,
+        loading: false
       };
     case SUCCESS(ACTION_TYPES.POST_CONFIG):
       return {
@@ -44,23 +49,33 @@ export default (state = initialState, action) => {
         configForms: action.payload.data.map((fetched) => {
           return new ConfigFormData(fetched);
         }),
-        focusEntry: null
+        focusEntry: null,
+        loading: false
       };
     case REQUEST(ACTION_TYPES.FETCH_CONFIGS):
       return {
-        ...state
+        ...state,
+        loading: true
       };
     case FAILURE(ACTION_TYPES.FETCH_CONFIGS):
       return {
-        ...state
+        ...state,
+        loading: false
       };
     case SUCCESS(ACTION_TYPES.FETCH_CONFIGS):
       return {
         ...state,
         configForms: action.payload.data.map((fetched) => {
           return new ConfigFormData(fetched);
-        })
+        }),
+        loading: false
       };
+    case ACTION_TYPES.UPDATE_ALL_CONFIG_FORMS: {
+      return {
+        ...state,
+        configForms: action.payload
+      };
+    }
     case ACTION_TYPES.UPDATE_CONFIG_FORMS: {
       return {
         ...state,
@@ -83,6 +98,13 @@ export default (state = initialState, action) => {
         configForms: action.payload,
         showModal: false,
         toDeleteId: null
+      };
+    }
+    case ACTION_TYPES.FOCUS: {
+      const localId = action.payload;
+      return {
+        ...state,
+        focusEntry: localId,
       };
     }
     case ACTION_TYPES.CLEAR_FOCUS: {
@@ -116,6 +138,11 @@ export default (state = initialState, action) => {
   }
 };
 
+export const updateAllConfigForms = (updated) => ({
+  type: ACTION_TYPES.UPDATE_ALL_CONFIG_FORMS,
+  payload: updated
+});
+
 const updateConfigForms = (configForms, updated) => {
   return configForms.map((item) => {
     if (item.localId === updated.localId) {
@@ -142,6 +169,11 @@ export const removeForm = (id, configForms) => {
   }
 };
 
+export const focus = (configForm) => ({
+  type: ACTION_TYPES.FOCUS,
+  payload: configForm.localId
+});
+
 export const clearFocus = () => ({
   type: ACTION_TYPES.CLEAR_FOCUS
 });
@@ -162,6 +194,11 @@ export const closeModal = () => ({
 const callflowsPath = 'ws/callflows';
 
 export const postConfigs = (configForms: ConfigFormData[]) => async (dispatch) => {
+  dispatch({
+    type: ACTION_TYPES.UPDATE_ALL_CONFIG_FORMS,
+    payload: configForms
+  })
+
   const requestUrl = callflowsPath + '/configs';
   let data: IConfig[] = configForms.map((form: ConfigFormData) => {
     return form.config.getModel();

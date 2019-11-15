@@ -15,6 +15,7 @@ export const FIELD_REQUIRED = 'This field is required';
 export const GENERIC_FAILURE = 'An error occurred.';
 export const GENERIC_PROCESSING = 'Processing...';
 export const GENERIC_SUCCESS = 'Success.';
+export const GENERIC_INVALID_FORM = "Form is invalid. Check fields and send it again.";
 
 // Designer flow test
 export const DESIGNER_FLOW_TEST_CONFIGURATION_LABEL = 'Configuration';
@@ -50,3 +51,4 @@ export const CONFIG_FORM_SAVE_BUTTON = 'SAVE';
 export const CONFIG_FORM_SERVICE_MAP_HEADER = 'Injected services map';
 export const CONFIG_FORM_SERVICE_MAP_NOTE = 'Map of services that can be injected in IVR templates. ' +
   'Key is the name used in Velocity, Value is the class of OSGi service';
+export const CONFIG_FORM_NAME_IS_NOT_UNIQUE = 'Each config must have their unique name';
