@@ -25,6 +25,7 @@ const initialState = {
   loading: false,
   data: [],
   flow: defaultValue as unknown as IFlow,
+  flowLoaded: false,
   nodes: [] as Array<INode>
 };
 
@@ -80,11 +81,13 @@ export default (state: DesignerState = initialState, action): DesignerState => {
       }
     case REQUEST(ACTION_TYPES.FETCH_FLOW):
       return {
-        ...state
+        ...state,
+        flowLoaded: false
       };
     case FAILURE(ACTION_TYPES.FETCH_FLOW):
       return {
-        ...state
+        ...state,
+        flowLoaded: false
       };
     case SUCCESS(ACTION_TYPES.FETCH_FLOW): {
       const flow = action.payload.data.results[0] as IFlow;
@@ -92,7 +95,8 @@ export default (state: DesignerState = initialState, action): DesignerState => {
       return {
         ...state,
         flow,
-        nodes
+        nodes,
+        flowLoaded: true
       }
     }
     case REQUEST(ACTION_TYPES.MAKE_TEST_CALL):

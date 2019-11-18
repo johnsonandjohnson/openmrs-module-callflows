@@ -38,13 +38,15 @@ export interface IDesignerFlowProps extends StateProps, DispatchProps, RouteComp
 
 export interface IDesignerFlowState {
   isNew: boolean;
+  nodesExpansion: {};
 };
 
 export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesignerFlowState> {
   constructor(props) {
     super(props);
     this.state = {
-      isNew: !this.props.match.params || !this.props.match.params.flowName
+      isNew: !this.props.match.params || !this.props.match.params.flowName,
+      nodesExpansion: {}
     };
   }
 
@@ -52,6 +54,23 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
     if (!this.state.isNew) {
       const { flowName } = this.props.match.params;
       this.props.getFlow(flowName);
+    }
+  }
+
+  componentWillUpdate(nextProps, nextState) {
+    if (this.props.flowLoaded === false && nextProps.flowLoaded === true) {
+      if (!!this.props.nodes) {
+        const initialExpansion = {};
+        try {
+          this.props.nodes.forEach((node) => {
+            initialExpansion[node.step] = false;
+          });
+        } finally {
+          this.setState({
+            nodesExpansion: initialExpansion
+          });
+        }
+      }
     }
   }
 
@@ -80,6 +99,20 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
     return <SystemNode node={node} nodeIndex={nodeIndex} />
   }
 
+  setExpansionAll = (val: boolean) => {
+    let clone = {};
+    this.props.nodes.forEach((node) => {
+        clone[node.step] = val;
+    });
+    this.setState({
+      nodesExpansion: clone
+    });
+  }
+
+  collapseAll = () => this.setExpansionAll(false);
+
+  expandAll = () => this.setExpansionAll(true);
+
   renderSteps = () => {
     let { flow } = this.props;
     if (!!flow.raw) {
@@ -88,10 +121,10 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
           return (
             <div>
               <Accordion
-                key={`node${index}`}
                 title={node.step}
                 border={true}
-                open={false}>
+                open={this.state.nodesExpansion[node.step]}
+                key={`node${index}-${this.state.nodesExpansion[node.step].toString()}`}>
                 {node.nodeType === NodeType.SYSTEM ? this.renderSystemNode(node as ISystemNode, index) : ''}
               </Accordion>
             </div>
@@ -126,9 +159,9 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
                 className={formClass}
               />
             </FormGroup>
-            <Button className="btn btn-success btn-md" onSubmit={() => alert('Not implemented yet.')}>Add interaction</Button>
-            <Button className="btn btn-secondary btn-md" >Expand</Button>
-            <Button className="btn btn-secondary btn-md" >Collapse</Button>
+            <Button className="btn btn-success btn-md" onClick={() => alert('Not implemented yet.')}>Add interaction</Button>
+            <Button className="btn btn-secondary btn-md" onClick={() => this.expandAll()}>Expand</Button>
+            <Button className="btn btn-secondary btn-md" onClick={() => this.collapseAll()}>Collapse</Button>
           </Form>
         </div>
         <hr />
