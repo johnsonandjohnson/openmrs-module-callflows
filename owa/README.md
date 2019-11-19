@@ -36,16 +36,17 @@ To deploy directly to your local Open Web Apps directory, run:
 npm run build:deploy
 ````
 
-This will build and deploy the app to the `/home/user/cfl/cfl-openmrs/cfl/web/owa`
+This will build and deploy the app to the `/home/user/.clf-dev/owa`
 directory. To change the deploy directory, edit the `LOCAL_OWA_FOLDER` entry in
 `config.json`. If this file does not exists, create one in the root directory
 that looks like:
 
 ```js
 {
-  "LOCAL_OWA_FOLDER": "/home/user/cfl/cfl-openmrs/cfl/web/owa"
+  "LOCAL_OWA_FOLDER": "/home/user/.clf-dev/owa"
 }
 ```
+Note: make sure that you have write access to LOCAL_OWA_FOLDER and its content.
 
 ### Live Reload with CfL docker
 
@@ -54,6 +55,9 @@ Adjust variables listed below to your environment, open terminal and run them
 CALLFLOWS_REPO=/home/user/cfl/omrs-callflows
 CALLFLOWS_OMOD=callflows-1.0.0-SNAPSHOT.omod
 CFL_REPO=/home/user/cfl/cfl-openmrs
+
+MODULES_PATH=$HOME_DIR/.cfl-dev/modules
+OWA_PATH=$HOME_DIR/.cfl-dev/owa
 ```
 Build the callflows module
 ```bash
@@ -62,14 +66,14 @@ mvn clean install
 ```
 Replace the callflows module file `CFL_REPO/cfl/web/cfl-modules/CALLFLOWS_OMOD` by `CALLFLOWS_REPO/omod/target/CALLFLOWS_OMOD`
 ```bash
-rm $CFL_REPO/cfl/web/cfl-modules/callflows*
-mv $CALLFLOWS_REPO/omod/target/$CALLFLOWS_OMOD $CFL_REPO/cfl/web/cfl-modules
+rm -f $MODULES_PATH/callflows*
+mv $CALLFLOWS_REPO/omod/target/$CALLFLOWS_OMOD $MODULES_PATH
 ```
 Run docker-compose
 ```bash
 cd $CFL_REPO/cfl/
 docker-compose down
-docker-compose up -d
+docker-compose up --build -d
 ```
 Log in to local OpenMRS app to make sure everythink works fine before executing further steps.
 Go to `CALLFLOWS_REPO/owa` and create a file `config.json`
@@ -77,10 +81,10 @@ Go to `CALLFLOWS_REPO/owa` and create a file `config.json`
 cd $CALLFLOWS_REPO/owa
 touch config.json
 ```
-Replace `CFL_REPO` with our own path and paste into `config.json` file. 
+Replace `CFL_REPO` with our own path and paste into `config.json` file.
 ```js
 {
-  "LOCAL_OWA_FOLDER":"CFL_REPO/cfl/web/owa/",
+  "LOCAL_OWA_FOLDER":"CFL_REPO/owa/",
   "APP_ENTRY_POINT":"http://localhost:8080/openmrs/owa/callflows/index.html"
 }
 ```
@@ -88,17 +92,20 @@ This file isn't tracked by git so you can leave it like that.
 <br/>
 Now run
 ```bash
+sudo chown -R $(whoami):$(whoami) $OWA_PATH
 cd $CALLFLOWS_REPO/owa
-sudo npm run watch
+npm run watch
 ```
 You can add
 ```html
 <h1>TEST</h1>
 ```
-to `CALLFLOWS_REPO/owa/js/components/App.jsx` in order to check if it works.
+to `CALLFLOWS_REPO/owa/js/components/App.jsx` in order to check if it works. <br />
 
 #### Note!
-You will have to use `Ctrl+F5` to see changes in the HTML. It's caused by Docker volume system. 
+* You will have to use `Ctrl+F5` to see changes in the HTML. It's caused by Docker volume system.
+* You can use the script `runNpmWatch.sh` which checks permissions and runs `npm run watch`.
+* After rerunning of OpenMRS (`run.sh`), you should also rerun the `runNpmWatch.sh` script.
 
 ### Extending
 

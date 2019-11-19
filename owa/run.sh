@@ -5,14 +5,31 @@ CALLFLOWS_REPO=$HOME_DIR/cfl/omrs-callflows
 CALLFLOWS_OMOD=callflows-1.0.0-SNAPSHOT.omod
 CFL_REPO=$HOME_DIR/cfl/cfl-openmrs
 
-cd $CALLFLOWS_REPO
-mvn clean install
+MODULES_PATH=$HOME_DIR/.cfl-dev/modules
+OWA_PATH=$HOME_DIR/.cfl-dev/owa
 
-rm $CFL_REPO/cfl/web/modules/callflows*
-mv $CALLFLOWS_REPO/omod/target/$CALLFLOWS_OMOD $CFL_REPO/cfl/web/modules
+check_ownership_and_fix () {
+  PATH_TO_CHECK=$1
+  if [ $(stat -c '%U' $PATH_TO_CHECK) != $(whoami) ] || [ $(find $PATH_TO_CHECK ! -user $(whoami) | wc -l) -gt 0 ]; then
+    sudo chown -R $(whoami):$(whoami) $PATH_TO_CHECK
+    echo "Changed ownership of $PATH_TO_CHECK to $(whoami):$(whoami)"
+  fi
+}
 
-cd $CFL_REPO/cfl/
-docker-compose down
-docker-compose up -d
+mkdir -p $MODULES_PATH
+mkdir -p $OWA_PATH &&
+
+check_ownership_and_fix $MODULES_PATH &&
+
+cd $CALLFLOWS_REPO &&
+mvn clean install &&
+
+rm -f $MODULES_PATH/callflows* &&
+mv $CALLFLOWS_REPO/omod/target/$CALLFLOWS_OMOD $MODULES_PATH &&
+
+cd $CFL_REPO/cfl/ &&
+docker-compose down &&
+docker-compose up --build -d &&
+docker-compose logs -f ||
 
 cd $CALLFLOWS_REPO/owa
