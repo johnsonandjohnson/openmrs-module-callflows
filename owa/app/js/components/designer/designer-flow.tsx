@@ -137,13 +137,14 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
                 title={node.step}
                 border={true}
                 open={this.state.nodesExpansion[node.step]}
-                key={`node${index}-${this.state.nodesExpansion[node.step].toString()}`}>
+                key={`node${index}-${this.state.nodesExpansion[node.step] ? 'true' : 'false'}`}>
                 {node.nodeType === NodeType.SYSTEM ? this.renderSystemNode(node as ISystemNode, index) : ''}
               </Accordion>
             </div>
           );
         });
       } catch (ex) {
+        console.error(ex);
         return (
           <div>Unable to parse flow steps</div>
         );
