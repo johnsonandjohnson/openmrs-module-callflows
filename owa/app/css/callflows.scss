@@ -166,3 +166,8 @@ $highlight: darken(#009384, 15%);
   background-color: #6561b6 !important;
   border-color: #5b57a6;
 }
+
+.dropdown-container {
+  min-height: 200px;
+  overflow: auto;
+}

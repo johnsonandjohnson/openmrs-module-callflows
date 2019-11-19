@@ -32,10 +32,12 @@ import _ from 'lodash';
 import { Accordion } from '@openmrs/react-components';
 
 import SystemNode from './flow-node/system-node';
+import UserNode from './flow-node/user-node';
 import { ISystemNode } from '../../shared/model/system-node.model';
 import { NodeType } from '../../shared/model/node-type.model';
 import { INode } from '../../shared/model/node.model';
 import { IFlow } from '../../shared/model/flow.model';
+import { IUserNode } from '../../shared/model/user-node.model';
 
 export interface IDesignerFlowProps extends StateProps, DispatchProps, RouteComponentProps<{ flowName: string }> {
 };
@@ -96,21 +98,13 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
     }
   }
 
-  renderStepElement = (node: any, elementName: string, label: string) => {
-    //TODO: OCALL-70: Refactor or remove it, it's unused
-    if (!!node.templates[elementName]) {
-      return (
-        <div>
-          <label>{label}:</label>
-          <p>{node.templates[elementName].content}</p>
-        </div>
-      );
-    } else return null;
-  }
-
   renderSystemNode = (node: ISystemNode, nodeIndex: number) => {
     return <SystemNode node={node} nodeIndex={nodeIndex} />
   }
+
+  renderUserNode = (node: IUserNode, index: number) => {
+    return <UserNode node={node} nodeIndex={index} />
+  };
 
   setExpansionAll = (val: boolean) => {
     let clone = {};
@@ -138,7 +132,10 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
                 border={true}
                 open={this.state.nodesExpansion[node.step]}
                 key={`node${index}-${this.state.nodesExpansion[node.step] ? 'true' : 'false'}`}>
-                {node.nodeType === NodeType.SYSTEM ? this.renderSystemNode(node as ISystemNode, index) : ''}
+                {node.nodeType === NodeType.SYSTEM ?
+                  this.renderSystemNode(node as ISystemNode, index) :
+                  this.renderUserNode(node as IUserNode, index)
+                }
               </Accordion>
             </div>
           );
@@ -155,7 +152,6 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
   render() {
     const { flow } = this.props;
     const formClass = 'form-control';
-    const errorFormClass = formClass + ' error-field';
     return (
       <div className="body-wrapper">
         <div className="panel-body">

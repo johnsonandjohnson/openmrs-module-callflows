@@ -5,5 +5,5 @@ export interface INode {
   nodeType: NodeType;
   templates: any;
   blocks: ReadonlyArray<IBlock>;
-  step: string
+  step: string;
 }
