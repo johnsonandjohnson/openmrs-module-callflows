@@ -8,7 +8,7 @@ import org.openmrs.module.callflows.api.domain.FlowStep;
 import org.openmrs.module.callflows.api.domain.flow.Flow;
 import org.openmrs.module.callflows.api.domain.flow.Node;
 import org.openmrs.module.callflows.api.domain.flow.SystemNode;
-import org.openmrs.module.callflows.api.dao.CallFlowDao;
+import org.openmrs.module.callflows.api.service.CallFlowService;
 import org.openmrs.module.callflows.api.service.FlowService;
 import org.openmrs.module.callflows.api.util.FlowUtil;
 
@@ -44,7 +44,7 @@ public class FlowServiceImpl implements FlowService {
     private static final String VELOCITY = "velocity";
 
     @Autowired
-    private CallFlowDao callFlowDao;
+    private CallFlowService callFlowService;
 
     @Autowired
     private FlowUtil flowUtil;
@@ -74,7 +74,7 @@ public class FlowServiceImpl implements FlowService {
     @Override
     public Flow load(String name) {
         try {
-            CallFlow callFlow = callFlowDao.findByName(name);
+            CallFlow callFlow = callFlowService.findByName(name);
             if (callFlow != null) {
                 return objectMapper.readValue(callFlow.getRaw(), Flow.class);
             } else {
