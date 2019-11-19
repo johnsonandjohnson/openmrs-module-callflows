@@ -9,7 +9,6 @@ import { Row, Col, FormGroup, FormControl, Checkbox, Form } from 'react-bootstra
 import { DropdownBreadCrumb } from '../dropdown-bread-crumb/dropdown-bread-crumb';
 import AddButton from '../../add-button';
 import { FormSection } from './form-section';
-import { INode } from '../../../shared/model/node.model';
 
 interface IProps  extends DispatchProps, RouteComponentProps<{ flowName: string }> {
   node: IUserNode;
@@ -39,7 +38,7 @@ class UserNode extends React.Component<IProps, IState> {
     }
   }
 
-  getFirstBlockFromNode = (node: INode) => node.blocks && node.blocks.length > 0 ? node.blocks[0] : undefined;
+  getFirstBlockFromNode = (node: IUserNode) => node.blocks && node.blocks.length > 0 ? node.blocks[0] : undefined;
 
   getFirstElementFromBlock = (block: IBlock | undefined) => block && block.elements.length > 0 ?
     block.elements[0] : undefined
