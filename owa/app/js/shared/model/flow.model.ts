@@ -1,6 +1,6 @@
 import { FlowStatus } from './flow-status.model'
 export interface IFlow {
-  id?: number;
+  id?: number | null;
   name?: string;
   raw?: any;
   status?: FlowStatus;
@@ -8,7 +8,7 @@ export interface IFlow {
 }
 
 export const defaultValue: Readonly<IFlow> = {
-  id: 0,
+  id: null,
   name: '',
   raw: '{}',
   status: FlowStatus.Draft,

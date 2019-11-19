@@ -14,13 +14,12 @@ import PropTypes from 'prop-types';
 import { Link, withRouter } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import UrlPattern from 'url-pattern';
-import _ from 'lodash';
 
 import './bread-crumb.scss';
 import * as Msg from '../../shared/utils/messages';
 
 export const DESIGNER_NEW_FLOW_ROUTE = '#/designer/new';
-const DESIGNER_NEW_FLOW_PATTERN = new UrlPattern('/designer/new$');
+const DESIGNER_NEW_FLOW_PATTERN = new UrlPattern('/designer/new');
 const DESIGNER_ROUTE = '/designer';
 const DESIGNER_PATTERN = new UrlPattern('/designer*');
 const PROVIDER_PATTERN = new UrlPattern('/providers*');
@@ -88,13 +87,15 @@ class BreadCrumb extends React.Component {
   }
 
   buildPathDynamically = (pattern, path) => {
-    let matched = path.match(pattern);
-    let res = _.split(matched, '/');
-    return (
-      <span>
-        {this.renderLastCrumb(_.last(res))}
-      </span>
-    );
+    return pattern.match(path)._.split('/')
+      .filter(e => !!e)
+      .map((e) => {
+        return (
+          <span>
+            {this.renderLastCrumb(e)}
+          </span>
+        );
+      });
   }
 
   buildDesignerBreadCrumb = (path) => {
@@ -103,10 +104,10 @@ class BreadCrumb extends React.Component {
       this.renderCrumb(MODULE_ROUTE, Msg.MODULE_NAME)
     ];
 
-    if (path.match(DESIGNER_NEW_FLOW_PATTERN)) {
+    if (DESIGNER_NEW_FLOW_PATTERN.match(path)) {
       designerCrumbs.push(this.renderCrumb(DESIGNER_ROUTE, designerName));
       designerCrumbs.push(this.renderLastCrumb(Msg.DESIGNER_NEW_FLOW_BREADCRUMB_NEW));
-    } else if (path.match(DESIGNER_PATTERN)._) {
+    } else if (DESIGNER_PATTERN.match(path)._) {
       designerCrumbs.push(this.renderCrumb(DESIGNER_ROUTE, designerName));
       designerCrumbs.push(this.buildPathDynamically(DESIGNER_PATTERN, path));
     } else {
@@ -132,15 +133,15 @@ class BreadCrumb extends React.Component {
       this.renderLastCrumb('Renderers')
     ];
 
-    if (!!current.match(DESIGNER_PATTERN)) {
+    if (!!DESIGNER_PATTERN.match(current)) {
       return this.buildDesignerBreadCrumb(current);
-    } else if (!!current.match(PROVIDER_PATTERN)) {
+    } else if (!!PROVIDER_PATTERN.match(current)) {
       return (
         <div className="breadcrumb">
           {this.renderCrumbs(providerCrumbs)}
         </div>
       );
-    } else if (!!current.match(RENDERERS_PATTERN)) {
+    } else if (!!RENDERERS_PATTERN.match(current)) {
       return (
         <div className="breadcrumb">
           {this.renderCrumbs(rendererCrumbs)}

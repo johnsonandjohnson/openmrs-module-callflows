@@ -14,7 +14,9 @@ export const ACTION_TYPES = {
   FETCH_FLOW: 'designerReducer/FETCH_FLOW',
   MAKE_TEST_CALL: 'designerReducer/MAKE_TEST_CALL',
   UPDATE_NODE: 'designerReducer/UPDATE_NODE',
-  UPDATE_FLOW: 'designerReducer/UPDATE_FLOW'
+  PUT_FLOW: 'designerReducer/PUT_FLOW',
+  UPDATE_FLOW: 'designerReducer/UPDATE_FLOW',
+  POST_FLOW: 'designerReducer/POST_FLOW'
 };
 
 const initialState = {
@@ -33,23 +35,47 @@ export type DesignerState = Readonly<typeof initialState>;
 
 export default (state: DesignerState = initialState, action): DesignerState => {
   switch (action.type) {
-    case REQUEST(ACTION_TYPES.UPDATE_FLOW):
+    case REQUEST(ACTION_TYPES.PUT_FLOW):
       return {
         ...state,
         loading: true
       };
-    case FAILURE(ACTION_TYPES.UPDATE_FLOW):
+    case FAILURE(ACTION_TYPES.PUT_FLOW):
       return {
         ...state,
         loading: false
       };
-    case SUCCESS(ACTION_TYPES.UPDATE_FLOW):
+    case SUCCESS(ACTION_TYPES.PUT_FLOW):
       let flow = action.payload.data;
       let nodes = extractNodes(flow);
       return {
         ...state,
+        loading: false,
         flow,
         nodes
+      };
+    case ACTION_TYPES.UPDATE_FLOW:
+      return {
+        ...state,
+        flow: action.payload,
+        nodes: extractNodes(action.payload)
+      }
+    case REQUEST(ACTION_TYPES.POST_FLOW):
+      return {
+        ...state,
+        loading: true
+      };
+    case FAILURE(ACTION_TYPES.POST_FLOW):
+      return {
+        ...state,
+        loading: false
+      };
+    case SUCCESS(ACTION_TYPES.POST_FLOW):
+      return {
+        ...state,
+        loading: false,
+        flow: action.payload.data,
+        nodes: extractNodes(action.payload.data)
       };
     case REQUEST(ACTION_TYPES.FETCH_CONFIGS):
       return {
@@ -169,7 +195,7 @@ export const getFlow = (flowName: string) => async (dispatch) => {
   });
 };
 
-export const updateFlow = (flow: IFlow, nodes: Array<INode>) => async (dispatch) => {
+export const putFlow = (flow: IFlow, nodes: Array<INode>) => async (dispatch) => {
   const requestUrl = `${callflowsPath}/flows/${flow.id}`;
   const data = {
     ...flow,
@@ -177,7 +203,7 @@ export const updateFlow = (flow: IFlow, nodes: Array<INode>) => async (dispatch)
   }
   delete data.id;
   let body = {
-    type: ACTION_TYPES.UPDATE_FLOW,
+    type: ACTION_TYPES.PUT_FLOW,
     payload: axiosInstance.put(requestUrl, data)
   };
   handleRequest(dispatch, body, Msg.DESIGNER_FLOW_UPDATE_SUCCESS, Msg.DESIGNER_FLOW_UPDATE_FAILURE);
@@ -201,6 +227,28 @@ export const makeTestCall = (config: string, flow: string, phone: string, extens
   };
   handleTestCallRequest(dispatch, body);
 }
+
+export const updateFlow = (payload: any) => ({
+  type: ACTION_TYPES.UPDATE_FLOW,
+  payload
+});
+
+export const postFlow = (flow: IFlow, nodes: Array<INode>) => async (dispatch) => {
+  const requestUrl = `${callflowsPath}/flows`;
+  const data = {
+    ...flow,
+    raw: JSON.stringify({ nodes: nodes })
+  }
+  delete data.id;
+  let body = {
+    type: ACTION_TYPES.POST_FLOW,
+    payload: axiosInstance.post(requestUrl, data)
+  };
+  handleRequest(dispatch,
+    body,
+    Msg.DESIGNER_FLOW_CREATE_SUCCESS,
+    Msg.DESIGNER_FLOW_CREATE_FAILURE);
+};
 
 const replaceNode = (nodes: Array<any>, node: any, nodeIndex: number) => {
   return nodes.map((item, index: number) => {

@@ -16,7 +16,9 @@ import {
   postConfigs,
   getFlows,
   getFlow,
-  updateFlow
+  putFlow,
+  updateFlow,
+  postFlow
 } from '../../reducers/designer.reducer';
 import { IRootState } from '../../reducers';
 import DesignerFlowTest from './designer-flow-test';
@@ -26,12 +28,14 @@ import {
   FormGroup,
   FormControl
 } from 'react-bootstrap';
-
+import _ from 'lodash';
 import { Accordion } from '@openmrs/react-components';
+
 import SystemNode from './flow-node/system-node';
 import { ISystemNode } from '../../shared/model/system-node.model';
 import { NodeType } from '../../shared/model/node-type.model';
 import { INode } from '../../shared/model/node.model';
+import { IFlow } from '../../shared/model/flow.model';
 
 export interface IDesignerFlowProps extends StateProps, DispatchProps, RouteComponentProps<{ flowName: string }> {
 };
@@ -51,7 +55,9 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
   }
 
   componentDidMount = () => {
-    if (!this.state.isNew) {
+    if (!!this.state.isNew) {
+      this.props.reset();
+    } else {
       const { flowName } = this.props.match.params;
       this.props.getFlow(flowName);
     }
@@ -74,13 +80,20 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
     }
   }
 
-  handleNameChange = () => {
-    alert('Not implemented yet.');
-    //TODO: OCALL-50: Add name changing via redux
-  }
+  handleNameChange = (event) => {
+    const fieldName: string = event.target.name;
+    const value: string = event.target.value;
+    let flow: IFlow = _.cloneDeep(this.props.flow);
+    flow[fieldName] = value;
+    this.props.updateFlow(flow);
+  };
 
   handleSave = () => {
-    this.props.updateFlow(this.props.flow, this.props.nodes);
+    if (!!this.props.flow.id) {
+      this.props.putFlow(this.props.flow, this.props.nodes);
+    } else {
+      this.props.postFlow(this.props.flow, this.props.nodes);
+    }
   }
 
   renderStepElement = (node: any, elementName: string, label: string) => {
@@ -186,7 +199,9 @@ const mapDispatchToProps = ({
   postConfigs,
   getFlows,
   getFlow,
-  updateFlow
+  putFlow,
+  updateFlow,
+  postFlow
 });
 
 type StateProps = ReturnType<typeof mapStateToProps>;
