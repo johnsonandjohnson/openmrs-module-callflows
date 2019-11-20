@@ -3,6 +3,7 @@
 HOME_DIR=~
 CALLFLOWS_REPO=$HOME_DIR/cfl/omrs-callflows
 CALLFLOWS_OMOD=callflows-1.0.0-SNAPSHOT.omod
+CALLFLOWS_OMOD_PREFIX=callflows
 CFL_REPO=$HOME_DIR/cfl/cfl-openmrs
 
 MODULES_PATH=$HOME_DIR/.cfl-dev/modules
@@ -24,7 +25,7 @@ check_ownership_and_fix $MODULES_PATH &&
 cd $CALLFLOWS_REPO &&
 mvn clean install &&
 
-rm -f $MODULES_PATH/callflows* &&
+rm -f $MODULES_PATH/$CALLFLOWS_OMOD_PREFIX* &&
 mv $CALLFLOWS_REPO/omod/target/$CALLFLOWS_OMOD $MODULES_PATH &&
 
 cd $CFL_REPO/cfl/ &&
