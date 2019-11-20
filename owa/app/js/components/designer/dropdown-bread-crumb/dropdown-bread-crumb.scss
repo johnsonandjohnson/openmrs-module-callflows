@@ -42,6 +42,7 @@
   @extend .breadcrumb-item;
   text-decoration: underline;
   text-decoration-color: black;
+  z-index: 7;
 }
 
 .breadcrumb-link-item .dropdown-toggle {

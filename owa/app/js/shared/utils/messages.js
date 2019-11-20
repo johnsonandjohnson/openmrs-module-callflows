@@ -76,3 +76,6 @@ export const FLOW_NO_MATCH_LABEL = 'No Match';
 export const FLOW_EXIT_LABEL = 'Exit';
 export const FLOW_DTMFGRAMMAR_LABEL = 'DTMF Grammar';
 export const FLOW_VOICEGRAMMAR_LABEL = 'Voice Grammar';
+export const DIRTY_LABEL = 'Content can be safely edited manually without losing changes as renderer is OFF.';
+export const NON_DIRTY_LABEL = 'Auto generation via renderer template is ON';
+export const MISSING_TEMPLATE = 'Missing template for the following renderer: ';

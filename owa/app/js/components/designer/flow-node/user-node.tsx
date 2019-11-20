@@ -9,6 +9,7 @@ import { Row, Col, FormGroup, FormControl, Checkbox, Form } from 'react-bootstra
 import { DropdownBreadCrumb } from '../dropdown-bread-crumb/dropdown-bread-crumb';
 import AddButton from '../../add-button';
 import { FormSection } from './form-section';
+import { RenderedSections } from './rendered-section/rendered-sections';
 
 interface IProps extends DispatchProps, RouteComponentProps<{ flowName: string }> {
   node: IUserNode;
@@ -186,8 +187,12 @@ class UserNode extends React.Component<IProps, IState> {
             elementIndex={selectedElementIndex}
             update={this.updateNode}
           />
-          // todo OCALL-72: Add Render Block to 'User' node
         )}
+        {<RenderedSections 
+          key={this.props.nodeIndex + '-rendered-section'} 
+          node={node} 
+          nodeIndex={this.props.nodeIndex} 
+          updateNode={this.props.updateNode} />}
       </Form>
     );
   };

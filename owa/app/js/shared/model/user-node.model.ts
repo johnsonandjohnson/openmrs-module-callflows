@@ -1,18 +1,10 @@
 import { NodeType } from './node-type.model';
 import { IBlock } from './block.model';
+import { IUserNodeTemplate } from './user-node-template.model';
 
 export interface IUserNode {
   nodeType: NodeType.USER;
-  templates: {
-    vxml: {
-      content: any;
-      dirty: boolean;
-    };
-    ccxml: {
-      content: any;
-      dirty: boolean;
-    }
-  };
+  templates: Map<string, IUserNodeTemplate>;
   blocks: Array<IBlock>;
   step: string;
 }
