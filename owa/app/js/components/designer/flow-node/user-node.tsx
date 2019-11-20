@@ -4,13 +4,13 @@ import { updateNode } from '../../../reducers/designer.reducer';
 import { IUserNode } from '../../../shared/model/user-node.model';
 import { RouteComponentProps } from 'react-router';
 import { IBlock } from '../../../shared/model/block.model';
-import { IElement, defaultTxtValue } from '../../../shared/model/element.model';
+import { IElement, defaultTxtValue, defaultFieldValue } from '../../../shared/model/element.model';
 import { Row, Col, FormGroup, FormControl, Checkbox, Form } from 'react-bootstrap';
 import { DropdownBreadCrumb } from '../dropdown-bread-crumb/dropdown-bread-crumb';
 import AddButton from '../../add-button';
 import { FormSection } from './form-section';
 
-interface IProps  extends DispatchProps, RouteComponentProps<{ flowName: string }> {
+interface IProps extends DispatchProps, RouteComponentProps<{ flowName: string }> {
   node: IUserNode;
   nodeIndex: number;
 }
@@ -54,7 +54,7 @@ class UserNode extends React.Component<IProps, IState> {
     });
   };
 
-  onSelectedElementChange = (selectedElementIndex: number) => 
+  onSelectedElementChange = (selectedElementIndex: number) =>
     this.setState((prevState: IState) => ({
       selectedElement: prevState.selectedBlock ? prevState.selectedBlock.elements[selectedElementIndex] : undefined,
       selectedElementIndex
@@ -114,18 +114,14 @@ class UserNode extends React.Component<IProps, IState> {
     node.blocks.push(block);
     this.setState({
       selectedBlock: block,
-      selectedBlockIndex: node.blocks.length - 1,
-      selectedElement: undefined,
       selectedElementIndex: 0
     }, () => this.props.updateNode(node, this.props.nodeIndex));
   }
 
-  // todo OCALL-71: Refactor when implementing ability to add field
-  addTTS = () => {
+  addElement = (element: IElement) => {
     const { selectedBlock } = this.state;
     if (selectedBlock) {
       const node = this.props.node;
-      const element: IElement = { ...defaultTxtValue };
       selectedBlock.elements.push(element);
       node.blocks[this.state.selectedBlockIndex] = selectedBlock;
       this.setState({
@@ -135,14 +131,22 @@ class UserNode extends React.Component<IProps, IState> {
     }
   };
 
+  addTTS = () => {
+    this.addElement({ ...defaultTxtValue });
+  }
+
+  addField = () => {
+    this.addElement({ ...defaultFieldValue });
+  }
+
   render = () => {
     const { node } = this.props;
     const { selectedBlock, selectedElement, selectedElementIndex } = this.state;
     return (
       <Form className="form dropdown-container">
         <Row>
-          <Col md="7">
-            <FormGroup controlId={this.props.nodeIndex}>
+          <Col md={7}>
+            <FormGroup controlId={this.props.nodeIndex.toString()}>
               <FormControl
                 type="text"
                 name="name"
@@ -151,14 +155,14 @@ class UserNode extends React.Component<IProps, IState> {
               />
             </FormGroup>
           </Col>
-          <Col md="5">
+          <Col md={5}>
             <AddButton handleAdd={this.addBlock} txt="Form" />
-            <AddButton handleAdd={e => {}} txt="Field" />
+            <AddButton handleAdd={this.addField} txt="Field" />
             <AddButton handleAdd={this.addTTS} txt="TTS" />
           </Col>
         </Row>
         <Row>
-        <Col md="12">
+          <Col md={12}>
             <FormGroup controlId="callAllowed">
               <Checkbox name="callAllowed" checked={false}>
                 Check this if you want to submit to the server even if no fields are configured

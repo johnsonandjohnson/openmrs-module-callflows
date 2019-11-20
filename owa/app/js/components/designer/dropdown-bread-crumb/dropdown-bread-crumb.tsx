@@ -23,7 +23,7 @@ export class DropdownBreadCrumb extends React.Component<IProps> {
 
   onElementChange = (selectedIndex: number) => {
     const { selectedBlock } = this.props;
-    selectedBlock && this.props.elementChangedCallback(selectedIndex); 
+    selectedBlock && this.props.elementChangedCallback(selectedIndex);
   };
 
   onBlockRemove = (index: number, event) => {
@@ -38,20 +38,20 @@ export class DropdownBreadCrumb extends React.Component<IProps> {
     this.props.elementRemovedCallback(index);
   };
 
-  renderHomeCrumb = () => 
+  renderHomeCrumb = () =>
     <a className="breadcrumb-link-item">
       <FontAwesomeIcon icon={['fas', 'home']} />
     </a>
 
-  renderDelimiter = () => 
+  renderDelimiter = () =>
     <span className="breadcrumb-link-item">
       <FontAwesomeIcon size="xs" icon={['fas', 'chevron-right']} />
     </span>
 
-  renderMenuItem = (text: string, index: number, onChange:(index: number) => void, onRemove: (index: number, event) => void) =>
-    <MenuItem className="breadcrumb-menu-item" onClick={e => onChange(index)}>
+  renderMenuItem = (text: string, index: number, onChange:(index: number) => void, onRemove: (index: number) => void) =>
+    <MenuItem key={`breadcrumb-menu-item-${index}`} className="breadcrumb-menu-item" onClick={e => onChange(index)}>
       {text}
-      <span className="breadcrumb-menu-item-icon" onClick={e => onRemove(index, e)}>
+      <span className="breadcrumb-menu-item-icon" onClick={() => onRemove(index)}>
         <FontAwesomeIcon size="xs" icon={['fas', 'times']} />
       </span>
     </MenuItem>
@@ -68,7 +68,7 @@ export class DropdownBreadCrumb extends React.Component<IProps> {
             <>
               <NavDropdown title={selectedBlock.name} className="breadcrumb-link-item">
                 {this.props.blocks.map((block: IBlock, index: number) => 
-                  this.renderMenuItem(block.name, index, this.onBlockChange, this.onBlockRemove))}
+                  this.renderMenuItem(block.name, index, this.onBlockChange, e => this.onBlockRemove(index, e)))}
               </NavDropdown>
               {selectedElement && (
                 <>
@@ -78,7 +78,7 @@ export class DropdownBreadCrumb extends React.Component<IProps> {
                   <NavDropdown title={selectedElement.name} className="breadcrumb-link-item">
                     {selectedBlock.elements && selectedBlock.elements
                       .map((element: IElement, index: number) =>
-                        this.renderMenuItem(element.name, index, this.onElementChange, this.onElementRemove))}
+                        this.renderMenuItem(element.name, index, this.onElementChange, e => this.onElementRemove(index, e)))}
                   </NavDropdown>
                 </>
               )}

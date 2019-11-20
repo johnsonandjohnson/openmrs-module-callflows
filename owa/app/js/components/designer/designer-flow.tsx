@@ -109,7 +109,7 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
   setExpansionAll = (val: boolean) => {
     let clone = {};
     this.props.nodes.forEach((node) => {
-        clone[node.step] = val;
+      clone[node.step] = val;
     });
     this.setState({
       nodesExpansion: clone
@@ -126,18 +126,16 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
       try {
         return this.props.nodes.map((node: INode, index: number) => {
           return (
-            <div>
-              <Accordion
-                title={node.step}
-                border={true}
-                open={this.state.nodesExpansion[node.step]}
-                key={`node${index}-${this.state.nodesExpansion[node.step] ? 'true' : 'false'}`}>
-                {node.nodeType === NodeType.SYSTEM ?
-                  this.renderSystemNode(node as ISystemNode, index) :
-                  this.renderUserNode(node as IUserNode, index)
-                }
-              </Accordion>
-            </div>
+            <Accordion
+              title={node.step}
+              border={true}
+              open={this.state.nodesExpansion[node.step]}
+              key={`node${index}-${this.state.nodesExpansion[node.step] ? 'true' : 'false'}`}>
+              {node.nodeType === NodeType.SYSTEM ?
+                this.renderSystemNode(node as ISystemNode, index) :
+                this.renderUserNode(node as IUserNode, index)
+              }
+            </Accordion>
           );
         });
       } catch (ex) {
@@ -180,7 +178,7 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
         </div>
         <div className="body-wrapper">
           <div className="panel-body">
-          <Button className="btn btn-success btn-md" onClick={this.handleSave}>Save</Button>
+            <Button className="btn btn-success btn-md" onClick={this.handleSave}>Save</Button>
           </div>
         </div>
       </div>

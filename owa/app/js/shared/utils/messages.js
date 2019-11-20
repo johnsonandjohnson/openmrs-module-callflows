@@ -62,3 +62,17 @@ export const CONFIG_FORM_SERVICE_MAP_HEADER = 'Injected services map';
 export const CONFIG_FORM_SERVICE_MAP_NOTE = 'Map of services that can be injected in IVR templates. ' +
   'Key is the name used in Velocity, Value is the class of OSGi service';
 export const CONFIG_FORM_NAME_IS_NOT_UNIQUE = 'Each config must have their unique name';
+
+// Flow form
+export const FLOW_NAME_LABEL = 'Name';
+export const FLOW_REPROMPT_LABEL = 'Repeat/Reprompt count';
+export const FLOW_FIELDTYPE_LABEL = 'Type';
+export const FLOW_FIELDMETA_LABEL = 'Range';
+export const FLOW_BARGEIN_LABEL = 'Barge';
+export const FLOW_DTMF_LABEL = 'DTMF';
+export const FLOW_VOICE_LABEL = 'Voice';
+export const FLOW_NO_INPUT_LABEL = 'No Input';
+export const FLOW_NO_MATCH_LABEL = 'No Match';
+export const FLOW_EXIT_LABEL = 'Exit';
+export const FLOW_DTMFGRAMMAR_LABEL = 'DTMF Grammar';
+export const FLOW_VOICEGRAMMAR_LABEL = 'Voice Grammar';
