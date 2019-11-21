@@ -123,22 +123,34 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
 
   expandAll = () => this.setExpansionAll(true);
 
+  toggleExpansion = (key: string) => {
+    this.setState((prevState) => {
+      const newValues = { ...prevState.nodesExpansion };
+      newValues[key] = !prevState.nodesExpansion[key];
+      return ({
+        nodesExpansion: newValues
+      })
+    });
+  }
+
   renderSteps = () => {
     let { flow } = this.props;
     if (!!flow.raw) {
       try {
         return this.props.nodes.map((node: INode, index: number) => {
           return (
-            <Accordion
-              title={node.step ? node.step : ''}
-              border={true}
-              open={this.state.nodesExpansion[node.step]}
-              key={`node${index}-${this.state.nodesExpansion[node.step] ? 'true' : 'false'}`}>
-              {node.nodeType === NodeType.SYSTEM ?
-                this.renderSystemNode(node as ISystemNode, index) :
-                this.renderUserNode(node as IUserNode, index)
-              }
-            </Accordion>
+            <div onClick={() => this.toggleExpansion(node.step)}>
+                <Accordion
+                  title={node.step ? node.step : ''}
+                  border={true}
+                  open={this.state.nodesExpansion[node.step]}
+                  key={`node${index}-${this.state.nodesExpansion[node.step] ? 'true' : 'false'}`}>
+                  {node.nodeType === NodeType.SYSTEM ?
+                    this.renderSystemNode(node as ISystemNode, index) :
+                    this.renderUserNode(node as IUserNode, index)
+                  }
+                </Accordion>
+            </div>
           );
         });
       } catch (ex) {
