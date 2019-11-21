@@ -20,6 +20,7 @@ check_ownership_and_fix () {
 mkdir -p $MODULES_PATH
 mkdir -p $OWA_PATH &&
 
+check_ownership_and_fix $CALLFLOWS_REPO &&
 check_ownership_and_fix $MODULES_PATH &&
 
 cd $CALLFLOWS_REPO &&
