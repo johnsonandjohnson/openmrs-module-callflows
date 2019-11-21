@@ -21,7 +21,7 @@ import {
   postFlow
 } from '../../reducers/designer.reducer';
 import { IRootState } from '../../reducers';
-import DesignerFlowTest from './designer-flow-test';
+import DesignerCallTest from './test-call/designer-call-test';
 import {
   Form,
   Button,
@@ -29,15 +29,17 @@ import {
   FormControl
 } from 'react-bootstrap';
 import _ from 'lodash';
-import { Accordion } from '@openmrs/react-components';
-
+import { Accordion, Tabs, Tab } from '@openmrs/react-components';
 import SystemNode from './flow-node/system-node';
 import UserNode from './flow-node/user-node';
 import { ISystemNode } from '../../shared/model/system-node.model';
 import { NodeType } from '../../shared/model/node-type.model';
 import { INode } from '../../shared/model/node.model';
+import DesignerFlowTest from './test-flow/designer-flow-test';
 import { IFlow } from '../../shared/model/flow.model';
 import { IUserNode } from '../../shared/model/user-node.model';
+import * as Msg from '../../shared/utils/messages';
+import Tooltip from '../tooltip';
 
 export interface IDesignerFlowProps extends StateProps, DispatchProps, RouteComponentProps<{ flowName: string }> {
 };
@@ -153,32 +155,39 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
     return (
       <div className="body-wrapper">
         <div className="panel-body">
-          <h2>Test Call Flow</h2>
-          <DesignerFlowTest />
-        </div>
-        <hr />
-        <div className="panel-body">
           <Form>
             <FormGroup>
-              <FormControl type="text"
-                name="name"
-                value={flow.name}
-                onChange={this.handleNameChange}
-                className={formClass}
-              />
+                <FormControl type="text"
+                  name="name"
+                  value={flow.name}
+                  onChange={this.handleNameChange}
+                  className={formClass}
+                />
             </FormGroup>
             <Button className="btn btn-success btn-md" onClick={() => alert('Not implemented yet.')}>Add interaction</Button>
             <Button className="btn btn-secondary btn-md" onClick={() => this.expandAll()}>Expand</Button>
             <Button className="btn btn-secondary btn-md" onClick={() => this.collapseAll()}>Collapse</Button>
           </Form>
         </div>
-        <hr />
         <div className="panel-body">
           {this.renderSteps()}
         </div>
         <div className="body-wrapper">
           <div className="panel-body">
             <Button className="btn btn-success btn-md" onClick={this.handleSave}>Save</Button>
+          </div>
+          <hr />
+          <div className="panel-body">
+            <h2>Test Flow</h2>
+            <Tooltip message={Msg.DESIGNER_FLOW_TEST_SECTION_DESCRIPTION} />
+            <Tabs>
+              <Tab label={Msg.DESIGNER_TEST_CALL_LABEL}>
+                <DesignerCallTest />
+              </Tab>
+              <Tab label={Msg.DESIGNER_TEST_FLOW_LABEL}>
+                <DesignerFlowTest />
+              </Tab>
+            </Tabs>
           </div>
         </div>
       </div>

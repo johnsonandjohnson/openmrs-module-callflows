@@ -20,11 +20,16 @@ export const GENERIC_SUCCESS = 'Success.';
 export const GENERIC_INVALID_FORM = "Form is invalid. Check fields and send it again.";
 
 // Designer flow test
-export const DESIGNER_FLOW_TEST_CONFIGURATION_LABEL = 'Configuration';
-export const DESIGNER_FLOW_TEST_EXTENSION_LABEL = 'Extension';
-export const DESIGNER_FLOW_TEST_PHONE_NUMBER_LABEL = 'Phone Number';
-export const DESIGNER_FLOW_TEST_INITIATION_SUCCESS = 'Successfully initiated the test call.';
-export const DESIGNER_FLOW_TEST_INITIATION_FAILURE = 'The test call initiation failed.';
+export const DESIGNER_FLOW_TEST_SECTION_DESCRIPTION='The data you provide here are not saved in the Call Flow and they are only used for testing.'
+export const DESIGNER_TEST_CALL_LABEL = 'Initiate Call';
+export const DESIGNER_TEST_CALL_GENERAL_DESCRIPTION = 'Start a call and test it end-to-end using configured provider.';
+export const DESIGNER_TEST_CALL_CONFIGURATION_LABEL = 'Configuration';
+export const DESIGNER_TEST_CALL_EXTENSION_LABEL = 'Extension';
+export const DESIGNER_TEST_CALL_PHONE_NUMBER_LABEL = 'Phone Number';
+export const DESIGNER_TEST_CALL_INITIATION_SUCCESS = 'Successfully initiated the test call.';
+export const DESIGNER_TEST_CALL_INITIATION_FAILURE = 'The test call initiation failed.';
+export const DESIGNER_TEST_FLOW_LABEL = 'Test Call Flow';
+export const DESIGNER_TEST_FLOW_GENERAL_DESCRIPTION = 'Test the callflow without using configured provider.';
 export const DESIGNER_FLOW_UPDATE_SUCCESS = 'Successfully updated the flow.';
 export const DESIGNER_FLOW_UPDATE_FAILURE = 'Failed to update the flow.';
 export const DESIGNER_FLOW_CREATE_SUCCESS = 'Successfully created the flow.';

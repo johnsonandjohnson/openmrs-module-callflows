@@ -8,7 +8,7 @@ const Routes = ({ match }) => (
   <>
     <Switch>
       <Route exact path={`${match.url}/new`} component={DesignerFlow} />
-      <Route exact path={`${match.url}/:flowName`} component={DesignerFlow} />
+      <Route exact path={`${match.url}/edit/:flowName`} component={DesignerFlow} />
       <Route exact path={`${match.url}`} component={Designer} />
     </Switch>
   </>

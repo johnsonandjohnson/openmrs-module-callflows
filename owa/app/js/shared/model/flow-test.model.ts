@@ -1,7 +1,7 @@
 import * as Yup from 'yup';
 import * as Msg from '../utils/messages';
 
-export interface IFlowTestError {
+export interface IFlowCallError {
   configuration?: string,
   extension?: string,
   phoneNumber?: string,

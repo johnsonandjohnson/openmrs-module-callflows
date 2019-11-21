@@ -3,9 +3,17 @@ import { SUCCESS, REQUEST, FAILURE } from './action-type.util';
 import ConfigFormData from '../components/config-form/config-form-data';
 import { IFlow, defaultValue } from '../shared/model/flow.model';
 import { INode } from '../shared/model/node.model';
-import { handleTestCallRequest, handleSuccessMessage } from '../components/designer/designer-flow-test.util';
+import { handleTestCallRequest, handleSuccessMessage } from '../components/designer/test-call/designer-call-test.util';
 import * as Msg from '../shared/utils/messages';
 import { handleRequest } from '../shared/utils/request-status-util';
+import SystemMessage from '../shared/model/system-message.model';
+import UserMessage from '../shared/model/user-message.model';
+import { IFlowTestResponse } from '../shared/model/flow-test-response.model';
+import { IFlowTestResponseBody } from '../shared/model/flow-test-response-body.model';
+import { string } from 'prop-types';
+import { IContinueFieldProps } from '../shared/model/continue-field-props.model';
+import { convertToType } from '../shared/utils/conversion-util';
+import { AxiosPromise, AxiosResponse } from 'axios';
 
 export const ACTION_TYPES = {
   RESET: 'designerReducer/RESET',
@@ -14,9 +22,12 @@ export const ACTION_TYPES = {
   FETCH_FLOW: 'designerReducer/FETCH_FLOW',
   MAKE_TEST_CALL: 'designerReducer/MAKE_TEST_CALL',
   UPDATE_NODE: 'designerReducer/UPDATE_NODE',
-  PUT_FLOW: 'designerReducer/PUT_FLOW',
   UPDATE_FLOW: 'designerReducer/UPDATE_FLOW',
-  POST_FLOW: 'designerReducer/POST_FLOW'
+  PUT_FLOW: 'designerReducer/PUT_FLOW',
+  POST_FLOW: 'designerReducer/POST_FLOW',
+  SEND_MESSAGE: 'designerReducer/SEND_MESSAGE',
+  RESET_MESSAGES: 'designerReducer/RESET_MESSAGES',
+  NODE_PROCESSED: 'designerReducer/NODE_PROCESSED',
 };
 
 const initialState = {
@@ -28,7 +39,9 @@ const initialState = {
   data: [],
   flow: defaultValue as unknown as IFlow,
   flowLoaded: false,
-  nodes: [] as Array<INode>
+  nodes: [] as Array<INode>,
+  messages: [] as ReadonlyArray<UserMessage | SystemMessage>,
+  continueFieldProps: null as unknown as IContinueFieldProps
 };
 
 export type DesignerState = Readonly<typeof initialState>;
@@ -138,11 +151,31 @@ export default (state: DesignerState = initialState, action): DesignerState => {
       return {
         ...state,
       }
+    case ACTION_TYPES.NODE_PROCESSED: {
+      console.log(action.meta);
+      return {
+        ...state,
+        messages: [...state.messages, ...action.payload],
+        continueFieldProps: action.meta
+      };
+    }
     case ACTION_TYPES.UPDATE_NODE: {
       return {
         ...state,
         nodes: replaceNode(state.nodes, action.payload, action.meta)
       }
+    }
+    case ACTION_TYPES.SEND_MESSAGE: {
+      return {
+        ...state,
+        messages: [...state.messages, action.payload]
+      }
+    }
+    case ACTION_TYPES.RESET_MESSAGES: {
+      return {
+        ...state,
+        messages: []
+      };
     }
     case ACTION_TYPES.RESET: {
       return initialState;
@@ -156,6 +189,9 @@ export const reset = () => ({
   type: ACTION_TYPES.RESET
 });
 
+export const resetMessages = () => ({
+  type: ACTION_TYPES.RESET_MESSAGES
+});
 const callflowsPath = 'ws/callflows';
 
 export const postConfigs = (configForms) => async (dispatch) => {
@@ -171,7 +207,7 @@ export const postConfigs = (configForms) => async (dispatch) => {
 
 export const getConfigs = () => async (dispatch) => {
   const requestUrl = callflowsPath + '/configs';
-  await dispatch({
+  dispatch({
     type: ACTION_TYPES.FETCH_CONFIGS,
     payload: axiosInstance.get(requestUrl)
   });
@@ -228,6 +264,77 @@ export const makeTestCall = (config: string, flow: string, phone: string, extens
   handleTestCallRequest(dispatch, body);
 }
 
+export const sendMessage = (message: UserMessage) => async (dispatch, getState) => {
+  const state: DesignerState = getState().designerReducer;
+  const { continueFieldProps } = state;
+  const { callId } = continueFieldProps;
+  const params = {};
+  params[continueFieldProps.name] = message.text;
+  await dispatch({
+    type: ACTION_TYPES.NODE_PROCESSED,
+    payload: [message],
+    meta: continueFieldProps
+  });
+  moveToNextNode(callId, dispatch, params);
+};
+
+export const initiateTestFlow = (configName: string, flowName: string) => async (dispatch) => {
+  // on the backend any configuration is required
+  const requestUrl = `${callflowsPath}/in/${configName}/flows/${flowName}.json`;
+  const { data } = await axiosInstance.get(requestUrl);
+  processNodeResponse(data, dispatch);
+};
+
+export const processNodeResponse = (data: IFlowTestResponse, dispatch: Function) => {
+  const response = data;
+  if (!isJsonContent(response.body)) {
+    dispatch({
+      type: ACTION_TYPES.NODE_PROCESSED,
+      payload: [new SystemMessage(response.node, response.body)],
+      meta: null
+    });
+    return;
+  }
+  const responseContent: [IFlowTestResponseBody] = JSON.parse(response.body);
+  const newMessages = responseContent.map(m => new SystemMessage(response.node, m.txt));
+  let continueFieldProps = extractContinueFieldProps(responseContent, response.callId);
+  dispatch({
+    type: ACTION_TYPES.NODE_PROCESSED,
+    payload: newMessages,
+    meta: continueFieldProps
+  });
+  if (response.continueNode) {
+    moveToNextNode(response.callId, dispatch);
+  }
+};
+
+export const moveToNextNode = async (callId: string, dispatch: Function, params: any = {}) => {
+  const requestUrl = `${callflowsPath}/calls/${callId}.json`;
+  try {
+    let response = await axiosInstance.get(requestUrl, {
+      params: {
+        ...params
+      }
+    });
+    processNodeResponse(response.data, dispatch);
+  } catch (e) {
+    handleNodeError(e, dispatch);
+  }
+};
+
+const extractContinueFieldProps = (responseContent: IFlowTestResponseBody[], callId: string) => {
+  if (responseContent.length > 0) {
+    const lastMessage = responseContent[responseContent.length - 1];
+    if (lastMessage.field) {
+      return {
+        name: lastMessage.field,
+        type: lastMessage.type,
+        callId
+      };
+    }
+  } else return null;
+}
+
 export const updateFlow = (payload: any) => ({
   type: ACTION_TYPES.UPDATE_FLOW,
   payload
@@ -267,4 +374,37 @@ const extractNodes = (flow: IFlow) => {
     console.error('Cannot parse nodes');
   }
   return nodes;
+}
+
+const handleNodeError = (e, dispatch) => {
+  let errorMessage = 'Error';
+  try {
+    try {
+      try {
+        errorMessage = e.response.data.message;
+        if (!errorMessage) throw 'Blank error';
+      } catch (ex) {
+        errorMessage = JSON.stringify(e.response.data);
+      }
+    } catch (exc) {
+      errorMessage = JSON.stringify(e);
+    }
+  } catch (exception) {
+    errorMessage = exception;
+  }
+
+  dispatch({
+    type: ACTION_TYPES.NODE_PROCESSED,
+    payload: [new SystemMessage('error', errorMessage, new Date(), 'red')],
+    meta: null
+  });
+}
+
+const isJsonContent = (text: string) => {
+  try {
+    const parsed = JSON.parse(text);
+    return !!parsed;
+  } catch (e) {
+    return false;
+  }
 }

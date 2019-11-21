@@ -33,14 +33,14 @@ class BreadCrumb extends React.Component {
 
     const { history } = this.props;
     this.state = {
-      current: history.location.pathname.toLowerCase()
+      current: history.location.pathname
     };
   }
 
   componentDidMount = () => {
     const { history } = this.props;
     this.unlisten = history.listen((location) => {
-      const current = location.pathname.toLowerCase();
+      const current = location.pathname;
       this.setState({ current });
     });
   }
@@ -133,15 +133,15 @@ class BreadCrumb extends React.Component {
       this.renderLastCrumb('Renderers')
     ];
 
-    if (!!DESIGNER_PATTERN.match(current)) {
+    if (!!DESIGNER_PATTERN.match(current.toLowerCase())) {
       return this.buildDesignerBreadCrumb(current);
-    } else if (!!PROVIDER_PATTERN.match(current)) {
+    } else if (!!PROVIDER_PATTERN.match(current.toLowerCase())) {
       return (
         <div className="breadcrumb">
           {this.renderCrumbs(providerCrumbs)}
         </div>
       );
-    } else if (!!RENDERERS_PATTERN.match(current)) {
+    } else if (!!RENDERERS_PATTERN.match(current.toLowerCase())) {
       return (
         <div className="breadcrumb">
           {this.renderCrumbs(rendererCrumbs)}

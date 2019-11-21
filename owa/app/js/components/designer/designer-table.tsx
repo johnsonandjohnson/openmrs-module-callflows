@@ -33,7 +33,7 @@ export class DesignerTable extends React.PureComponent<IDesignerTableProps, IDes
         Header: 'Name',
         accessor: 'name',
         Cell: props => {
-          const link = `#designer/${props.value}`;
+          const link = `#designer/edit/${props.value}`;
           return (
             <span>
               {props.value}
@@ -45,7 +45,7 @@ export class DesignerTable extends React.PureComponent<IDesignerTableProps, IDes
         Header: 'Actions',
         accessor: 'name',
         Cell: props => {
-          const link = `#designer/${props.value}`;
+          const link = `#designer/edit/${props.value}`;
           return (
             <span>
               <a href={link} className="pull-right" >

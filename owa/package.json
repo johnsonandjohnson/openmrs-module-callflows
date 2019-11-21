@@ -41,6 +41,7 @@
     "ramda": "^0.24.0",
     "react": "^16.4.2",
     "react-bootstrap": "^0.32.3",
+    "react-chat-elements": "^10.8.0",
     "react-codemirror2": "^6.0.0",
     "react-dom": "^16.4.2",
     "react-intl": "^2.4.0",

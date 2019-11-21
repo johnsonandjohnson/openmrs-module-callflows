@@ -17,34 +17,37 @@ import {
   getFlows,
   getFlow,
   makeTestCall
-} from '../../reducers/designer.reducer';
-import { IRootState } from '../../reducers';
+} from '../../../reducers/designer.reducer';
+import { IRootState } from '../../../reducers';
 import {
   Form,
   Button,
   FormGroup,
   FormControl
 } from 'react-bootstrap';
-import TextLabel from '../text-label';
-import * as Msg from '../../shared/utils/messages';
-import { validateForm, validateField } from '../../shared/utils/validation-util'
-import { IFlowTestError, validationSchema } from '../../shared/model/flow-test.model';
-import ErrorDesc from '../error-desc';
-import { CONFIG_EXTENSIONS } from '../../constants';
-import { handleCarret } from '../../shared/utils/form-handling-util';
+import TextLabel from '../../text-label';
+import Tooltip from '../../tooltip';
+import * as Msg from '../../../shared/utils/messages';
+import { validateForm, validateField } from '../../../shared/utils/validation-util'
+import { IFlowCallError, validationSchema } from '../../../shared/model/flow-test.model';
+import ErrorDesc from '../../error-desc';
+import { CONFIG_EXTENSIONS } from '../../../constants';
+import { handleCarret } from '../../../shared/utils/form-handling-util';
+import { MessageList } from 'react-chat-elements';
+import 'react-chat-elements/dist/main.css';
 
-export interface IDesignerFlowTestProps extends StateProps, DispatchProps, RouteComponentProps<{ flowName: string }> {
+export interface IDesignerCallTestProps extends StateProps, DispatchProps, RouteComponentProps<{ flowName: string }> {
   flowName?: string
 };
 
-export interface IDesignerFlowTestState {
+export interface IDesignerCallTestState {
   configuration: string,
   extension: string,
   phoneNumber: string
-  errors?: IFlowTestError,
+  errors?: IFlowCallError,
 };
 
-export class DesignerFlowTest extends React.PureComponent<IDesignerFlowTestProps, IDesignerFlowTestState> {
+export class DesignerCallTest extends React.PureComponent<IDesignerCallTestProps, IDesignerCallTestState> {
   constructor(props) {
     super(props);
     this.state = {
@@ -161,8 +164,11 @@ export class DesignerFlowTest extends React.PureComponent<IDesignerFlowTestProps
     const { errors } = this.state;
     return (
       <Form className="form" onSubmit={this.handleSubmit}>
+        <FormGroup>
+          <Tooltip message={Msg.DESIGNER_TEST_CALL_GENERAL_DESCRIPTION} />
+        </FormGroup>
         <FormGroup controlId={"formName"}>
-          <TextLabel text={Msg.DESIGNER_FLOW_TEST_CONFIGURATION_LABEL} isMandatory={false} isWithColon={true} />
+          <TextLabel text={Msg.DESIGNER_TEST_CALL_CONFIGURATION_LABEL} isMandatory={false} isWithColon={true} />
           <FormControl componentClass="select" name="configuration"
             value={this.state.configuration}
             onChange={this.handleConfigurationChange}
@@ -175,7 +181,7 @@ export class DesignerFlowTest extends React.PureComponent<IDesignerFlowTestProps
           {this.renderError('configuration')}
         </FormGroup>
         <FormGroup controlId={"formName"}>
-          <TextLabel text={Msg.DESIGNER_FLOW_TEST_EXTENSION_LABEL} isMandatory={false} isWithColon={true} />
+          <TextLabel text={Msg.DESIGNER_TEST_CALL_EXTENSION_LABEL} isMandatory={false} isWithColon={true} />
           <FormControl componentClass="select" name="extension"
             value={this.state.extension}
             onChange={this.handleExtensionChange}
@@ -188,7 +194,7 @@ export class DesignerFlowTest extends React.PureComponent<IDesignerFlowTestProps
           {this.renderError('extension')}
         </FormGroup>
         <FormGroup controlId={"formName"}>
-          <TextLabel text={Msg.DESIGNER_FLOW_TEST_PHONE_NUMBER_LABEL} isMandatory={false} isWithColon={true} />
+          <TextLabel text={Msg.DESIGNER_TEST_CALL_PHONE_NUMBER_LABEL} isMandatory={false} isWithColon={true} />
           <FormControl type="text"
             name="phoneNumber"
             value={this.state.phoneNumber}
@@ -196,7 +202,7 @@ export class DesignerFlowTest extends React.PureComponent<IDesignerFlowTestProps
             className={errors && errors.phoneNumber ? errorFormClass : formClass} />
           {this.renderError('phoneNumber')}
         </FormGroup>
-        <Button className="btn btn-primary btn-md" type="submit">Test Call Flow</Button>
+        <Button className="btn btn-primary btn-md" type="submit">Initiate Test Call</Button>
       </Form>
     );
   }
@@ -219,4 +225,4 @@ type DispatchProps = typeof mapDispatchToProps;
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(DesignerFlowTest);
+)(DesignerCallTest);

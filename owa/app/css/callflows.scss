@@ -167,7 +167,37 @@ $highlight: darken(#009384, 15%);
   border-color: #5b57a6;
 }
 
-.dropdown-container {
-  min-height: 200px;
-  overflow: auto;
+.flow-test-container {
+  background-color: #DDD;
+  padding: 10px;
+
+  .rce-container-input {
+    padding: 10px;
+    background-color: #DDD;
+  }
+}
+
+.rce-mlist {
+  height: 300px;
+
+  .dropdown-container {
+    min-height: 200px;
+    overflow: auto;
+  }
+}
+
+.rce-mbox-title {
+  cursor: default;
+  text-decoration: none !important;
+}
+
+.disabled {
+  pointer-events: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  opacity: 0.6;
 }
