@@ -84,12 +84,13 @@ export class FormSection extends React.Component<IProps, IState> {
           </FormSectionField>
         </Row>
         <Row>
-          <FormSectionField {...{ elementIndex, handleChange }} name="reprompt" value={element.reprompt} />
+          <FormSectionField {...{ elementIndex, handleChange }} name="reprompt" value={element.reprompt} help={Msg.FLOW_REPROMPT_HELP} />
           {element.fieldType == FieldType.DIGITS &&
             <FormSectionField {...{ elementIndex, handleChange }}
               name="fieldMeta"
               value={element.fieldMeta}
-              label={FieldType.DIGITS} />
+              label={Msg.FLOW_RANGE_LABEL}
+              help={Msg.FLOW_RANGE_HELP} />
           }
         </Row>
         <Row>
@@ -114,7 +115,7 @@ export class FormSection extends React.Component<IProps, IState> {
           <Col md={6}>
             <Row className="right-code-wrapper">
               <Tabs>
-                <TabWrapper key="noInput" label={Msg.FLOW_NO_INPUT_LABEL} >
+                <TabWrapper key="noInput" label={Msg.FLOW_NO_INPUT_LABEL}>
                   <CodeMirror
                     value={this.state.noInputValue}
                     options={this.options}
@@ -122,7 +123,7 @@ export class FormSection extends React.Component<IProps, IState> {
                     onChange={(editor, data, value) => this.handleCodeChange(editor, data, value, 'noInput')}
                   />
                 </TabWrapper>
-                <TabWrapper key="noMatch" label={Msg.FLOW_NO_MATCH_LABEL} >
+                <TabWrapper key="noMatch" label={Msg.FLOW_NO_MATCH_LABEL}>
                   <CodeMirror
                     value={this.state.noMatchValue}
                     options={this.options}
@@ -130,7 +131,7 @@ export class FormSection extends React.Component<IProps, IState> {
                     onChange={(editor, data, value) => this.handleCodeChange(editor, data, value, 'noMatch')}
                   />
                 </TabWrapper>
-                <TabWrapper key="exit" label={Msg.FLOW_EXIT_LABEL} >
+                <TabWrapper key="exit" label={Msg.FLOW_EXIT_LABEL}>
                   <CodeMirror
                     value={this.state.exitValue}
                     options={this.options}

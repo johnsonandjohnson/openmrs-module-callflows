@@ -48,10 +48,10 @@ export class DropdownBreadCrumb extends React.Component<IProps> {
       <FontAwesomeIcon size="xs" icon={['fas', 'chevron-right']} />
     </span>
 
-  renderMenuItem = (text: string, index: number, onChange:(index: number) => void, onRemove: (index: number) => void) =>
+  renderMenuItem = (text: string, index: number, onChange:(index: number) => void, onRemove: (index: number, event) => void) =>
     <MenuItem key={`breadcrumb-menu-item-${index}`} className="breadcrumb-menu-item" onClick={e => onChange(index)}>
       {text}
-      <span className="breadcrumb-menu-item-icon" onClick={() => onRemove(index)}>
+      <span className="breadcrumb-menu-item-icon" onClick={e => onRemove(index, e)}>
         <FontAwesomeIcon size="xs" icon={['fas', 'times']} />
       </span>
     </MenuItem>
@@ -66,19 +66,19 @@ export class DropdownBreadCrumb extends React.Component<IProps> {
           </NavItem>
           {selectedBlock && (
             <>
-              <NavDropdown title={selectedBlock.name} className="breadcrumb-link-item">
+              <NavDropdown id={selectedElement && selectedElement.name} title={selectedBlock.name} className="breadcrumb-link-item">
                 {this.props.blocks.map((block: IBlock, index: number) => 
-                  this.renderMenuItem(block.name, index, this.onBlockChange, e => this.onBlockRemove(index, e)))}
+                  this.renderMenuItem(block.name, index, this.onBlockChange, this.onBlockRemove))}
               </NavDropdown>
               {selectedElement && (
                 <>
                   <NavItem className="breadcrumb-link-item">
                     <FontAwesomeIcon size="xs" icon={['fas', 'chevron-right']} />
                   </NavItem>
-                  <NavDropdown title={selectedElement.name} className="breadcrumb-link-item">
+                  <NavDropdown id={selectedElement && selectedElement.name} title={selectedElement.name} className="breadcrumb-link-item">
                     {selectedBlock.elements && selectedBlock.elements
                       .map((element: IElement, index: number) =>
-                        this.renderMenuItem(element.name, index, this.onElementChange, e => this.onElementRemove(index, e)))}
+                        this.renderMenuItem(element.name, index, this.onElementChange, this.onElementRemove))}
                   </NavDropdown>
                 </>
               )}

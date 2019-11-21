@@ -10,6 +10,7 @@ import { DropdownBreadCrumb } from '../dropdown-bread-crumb/dropdown-bread-crumb
 import AddButton from '../../add-button';
 import { FormSection } from './form-section';
 import { RenderedSections } from './rendered-section/rendered-sections';
+import _ from 'lodash';
 
 interface IProps extends DispatchProps, RouteComponentProps<{ flowName: string }> {
   node: IUserNode;
@@ -140,6 +141,18 @@ class UserNode extends React.Component<IProps, IState> {
     this.addElement({ ...defaultFieldValue });
   }
 
+  toggleContinueNode = () => {
+    const { node } = this.props;
+    const selectedBlock = this.state.selectedBlock;
+    if (selectedBlock) {
+      selectedBlock.continueNode = !selectedBlock.continueNode;
+      this.setState({selectedBlock}, () => {
+        node.blocks[this.state.selectedBlockIndex] = selectedBlock;
+        this.props.updateNode(node, this.props.nodeIndex);
+      });
+    }
+  }
+
   render = () => {
     const { node } = this.props;
     const { selectedBlock, selectedElement, selectedElementIndex } = this.state;
@@ -165,7 +178,8 @@ class UserNode extends React.Component<IProps, IState> {
         <Row>
           <Col md={12}>
             <FormGroup controlId="callAllowed">
-              <Checkbox name="callAllowed" checked={false}>
+              <Checkbox name="callAllowed" checked={selectedBlock && selectedBlock.continueNode}
+                onChange={this.toggleContinueNode}>
                 Check this if you want to submit to the server even if no fields are configured
               </Checkbox>
             </FormGroup>
@@ -188,10 +202,10 @@ class UserNode extends React.Component<IProps, IState> {
             update={this.updateNode}
           />
         )}
-        {<RenderedSections 
-          key={this.props.nodeIndex + '-rendered-section'} 
-          node={node} 
-          nodeIndex={this.props.nodeIndex} 
+        {<RenderedSections
+          key={this.props.nodeIndex + '-rendered-section'}
+          node={node}
+          nodeIndex={this.props.nodeIndex}
           updateNode={this.props.updateNode} />}
       </Form>
     );

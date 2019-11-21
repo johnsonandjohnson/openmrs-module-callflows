@@ -130,7 +130,7 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
         return this.props.nodes.map((node: INode, index: number) => {
           return (
             <Accordion
-              title={node.step}
+              title={node.step ? node.step : ''}
               border={true}
               open={this.state.nodesExpansion[node.step]}
               key={`node${index}-${this.state.nodesExpansion[node.step] ? 'true' : 'false'}`}>

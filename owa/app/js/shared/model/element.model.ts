@@ -46,5 +46,8 @@ export const defaultFieldValue: Readonly<IElement> = {
   fieldType: FieldType.DIGITS,
   noInput: '',
   noMatch: '',
-  goodBye: ''
+  goodBye: '',
+  bargeIn: false,
+  dtmf: false,
+  voice: false
 }

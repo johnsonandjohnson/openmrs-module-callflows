@@ -9,6 +9,7 @@ interface IProps {
   type?: string;
   md?: number;
   label?: string;
+  help?: string;
   componentClass?: string;
   value?: string;
   handleChange: (value, fieldName: string) => void;
@@ -23,7 +24,8 @@ export class FormSectionField extends React.Component<IProps> {
   render = () =>
     <Col md={this.props.md}>
       <FormGroup controlId={`element_name_${this.props.name}-${this.props.elementIndex}`}>
-        <ControlLabel>{this.props.label ? this.props.label : Msg[`FLOW_${this.props.name.toUpperCase()}_LABEL`] + ':'}</ControlLabel>
+        <ControlLabel>{`${this.props.label ? this.props.label : Msg[`FLOW_${this.props.name.toUpperCase()}_LABEL`]}:`}</ControlLabel>
+        {this.props.help && <HelpBlock>{this.props.help}</HelpBlock>}
         <FormControl
           componentClass={this.props.componentClass}
           type={this.props.type}

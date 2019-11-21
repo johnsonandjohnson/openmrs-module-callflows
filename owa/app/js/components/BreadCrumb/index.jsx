@@ -89,13 +89,12 @@ class BreadCrumb extends React.Component {
   buildPathDynamically = (pattern, path) => {
     return pattern.match(path)._.split('/')
       .filter(e => !!e)
-      .map((e) => {
-        return (
-          <span>
+      .map((e, i) => 
+          <span key={`${pattern}-${i}`} >
             {this.renderLastCrumb(e)}
           </span>
-        );
-      });
+        
+      );
   }
 
   buildDesignerBreadCrumb = (path) => {

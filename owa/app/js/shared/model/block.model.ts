@@ -4,4 +4,5 @@ export interface IBlock {
   name: string;
   type: string; // todo maybe we can define enum
   elements: Array<IElement>;
+  continueNode?: boolean;
 }
