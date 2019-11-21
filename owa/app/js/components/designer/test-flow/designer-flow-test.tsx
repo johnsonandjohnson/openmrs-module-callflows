@@ -11,12 +11,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 import {
-  reset,
   getConfigs,
-  postConfigs,
-  getFlows,
   getFlow,
-  makeTestCall,
   resetMessages,
   sendMessage,
   initiateTestFlow
@@ -120,12 +116,8 @@ export class DesignerFlowTest extends React.PureComponent<IDesignerFlowTestProps
 export const mapStateToProps = ({ designerReducer }: IRootState) => (designerReducer);
 
 const mapDispatchToProps = ({
-  reset,
   getConfigs,
-  postConfigs,
-  getFlows,
   getFlow,
-  makeTestCall,
   sendMessage,
   initiateTestFlow,
   resetMessages

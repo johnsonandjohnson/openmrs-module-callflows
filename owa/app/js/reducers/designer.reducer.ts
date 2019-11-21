@@ -152,7 +152,6 @@ export default (state: DesignerState = initialState, action): DesignerState => {
         ...state,
       }
     case ACTION_TYPES.NODE_PROCESSED: {
-      console.log(action.meta);
       return {
         ...state,
         messages: [...state.messages, ...action.payload],
@@ -303,9 +302,6 @@ export const processNodeResponse = (data: IFlowTestResponse, dispatch: Function)
     payload: newMessages,
     meta: continueFieldProps
   });
-  if (response.continueNode) {
-    moveToNextNode(response.callId, dispatch);
-  }
 };
 
 export const moveToNextNode = async (callId: string, dispatch: Function, params: any = {}) => {
@@ -333,7 +329,7 @@ const extractContinueFieldProps = (responseContent: IFlowTestResponseBody[], cal
       };
     }
   } else return null;
-}
+};
 
 export const updateFlow = (payload: any) => ({
   type: ACTION_TYPES.UPDATE_FLOW,
@@ -364,7 +360,7 @@ const replaceNode = (nodes: Array<any>, node: any, nodeIndex: number) => {
     }
     return item;
   });
-}
+};
 
 const extractNodes = (flow: IFlow) => {
   let nodes = [];
@@ -374,7 +370,7 @@ const extractNodes = (flow: IFlow) => {
     console.error('Cannot parse nodes');
   }
   return nodes;
-}
+};
 
 const handleNodeError = (e, dispatch) => {
   let errorMessage = 'Error';
@@ -398,7 +394,7 @@ const handleNodeError = (e, dispatch) => {
     payload: [new SystemMessage('error', errorMessage, new Date(), 'red')],
     meta: null
   });
-}
+};
 
 const isJsonContent = (text: string) => {
   try {
@@ -407,4 +403,4 @@ const isJsonContent = (text: string) => {
   } catch (e) {
     return false;
   }
-}
+};

@@ -29,7 +29,7 @@ import {
   FormControl
 } from 'react-bootstrap';
 import _ from 'lodash';
-import { Accordion, Tabs, Tab } from '@openmrs/react-components';
+import { Accordion, Tabs } from '@openmrs/react-components';
 import SystemNode from './flow-node/system-node';
 import UserNode from './flow-node/user-node';
 import { ISystemNode } from '../../shared/model/system-node.model';
@@ -40,6 +40,7 @@ import { IFlow } from '../../shared/model/flow.model';
 import { IUserNode } from '../../shared/model/user-node.model';
 import * as Msg from '../../shared/utils/messages';
 import Tooltip from '../tooltip';
+import { TabWrapper } from '../tab-wrapper';
 
 export interface IDesignerFlowProps extends StateProps, DispatchProps, RouteComponentProps<{ flowName: string }> {
 };
@@ -156,13 +157,13 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
       <div className="body-wrapper">
         <div className="panel-body">
           <Form>
-            <FormGroup>
-                <FormControl type="text"
-                  name="name"
-                  value={flow.name}
-                  onChange={this.handleNameChange}
-                  className={formClass}
-                />
+            <FormGroup controlId="name">
+              <FormControl type="text"
+                name="name"
+                value={flow.name}
+                onChange={this.handleNameChange}
+                className={formClass}
+              />
             </FormGroup>
             <Button className="btn btn-success btn-md" onClick={() => alert('Not implemented yet.')}>Add interaction</Button>
             <Button className="btn btn-secondary btn-md" onClick={() => this.expandAll()}>Expand</Button>
@@ -181,12 +182,12 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
             <h2>Test Flow</h2>
             <Tooltip message={Msg.DESIGNER_FLOW_TEST_SECTION_DESCRIPTION} />
             <Tabs>
-              <Tab label={Msg.DESIGNER_TEST_CALL_LABEL}>
+              <TabWrapper key="callTest" label={Msg.DESIGNER_TEST_CALL_LABEL} >
                 <DesignerCallTest />
-              </Tab>
-              <Tab label={Msg.DESIGNER_TEST_FLOW_LABEL}>
+              </TabWrapper>
+              <TabWrapper key="flowTest" label={Msg.DESIGNER_TEST_FLOW_LABEL} >
                 <DesignerFlowTest />
-              </Tab>
+              </TabWrapper>
             </Tabs>
           </div>
         </div>

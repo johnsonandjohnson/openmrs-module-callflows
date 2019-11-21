@@ -44,7 +44,6 @@ export const handleTestCallRequest = async (dispatch, body) => {
 
 export const handleSuccessMessage = (response: any, toastId: any) => {
   try {
-    console.log(response);
     if (response.status === CALLFLOW_TEST_SUCCESS_STATUS) {
       toast.update(toastId, {
         render: <ToastStatusContent message={Msg.DESIGNER_TEST_CALL_INITIATION_SUCCESS} type={toast.TYPE.SUCCESS} />,

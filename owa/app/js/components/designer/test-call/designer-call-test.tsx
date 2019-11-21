@@ -11,10 +11,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router-dom';
 import {
-  reset,
   getConfigs,
-  postConfigs,
-  getFlows,
   getFlow,
   makeTestCall
 } from '../../../reducers/designer.reducer';
@@ -33,7 +30,6 @@ import { IFlowCallError, validationSchema } from '../../../shared/model/flow-tes
 import ErrorDesc from '../../error-desc';
 import { CONFIG_EXTENSIONS } from '../../../constants';
 import { handleCarret } from '../../../shared/utils/form-handling-util';
-import { MessageList } from 'react-chat-elements';
 import 'react-chat-elements/dist/main.css';
 
 export interface IDesignerCallTestProps extends StateProps, DispatchProps, RouteComponentProps<{ flowName: string }> {
@@ -164,10 +160,10 @@ export class DesignerCallTest extends React.PureComponent<IDesignerCallTestProps
     const { errors } = this.state;
     return (
       <Form className="form" onSubmit={this.handleSubmit}>
-        <FormGroup>
+        <FormGroup controlId="general-description">
           <Tooltip message={Msg.DESIGNER_TEST_CALL_GENERAL_DESCRIPTION} />
         </FormGroup>
-        <FormGroup controlId={"formName"}>
+        <FormGroup controlId="configuration">
           <TextLabel text={Msg.DESIGNER_TEST_CALL_CONFIGURATION_LABEL} isMandatory={false} isWithColon={true} />
           <FormControl componentClass="select" name="configuration"
             value={this.state.configuration}
@@ -180,7 +176,7 @@ export class DesignerCallTest extends React.PureComponent<IDesignerCallTestProps
           </FormControl>
           {this.renderError('configuration')}
         </FormGroup>
-        <FormGroup controlId={"formName"}>
+        <FormGroup controlId="extension">
           <TextLabel text={Msg.DESIGNER_TEST_CALL_EXTENSION_LABEL} isMandatory={false} isWithColon={true} />
           <FormControl componentClass="select" name="extension"
             value={this.state.extension}
@@ -193,7 +189,7 @@ export class DesignerCallTest extends React.PureComponent<IDesignerCallTestProps
           </FormControl>
           {this.renderError('extension')}
         </FormGroup>
-        <FormGroup controlId={"formName"}>
+        <FormGroup controlId="phoneNumber">
           <TextLabel text={Msg.DESIGNER_TEST_CALL_PHONE_NUMBER_LABEL} isMandatory={false} isWithColon={true} />
           <FormControl type="text"
             name="phoneNumber"
@@ -211,10 +207,7 @@ export class DesignerCallTest extends React.PureComponent<IDesignerCallTestProps
 export const mapStateToProps = ({ designerReducer }: IRootState) => (designerReducer);
 
 const mapDispatchToProps = ({
-  reset,
   getConfigs,
-  postConfigs,
-  getFlows,
   getFlow,
   makeTestCall
 });
