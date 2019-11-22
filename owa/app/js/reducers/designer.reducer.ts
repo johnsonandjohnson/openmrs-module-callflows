@@ -1,8 +1,9 @@
+import _ from 'lodash';
 import axiosInstance from '../config/axios';
 import { SUCCESS, REQUEST, FAILURE } from './action-type.util';
 import ConfigFormData from '../components/config-form/config-form-data';
-import { IFlow, defaultValue } from '../shared/model/flow.model';
-import { INode } from '../shared/model/node.model';
+import { IFlow, defaultValue as defaultFlowValue } from '../shared/model/flow.model';
+import { getUI, getModel } from '../shared/model/node.model';
 import { handleTestCallRequest, handleSuccessMessage } from '../components/designer/test-call/designer-call-test.util';
 import * as Msg from '../shared/utils/messages';
 import { handleRequest } from '../shared/utils/request-status-util';
@@ -14,6 +15,9 @@ import { string } from 'prop-types';
 import { IContinueFieldProps } from '../shared/model/continue-field-props.model';
 import { convertToType } from '../shared/utils/conversion-util';
 import { AxiosPromise, AxiosResponse } from 'axios';
+import { NodeUI } from '../shared/model/node-ui';
+import { getNewUI as getNewSystemNodeUI } from '../shared/model/system-node-ui';
+import { getNewUI as getNewUserNodeUI } from '../shared/model/user-node-ui';
 
 export const ACTION_TYPES = {
   RESET: 'designerReducer/RESET',
@@ -28,6 +32,7 @@ export const ACTION_TYPES = {
   SEND_MESSAGE: 'designerReducer/SEND_MESSAGE',
   RESET_MESSAGES: 'designerReducer/RESET_MESSAGES',
   NODE_PROCESSED: 'designerReducer/NODE_PROCESSED',
+  ADD_EMPTY_USER_AND_SYSTEM_NODES: 'designerReducer/ADD_EMPTY_USER_AND_SYSTEM_NODES'
 };
 
 const initialState = {
@@ -37,9 +42,9 @@ const initialState = {
   pages: 0,
   loading: false,
   data: [],
-  flow: defaultValue as unknown as IFlow,
+  flow: defaultFlowValue as unknown as IFlow,
   flowLoaded: false,
-  nodes: [] as Array<INode>,
+  nodes: [] as Array<NodeUI>,
   messages: [] as ReadonlyArray<UserMessage | SystemMessage>,
   continueFieldProps: null as unknown as IContinueFieldProps
 };
@@ -59,8 +64,8 @@ export default (state: DesignerState = initialState, action): DesignerState => {
         loading: false
       };
     case SUCCESS(ACTION_TYPES.PUT_FLOW):
-      let flow = action.payload.data;
-      let nodes = extractNodes(flow);
+      const flow = action.payload.data;
+      const nodes = extractNodes(flow);
       return {
         ...state,
         loading: false,
@@ -158,6 +163,12 @@ export default (state: DesignerState = initialState, action): DesignerState => {
         continueFieldProps: action.meta
       };
     }
+    case ACTION_TYPES.ADD_EMPTY_USER_AND_SYSTEM_NODES: {
+      return {
+        ...state,
+        nodes: addNewUserAndSystemNodes(state.nodes)
+      }
+    }
     case ACTION_TYPES.UPDATE_NODE: {
       return {
         ...state,
@@ -230,11 +241,11 @@ export const getFlow = (flowName: string) => async (dispatch) => {
   });
 };
 
-export const putFlow = (flow: IFlow, nodes: Array<INode>) => async (dispatch) => {
+export const putFlow = (flow: IFlow, nodes: Array<NodeUI>) => async (dispatch) => {
   const requestUrl = `${callflowsPath}/flows/${flow.id}`;
   const data = {
     ...flow,
-    raw: JSON.stringify({ nodes: nodes })
+    raw: JSON.stringify({ nodes: _.map(nodes, getModel) })
   }
   delete data.id;
   let body = {
@@ -243,6 +254,10 @@ export const putFlow = (flow: IFlow, nodes: Array<INode>) => async (dispatch) =>
   };
   handleRequest(dispatch, body, Msg.DESIGNER_FLOW_UPDATE_SUCCESS, Msg.DESIGNER_FLOW_UPDATE_FAILURE);
 };
+
+export const addEmptyInteractionNode = () => ({
+  type: ACTION_TYPES.ADD_EMPTY_USER_AND_SYSTEM_NODES,
+});
 
 export const updateNode = (node: any, nodeIndex: number) => ({
   type: ACTION_TYPES.UPDATE_NODE,
@@ -336,11 +351,11 @@ export const updateFlow = (payload: any) => ({
   payload
 });
 
-export const postFlow = (flow: IFlow, nodes: Array<INode>) => async (dispatch) => {
+export const postFlow = (flow: IFlow, nodes: Array<NodeUI>) => async (dispatch) => {
   const requestUrl = `${callflowsPath}/flows`;
   const data = {
     ...flow,
-    raw: JSON.stringify({ nodes: nodes })
+    raw: JSON.stringify({ nodes: _.map(nodes, getModel) })
   }
   delete data.id;
   let body = {
@@ -353,7 +368,15 @@ export const postFlow = (flow: IFlow, nodes: Array<INode>) => async (dispatch) =
     Msg.DESIGNER_FLOW_CREATE_FAILURE);
 };
 
-const replaceNode = (nodes: Array<any>, node: any, nodeIndex: number) => {
+const addNewUserAndSystemNodes = (nodes: Array<NodeUI>): Array<NodeUI> => {
+  return [
+    ...nodes,
+    getNewUserNodeUI(),
+    getNewSystemNodeUI()
+  ]
+}
+
+const replaceNode = (nodes: Array<NodeUI>, node: NodeUI, nodeIndex: number): Array<NodeUI> => {
   return nodes.map((item, index: number) => {
     if (index === nodeIndex) {
       item = node;
@@ -363,14 +386,14 @@ const replaceNode = (nodes: Array<any>, node: any, nodeIndex: number) => {
 };
 
 const extractNodes = (flow: IFlow) => {
-  let nodes = [];
+  let modals = [];
   try {
-    nodes = JSON.parse(flow.raw).nodes;
+    modals = JSON.parse(flow.raw).nodes || [];
   } catch (ex) {
     console.error('Cannot parse nodes');
   }
-  return nodes;
-};
+  return _.map(modals, getUI);
+}
 
 const handleNodeError = (e, dispatch) => {
   let errorMessage = 'Error';

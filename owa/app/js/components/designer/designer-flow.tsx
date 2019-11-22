@@ -18,7 +18,8 @@ import {
   getFlow,
   putFlow,
   updateFlow,
-  postFlow
+  postFlow,
+  addEmptyInteractionNode
 } from '../../reducers/designer.reducer';
 import { IRootState } from '../../reducers';
 import DesignerCallTest from './test-call/designer-call-test';
@@ -33,16 +34,17 @@ import { Tabs } from '@openmrs/react-components';
 import Accordion from '../accordion';
 import SystemNode from './flow-node/system-node';
 import UserNode from './flow-node/user-node';
-import { ISystemNode } from '../../shared/model/system-node.model';
 import { NodeType } from '../../shared/model/node-type.model';
 import { INode } from '../../shared/model/node.model';
 import DesignerFlowTest from './test-flow/designer-flow-test';
 import { IFlow } from '../../shared/model/flow.model';
-import { IUserNode } from '../../shared/model/user-node.model';
 import * as Msg from '../../shared/utils/messages';
 import Tooltip from '../tooltip';
 import { getRenderers } from '../../reducers/renderersReducer';
 import { TabWrapper } from '../tab-wrapper';
+import { NodeUI } from '../../shared/model/node-ui';
+import { UserNodeUI } from '../../shared/model/user-node-ui';
+import { SystemNodeUI } from '../../shared/model/system-node-ui';
 
 export interface IDesignerFlowProps extends StateProps, DispatchProps, RouteComponentProps<{ flowName: string }> {
 };
@@ -71,13 +73,15 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
     }
   }
 
-  componentWillUpdate(nextProps, nextState) {
-    if (this.props.designer.flowLoaded === false && nextProps.flowLoaded === true) {
-      if (!!this.props.designer.nodes) {
+  componentWillUpdate(nextProps: IDesignerFlowProps, nextState: IDesignerFlowState) {
+    const { designer } = this.props;
+    const flowLoaded = designer.flowLoaded === false && nextProps.designer.flowLoaded === true;
+    if (flowLoaded) {
+      if (!!designer.nodes) {
         const initialExpansion = {};
         try {
-          this.props.designer.nodes.forEach((node) => {
-            initialExpansion[node.step] = false;
+          nextProps.designer.nodes.forEach((node, i) => {
+            initialExpansion[i] = false;
           });
         } finally {
           this.setState({
@@ -104,11 +108,11 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
     }
   }
 
-  renderSystemNode = (node: ISystemNode, nodeIndex: number) => {
+  renderSystemNode = (node: SystemNodeUI, nodeIndex: number) => {
     return <SystemNode node={node} nodeIndex={nodeIndex} />
   }
 
-  renderUserNode = (node: IUserNode, index: number) => {
+  renderUserNode = (node: UserNodeUI, index: number) => {
     return <UserNode
       initialNode={node}
       nodeIndex={index}
@@ -126,14 +130,26 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
     });
   }
 
+  addInteraction = () => {
+    this.props.addEmptyInteractionNode();
+
+    const nodesExpansion = _.clone(this.state.nodesExpansion);
+    const length = _.keys(nodesExpansion).length;
+    nodesExpansion[length] = true;
+    nodesExpansion[length + 1] = true;
+    this.setState({
+      nodesExpansion
+    });
+  }
+
   collapseAll = () => this.setExpansionAll(false);
 
   expandAll = () => this.setExpansionAll(true);
 
-  toggleExpansion = (key: number) => {
+  toggleExpansion = (index: number) => {
     this.setState((prevState) => {
       const newValues = { ...prevState.nodesExpansion };
-      newValues[key] = !prevState.nodesExpansion[key];
+      newValues[index] = !prevState.nodesExpansion[index];
       return ({
         nodesExpansion: newValues
       })
@@ -141,10 +157,10 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
   }
 
   renderSteps = () => {
-    let { flow } = this.props.designer;
-    if (!!flow.raw) {
+    let { flowLoaded } = this.props.designer;
+    if (flowLoaded) {
       try {
-        return this.props.designer.nodes.map((node: INode, index: number) => {
+        return this.props.designer.nodes.map((node: NodeUI, index: number) => {
           return (
             <div key={`node-${index}`}>
               <Accordion
@@ -153,8 +169,8 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
                 border={true}
                 open={this.state.nodesExpansion[index]}>
                 {node.nodeType === NodeType.SYSTEM ?
-                  this.renderSystemNode(node as ISystemNode, index) :
-                  this.renderUserNode(node as IUserNode, index)
+                  this.renderSystemNode(node as SystemNodeUI, index) :
+                  this.renderUserNode(node as UserNodeUI, index)
                 }
               </Accordion>
             </div>
@@ -166,12 +182,13 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
           <div>Unable to parse flow steps</div>
         );
       }
-    } else return null;
+    } else return Msg.GENERIC_LOADING;
   }
 
   render() {
-    const { flow } = this.props.designer;
+    const { flow, loading, flowLoaded } = this.props.designer;
     const formClass = 'form-control';
+    const ready = !loading && flowLoaded;
     return (
       <div className="body-wrapper">
         <div className="panel-body">
@@ -184,9 +201,9 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
                 className={formClass}
               />
             </FormGroup>
-            <Button className="btn btn-success btn-md" onClick={() => alert('Not implemented yet.')}>Add interaction</Button>
-            <Button className="btn btn-secondary btn-md" onClick={() => this.expandAll()}>Expand</Button>
-            <Button className="btn btn-secondary btn-md" onClick={() => this.collapseAll()}>Collapse</Button>
+            <Button className="btn btn-success btn-md" disabled={!ready} onClick={() => this.addInteraction()}>Add interaction</Button>
+            <Button className="btn btn-secondary btn-md" disabled={!ready} onClick={() => this.expandAll()}>Expand</Button>
+            <Button className="btn btn-secondary btn-md" disabled={!ready} onClick={() => this.collapseAll()}>Collapse</Button>
           </Form>
         </div>
         <div className="panel-body">
@@ -194,7 +211,7 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
         </div>
         <div className="body-wrapper">
           <div className="panel-body">
-            <Button className="btn btn-success btn-md" onClick={this.handleSave}>Save</Button>
+            <Button className="btn btn-success btn-md" disabled={!ready} onClick={this.handleSave}>Save</Button>
           </div>
           <hr />
           <div className="panel-body">
@@ -226,6 +243,7 @@ const mapDispatchToProps = ({
   putFlow,
   updateFlow,
   postFlow,
+  addEmptyInteractionNode,
   getRenderers
 });
 

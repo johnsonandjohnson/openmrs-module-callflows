@@ -20,10 +20,10 @@ import {
 } from '../../../reducers/designer.reducer';
 import { IRootState } from '../../../reducers';
 import { Controlled as CodeMirror } from 'react-codemirror2';
-import { ISystemNode } from '../../../shared/model/system-node.model';
+import { SystemNodeUI } from '../../../shared/model/system-node-ui';
 
 export interface ISystemNodeProps extends StateProps, DispatchProps, RouteComponentProps<{ flowName: string }> {
-  node: ISystemNode,
+  node: SystemNodeUI,
   nodeIndex: number
 };
 

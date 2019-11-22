@@ -1,7 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { updateNode } from '../../../reducers/designer.reducer';
-import { IUserNode } from '../../../shared/model/user-node.model';
 import { RouteComponentProps } from 'react-router';
 import { IBlock } from '../../../shared/model/block.model';
 import { IElement, defaultTxtValue, defaultFieldValue } from '../../../shared/model/element.model';
@@ -15,12 +14,13 @@ import { IFlow } from '../../../shared/model/flow.model';
 import RendererModel from '../../../shared/model/Renderer.model';
 import { IUserNodeTemplate } from '../../../shared/model/user-node-template.model';
 import _ from 'lodash';
+import { UserNodeUI } from '../../../shared/model/user-node-ui';
 
 interface IProps extends DispatchProps, RouteComponentProps<{ flowName: string }> {
-  initialNode: IUserNode;
+  initialNode: UserNodeUI;
   nodeIndex: number;
   renderers: Array<any>;
-  currentFlow: IFlow; 
+  currentFlow: IFlow;
 }
 
 interface IState {
@@ -29,7 +29,7 @@ interface IState {
   selectedElement?: IElement | null;
   selectedElementIndex: number;
   nodeStep: string;
-  node: IUserNode;
+  node: UserNodeUI;
 }
 
 class UserNode extends React.Component<IProps, IState> {
@@ -56,7 +56,7 @@ class UserNode extends React.Component<IProps, IState> {
     }, () => this.props.updateNode(node, this.props.nodeIndex));
   }
 
-  getFirstBlockFromNode = (node: IUserNode) => node.blocks && node.blocks.length > 0 ? node.blocks[0] : undefined;
+  getFirstBlockFromNode = (node: UserNodeUI) => node.blocks && node.blocks.length > 0 ? node.blocks[0] : undefined;
 
   getFirstElementFromBlock = (block: IBlock | undefined) => block && block.elements.length > 0 ?
     block.elements[0] : undefined
@@ -89,7 +89,7 @@ class UserNode extends React.Component<IProps, IState> {
   updateRenderedSection = (): Map<string, IUserNodeTemplate> => {
     let newTemplates = {} as Map<string, IUserNodeTemplate>;
     this.props.renderers.map((rendererUi) => {
-      const renderer: RendererModel = rendererUi.renderer; 
+      const renderer: RendererModel = rendererUi.renderer;
       if (!!renderer) {
         const template = this.getExistingTemplateOrCreate(renderer.name);
         if (template.dirty) {
@@ -162,7 +162,7 @@ class UserNode extends React.Component<IProps, IState> {
       }, () => this.props.updateNode(node, this.props.nodeIndex));
     }
   };
-  
+
 
   onNodeStepChange = event => {
     const { node } = this.state;
@@ -272,8 +272,8 @@ class UserNode extends React.Component<IProps, IState> {
             update={this.updateNode}
           />
         )}
-        {<RenderedSections 
-          key={this.props.nodeIndex + '-rendered-section'} 
+        {<RenderedSections
+          key={this.props.nodeIndex + '-rendered-section'}
           templates={node.templates}
           nodeIndex={this.props.nodeIndex}
           updateTemplateContent={this.updateTemplateContent}

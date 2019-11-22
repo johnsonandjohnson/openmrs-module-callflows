@@ -17,7 +17,8 @@ export const MODULE_NAME = 'Call flows';
 export const GENERIC_FAILURE = 'An error occurred.';
 export const GENERIC_PROCESSING = 'Processing...';
 export const GENERIC_SUCCESS = 'Success.';
-export const GENERIC_INVALID_FORM = "Form is invalid. Check fields and send it again.";
+export const GENERIC_INVALID_FORM = 'Form is invalid. Check fields and send it again.';
+export const GENERIC_LOADING = 'Loading...'
 
 // Designer flow test
 export const DESIGNER_FLOW_TEST_SECTION_DESCRIPTION='The data you provide here are not saved in the Call Flow and they are only used for testing.'
