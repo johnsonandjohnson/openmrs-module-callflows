@@ -20,7 +20,7 @@ interface IProps extends DispatchProps, RouteComponentProps<{ flowName: string }
 interface IState {
   selectedBlock?: IBlock;
   selectedBlockIndex: number;
-  selectedElement?: IElement;
+  selectedElement?: IElement | null;
   selectedElementIndex: number;
   nodeStep: string;
 }
@@ -116,7 +116,7 @@ class UserNode extends React.Component<IProps, IState> {
     node.blocks.push(block);
     this.setState({
       selectedBlock: block,
-      selectedElementIndex: 0
+      selectedElement: null
     }, () => this.props.updateNode(node, this.props.nodeIndex));
   }
 

@@ -29,7 +29,8 @@ import {
   FormControl
 } from 'react-bootstrap';
 import _ from 'lodash';
-import { Accordion, Tabs } from '@openmrs/react-components';
+import { Tabs } from '@openmrs/react-components';
+import Accordion from '../accordion';
 import SystemNode from './flow-node/system-node';
 import UserNode from './flow-node/user-node';
 import { ISystemNode } from '../../shared/model/system-node.model';
@@ -111,8 +112,8 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
 
   setExpansionAll = (val: boolean) => {
     let clone = {};
-    this.props.nodes.forEach((node) => {
-      clone[node.step] = val;
+    this.props.nodes.forEach((node, id) => {
+      clone[id] = val;
     });
     this.setState({
       nodesExpansion: clone
@@ -123,7 +124,7 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
 
   expandAll = () => this.setExpansionAll(true);
 
-  toggleExpansion = (key: string) => {
+  toggleExpansion = (key: number) => {
     this.setState((prevState) => {
       const newValues = { ...prevState.nodesExpansion };
       newValues[key] = !prevState.nodesExpansion[key];
@@ -139,17 +140,17 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
       try {
         return this.props.nodes.map((node: INode, index: number) => {
           return (
-            <div onClick={() => this.toggleExpansion(node.step)}>
-                <Accordion
-                  title={node.step ? node.step : ''}
-                  border={true}
-                  open={this.state.nodesExpansion[node.step]}
-                  key={`node${index}-${this.state.nodesExpansion[node.step] ? 'true' : 'false'}`}>
-                  {node.nodeType === NodeType.SYSTEM ?
-                    this.renderSystemNode(node as ISystemNode, index) :
-                    this.renderUserNode(node as IUserNode, index)
-                  }
-                </Accordion>
+            <div key={`node-${index}`}>
+              <Accordion
+                handleClick={() => this.toggleExpansion(index)}
+                title={node.step ? node.step : ''}
+                border={true}
+                open={this.state.nodesExpansion[index]}>
+                {node.nodeType === NodeType.SYSTEM ?
+                  this.renderSystemNode(node as ISystemNode, index) :
+                  this.renderUserNode(node as IUserNode, index)
+                }
+              </Accordion>
             </div>
           );
         });

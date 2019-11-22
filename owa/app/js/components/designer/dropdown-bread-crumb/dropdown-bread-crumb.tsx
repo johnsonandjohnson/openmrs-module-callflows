@@ -10,7 +10,7 @@ import { IElement } from '../../../shared/model/element.model';
 interface IProps {
   blocks: ReadonlyArray<IBlock>;
   selectedBlock?: IBlock;
-  selectedElement?: IElement;
+  selectedElement?: IElement | null;
   blockChangedCallback: (index: number) => void;
   blockRemovedCallback: (index: number) => void;
   elementChangedCallback: (index: number) => void;
@@ -48,10 +48,10 @@ export class DropdownBreadCrumb extends React.Component<IProps> {
       <FontAwesomeIcon size="xs" icon={['fas', 'chevron-right']} />
     </span>
 
-  renderMenuItem = (text: string, index: number, onChange:(index: number) => void, onRemove: (index: number, event) => void) =>
+  renderMenuItem = (text: string, index: number, onChange: (index: number) => void, onRemove: (index: number) => void) =>
     <MenuItem key={`breadcrumb-menu-item-${index}`} className="breadcrumb-menu-item" onClick={e => onChange(index)}>
       {text}
-      <span className="breadcrumb-menu-item-icon" onClick={e => onRemove(index, e)}>
+      <span className="breadcrumb-menu-item-icon" onClick={() => onRemove(index)}>
         <FontAwesomeIcon size="xs" icon={['fas', 'times']} />
       </span>
     </MenuItem>
@@ -66,9 +66,9 @@ export class DropdownBreadCrumb extends React.Component<IProps> {
           </NavItem>
           {selectedBlock && (
             <>
-              <NavDropdown id={selectedElement && selectedElement.name} title={selectedBlock.name} className="breadcrumb-link-item">
-                {this.props.blocks.map((block: IBlock, index: number) => 
-                  this.renderMenuItem(block.name, index, this.onBlockChange, this.onBlockRemove))}
+              <NavDropdown id={selectedBlock && selectedBlock.name} title={selectedBlock.name} className="breadcrumb-link-item">
+                {this.props.blocks.map((block: IBlock, index: number) =>
+                  this.renderMenuItem(block.name, index, this.onBlockChange, e => this.onBlockRemove(index, e)))}
               </NavDropdown>
               {selectedElement && (
                 <>
@@ -78,7 +78,7 @@ export class DropdownBreadCrumb extends React.Component<IProps> {
                   <NavDropdown id={selectedElement && selectedElement.name} title={selectedElement.name} className="breadcrumb-link-item">
                     {selectedBlock.elements && selectedBlock.elements
                       .map((element: IElement, index: number) =>
-                        this.renderMenuItem(element.name, index, this.onElementChange, this.onElementRemove))}
+                        this.renderMenuItem(element.name, index, this.onElementChange, e => this.onElementRemove(index, e)))}
                   </NavDropdown>
                 </>
               )}
