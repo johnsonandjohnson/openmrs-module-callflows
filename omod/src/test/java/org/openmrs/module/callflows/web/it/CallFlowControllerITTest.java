@@ -47,6 +47,8 @@ public class CallFlowControllerITTest extends BaseModuleWebContextSensitiveTest 
 
 	private CallFlowRequest badFlowRequest;
 
+	private CallFlowRequest badFlowRequestWithoutNodes;
+
 	private CallFlow existingFlow;
 
 	@Autowired
@@ -65,6 +67,7 @@ public class CallFlowControllerITTest extends BaseModuleWebContextSensitiveTest 
 		// for create
 		mainFlowRequest = CallFlowContractHelper.createMainFlowRequest();
 		badFlowRequest = CallFlowContractHelper.createBadFlowRequest();
+		badFlowRequestWithoutNodes = CallFlowContractHelper.createBadFlowRequestWithoutNodes();
 		mainFlow = CallFlowHelper.createMainFlow();
 		// for searches
 		mainFlow2 = CallFlowHelper.createMainFlow();
@@ -90,12 +93,28 @@ public class CallFlowControllerITTest extends BaseModuleWebContextSensitiveTest 
 	}
 
 	@Test
+	public void shouldReturnBadRequestOnCreateFlowWithBadRaw() throws Exception {
+		mockMvc.perform(post("/callflows/flows").contentType(MediaType.APPLICATION_JSON)
+			.content(json(badFlowRequest)))
+			.andExpect(status().is(HttpStatus.SC_BAD_REQUEST))
+			.andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8));
+	}
+
+	@Test
+	public void shouldReturnBadRequestOnCreateFlowWithBadRawNoNodes() throws Exception {
+		mockMvc.perform(post("/callflows/flows").contentType(MediaType.APPLICATION_JSON)
+			.content(json(badFlowRequestWithoutNodes)))
+			.andExpect(status().is(HttpStatus.SC_BAD_REQUEST))
+			.andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8));
+	}
+
+	@Test
 	public void shouldReturnStatusConflictOnCreateDuplicateCallFlow() throws Exception {
 		// Given
 		callFlowService.create(CallFlowHelper.createMainFlow());
 		mockMvc.perform(post("/callflows/flows").contentType(MediaType.APPLICATION_JSON)
 				.content(json(mainFlowRequest)))
-				.andExpect(status().is(HttpStatus.SC_CONFLICT))
+				.andExpect(status().is(HttpStatus.SC_BAD_REQUEST))
 				.andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8));
 	}
 
@@ -131,7 +150,7 @@ public class CallFlowControllerITTest extends BaseModuleWebContextSensitiveTest 
 
 		mockMvc.perform(put("/callflows/flows/" + flow2.getId()).contentType(MediaType.APPLICATION_JSON)
 				.content(json(mainFlowRequest)))
-				.andExpect(status().is(HttpStatus.SC_CONFLICT))
+				.andExpect(status().is(HttpStatus.SC_BAD_REQUEST))
 				.andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8));
 	}
 

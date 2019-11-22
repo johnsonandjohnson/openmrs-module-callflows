@@ -2,7 +2,6 @@ package org.openmrs.module.callflows.web.controller;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.validation.Valid;
 import org.openmrs.module.callflows.api.builder.ConfigBuilder;
 import org.openmrs.module.callflows.api.builder.ConfigContractBuilder;
 import org.openmrs.module.callflows.api.builder.RendererBuilder;
@@ -13,12 +12,11 @@ import org.openmrs.module.callflows.api.contract.RendererContract;
 import org.openmrs.module.callflows.api.domain.Config;
 import org.openmrs.module.callflows.api.domain.Renderer;
 import org.openmrs.module.callflows.api.service.ConfigService;
-import org.openmrs.module.callflows.api.util.ValidationUtil;
+import org.openmrs.module.callflows.api.util.ValidationComponent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -50,6 +48,9 @@ public class CallFlowSettingsController extends RestController {
     @Autowired
     private RendererContractBuilder rendererContractBuilder;
 
+    @Autowired
+    private ValidationComponent validationComponent;
+
     /**
      * API to get all IVR based configurations defined in system
      *
@@ -71,7 +72,7 @@ public class CallFlowSettingsController extends RestController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public List<ConfigContract> updateConfigs(@RequestBody ConfigContracts configContracts) {
-        ValidationUtil.validate(configContracts);
+        validationComponent.validate(configContracts);
 
         List<Config> configs = new ArrayList<>();
         for (ConfigContract configContract : configContracts.getConfigContracts()) {

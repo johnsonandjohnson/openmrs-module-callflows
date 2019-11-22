@@ -37,13 +37,15 @@ public final class Constants {
 
     public static final String CALLFLOW_MAIN_DESCRIPTION = "This is the Main Flow";
 
-    public static final String CALLFLOW_MAIN_RAW = "{}";
+    public static final String CALLFLOW_MAIN_RAW = "{ \"name\": \"MainFlow\", \"nodes\": []}";
 
     public static final String CALLFLOW_BAD = "BadFlow.";
 
     public static final String CALLFLOW_BAD_DESCRIPTION = "This is a badly formatted callflow";
 
     public static final String CALLFLOW_BAD_RAW = "{}";
+
+    public static final String CALLFLOW_BAD_RAW_NO_NODES = "{ \"name\": \"MainFlow\" }";
 
     public static final String CALLFLOW_MAIN_PREFIX = "Ma";
 

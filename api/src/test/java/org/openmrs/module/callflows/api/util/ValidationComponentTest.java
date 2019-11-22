@@ -12,16 +12,18 @@ import javax.validation.ValidatorFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.openmrs.module.callflows.BaseTest;
 import org.openmrs.module.callflows.api.exception.ValidationException;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ Validation.class})
-public class ValidationUtilTest extends BaseTest {
+public class ValidationComponentTest extends BaseTest {
 
     private Object simpleObject = new Object();
 
@@ -32,16 +34,19 @@ public class ValidationUtilTest extends BaseTest {
     private Path path;
 
     @Mock
-    private ValidatorFactory validatorFactory;
+    private LocalValidatorFactoryBean factory;
 
     @Mock
     private Validator validator;
 
+    @InjectMocks
+    private ValidationComponent validationComponent = new ValidationComponent();
+
     @Before
     public void setUp() {
         mockStatic(Validation.class);
-        when(Validation.buildDefaultValidatorFactory()).thenReturn(validatorFactory);
-        when(validatorFactory.getValidator()).thenReturn(validator);
+        when(Validation.buildDefaultValidatorFactory()).thenReturn(factory);
+        when(factory.getValidator()).thenReturn(validator);
 
         when(constraintViolation.getPropertyPath()).thenReturn(path);
         when(constraintViolation.getMessage()).thenReturn("message");
@@ -52,13 +57,13 @@ public class ValidationUtilTest extends BaseTest {
     public void shouldNotThrowExceptionWhenObjectIsValid() {
         when(validator.validate(Matchers.any())).thenReturn(Collections.emptySet());
 
-        ValidationUtil.validate(simpleObject);
+        validationComponent.validate(simpleObject);
     }
 
     @Test(expected = ValidationException.class)
     public void shouldThrowExceptionWhenObjectIsNotValid() {
         when(validator.validate(Matchers.any())).thenReturn(Collections.singleton(constraintViolation));
 
-        ValidationUtil.validate(simpleObject);
+        validationComponent.validate(simpleObject);
     }
 }

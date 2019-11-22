@@ -1,8 +1,10 @@
 package org.openmrs.module.callflows.api.service;
 
+import java.util.Collections;
 import org.openmrs.module.callflows.BaseTest;
 import org.openmrs.module.callflows.Constants;
 import org.openmrs.module.callflows.api.domain.CallFlow;
+import org.openmrs.module.callflows.api.domain.flow.Flow;
 import org.openmrs.module.callflows.api.domain.types.CallFlowStatus;
 import org.openmrs.module.callflows.api.exception.CallFlowAlreadyExistsException;
 import org.openmrs.module.callflows.api.helper.CallFlowHelper;
@@ -19,12 +21,15 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import java.util.ArrayList;
 import java.util.List;
+import org.openmrs.module.callflows.api.util.ValidationComponent;
 
 import static junit.framework.TestCase.assertNotNull;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -46,15 +51,26 @@ public class CallFlowServiceTest extends BaseTest {
 
     private List<CallFlow> searchedFlows;
 
+    private Flow validFlow;
+
     @InjectMocks
     private CallFlowService callFlowService = new CallFlowServiceImpl();
 
     @Mock
     private CallFlowDao callFlowDao;
 
+    @Mock
+    private FlowService flowService;
+
+    @Mock
+    private ValidationComponent validationComponent;
+
     @Before
     public void setUp() {
         mainFlow = CallFlowHelper.createMainFlow();
+        validFlow = new Flow();
+        validFlow.setName(mainFlow.getName());
+        validFlow.setNodes(Collections.emptyList());
         badCallFlow = CallFlowHelper.createBadFlow();
 
         existingMainFlow = CallFlowHelper.createMainFlow();
@@ -69,6 +85,7 @@ public class CallFlowServiceTest extends BaseTest {
         // Given
         ArgumentCaptor<CallFlow> callFlowArgumentCaptor = ArgumentCaptor.forClass(CallFlow.class);
         given(callFlowDao.create(callFlowArgumentCaptor.capture())).willReturn(mainFlow);
+        doNothing().when(validationComponent).validate(mainFlow);
 
         // When
         CallFlow createdCallFlow = callFlowService.create(mainFlow);
@@ -82,10 +99,22 @@ public class CallFlowServiceTest extends BaseTest {
         assertThat(createdCallFlow.getRaw(), equalTo(mainFlow.getRaw()));
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldNotCreateCallFlowForEmptyRawFlow() throws CallFlowAlreadyExistsException {
+        // Given
+        ArgumentCaptor<CallFlow> callFlowArgumentCaptor = ArgumentCaptor.forClass(CallFlow.class);
+        given(callFlowDao.create(callFlowArgumentCaptor.capture())).willReturn(mainFlow);
+        doThrow(IllegalArgumentException.class).when(validationComponent).validate(mainFlow);
+
+        // When And Then
+        callFlowService.create(mainFlow);
+    }
+
     @Test
     public void shouldThrowIllegalArgumentIfCallFlowNameDoesNotHaveAlphanumericCharacters()
             throws CallFlowAlreadyExistsException {
         expectException(IllegalArgumentException.class);
+        doThrow(IllegalArgumentException.class).when(validationComponent).validate(badCallFlow);
         // Given
         try {
             // When
@@ -101,6 +130,7 @@ public class CallFlowServiceTest extends BaseTest {
         expectException(IllegalArgumentException.class);
         // Given
         badCallFlow.setName(null);
+        doThrow(IllegalArgumentException.class).when(validationComponent).validate(badCallFlow);
         try {
             // When
             CallFlow createdCallFlow = callFlowService.create(badCallFlow);
@@ -115,6 +145,7 @@ public class CallFlowServiceTest extends BaseTest {
         expectException(IllegalArgumentException.class);
         // Given
         badCallFlow.setName(StringUtils.EMPTY);
+        doThrow(IllegalArgumentException.class).when(validationComponent).validate(badCallFlow);
         try {
             // When
             CallFlow createdCallFlow = callFlowService.create(badCallFlow);
@@ -130,13 +161,10 @@ public class CallFlowServiceTest extends BaseTest {
         expectException(CallFlowAlreadyExistsException.class);
         // Given
         given(callFlowDao.findByName(Constants.CALLFLOW_MAIN)).willReturn(mainFlow);
-        try {
-            // When
-            CallFlow duplicateFlow = callFlowService.create(mainFlow);
-        } finally {
-            // Then
-            verify(callFlowDao, times(1)).findByName(mainFlow.getName());
-        }
+        doThrow(CallFlowAlreadyExistsException.class).when(validationComponent).validate(mainFlow);
+
+        // When
+        CallFlow duplicateFlow = callFlowService.create(mainFlow);
     }
 
     @Test
@@ -144,6 +172,8 @@ public class CallFlowServiceTest extends BaseTest {
 
         // Given a Main Flow exists
         given(callFlowDao.findByName(Constants.CALLFLOW_MAIN)).willReturn(existingMainFlow);
+        given(flowService.loadByJson(any(String.class))).willReturn(validFlow);
+        doNothing().when(validationComponent).validate(existingMainFlow);
 
         // And the update on the data service returns the updated callflow
         ArgumentCaptor<CallFlow> callFlowArgumentCaptor = ArgumentCaptor.forClass(CallFlow.class);
@@ -167,6 +197,8 @@ public class CallFlowServiceTest extends BaseTest {
 
         // Given a Main Flow exists
         given(callFlowDao.findByName(Constants.CALLFLOW_MAIN)).willReturn(existingMainFlow);
+        given(flowService.loadByJson(any(String.class))).willReturn(validFlow);
+        doNothing().when(validationComponent).validate(existingMainFlow);
 
         // And the update on the data service returns the updated callflow
         ArgumentCaptor<CallFlow> callFlowArgumentCaptor = ArgumentCaptor.forClass(CallFlow.class);
@@ -219,6 +251,7 @@ public class CallFlowServiceTest extends BaseTest {
             throws CallFlowAlreadyExistsException {
         expectException(IllegalArgumentException.class);
         // Given A bad call flow
+        doThrow(IllegalArgumentException.class).when(validationComponent).validate(badCallFlow);
         try {
             // When
             CallFlow updatedCallFlow = callFlowService.update(badCallFlow);
@@ -233,6 +266,7 @@ public class CallFlowServiceTest extends BaseTest {
         expectException(IllegalArgumentException.class);
         // Given
         badCallFlow.setName(null);
+        doThrow(IllegalArgumentException.class).when(validationComponent).validate(badCallFlow);
         try {
             // When
             CallFlow updatedCallFlow = callFlowService.update(badCallFlow);
@@ -247,6 +281,7 @@ public class CallFlowServiceTest extends BaseTest {
         expectException(IllegalArgumentException.class);
         // Given
         badCallFlow.setName(StringUtils.EMPTY);
+        doThrow(IllegalArgumentException.class).when(validationComponent).validate(badCallFlow);
         try {
             // When
             CallFlow updatedCallFlow = callFlowService.update(badCallFlow);
@@ -262,17 +297,14 @@ public class CallFlowServiceTest extends BaseTest {
         expectException(CallFlowAlreadyExistsException.class);
         // Given
         given(callFlowDao.findByName(Constants.CALLFLOW_MAIN)).willReturn(existingMainFlow);
+        doThrow(CallFlowAlreadyExistsException.class).when(validationComponent).validate(existingMainFlow);
+
         // And that we make the bad call flow good and duplicate by just changing the name
         CallFlow duplicateFlow = badCallFlow;
         duplicateFlow.setName(existingMainFlow.getName());
-        try {
-            // When we try to update this duplicate call flow
-            CallFlow updatedFlow = callFlowService.update(duplicateFlow);
-        } finally {
-            // Then we expect an exception
-            // And the below
-            verify(callFlowDao, times(1)).findByName(mainFlow.getName());
-        }
+
+        // When we try to update this duplicate call flow
+        CallFlow updatedFlow = callFlowService.update(duplicateFlow);
     }
 
     @Test

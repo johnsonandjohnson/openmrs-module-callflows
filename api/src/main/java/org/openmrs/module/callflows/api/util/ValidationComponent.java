@@ -3,15 +3,20 @@ package org.openmrs.module.callflows.api.util;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
 import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
 import org.openmrs.module.callflows.api.exception.ValidationException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
-public final class ValidationUtil {
+@Component
+public class ValidationComponent {
 
+    @Autowired
+    @Qualifier("springValidationFactory")
+    private LocalValidatorFactoryBean factory;
     /**
      * Generic method which validates objects according its annotations.
      *
@@ -20,8 +25,8 @@ public final class ValidationUtil {
 
      * @throws ValidationException if validation error found
      */
-    public static <T> void validate(T objectToValidate, Class<?>... clazz) {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+    public <T> void validate(T objectToValidate, Class<?>... clazz) {
+
         Validator validator = factory.getValidator();
         Set<ConstraintViolation<T>> violations = validator.validate(objectToValidate, clazz);
         if (!violations.isEmpty()) {
@@ -37,6 +42,4 @@ public final class ValidationUtil {
         return map;
     }
 
-    private ValidationUtil() {
-    }
 }

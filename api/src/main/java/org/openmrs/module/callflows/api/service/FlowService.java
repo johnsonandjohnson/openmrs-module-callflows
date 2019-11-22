@@ -47,6 +47,8 @@ public interface FlowService {
      */
     Flow load(String name);
 
+    Flow loadByJson(String json);
+
     /**
      * Evaluate a node
      * If a user node was passed, will not evaluate, but return the current position

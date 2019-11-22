@@ -3,10 +3,10 @@ package org.openmrs.module.callflows.api.service.it;
 import org.hibernate.HibernateException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.callflows.Constants;
-import org.openmrs.module.callflows.api.domain.Call;
 import org.openmrs.module.callflows.api.domain.CallFlow;
 import org.openmrs.module.callflows.api.domain.types.CallFlowStatus;
 import org.openmrs.module.callflows.api.exception.CallFlowAlreadyExistsException;
+import org.openmrs.module.callflows.api.exception.ValidationException;
 import org.openmrs.module.callflows.api.helper.CallFlowHelper;
 import org.openmrs.module.callflows.api.dao.CallFlowDao;
 import org.openmrs.module.callflows.api.service.CallFlowService;
@@ -23,6 +23,7 @@ import static junit.framework.Assert.assertNull;
 import static junit.framework.TestCase.assertNotNull;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
+import static org.openmrs.module.callflows.Constants.CALLFLOW_MAIN_RAW;
 import static org.openmrs.module.callflows.Constants.SUPER_USER_ADMIN_DISPLAY_STRING;
 
 /**
@@ -88,16 +89,17 @@ public class CallFlowServiceITTest extends BaseModuleContextSensitiveTest {
         assertThat(callFlow.getRaw(), equalTo(mainFlow.getRaw()));
     }
 
-    @Test(expected = CallFlowAlreadyExistsException.class)
+    @Test(expected = javax.validation.ValidationException.class)
     public void shouldThrowCallFlowAlreadyExistsIfDuplicateCallFlowIsCreated() throws CallFlowAlreadyExistsException {
         // Given
         CallFlow callFlow = callFlowService.create(mainFlow);
         // When a flow with the same name is created again
+        mainFlow.setId(null);
         callFlowService.create(mainFlow);
 
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = ValidationException.class)
     public void shouldThrowIllegalArgumentIfCallFlowWithNonAlphanumericCharactersIsCreated()
             throws CallFlowAlreadyExistsException {
         // Given, When And Then
@@ -118,14 +120,18 @@ public class CallFlowServiceITTest extends BaseModuleContextSensitiveTest {
     public void showSaveLargeRawField()
         throws CallFlowAlreadyExistsException {
         // Given
-        int rawFieldSize = 10000000;
-        mainFlow3.setRaw(new String(new char[rawFieldSize]));
+        int emptySpacesSize = 10000000;
+        StringBuilder sb = new StringBuilder();
+        sb.append(CALLFLOW_MAIN_RAW);
+        sb.append(new String(new char[emptySpacesSize]));
+        String raw = sb.toString();
+        mainFlow3.setRaw(raw);
 
         // When
         CallFlow callFlow = callFlowService.create(mainFlow3);
 
         // Then
-        assertThat(callFlow.getRaw().length(), equalTo(rawFieldSize));
+        assertThat(callFlow.getRaw().length(), equalTo(raw.length()));
     }
 
     @Test
@@ -146,7 +152,7 @@ public class CallFlowServiceITTest extends BaseModuleContextSensitiveTest {
         assertThat(callFlow.getRaw(), equalTo(existingFlow.getRaw()));
     }
 
-    @Test(expected = CallFlowAlreadyExistsException.class)
+    @Test(expected = ValidationException.class)
     public void shouldThrowCallFlowAlreadyExistsIfCallFlowExistsDuringUpdate() throws CallFlowAlreadyExistsException {
         // Given Two flows with name MainFlow and NewMainFlow
         CallFlow flow1 = CallFlowHelper.createMainFlow();
@@ -163,7 +169,7 @@ public class CallFlowServiceITTest extends BaseModuleContextSensitiveTest {
         // Then we expect a exception
     }
 
-    @Test(expected = HibernateException.class)
+    @Test(expected = javax.validation.ValidationException.class)
     public void shouldThrowHibernateExceptionIfNameIsNewButIdIsInvalidDuringUpdate()
             throws HibernateException, CallFlowAlreadyExistsException {
         // Given  flow named MainFlow
@@ -178,7 +184,7 @@ public class CallFlowServiceITTest extends BaseModuleContextSensitiveTest {
         // Then expect a exception
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = ValidationException.class)
     public void shouldThrowIllegalArgumentIfCallFlowWithNonAlphanumericCharactersIsUsedDuringUpdate()
             throws CallFlowAlreadyExistsException {
         // Given, When And Then

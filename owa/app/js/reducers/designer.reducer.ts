@@ -245,8 +245,11 @@ export const putFlow = (flow: IFlow, nodes: Array<NodeUI>) => async (dispatch) =
   const requestUrl = `${callflowsPath}/flows/${flow.id}`;
   const data = {
     ...flow,
-    raw: JSON.stringify({ nodes: _.map(nodes, getModel) })
-  }
+    raw: JSON.stringify({
+      nodes: _.map(nodes, getModel),
+      name: flow.name
+    })
+  };
   delete data.id;
   let body = {
     type: ACTION_TYPES.PUT_FLOW,
@@ -317,6 +320,10 @@ export const processNodeResponse = (data: IFlowTestResponse, dispatch: Function)
     payload: newMessages,
     meta: continueFieldProps
   });
+
+  if (response.continueNode) {
+    moveToNextNode(response.callId, dispatch);
+  }
 };
 
 export const moveToNextNode = async (callId: string, dispatch: Function, params: any = {}) => {
@@ -355,8 +362,11 @@ export const postFlow = (flow: IFlow, nodes: Array<NodeUI>) => async (dispatch) 
   const requestUrl = `${callflowsPath}/flows`;
   const data = {
     ...flow,
-    raw: JSON.stringify({ nodes: _.map(nodes, getModel) })
-  }
+    raw: JSON.stringify({
+      nodes: _.map(nodes, getModel),
+      name: flow.name
+    })
+  };
   delete data.id;
   let body = {
     type: ACTION_TYPES.POST_FLOW,

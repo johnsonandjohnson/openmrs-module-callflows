@@ -2,6 +2,8 @@ package org.openmrs.module.callflows.api.service.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.velocity.VelocityContext;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.openmrs.module.callflows.api.domain.CallFlow;
 import org.openmrs.module.callflows.api.domain.FlowPosition;
 import org.openmrs.module.callflows.api.domain.FlowStep;
@@ -11,15 +13,13 @@ import org.openmrs.module.callflows.api.domain.flow.SystemNode;
 import org.openmrs.module.callflows.api.service.CallFlowService;
 import org.openmrs.module.callflows.api.service.FlowService;
 import org.openmrs.module.callflows.api.util.FlowUtil;
-
-import org.apache.velocity.VelocityContext;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Flow Service Implementation
@@ -73,15 +73,20 @@ public class FlowServiceImpl implements FlowService {
 
     @Override
     public Flow load(String name) {
+        CallFlow callFlow = callFlowService.findByName(name);
+        if (callFlow != null) {
+            return loadByJson(callFlow.getRaw());
+        } else {
+            throw new IllegalArgumentException("Unable to load Flow : " + name);
+        }
+    }
+
+    @Override
+    public Flow loadByJson(String json) {
         try {
-            CallFlow callFlow = callFlowService.findByName(name);
-            if (callFlow != null) {
-                return objectMapper.readValue(callFlow.getRaw(), Flow.class);
-            } else {
-                throw new IllegalArgumentException("Unable to load Flow : " + name);
-            }
+            return objectMapper.readValue(json, Flow.class);
         } catch (IOException e) {
-            throw new IllegalArgumentException("JSON parse issue. Unable to load flow : " + name, e);
+            throw new IllegalArgumentException("JSON parse issue. Unable to load flow : ", e);
         }
     }
 

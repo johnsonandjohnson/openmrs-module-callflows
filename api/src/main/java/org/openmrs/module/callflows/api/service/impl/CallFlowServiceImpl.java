@@ -2,17 +2,17 @@ package org.openmrs.module.callflows.api.service.impl;
 
 import org.openmrs.api.context.Context;
 import org.openmrs.api.db.UserDAO;
-import org.openmrs.module.callflows.api.domain.CallFlow;
-import org.openmrs.module.callflows.api.exception.CallFlowAlreadyExistsException;
 import org.openmrs.module.callflows.api.dao.CallFlowDao;
+import org.openmrs.module.callflows.api.domain.CallFlow;
 import org.openmrs.module.callflows.api.service.CallFlowService;
-
-import org.apache.commons.lang.StringUtils;
+import org.openmrs.module.callflows.api.service.FlowService;
+import org.openmrs.module.callflows.api.util.FlowUtil;
+import org.openmrs.module.callflows.api.util.ValidationComponent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * Call Flow service implementation
@@ -23,7 +23,6 @@ import java.util.regex.Pattern;
 @Transactional
 public class CallFlowServiceImpl implements CallFlowService {
 
-    private static final Pattern ALPHA_NUMERIC = Pattern.compile("^[a-zA-Z0-9]+$");
 
     private static final String ADMIN_USER = "admin";
 
@@ -33,17 +32,18 @@ public class CallFlowServiceImpl implements CallFlowService {
     @Autowired
     private UserDAO userDAO;
 
-    @Override
-    public CallFlow create(CallFlow callflow) throws CallFlowAlreadyExistsException {
-        if (StringUtils.isEmpty(callflow.getName()) || !ALPHA_NUMERIC.matcher(callflow.getName()).matches()) {
-            throw new IllegalArgumentException(
-                    "Callflow name is required and must contain only alphanumeric characters :" + callflow.getName());
-        }
-        // check for duplicates in database
-        if (null != callFlowDao.findByName(callflow.getName())) {
-            throw new CallFlowAlreadyExistsException("CallFlow already exists! :" + callflow.getName());
-        }
+    @Autowired
+    private FlowUtil flowUtil;
 
+    @Autowired
+    private FlowService flowService;
+
+    @Autowired
+    private ValidationComponent validationComponent;
+
+    @Override
+    public CallFlow create(CallFlow callflow) {
+        validationComponent.validate(callflow);
         if (Context.isSessionOpen() && !Context.isAuthenticated()) {
             callflow.setCreator(userDAO.getUserByUsername(ADMIN_USER));
         }
@@ -51,21 +51,15 @@ public class CallFlowServiceImpl implements CallFlowService {
     }
 
     @Override
-    public CallFlow update(CallFlow callflow) throws CallFlowAlreadyExistsException {
-        if (StringUtils.isEmpty(callflow.getName()) || !ALPHA_NUMERIC.matcher(callflow.getName()).matches()) {
-            throw new IllegalArgumentException(
-                    "Callflow name is required and must contain only alphanumeric characters :" + callflow.getName());
-        }
+    public CallFlow update(CallFlow callflow) {
+        validationComponent.validate(callflow);
+
         // Attempt to find the flow we are trying to update by querying for name
         // The idea of querying by name instead of id serves dual purpose with one query.
         // First we can check whether the call flow that we are trying to update exists
         // Second we can check whether the id of this call flow matches the one we are trying to update
         // If the second condition fails, it means that the call flow name is being changed to another callflow's name
         CallFlow existingFlow = callFlowDao.findByName(callflow.getName());
-        if (null != existingFlow && !existingFlow.getId().equals(callflow.getId())) {
-            throw new CallFlowAlreadyExistsException(
-                    "Callflow name is already used by another flow :" + callflow.getName());
-        }
         if (null == existingFlow) {
             existingFlow = callFlowDao.findById(callflow.getId());
             if (null == existingFlow) {

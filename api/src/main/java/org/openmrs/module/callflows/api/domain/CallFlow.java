@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import java.util.Objects;
+import org.openmrs.module.callflows.api.validate.annotation.ValidCallFlow;
 
 /**
  * The call flow domain
@@ -19,6 +20,7 @@ import java.util.Objects;
  */
 @Entity(name = "callFlow.CallFlow")
 @Table(name = "cfl_callflows", uniqueConstraints = @UniqueConstraint(name = "UNIQUE_CALLFLOW_IDX", columnNames = {"name"}))
+@ValidCallFlow
 public class CallFlow extends AbstractBaseOpenmrsData {
 
     private static final String TEXT = "text";

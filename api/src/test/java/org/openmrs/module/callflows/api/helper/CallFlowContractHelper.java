@@ -43,6 +43,15 @@ public final class CallFlowContractHelper {
         return request;
     }
 
+    public static CallFlowRequest createBadFlowRequestWithoutNodes() {
+        CallFlowRequest request = new CallFlowRequest();
+        request.setName(Constants.CALLFLOW_BAD);
+        request.setDescription(Constants.CALLFLOW_BAD_DESCRIPTION);
+        request.setStatus(CallFlowStatus.DRAFT.name());
+        request.setRaw(Constants.CALLFLOW_BAD_RAW_NO_NODES);
+        return request;
+    }
+
     public static CallFlowResponse createFlow1Response() {
         return new CallFlowResponse(1,
                                     Constants.CALLFLOW_MAIN,

@@ -2,11 +2,15 @@ package org.openmrs.module.callflows.web.controller;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.openmrs.module.callflows.BaseTest;
 import org.openmrs.module.callflows.Constants;
 import org.openmrs.module.callflows.api.builder.ConfigBuilder;
@@ -14,14 +18,17 @@ import org.openmrs.module.callflows.api.builder.ConfigContractBuilder;
 import org.openmrs.module.callflows.api.builder.RendererBuilder;
 import org.openmrs.module.callflows.api.builder.RendererContractBuilder;
 import org.openmrs.module.callflows.api.contract.ConfigContract;
+import org.openmrs.module.callflows.api.contract.ConfigContracts;
 import org.openmrs.module.callflows.api.contract.RendererContract;
 import org.openmrs.module.callflows.api.domain.Config;
 import org.openmrs.module.callflows.api.domain.Renderer;
 import org.openmrs.module.callflows.api.domain.Settings;
+import org.openmrs.module.callflows.api.exception.ValidationException;
 import org.openmrs.module.callflows.api.helper.ConfigHelper;
 import org.openmrs.module.callflows.api.helper.GenericHelper;
 import org.openmrs.module.callflows.api.helper.RendererHelper;
 import org.openmrs.module.callflows.api.service.ConfigService;
+import org.openmrs.module.callflows.api.util.ValidationComponent;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -36,6 +43,8 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.contains;
 import static org.mockito.Matchers.matches;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -72,6 +81,9 @@ public class SettingsControllerTest extends BaseTest {
 
     @Mock
     private RendererBuilder rendererBuilder;
+
+    @Mock
+    private ValidationComponent validationComponent;
 
     private Config voxeo;
 
@@ -166,6 +178,7 @@ public class SettingsControllerTest extends BaseTest {
         given(configContractBuilder.createFrom(imiMobile)).willReturn(imiMobileContract);
         // And
         given(configService.allConfigs()).willReturn(configs);
+        doNothing().when(validationComponent).validate(configContracts);
 
         // When and Then
         mockMvc.perform(post("/callflows/configs").contentType(MediaType.APPLICATION_JSON).content(jsonBytes(configContracts)))
@@ -187,6 +200,13 @@ public class SettingsControllerTest extends BaseTest {
     public void shouldReturnValidationErrorIfConfigsHaveNotUniqueNames() throws Exception {
         // Given
         List<ConfigContract> configContracts = buildNotUniqueConfigContacts();
+        String path = "configContracts.name";
+        String message = "Names of configs are not unique: voxeo";
+        Map<String, String> violations = new HashMap<>();
+        violations.put(path, message);
+
+        doThrow(new ValidationException(violations))
+            .when(validationComponent).validate(Mockito.any(ConfigContracts.class));
 
         // When and Then
         mockMvc.perform(post("/callflows/configs")
@@ -194,8 +214,8 @@ public class SettingsControllerTest extends BaseTest {
                         .content(jsonBytes(configContracts)))
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
-                .andExpect(jsonPath("$.constraintViolations['configContracts.name']")
-                        .value("Names of configs are not unique: voxeo"));
+                .andExpect(jsonPath("$.constraintViolations['" + path + "']")
+                    .value(message));
     }
 
     @Test
