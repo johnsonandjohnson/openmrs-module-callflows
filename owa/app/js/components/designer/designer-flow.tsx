@@ -41,6 +41,7 @@ import { IFlow } from '../../shared/model/flow.model';
 import { IUserNode } from '../../shared/model/user-node.model';
 import * as Msg from '../../shared/utils/messages';
 import Tooltip from '../tooltip';
+import { getRenderers } from '../../reducers/renderersReducer';
 import { TabWrapper } from '../tab-wrapper';
 
 export interface IDesignerFlowProps extends StateProps, DispatchProps, RouteComponentProps<{ flowName: string }> {
@@ -61,6 +62,7 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
   }
 
   componentDidMount = () => {
+    this.props.getRenderers();
     if (!!this.state.isNew) {
       this.props.reset();
     } else {
@@ -70,11 +72,11 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
   }
 
   componentWillUpdate(nextProps, nextState) {
-    if (this.props.flowLoaded === false && nextProps.flowLoaded === true) {
-      if (!!this.props.nodes) {
+    if (this.props.designer.flowLoaded === false && nextProps.flowLoaded === true) {
+      if (!!this.props.designer.nodes) {
         const initialExpansion = {};
         try {
-          this.props.nodes.forEach((node) => {
+          this.props.designer.nodes.forEach((node) => {
             initialExpansion[node.step] = false;
           });
         } finally {
@@ -89,16 +91,16 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
   handleNameChange = (event) => {
     const fieldName: string = event.target.name;
     const value: string = event.target.value;
-    let flow: IFlow = _.cloneDeep(this.props.flow);
+    let flow: IFlow = _.cloneDeep(this.props.designer.flow);
     flow[fieldName] = value;
     this.props.updateFlow(flow);
   };
 
   handleSave = () => {
-    if (!!this.props.flow.id) {
-      this.props.putFlow(this.props.flow, this.props.nodes);
+    if (!!this.props.designer.flow.id) {
+      this.props.putFlow(this.props.designer.flow, this.props.designer.nodes);
     } else {
-      this.props.postFlow(this.props.flow, this.props.nodes);
+      this.props.postFlow(this.props.designer.flow, this.props.designer.nodes);
     }
   }
 
@@ -107,12 +109,16 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
   }
 
   renderUserNode = (node: IUserNode, index: number) => {
-    return <UserNode node={node} nodeIndex={index} />
+    return <UserNode
+      initialNode={node}
+      nodeIndex={index}
+      renderers={this.props.renderers.rendererForms}
+      currentFlow={this.props.designer.flow} />
   };
 
   setExpansionAll = (val: boolean) => {
     let clone = {};
-    this.props.nodes.forEach((node, id) => {
+    this.props.designer.nodes.forEach((node, id) => {
       clone[id] = val;
     });
     this.setState({
@@ -135,10 +141,10 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
   }
 
   renderSteps = () => {
-    let { flow } = this.props;
+    let { flow } = this.props.designer;
     if (!!flow.raw) {
       try {
-        return this.props.nodes.map((node: INode, index: number) => {
+        return this.props.designer.nodes.map((node: INode, index: number) => {
           return (
             <div key={`node-${index}`}>
               <Accordion
@@ -164,7 +170,7 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
   }
 
   render() {
-    const { flow } = this.props;
+    const { flow } = this.props.designer;
     const formClass = 'form-control';
     return (
       <div className="body-wrapper">
@@ -209,7 +215,7 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
   }
 }
 
-export const mapStateToProps = ({ designerReducer }: IRootState) => (designerReducer);
+export const mapStateToProps = ({ designerReducer, renderersReducer }: IRootState) => ({ designer: designerReducer, renderers: renderersReducer });
 
 const mapDispatchToProps = ({
   reset,
@@ -219,7 +225,8 @@ const mapDispatchToProps = ({
   getFlow,
   putFlow,
   updateFlow,
-  postFlow
+  postFlow,
+  getRenderers
 });
 
 type StateProps = ReturnType<typeof mapStateToProps>;

@@ -10,11 +10,17 @@ import { DropdownBreadCrumb } from '../dropdown-bread-crumb/dropdown-bread-crumb
 import AddButton from '../../add-button';
 import { FormSection } from './form-section';
 import { RenderedSections } from './rendered-section/rendered-sections';
+import * as _u from 'underscore';
+import { IFlow } from '../../../shared/model/flow.model';
+import RendererModel from '../../../shared/model/Renderer.model';
+import { IUserNodeTemplate } from '../../../shared/model/user-node-template.model';
 import _ from 'lodash';
 
 interface IProps extends DispatchProps, RouteComponentProps<{ flowName: string }> {
-  node: IUserNode;
+  initialNode: IUserNode;
   nodeIndex: number;
+  renderers: Array<any>;
+  currentFlow: IFlow; 
 }
 
 interface IState {
@@ -23,21 +29,31 @@ interface IState {
   selectedElement?: IElement | null;
   selectedElementIndex: number;
   nodeStep: string;
+  node: IUserNode;
 }
 
 class UserNode extends React.Component<IProps, IState> {
 
   constructor(props: IProps) {
     super(props);
-    const selectedBlock = this.getFirstBlockFromNode(props.node);
+    const selectedBlock = this.getFirstBlockFromNode(props.initialNode);
     const selectedElement = this.getFirstElementFromBlock(selectedBlock);
     this.state = {
       selectedBlock,
       selectedBlockIndex: 0,
       selectedElement,
       selectedElementIndex: 0,
-      nodeStep: props.node.step
+      nodeStep: props.initialNode.step,
+      node: props.initialNode
     }
+  }
+
+  componentDidMount = () => {
+    const { node } = this.state;
+    node.templates = this.updateRenderedSection();
+    this.setState({
+      node
+    }, () => this.props.updateNode(node, this.props.nodeIndex));
   }
 
   getFirstBlockFromNode = (node: IUserNode) => node.blocks && node.blocks.length > 0 ? node.blocks[0] : undefined;
@@ -46,7 +62,7 @@ class UserNode extends React.Component<IProps, IState> {
     block.elements[0] : undefined
 
   onSelectedBlockChange = (selectedBlockIndex: number) => {
-    const selectedBlock = this.props.node.blocks[selectedBlockIndex];
+    const selectedBlock = this.state.node.blocks[selectedBlockIndex];
     const selectedElement = this.getFirstElementFromBlock(selectedBlock);
     this.setState({
       selectedBlock,
@@ -62,25 +78,72 @@ class UserNode extends React.Component<IProps, IState> {
       selectedElementIndex
     }));
 
+  getExistingTemplateOrCreate = (templateKey: string): IUserNodeTemplate => {
+    let template: IUserNodeTemplate = this.state.node.templates[templateKey];
+    if (!template) {
+      template = {dirty: false} as IUserNodeTemplate;
+    }
+    return template;
+  }
+
+  updateRenderedSection = (): Map<string, IUserNodeTemplate> => {
+    let newTemplates = {} as Map<string, IUserNodeTemplate>;
+    this.props.renderers.map((rendererUi) => {
+      const renderer: RendererModel = rendererUi.renderer; 
+      if (!!renderer) {
+        const template = this.getExistingTemplateOrCreate(renderer.name);
+        if (template.dirty) {
+          newTemplates[renderer.name] = template;
+        } else {
+          const compiledTpl = _u.template(renderer.template);
+          template.content = compiledTpl({node: this.state.node, flow: this.props.currentFlow});
+          newTemplates[renderer.name] = template;
+        }
+      }
+    });
+    return newTemplates;
+  };
+
   onBlockRemove = (indexToRemove: number) => {
-    const { node } = this.props;
+    const { node } = this.state;
     node.blocks.splice(indexToRemove, 1);
     const selectedBlock = this.getFirstBlockFromNode(node);
     this.setState({
       selectedBlock,
       selectedBlockIndex: 0,
       selectedElement: this.getFirstElementFromBlock(selectedBlock),
-      selectedElementIndex: 0
+      selectedElementIndex: 0,
+      node
     }, () => this.props.updateNode(node, this.props.nodeIndex));
   };
 
   onElementRemove = (indexToRemove: number) => {
-    const { node } = this.props;
+    const { node } = this.state;
     node.blocks[this.state.selectedBlockIndex].elements.splice(indexToRemove, 1);
     const updatedElements = node.blocks[this.state.selectedBlockIndex].elements;
     this.setState({
       selectedElement: updatedElements.length > 0 ? updatedElements[0] : undefined,
-      selectedElementIndex: 0
+      selectedElementIndex: 0,
+      node
+    }, () => this.props.updateNode(node, this.props.nodeIndex));
+  };
+
+  updateTemplateContent = (templateKey: string, value: string) => {
+    const { node } = this.state;
+    node.templates[templateKey].content = value;
+    this.setState({
+      node
+    }, () => this.props.updateNode(node, this.props.nodeIndex));
+  };
+
+  updateTemplateDirtyStatus = (templateKey: string, dirty: boolean) => {
+    const { node } = this.state;
+    node.templates[templateKey].dirty = dirty;
+    if (!dirty) {
+      node.templates = this.updateRenderedSection();
+    }
+    this.setState({
+      node
     }, () => this.props.updateNode(node, this.props.nodeIndex));
   };
 
@@ -88,26 +151,31 @@ class UserNode extends React.Component<IProps, IState> {
     const { selectedBlock } = this.state;
     if (selectedBlock && this.state.selectedElement) {
       selectedBlock.elements[this.state.selectedElementIndex] = element;
-      const { node } = this.props;
+      let { node } = this.state;
+      const newTemplates = this.updateRenderedSection();
+      node.templates= newTemplates;
       node.blocks[this.state.selectedBlockIndex] = selectedBlock;
       this.setState({
         selectedBlock,
-        selectedElement: element
+        selectedElement: element,
+        node
       }, () => this.props.updateNode(node, this.props.nodeIndex));
     }
   };
+  
 
   onNodeStepChange = event => {
-    const { node } = this.props;
+    const { node } = this.state;
     const nodeStep = event.target.value;
     node.step = nodeStep;
     this.setState({
-      nodeStep
+      nodeStep,
+      node
     }, () => this.props.updateNode(node, this.props.nodeIndex));
   };
 
   addBlock = () => {
-    const { node } = this.props;
+    const { node } = this.state;
     const block: IBlock = {
       name: 'Form',
       type: 'form',
@@ -116,19 +184,21 @@ class UserNode extends React.Component<IProps, IState> {
     node.blocks.push(block);
     this.setState({
       selectedBlock: block,
-      selectedElement: null
+      selectedElement: null,
+      node
     }, () => this.props.updateNode(node, this.props.nodeIndex));
   }
 
   addElement = (element: IElement) => {
     const { selectedBlock } = this.state;
     if (selectedBlock) {
-      const node = this.props.node;
+      const node = this.state.node;
       selectedBlock.elements.push(element);
       node.blocks[this.state.selectedBlockIndex] = selectedBlock;
       this.setState({
         selectedElement: element,
-        selectedElementIndex: selectedBlock.elements.length - 1
+        selectedElementIndex: selectedBlock.elements.length - 1,
+        node
       }, () => this.props.updateNode(node, this.props.nodeIndex));
     }
   };
@@ -142,7 +212,7 @@ class UserNode extends React.Component<IProps, IState> {
   }
 
   toggleContinueNode = () => {
-    const { node } = this.props;
+    const { node } = this.state;
     const selectedBlock = this.state.selectedBlock;
     if (selectedBlock) {
       selectedBlock.continueNode = !selectedBlock.continueNode;
@@ -154,7 +224,7 @@ class UserNode extends React.Component<IProps, IState> {
   }
 
   render = () => {
-    const { node } = this.props;
+    const { node } = this.state;
     const { selectedBlock, selectedElement, selectedElementIndex } = this.state;
     return (
       <Form className="form dropdown-container">
@@ -202,11 +272,12 @@ class UserNode extends React.Component<IProps, IState> {
             update={this.updateNode}
           />
         )}
-        {<RenderedSections
-          key={this.props.nodeIndex + '-rendered-section'}
-          node={node}
+        {<RenderedSections 
+          key={this.props.nodeIndex + '-rendered-section'} 
+          templates={node.templates}
           nodeIndex={this.props.nodeIndex}
-          updateNode={this.props.updateNode} />}
+          updateTemplateContent={this.updateTemplateContent}
+          updateTemplateDirtyStatus={this.updateTemplateDirtyStatus} />}
       </Form>
     );
   };
