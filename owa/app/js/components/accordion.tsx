@@ -8,6 +8,7 @@ interface IProps {
   border?: boolean;
   open?: boolean;
   default?: boolean;
+  otherClassNames?: string;
   handleClick: () => void
 }
 
@@ -56,7 +57,7 @@ export default class Accordion extends React.PureComponent<IProps, IState> {
 
   render = () => {
     return (
-      <div className={`accordion ${this.props.border ? 'border' : ''}`}>
+      <div className={`accordion ${this.props.border ? 'border' : ''} ${this.props.otherClassNames}`}>
         <div
           className="header"
           onClick={this.handleClick}

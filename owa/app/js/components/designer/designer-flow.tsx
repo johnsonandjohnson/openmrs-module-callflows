@@ -22,13 +22,14 @@ import {
   deleteInteractionNode,
   addEmptyInteractionNode
 } from '../../reducers/designer.reducer';
-import { IRootState } from '../../reducers';
 import DesignerCallTest from './test-call/designer-call-test';
 import {
   Form,
   Button,
   FormGroup,
-  FormControl
+  FormControl,
+  Row,
+  Col
 } from 'react-bootstrap';
 import _ from 'lodash';
 import { Tabs } from '@openmrs/react-components';
@@ -36,15 +37,12 @@ import Accordion from '../accordion';
 import SystemNode from './flow-node/system-node';
 import UserNode from './flow-node/user-node';
 import { NodeType } from '../../shared/model/node-type.model';
-import { INode } from '../../shared/model/node.model';
 import DesignerFlowTest from './test-flow/designer-flow-test';
 import { IFlow } from '../../shared/model/flow.model';
 import * as Msg from '../../shared/utils/messages';
 import Tooltip from '../tooltip';
 import { getRenderers } from '../../reducers/renderersReducer';
 import { TabWrapper } from '../tab-wrapper';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import './designer.scss';
 import { NodeUI } from '../../shared/model/node-ui';
 import { UserNodeUI } from '../../shared/model/user-node-ui';
@@ -59,8 +57,6 @@ export interface IDesignerFlowState {
 };
 
 export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesignerFlowState> {
-
-  trashIcon: IconProp = ['far', 'trash-alt'];
 
   constructor(props) {
     super(props);
@@ -194,46 +190,46 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
     this.setState({
       nodesExpansion
     }, () => this.props.deleteInteractionNode(index));
-
-
   };
 
-  createTitle = (node, index) => {
-    return (
-      <span>
-        {(node.step ? node.step : '')}
-        {this.state.nodesExpansion[index] && (node.nodeType === NodeType.USER ?
-          <span
-            onClick={(event) => this.handleRemoveInteraction(event, index)}
-            className="interaction-trash-button"
-            title={Msg.DELETE_INTERACTION_NODE}>
-            <FontAwesomeIcon
-              size="1x"
-              icon={this.trashIcon} />
-          </span>
-          : '')}
-      </span>
-    );
+  changeAccordionTheme = (darkTheme) => {
+    darkTheme++;
+    if ( darkTheme > 4) {
+      darkTheme = 1;
+    }
+    return darkTheme;
   }
 
   renderSteps = () => {
     let { flowLoaded } = this.props;
     if (flowLoaded) {
       try {
+        let darkTheme = 0;
         return this.props.nodes.map((node: NodeUI, index: number) => {
+          darkTheme = this.changeAccordionTheme(darkTheme);
           return (
-            <div key={`node-${index}`}>
-              <Accordion
-                handleClick={() => this.toggleExpansion(index)}
-                title={this.createTitle(node, index)}
-                border={true}
-                open={this.state.nodesExpansion[index]}>
-                {node.nodeType === NodeType.SYSTEM ?
-                  this.renderSystemNode(node as SystemNodeUI, index) :
-                  this.renderUserNode(node as UserNodeUI, index)
-                }
-              </Accordion>
-            </div>
+            <Row key={`node-${index}`} className={darkTheme < 3 ? 'darkAccordion' : ''}>
+              <Col sm={11}>
+                <Accordion
+                  handleClick={() => this.toggleExpansion(index)}
+                  title={node.step ? node.step : ''}
+                  border={true}
+                  otherClassNames={node.nodeType === NodeType.SYSTEM ? 'system-node' : 'user-node'}
+                  open={this.state.nodesExpansion[index]}>
+                  {node.nodeType === NodeType.SYSTEM ?
+                    this.renderSystemNode(node as SystemNodeUI, index) :
+                    this.renderUserNode(node as UserNodeUI, index)
+                  }
+                </Accordion>
+              </Col>
+              {(node.nodeType === NodeType.USER ?
+                <Col sm={1}>
+                  <i className="medium icon-remove delete-action interaction-trash-button"
+                    onClick={(event) => this.handleRemoveInteraction(event, index)}
+                    title={Msg.DELETE_INTERACTION_NODE} />
+                </Col>
+                : '')}
+            </Row>
           );
         });
       } catch (ex) {
