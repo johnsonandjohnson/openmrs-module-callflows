@@ -92,6 +92,9 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
         }
       }
     }
+    if (this.state.isNew && !this.props.flow.id && !!nextProps.flow.id) {
+      this.props.history.push('/designer/edit/' + nextProps.flow.name);
+    }
   }
 
   handleNameChange = (event) => {
