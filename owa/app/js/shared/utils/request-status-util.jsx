@@ -37,9 +37,10 @@ export const handleRequest = async (dispatch, body, successMessage, errorMessage
       hideProgressBar: true
     });
   } catch(e) {
+    let violations = Object.values(e.response.data.constraintViolations).join('\n');
     try {
       toast.update(toastId, {
-        render: <ToastStatusContent message={[errorMessage, e.response.data.message].join(' ')} type={toast.TYPE.ERROR}/>,
+        render: <ToastStatusContent message={[errorMessage, violations].join('\n')} type={toast.TYPE.ERROR}/>,
         autoClose: CLOSE_DELAY,
         closeButton: <CloseButton />,
         className: TOAST_CLASS,

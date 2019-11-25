@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 public class CallFlowValidator implements ConstraintValidator<ValidCallFlow, CallFlow> {
 
     private static final String NAME_PATH = "callflow.name";
+    private static final String RAW_PATH = "callflow.raw";
     private static final String RAW_NAME_PATH = "callflow.raw.name";
     private static final String RAW_NODES_PATH = "callflow.raw.nodes";
     private static final Pattern ALPHA_NUMERIC = Pattern.compile("^[a-zA-Z0-9]+$");
@@ -42,6 +43,8 @@ public class CallFlowValidator implements ConstraintValidator<ValidCallFlow, Cal
      */
     @Override
     public boolean isValid(CallFlow callflow, ConstraintValidatorContext ctx) {
+        ctx.disableDefaultConstraintViolation();
+
         boolean isValid = true;
 
         isValid = isValid && isNameValid(callflow, ctx);
@@ -78,8 +81,13 @@ public class CallFlowValidator implements ConstraintValidator<ValidCallFlow, Cal
 
     private boolean isRawFlowValid(CallFlow callflow, ConstraintValidatorContext ctx) {
         boolean isValid = true;
-
-        Flow flow = flowService.loadByJson(callflow.getRaw());
+        Flow flow;
+        try {
+            flow = flowService.loadByJson(callflow.getRaw());
+        } catch (Exception ex) {
+            addErrorToContext(ctx, RAW_PATH, ex.getMessage());
+            return false;
+        }
 
         if (StringUtils.isEmpty(flow.getName()) || !ALPHA_NUMERIC.matcher(flow.getName()).matches()) {
             addErrorToContext(ctx, RAW_NAME_PATH, String.format(CALL_FLOW_NAME_DUPLICATION,
@@ -103,7 +111,6 @@ public class CallFlowValidator implements ConstraintValidator<ValidCallFlow, Cal
 
     private void addErrorToContext(ConstraintValidatorContext context, String path,
                                    String message) {
-        context.disableDefaultConstraintViolation();
         context.buildConstraintViolationWithTemplate(message)
             .addNode(path)
             .addConstraintViolation();
