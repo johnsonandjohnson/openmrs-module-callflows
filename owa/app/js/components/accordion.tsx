@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 
 interface IProps {
-  title: string;
+  title: React.ReactNode;
   border?: boolean;
   open?: boolean;
   default?: boolean;

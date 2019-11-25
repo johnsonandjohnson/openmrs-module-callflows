@@ -19,6 +19,7 @@ import {
   putFlow,
   updateFlow,
   postFlow,
+  deleteInteractionNode,
   addEmptyInteractionNode
 } from '../../reducers/designer.reducer';
 import { IRootState } from '../../reducers';
@@ -42,6 +43,9 @@ import * as Msg from '../../shared/utils/messages';
 import Tooltip from '../tooltip';
 import { getRenderers } from '../../reducers/renderersReducer';
 import { TabWrapper } from '../tab-wrapper';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
+import './designer.scss';
 import { NodeUI } from '../../shared/model/node-ui';
 import { UserNodeUI } from '../../shared/model/user-node-ui';
 import { SystemNodeUI } from '../../shared/model/system-node-ui';
@@ -55,6 +59,9 @@ export interface IDesignerFlowState {
 };
 
 export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesignerFlowState> {
+
+  trashIcon: IconProp = ['far', 'trash-alt'];
+
   constructor(props) {
     super(props);
     this.state = {
@@ -74,13 +81,12 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
   }
 
   componentWillUpdate(nextProps: IDesignerFlowProps, nextState: IDesignerFlowState) {
-    const { designer } = this.props;
-    const flowLoaded = designer.flowLoaded === false && nextProps.designer.flowLoaded === true;
+    const flowLoaded = this.props.flowLoaded === false && nextProps.flowLoaded === true;
     if (flowLoaded) {
-      if (!!designer.nodes) {
+      if (!!this.props.nodes) {
         const initialExpansion = {};
         try {
-          nextProps.designer.nodes.forEach((node, i) => {
+          nextProps.nodes.forEach((node, i) => {
             initialExpansion[i] = false;
           });
         } finally {
@@ -95,16 +101,16 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
   handleNameChange = (event) => {
     const fieldName: string = event.target.name;
     const value: string = event.target.value;
-    let flow: IFlow = _.cloneDeep(this.props.designer.flow);
+    let flow: IFlow = _.cloneDeep(this.props.flow);
     flow[fieldName] = value;
     this.props.updateFlow(flow);
   };
 
   handleSave = () => {
-    if (!!this.props.designer.flow.id) {
-      this.props.putFlow(this.props.designer.flow, this.props.designer.nodes);
+    if (!!this.props.flow.id) {
+      this.props.putFlow(this.props.flow, this.props.nodes);
     } else {
-      this.props.postFlow(this.props.designer.flow, this.props.designer.nodes);
+      this.props.postFlow(this.props.flow, this.props.nodes);
     }
   }
 
@@ -116,13 +122,13 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
     return <UserNode
       initialNode={node}
       nodeIndex={index}
-      renderers={this.props.renderers.rendererForms}
-      currentFlow={this.props.designer.flow} />
+      renderers={this.props.rendererForms}
+      currentFlow={this.props.flow} />
   };
 
   setExpansionAll = (val: boolean) => {
     let clone = {};
-    this.props.designer.nodes.forEach((node, id) => {
+    this.props.nodes.forEach((node, id) => {
       clone[id] = val;
     });
     this.setState({
@@ -156,16 +162,70 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
     });
   }
 
+  isNotFirstInterationNode(id) {
+    return id >= 2;
+  }
+
+  isRemovedInteractionNode(id, deletedNodeId) {
+    return id === deletedNodeId || id === deletedNodeId + 1;
+  }
+
+  shiftNodesExpansion = (deletedNodeId: number) => {
+    const { nodesExpansion } = this.state;
+    const newNodesExpansion = {};
+    Object.keys(nodesExpansion).forEach((key) => {
+      const id = parseInt(key);
+      if (this.isRemovedInteractionNode(id, deletedNodeId)) {
+        newNodesExpansion[id] = false;
+        newNodesExpansion[id + 1] = false;
+      } else if (id < deletedNodeId) {
+        newNodesExpansion[id] = nodesExpansion[id];
+      } else if (this.isNotFirstInterationNode(id)) {
+        newNodesExpansion[id - 2] = nodesExpansion[id];
+      }
+    });
+    return newNodesExpansion;
+  }
+
+  handleRemoveInteraction = (event, index) => {
+    event.stopPropagation();
+    event.preventDefault();
+    const nodesExpansion = this.shiftNodesExpansion(index);
+    this.setState({
+      nodesExpansion
+    }, () => this.props.deleteInteractionNode(index));
+
+
+  };
+
+  createTitle = (node, index) => {
+    return (
+      <span>
+        {(node.step ? node.step : '')}
+        {this.state.nodesExpansion[index] && (node.nodeType === NodeType.USER ?
+          <span
+            onClick={(event) => this.handleRemoveInteraction(event, index)}
+            className="interaction-trash-button"
+            title={Msg.DELETE_INTERACTION_NODE}>
+            <FontAwesomeIcon
+              size="1x"
+              icon={this.trashIcon} />
+          </span>
+          : '')}
+      </span>
+    );
+  }
+
   renderSteps = () => {
-    let { flowLoaded } = this.props.designer;
+    let { flowLoaded } = this.props;
     if (flowLoaded) {
       try {
-        return this.props.designer.nodes.map((node: NodeUI, index: number) => {
+        return this.props.nodes.map((node: NodeUI, index: number) => {
           return (
             <div key={`node-${index}`}>
               <Accordion
                 handleClick={() => this.toggleExpansion(index)}
-                title={node.step ? node.step : ''}
+                title={this.createTitle(node, index)}
                 border={true}
                 open={this.state.nodesExpansion[index]}>
                 {node.nodeType === NodeType.SYSTEM ?
@@ -186,7 +246,7 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
   }
 
   render() {
-    const { flow, loading, flowLoaded } = this.props.designer;
+    const { flow, loading, flowLoaded } = this.props;
     const formClass = 'form-control';
     const ready = !loading && flowLoaded;
     return (
@@ -232,7 +292,13 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
   }
 }
 
-export const mapStateToProps = ({ designerReducer, renderersReducer }: IRootState) => ({ designer: designerReducer, renderers: renderersReducer });
+export const mapStateToProps = state => ({
+  flow: state.designerReducer.flow,
+  flowLoaded: state.designerReducer.flowLoaded,
+  nodes: state.designerReducer.nodes,
+  loading: state.designerReducer.loading,
+  rendererForms: state.renderersReducer.rendererForms
+});
 
 const mapDispatchToProps = ({
   reset,
@@ -243,8 +309,9 @@ const mapDispatchToProps = ({
   putFlow,
   updateFlow,
   postFlow,
-  addEmptyInteractionNode,
-  getRenderers
+  getRenderers,
+  deleteInteractionNode,
+  addEmptyInteractionNode
 });
 
 type StateProps = ReturnType<typeof mapStateToProps>;

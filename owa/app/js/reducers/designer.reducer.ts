@@ -11,10 +11,7 @@ import SystemMessage from '../shared/model/system-message.model';
 import UserMessage from '../shared/model/user-message.model';
 import { IFlowTestResponse } from '../shared/model/flow-test-response.model';
 import { IFlowTestResponseBody } from '../shared/model/flow-test-response-body.model';
-import { string } from 'prop-types';
 import { IContinueFieldProps } from '../shared/model/continue-field-props.model';
-import { convertToType } from '../shared/utils/conversion-util';
-import { AxiosPromise, AxiosResponse } from 'axios';
 import { NodeUI } from '../shared/model/node-ui';
 import { getNewUI as getNewSystemNodeUI } from '../shared/model/system-node-ui';
 import { getNewUI as getNewUserNodeUI } from '../shared/model/user-node-ui';
@@ -32,6 +29,7 @@ export const ACTION_TYPES = {
   SEND_MESSAGE: 'designerReducer/SEND_MESSAGE',
   RESET_MESSAGES: 'designerReducer/RESET_MESSAGES',
   NODE_PROCESSED: 'designerReducer/NODE_PROCESSED',
+  DELETE_INTERACTION_NODE: 'designerReducer/DELETE_INTERACTION_NODE',
   ADD_EMPTY_USER_AND_SYSTEM_NODES: 'designerReducer/ADD_EMPTY_USER_AND_SYSTEM_NODES'
 };
 
@@ -190,6 +188,12 @@ export default (state: DesignerState = initialState, action): DesignerState => {
     case ACTION_TYPES.RESET: {
       return initialState;
     }
+    case ACTION_TYPES.DELETE_INTERACTION_NODE: {
+      return {
+        ...state,
+        nodes: removeInteractioNode(state.nodes, action.payload)
+      }
+    }
     default:
       return state;
   }
@@ -266,6 +270,11 @@ export const updateNode = (node: any, nodeIndex: number) => ({
   type: ACTION_TYPES.UPDATE_NODE,
   payload: node,
   meta: nodeIndex
+});
+
+export const deleteInteractionNode = (nodeIndex: number) => ({
+  type: ACTION_TYPES.DELETE_INTERACTION_NODE,
+  payload: nodeIndex
 });
 
 export const makeTestCall = (config: string, flow: string, phone: string, extension: string) => async (dispatch) => {
@@ -392,6 +401,17 @@ const replaceNode = (nodes: Array<NodeUI>, node: NodeUI, nodeIndex: number): Arr
       item = node;
     }
     return item;
+  });
+};
+
+const removeInteractioNode = (nodes: Array<any>, userNodeIndex: number) => {
+  // the one interaction node is consists of by the User and the System nodes
+  // that's why we add 1 to calculate index of system node
+  const systemNodeIndex = userNodeIndex + 1;
+  return nodes.filter((item, index: number) => {
+    if (index !== userNodeIndex && index !== systemNodeIndex) {
+      return item;
+    }
   });
 };
 

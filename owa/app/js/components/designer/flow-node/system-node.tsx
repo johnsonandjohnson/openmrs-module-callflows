@@ -56,9 +56,6 @@ export class SystemNode extends React.PureComponent<ISystemNodeProps, ISystemNod
     }
   }
 
-  componentDidMount = () => {
-  }
-
   handleNodeValueChange = (editor, data, value) => {
     let node = this.props.node;
     node.templates.velocity.content = value;
@@ -78,7 +75,7 @@ export class SystemNode extends React.PureComponent<ISystemNodeProps, ISystemNod
           <span className="input-group-addon"> Step </span>
           <input
             className="form-control"
-            value={this.props.node.step}
+            value={!!this.props.node.step ? this.props.node.step : ''}
             onChange={this.handleNodeNameChange}
           />
         </div>

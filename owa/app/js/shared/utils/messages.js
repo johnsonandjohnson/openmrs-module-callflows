@@ -87,3 +87,4 @@ export const NON_DIRTY_LABEL = 'Auto generation via renderer template is ON';
 export const MISSING_TEMPLATE = 'Missing template for the following renderer: ';
 export const FLOW_RANGE_HELP = 'x..y or x or ..y or x..';
 export const FLOW_REPROMPT_HELP = 'No. of times to repeat/reprompt if no input/match';
+export const DELETE_INTERACTION_NODE = 'Delete interaction node.';

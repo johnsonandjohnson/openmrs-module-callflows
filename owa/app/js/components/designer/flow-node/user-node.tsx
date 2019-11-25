@@ -48,6 +48,21 @@ class UserNode extends React.Component<IProps, IState> {
     }
   }
 
+  componentDidUpdate = (prevProps, prevState) => {
+    if (this.props.initialNode !== prevState.node) {
+      const selectedBlock = this.getFirstBlockFromNode(this.props.initialNode);
+      const selectedElement = this.getFirstElementFromBlock(selectedBlock);
+      this.setState({
+        selectedBlock,
+        selectedBlockIndex: 0,
+        selectedElement,
+        selectedElementIndex: 0,
+        nodeStep: this.props.initialNode.step,
+        node: this.props.initialNode
+      });
+    }
+  }
+
   componentDidMount = () => {
     const { node } = this.state;
     node.templates = this.updateRenderedSection();
