@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { ObjectUI } from './object-ui';
 import { INode } from './node.model';
 import { NodeType } from './node-type.model';
@@ -28,13 +29,13 @@ export class NodeUI extends ObjectUI<INode> {
 }
 
 export const getNewUserNode = (): NodeUI => {
-  const nodeUI = new NodeUI(defaultUserNodeValue);
+  const nodeUI = new NodeUI(_.cloneDeep(defaultUserNodeValue));
   nodeUI.isNew = true;
   return nodeUI;
 };
 
 export const getNewSystemNode = (): NodeUI => {
-  const nodeUI = new NodeUI(defaultSystemNodeValue);
+  const nodeUI = new NodeUI(_.cloneDeep(defaultSystemNodeValue));
   nodeUI.isNew = true;
   return nodeUI;
 };
