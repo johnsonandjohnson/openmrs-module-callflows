@@ -3,7 +3,6 @@ import axiosInstance from '../config/axios';
 import { SUCCESS, REQUEST, FAILURE } from './action-type.util';
 import ConfigFormData from '../components/config-form/config-form-data';
 import { IFlow, defaultValue as defaultFlowValue } from '../shared/model/flow.model';
-import { getUI, getModel } from '../shared/model/node.model';
 import { handleTestCallRequest, handleSuccessMessage } from '../components/designer/test-call/designer-call-test.util';
 import * as Msg from '../shared/utils/messages';
 import { handleRequest } from '../shared/utils/request-status-util';
@@ -12,9 +11,9 @@ import UserMessage from '../shared/model/user-message.model';
 import { IFlowTestResponse } from '../shared/model/flow-test-response.model';
 import { IFlowTestResponseBody } from '../shared/model/flow-test-response-body.model';
 import { IContinueFieldProps } from '../shared/model/continue-field-props.model';
-import { NodeUI } from '../shared/model/node-ui';
-import { getNewUI as getNewSystemNodeUI } from '../shared/model/system-node-ui';
-import { getNewUI as getNewUserNodeUI } from '../shared/model/user-node-ui';
+import { convertToType } from '../shared/utils/conversion-util';
+import { AxiosPromise, AxiosResponse } from 'axios';
+import { NodeUI, toModel, getNewUserNode, getNewSystemNode, toUI } from '../shared/model/node-ui';
 
 export const ACTION_TYPES = {
   RESET: 'designerReducer/RESET',
@@ -250,7 +249,7 @@ export const putFlow = (flow: IFlow, nodes: Array<NodeUI>) => async (dispatch) =
   const data = {
     ...flow,
     raw: JSON.stringify({
-      nodes: _.map(nodes, getModel),
+      nodes: _.map(nodes, toModel),
       name: flow.name
     })
   };
@@ -266,7 +265,7 @@ export const addEmptyInteractionNode = () => ({
   type: ACTION_TYPES.ADD_EMPTY_USER_AND_SYSTEM_NODES,
 });
 
-export const updateNode = (node: any, nodeIndex: number) => ({
+export const updateNode = (node: NodeUI, nodeIndex: number) => ({
   type: ACTION_TYPES.UPDATE_NODE,
   payload: node,
   meta: nodeIndex
@@ -372,7 +371,7 @@ export const postFlow = (flow: IFlow, nodes: Array<NodeUI>) => async (dispatch) 
   const data = {
     ...flow,
     raw: JSON.stringify({
-      nodes: _.map(nodes, getModel),
+      nodes: _.map(nodes, toModel),
       name: flow.name
     })
   };
@@ -390,8 +389,8 @@ export const postFlow = (flow: IFlow, nodes: Array<NodeUI>) => async (dispatch) 
 const addNewUserAndSystemNodes = (nodes: Array<NodeUI>): Array<NodeUI> => {
   return [
     ...nodes,
-    getNewUserNodeUI(),
-    getNewSystemNodeUI()
+    getNewUserNode(),
+    getNewSystemNode()
   ]
 }
 
@@ -422,7 +421,7 @@ const extractNodes = (flow: IFlow) => {
   } catch (ex) {
     console.error('Cannot parse nodes');
   }
-  return _.map(modals, getUI);
+  return _.map(modals, toUI);
 }
 
 const handleNodeError = (e, dispatch) => {

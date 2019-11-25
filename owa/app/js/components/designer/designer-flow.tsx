@@ -45,8 +45,8 @@ import { getRenderers } from '../../reducers/renderersReducer';
 import { TabWrapper } from '../tab-wrapper';
 import './designer.scss';
 import { NodeUI } from '../../shared/model/node-ui';
-import { UserNodeUI } from '../../shared/model/user-node-ui';
-import { SystemNodeUI } from '../../shared/model/system-node-ui';
+import { IUserNode } from '../../shared/model/user-node.model';
+import { ISystemNode } from '../../shared/model/system-node.model';
 
 export interface IDesignerFlowProps extends StateProps, DispatchProps, RouteComponentProps<{ flowName: string }> {
 };
@@ -110,13 +110,13 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
     }
   }
 
-  renderSystemNode = (node: SystemNodeUI, nodeIndex: number) => {
-    return <SystemNode node={node} nodeIndex={nodeIndex} />
+  renderSystemNode = (nodeUI: NodeUI, nodeIndex: number) => {
+    return <SystemNode nodeUI={nodeUI} nodeIndex={nodeIndex} />
   }
 
-  renderUserNode = (node: UserNodeUI, index: number) => {
+  renderUserNode = (nodeUI: NodeUI, index: number) => {
     return <UserNode
-      initialNode={node}
+      initialNodeUI={nodeUI}
       nodeIndex={index}
       renderers={this.props.rendererForms}
       currentFlow={this.props.flow} />
@@ -201,12 +201,14 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
   }
 
   renderSteps = () => {
-    let { flowLoaded } = this.props;
-    if (flowLoaded) {
+    const { flowLoaded } = this.props;
+    const { isNew } = this.state;
+    if (flowLoaded  || isNew) {
       try {
         let darkTheme = 0;
-        return this.props.nodes.map((node: NodeUI, index: number) => {
+        return this.props.nodes.map((nodeUI: NodeUI, index: number) => {
           darkTheme = this.changeAccordionTheme(darkTheme);
+          const node = nodeUI.model;
           return (
             <Row key={`node-${index}`} className={darkTheme < 3 ? 'darkAccordion' : ''}>
               <Col sm={11}>
@@ -217,8 +219,8 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
                   otherClassNames={node.nodeType === NodeType.SYSTEM ? 'system-node' : 'user-node'}
                   open={this.state.nodesExpansion[index]}>
                   {node.nodeType === NodeType.SYSTEM ?
-                    this.renderSystemNode(node as SystemNodeUI, index) :
-                    this.renderUserNode(node as UserNodeUI, index)
+                    this.renderSystemNode(nodeUI, index) :
+                    this.renderUserNode(nodeUI, index)
                   }
                 </Accordion>
               </Col>
@@ -243,8 +245,9 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
 
   render() {
     const { flow, loading, flowLoaded } = this.props;
+    const { isNew } = this.state;
     const formClass = 'form-control';
-    const ready = !loading && flowLoaded;
+    const ready = !loading && (flowLoaded || isNew);
     return (
       <div className="body-wrapper">
         <div className="panel-body">

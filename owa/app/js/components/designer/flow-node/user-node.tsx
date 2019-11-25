@@ -14,10 +14,11 @@ import { IFlow } from '../../../shared/model/flow.model';
 import RendererModel from '../../../shared/model/Renderer.model';
 import { IUserNodeTemplate } from '../../../shared/model/user-node-template.model';
 import _ from 'lodash';
-import { UserNodeUI } from '../../../shared/model/user-node-ui';
+import { IUserNode } from '../../../shared/model/user-node.model';
+import { NodeUI } from '../../../shared/model/node-ui';
 
 interface IProps extends DispatchProps, RouteComponentProps<{ flowName: string }> {
-  initialNode: UserNodeUI;
+  initialNodeUI: NodeUI;
   nodeIndex: number;
   renderers: Array<any>;
   currentFlow: IFlow;
@@ -29,55 +30,58 @@ interface IState {
   selectedElement?: IElement | null;
   selectedElementIndex: number;
   nodeStep: string;
-  node: UserNodeUI;
+  nodeUI: NodeUI;
 }
 
 class UserNode extends React.Component<IProps, IState> {
 
   constructor(props: IProps) {
     super(props);
-    const selectedBlock = this.getFirstBlockFromNode(props.initialNode);
+    const node = props.initialNodeUI.model as IUserNode;
+    const selectedBlock = this.getFirstBlockFromNode(node);
     const selectedElement = this.getFirstElementFromBlock(selectedBlock);
     this.state = {
       selectedBlock,
       selectedBlockIndex: 0,
       selectedElement,
       selectedElementIndex: 0,
-      nodeStep: props.initialNode.step,
-      node: props.initialNode
+      nodeStep: node.step,
+      nodeUI: this.props.initialNodeUI
     }
   }
 
   componentDidUpdate = (prevProps, prevState) => {
-    if (this.props.initialNode !== prevState.node) {
-      const selectedBlock = this.getFirstBlockFromNode(this.props.initialNode);
+    if (this.props.initialNodeUI !== prevState.nodeUI) {
+      const node = this.props.initialNodeUI.model as IUserNode;
+      const selectedBlock = this.getFirstBlockFromNode(node);
       const selectedElement = this.getFirstElementFromBlock(selectedBlock);
       this.setState({
         selectedBlock,
         selectedBlockIndex: 0,
         selectedElement,
         selectedElementIndex: 0,
-        nodeStep: this.props.initialNode.step,
-        node: this.props.initialNode
+        nodeStep: node.step,
+        nodeUI: this.props.initialNodeUI
       });
     }
   }
 
   componentDidMount = () => {
-    const { node } = this.state;
-    node.templates = this.updateRenderedSection();
+    const { nodeUI } = this.state;
+    nodeUI.model.templates = this.updateRenderedSection();
     this.setState({
-      node
-    }, () => this.props.updateNode(node, this.props.nodeIndex));
+      nodeUI
+    }, () => this.props.updateNode(nodeUI, this.props.nodeIndex));
   }
 
-  getFirstBlockFromNode = (node: UserNodeUI) => node.blocks && node.blocks.length > 0 ? node.blocks[0] : undefined;
+  getFirstBlockFromNode = (node: IUserNode) => node.blocks && node.blocks.length > 0 ? node.blocks[0] : undefined;
 
   getFirstElementFromBlock = (block: IBlock | undefined) => block && block.elements.length > 0 ?
     block.elements[0] : undefined
 
   onSelectedBlockChange = (selectedBlockIndex: number) => {
-    const selectedBlock = this.state.node.blocks[selectedBlockIndex];
+    const node = this.state.nodeUI.model as IUserNode;
+    const selectedBlock = node.blocks[selectedBlockIndex];
     const selectedElement = this.getFirstElementFromBlock(selectedBlock);
     this.setState({
       selectedBlock,
@@ -94,7 +98,7 @@ class UserNode extends React.Component<IProps, IState> {
     }));
 
   getExistingTemplateOrCreate = (templateKey: string): IUserNodeTemplate => {
-    let template: IUserNodeTemplate = this.state.node.templates[templateKey];
+    let template: IUserNodeTemplate = this.state.nodeUI.model.templates[templateKey];
     if (!template) {
       template = {dirty: false} as IUserNodeTemplate;
     }
@@ -111,7 +115,7 @@ class UserNode extends React.Component<IProps, IState> {
           newTemplates[renderer.name] = template;
         } else {
           const compiledTpl = _u.template(renderer.template);
-          template.content = compiledTpl({node: this.state.node, flow: this.props.currentFlow});
+          template.content = compiledTpl({node: this.state.nodeUI, flow: this.props.currentFlow});
           newTemplates[renderer.name] = template;
         }
       }
@@ -120,7 +124,8 @@ class UserNode extends React.Component<IProps, IState> {
   };
 
   onBlockRemove = (indexToRemove: number) => {
-    const { node } = this.state;
+    const { nodeUI } = this.state;
+    const node = nodeUI.model as IUserNode;
     node.blocks.splice(indexToRemove, 1);
     const selectedBlock = this.getFirstBlockFromNode(node);
     this.setState({
@@ -128,69 +133,72 @@ class UserNode extends React.Component<IProps, IState> {
       selectedBlockIndex: 0,
       selectedElement: this.getFirstElementFromBlock(selectedBlock),
       selectedElementIndex: 0,
-      node
-    }, () => this.props.updateNode(node, this.props.nodeIndex));
+      nodeUI
+    }, () => this.props.updateNode(nodeUI, this.props.nodeIndex));
   };
 
   onElementRemove = (indexToRemove: number) => {
-    const { node } = this.state;
+    const { nodeUI } = this.state;
+    const node = nodeUI.model as IUserNode;
     node.blocks[this.state.selectedBlockIndex].elements.splice(indexToRemove, 1);
     const updatedElements = node.blocks[this.state.selectedBlockIndex].elements;
     this.setState({
       selectedElement: updatedElements.length > 0 ? updatedElements[0] : undefined,
       selectedElementIndex: 0,
-      node
-    }, () => this.props.updateNode(node, this.props.nodeIndex));
+      nodeUI
+    }, () => this.props.updateNode(nodeUI, this.props.nodeIndex));
   };
 
   updateTemplateContent = (templateKey: string, value: string) => {
-    const { node } = this.state;
-    node.templates[templateKey].content = value;
+    const { nodeUI } = this.state;
+    nodeUI.model.templates[templateKey].content = value;
     this.setState({
-      node
-    }, () => this.props.updateNode(node, this.props.nodeIndex));
+      nodeUI
+    }, () => this.props.updateNode(nodeUI, this.props.nodeIndex));
   };
 
   updateTemplateDirtyStatus = (templateKey: string, dirty: boolean) => {
-    const { node } = this.state;
-    node.templates[templateKey].dirty = dirty;
+    const { nodeUI } = this.state;
+    nodeUI.model.templates[templateKey].dirty = dirty;
     if (!dirty) {
-      node.templates = this.updateRenderedSection();
+      nodeUI.model.templates = this.updateRenderedSection();
     }
     this.setState({
-      node
-    }, () => this.props.updateNode(node, this.props.nodeIndex));
+      nodeUI
+    }, () => this.props.updateNode(nodeUI, this.props.nodeIndex));
   };
 
   updateNode = (element: IElement) => {
     const { selectedBlock } = this.state;
     if (selectedBlock && this.state.selectedElement) {
       selectedBlock.elements[this.state.selectedElementIndex] = element;
-      let { node } = this.state;
+      const { nodeUI } = this.state;
+      const node = nodeUI.model as IUserNode;
       const newTemplates = this.updateRenderedSection();
       node.templates= newTemplates;
       node.blocks[this.state.selectedBlockIndex] = selectedBlock;
       this.setState({
         selectedBlock,
         selectedElement: element,
-        node
-      }, () => this.props.updateNode(node, this.props.nodeIndex));
+        nodeUI
+      }, () => this.props.updateNode(nodeUI, this.props.nodeIndex));
     }
   };
 
 
   onNodeStepChange = event => {
-    const { node } = this.state;
+    const { nodeUI } = this.state;
     const nodeStep = event.target.value;
-    node.step = nodeStep;
+    nodeUI.model.step = nodeStep;
     this.setState({
       nodeStep,
-      node
-    }, () => this.props.updateNode(node, this.props.nodeIndex));
+      nodeUI
+    }, () => this.props.updateNode(nodeUI, this.props.nodeIndex));
   };
 
   addBlock = () => {
-    const { node } = this.state;
+    const { nodeUI } = this.state;
+    const node = nodeUI.model as IUserNode;
     const block: IBlock = {
       name: 'Form',
       type: 'form',
@@ -200,21 +208,21 @@ class UserNode extends React.Component<IProps, IState> {
     this.setState({
       selectedBlock: block,
       selectedElement: null,
-      node
-    }, () => this.props.updateNode(node, this.props.nodeIndex));
+      nodeUI
+    }, () => this.props.updateNode(nodeUI, this.props.nodeIndex));
   }
 
   addElement = (element: IElement) => {
-    const { selectedBlock } = this.state;
+    const { selectedBlock, nodeUI } = this.state;
+    const node = nodeUI.model as IUserNode;
     if (selectedBlock) {
-      const node = this.state.node;
       selectedBlock.elements.push(element);
       node.blocks[this.state.selectedBlockIndex] = selectedBlock;
       this.setState({
         selectedElement: element,
         selectedElementIndex: selectedBlock.elements.length - 1,
-        node
-      }, () => this.props.updateNode(node, this.props.nodeIndex));
+        nodeUI
+      }, () => this.props.updateNode(nodeUI, this.props.nodeIndex));
     }
   };
 
@@ -227,20 +235,20 @@ class UserNode extends React.Component<IProps, IState> {
   }
 
   toggleContinueNode = () => {
-    const { node } = this.state;
-    const selectedBlock = this.state.selectedBlock;
+    const { selectedBlock, nodeUI } = this.state;
+    const node = nodeUI.model as IUserNode;
     if (selectedBlock) {
       selectedBlock.continueNode = !selectedBlock.continueNode;
       this.setState({selectedBlock}, () => {
         node.blocks[this.state.selectedBlockIndex] = selectedBlock;
-        this.props.updateNode(node, this.props.nodeIndex);
+        this.props.updateNode(nodeUI, this.props.nodeIndex);
       });
     }
   }
 
   render = () => {
-    const { node } = this.state;
-    const { selectedBlock, selectedElement, selectedElementIndex } = this.state;
+    const { nodeUI, selectedBlock, selectedElement, selectedElementIndex } = this.state;
+    const node = nodeUI.model as IUserNode;
     return (
       <Form className="form dropdown-container">
         <Row>

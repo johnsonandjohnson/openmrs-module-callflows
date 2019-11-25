@@ -20,10 +20,11 @@ import {
 } from '../../../reducers/designer.reducer';
 import { IRootState } from '../../../reducers';
 import { Controlled as CodeMirror } from 'react-codemirror2';
-import { SystemNodeUI } from '../../../shared/model/system-node-ui';
+import { ISystemNode } from '../../../shared/model/system-node.model';
+import { NodeUI } from '../../../shared/model/node-ui';
 
 export interface ISystemNodeProps extends StateProps, DispatchProps, RouteComponentProps<{ flowName: string }> {
-  node: SystemNodeUI,
+  nodeUI: NodeUI,
   nodeIndex: number
 };
 
@@ -35,7 +36,7 @@ export class SystemNode extends React.PureComponent<ISystemNodeProps, ISystemNod
   constructor(props) {
     super(props);
     this.state = {
-      nodeValue: this.props.node.templates.velocity.content
+      nodeValue: this.props.nodeUI.model.templates.velocity.content
     };
   }
 
@@ -57,25 +58,26 @@ export class SystemNode extends React.PureComponent<ISystemNodeProps, ISystemNod
   }
 
   handleNodeValueChange = (editor, data, value) => {
-    let node = this.props.node;
-    node.templates.velocity.content = value;
-    this.props.updateNode(node, this.props.nodeIndex);
+    const nodeUI = this.props.nodeUI;
+    nodeUI.model.templates.velocity.content = value;
+    this.props.updateNode(nodeUI, this.props.nodeIndex);
   }
 
   handleNodeNameChange = (event: any) => {
-    let node = this.props.node;
-    node.step = event.target.value;
-    this.props.updateNode(node, this.props.nodeIndex);
+    const nodeUI = this.props.nodeUI;
+    nodeUI.model.step = event.target.value;
+    this.props.updateNode(nodeUI, this.props.nodeIndex);
   }
 
   render() {
+    const node = this.props.nodeUI.model;
     return (
       <div className="system-node">
         <div className="input-group">
           <span className="input-group-addon"> Step </span>
           <input
             className="form-control"
-            value={!!this.props.node.step ? this.props.node.step : ''}
+            value={!!node.step ? node.step : ''}
             onChange={this.handleNodeNameChange}
           />
         </div>
