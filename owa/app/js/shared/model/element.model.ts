@@ -4,9 +4,9 @@ export interface IElement {
   txt: string;
   fieldType?: FieldType;
   dtmfGrammar?: string;
-  goodBye: string;
-  noMatch: string;
-  noInput: string;
+  goodBye?: string;
+  noMatch?: string;
+  noInput?: string;
   voiceGrammar?: string;
   fieldMeta?: string;
   reprompt?: string;
@@ -33,10 +33,7 @@ export enum ElementType {
 export const defaultTxtValue: Readonly<IElement> = {
   name: 'Txt',
   type: ElementType.TXT,
-  txt: '',
-  noInput: '',
-  noMatch: '',
-  goodBye: ''
+  txt: ''
 }
 
 export const defaultFieldValue: Readonly<IElement> = {

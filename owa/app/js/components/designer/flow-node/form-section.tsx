@@ -18,9 +18,9 @@ interface IProps {
 
 interface IState {
   txtValue: string;
-  noInputValue: string;
-  noMatchValue: string;
-  exitValue: string;
+  noInputValue?: string;
+  noMatchValue?: string;
+  exitValue?: string;
 }
 
 export class FormSection extends React.Component<IProps, IState> {
@@ -117,7 +117,7 @@ export class FormSection extends React.Component<IProps, IState> {
               <Tabs>
                 <TabWrapper key="noInput" label={Msg.FLOW_NO_INPUT_LABEL}>
                   <CodeMirror
-                    value={this.state.noInputValue}
+                    value={this.state.noInputValue ? this.state.noInputValue : ''}
                     options={this.options}
                     onBeforeChange={(editor, data, value) => this.setState({ noInputValue: value })}
                     onChange={(editor, data, value) => this.handleCodeChange(editor, data, value, 'noInput')}
@@ -125,7 +125,7 @@ export class FormSection extends React.Component<IProps, IState> {
                 </TabWrapper>
                 <TabWrapper key="noMatch" label={Msg.FLOW_NO_MATCH_LABEL}>
                   <CodeMirror
-                    value={this.state.noMatchValue}
+                    value={this.state.noMatchValue ? this.state.noMatchValue : ''}
                     options={this.options}
                     onBeforeChange={(editor, data, value) => this.setState({ noMatchValue: value })}
                     onChange={(editor, data, value) => this.handleCodeChange(editor, data, value, 'noMatch')}
@@ -133,7 +133,7 @@ export class FormSection extends React.Component<IProps, IState> {
                 </TabWrapper>
                 <TabWrapper key="exit" label={Msg.FLOW_EXIT_LABEL}>
                   <CodeMirror
-                    value={this.state.exitValue}
+                    value={this.state.exitValue ? this.state.exitValue : ''}
                     options={this.options}
                     onBeforeChange={(editor, data, value) => this.setState({ exitValue: value })}
                     onChange={(editor, data, value) => this.handleCodeChange(editor, data, value, 'exit')}
