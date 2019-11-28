@@ -136,7 +136,7 @@ export class FormSection extends React.Component<IProps, IState> {
                     value={this.state.exitValue ? this.state.exitValue : ''}
                     options={this.options}
                     onBeforeChange={(editor, data, value) => this.setState({ exitValue: value })}
-                    onChange={(editor, data, value) => this.handleCodeChange(editor, data, value, 'exit')}
+                    onChange={(editor, data, value) => this.handleCodeChange(editor, data, value, 'goodBye')}
                   />
                 </TabWrapper>
               </Tabs>
