@@ -36,7 +36,7 @@ export class RenderedSections extends React.Component<IProps> {
     };
 
     renderBody = (templateKey: string) => {
-        let template = this.props.templates[templateKey];
+        const template = this.props.templates[templateKey];
         return (!template) ? (<p>{Msg.MISSING_TEMPLATE + templateKey}</p>) : (
             <CodeMirror
                 value={template.content}
@@ -57,8 +57,7 @@ export class RenderedSections extends React.Component<IProps> {
     };
 
     render = () => {
-        let { nodeIndex } = this.props;
-        let { templates } = this.props;
+        const { nodeIndex, templates } = this.props;
         return (!templates) ? null : (
             <div className="body-wrapper">
                 <Tabs id={nodeIndex + '-tabs'}>

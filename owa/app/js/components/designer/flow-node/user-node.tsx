@@ -16,6 +16,7 @@ import { IUserNodeTemplate } from '../../../shared/model/user-node-template.mode
 import _ from 'lodash';
 import { IUserNode } from '../../../shared/model/user-node.model';
 import { NodeUI } from '../../../shared/model/node-ui';
+import { INode } from '../../../shared/model/node.model';
 
 interface IProps extends DispatchProps, RouteComponentProps<{ flowName: string }> {
   initialNodeUI: NodeUI;
@@ -68,7 +69,7 @@ class UserNode extends React.Component<IProps, IState> {
 
   componentDidMount = () => {
     const { nodeUI } = this.state;
-    nodeUI.model.templates = this.updateRenderedSection();
+    nodeUI.model.templates = this.updateRenderedSection(nodeUI.model);
     this.setState({
       nodeUI
     }, () => this.props.updateNode(nodeUI, this.props.nodeIndex));
@@ -105,7 +106,7 @@ class UserNode extends React.Component<IProps, IState> {
     return template;
   }
 
-  updateRenderedSection = (): Map<string, IUserNodeTemplate> => {
+  updateRenderedSection = (node: INode): Map<string, IUserNodeTemplate> => {
     let newTemplates = {} as Map<string, IUserNodeTemplate>;
     this.props.renderers.map((rendererUi) => {
       const renderer: RendererModel = rendererUi.renderer;
@@ -115,7 +116,7 @@ class UserNode extends React.Component<IProps, IState> {
           newTemplates[renderer.name] = template;
         } else {
           const compiledTpl = _u.template(renderer.template);
-          template.content = compiledTpl({node: this.state.nodeUI, flow: this.props.currentFlow});
+          template.content = compiledTpl({ node, flow: this.props.currentFlow });
           newTemplates[renderer.name] = template;
         }
       }
@@ -161,7 +162,7 @@ class UserNode extends React.Component<IProps, IState> {
     const { nodeUI } = this.state;
     nodeUI.model.templates[templateKey].dirty = dirty;
     if (!dirty) {
-      nodeUI.model.templates = this.updateRenderedSection();
+      nodeUI.model.templates = this.updateRenderedSection(nodeUI.model);
     }
     this.setState({
       nodeUI
@@ -174,9 +175,8 @@ class UserNode extends React.Component<IProps, IState> {
       selectedBlock.elements[this.state.selectedElementIndex] = element;
       const { nodeUI } = this.state;
       const node = nodeUI.model as IUserNode;
-      const newTemplates = this.updateRenderedSection();
-      node.templates= newTemplates;
       node.blocks[this.state.selectedBlockIndex] = selectedBlock;
+      node.templates = this.updateRenderedSection(node);
       this.setState({
         selectedBlock,
         selectedElement: element,
@@ -295,12 +295,12 @@ class UserNode extends React.Component<IProps, IState> {
             update={this.updateNode}
           />
         )}
-        {<RenderedSections
+        <RenderedSections
           key={this.props.nodeIndex + '-rendered-section'}
           templates={node.templates}
           nodeIndex={this.props.nodeIndex}
           updateTemplateContent={this.updateTemplateContent}
-          updateTemplateDirtyStatus={this.updateTemplateDirtyStatus} />}
+          updateTemplateDirtyStatus={this.updateTemplateDirtyStatus} />
       </Form>
     );
   };
