@@ -8,6 +8,7 @@ export interface IUserNode {
   templates: Map<string, IUserNodeTemplate>;
   blocks: Array<IBlock>;
   step: string;
+  continueNode?: boolean;
 }
 
 export const defaultValue: Readonly<IUserNode> = {

@@ -101,7 +101,7 @@ class UserNode extends React.Component<IProps, IState> {
   getExistingTemplateOrCreate = (templateKey: string): IUserNodeTemplate => {
     let template: IUserNodeTemplate = this.state.nodeUI.model.templates[templateKey];
     if (!template) {
-      template = {dirty: false} as IUserNodeTemplate;
+      template = { dirty: false } as IUserNodeTemplate;
     }
     return template;
   }
@@ -235,15 +235,13 @@ class UserNode extends React.Component<IProps, IState> {
   }
 
   toggleContinueNode = () => {
-    const { selectedBlock, nodeUI } = this.state;
+    const { nodeUI } = this.state;
     const node = nodeUI.model as IUserNode;
-    if (selectedBlock) {
-      selectedBlock.continueNode = !selectedBlock.continueNode;
-      this.setState({selectedBlock}, () => {
-        node.blocks[this.state.selectedBlockIndex] = selectedBlock;
-        this.props.updateNode(nodeUI, this.props.nodeIndex);
-      });
-    }
+    node.continueNode = !node.continueNode;
+    nodeUI.model = node;
+    this.setState({ nodeUI }, () => {
+      this.props.updateNode(nodeUI, this.props.nodeIndex);
+    });
   }
 
   render = () => {
@@ -271,7 +269,7 @@ class UserNode extends React.Component<IProps, IState> {
         <Row>
           <Col md={12}>
             <FormGroup controlId="callAllowed">
-              <Checkbox name="callAllowed" checked={selectedBlock && selectedBlock.continueNode}
+              <Checkbox name="callAllowed" checked={node.continueNode}
                 onChange={this.toggleContinueNode}>
                 Check this if you want to submit to the server even if no fields are configured
               </Checkbox>
