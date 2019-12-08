@@ -75,7 +75,7 @@ public class CFLPersonServiceImpl extends HibernateOpenmrsDataDAO<PersonAttribut
 			cflPerson.setConsentId(dndConsent.getId());
 		}
 
-		PersonAttribute patientStatus = person.getAttribute("PatientStatus");
+		PersonAttribute patientStatus = person.getAttribute("Patient status");
 		if (patientStatus != null) {
 			cflPerson.setActivated(StringUtils.equalsIgnoreCase(patientStatus.getValue(), "Active"));
 		}
