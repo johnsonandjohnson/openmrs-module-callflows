@@ -6,7 +6,8 @@ public class CFLPerson {
 	private boolean consent = true;
 	private boolean activated = true;
 	private String phoneNumber;
-	private int consentId;
+	private Integer consentId;
+	private String personUuid;
 
 	public boolean isCaregiver() {
 		return caregiver;
@@ -40,11 +41,19 @@ public class CFLPerson {
 		this.phoneNumber = phoneNumber;
 	}
 
-	public int getConsentId() {
+	public Integer getConsentId() {
 		return consentId;
 	}
 
-	public void setConsentId(int consentId) {
+	public void setConsentId(Integer consentId) {
 		this.consentId = consentId;
+	}
+
+	public String getPersonUuid() {
+		return personUuid;
+	}
+
+	public void setPersonUuid(String personUuid) {
+		this.personUuid = personUuid;
 	}
 }

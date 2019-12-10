@@ -81,7 +81,7 @@ public class CFLPersonServiceITTest extends BaseModuleContextSensitiveTest {
 	public void shouldUpdateExistingConsent() {
 		assertThat(consentAttribute1.getValue(), equalTo(PERSON1_CONSENT));
 
-		cflPersonService.saveConsent(consentAttribute1.getId(), PERSON2_CONSENT);
+		cflPersonService.saveConsent(consentAttribute1.getId(), PERSON2_CONSENT, "test");
 
 		assertThat(
 				personService.getPersonAttribute(consentAttribute1.getId()).getValue(), equalTo(PERSON2_CONSENT));

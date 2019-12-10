@@ -6,5 +6,5 @@ public interface CFLPersonService {
 
 	CFLPerson findByPhone(String phone);
 
-	void saveConsent(int consentId, String value);
+	void saveConsent(Integer consentId, String value, String personUuid);
 }

@@ -7,6 +7,7 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 import org.openmrs.Person;
 import org.openmrs.PersonAttribute;
+import org.openmrs.PersonAttributeType;
 import org.openmrs.Relationship;
 import org.openmrs.RelationshipType;
 import org.openmrs.api.db.PersonDAO;
@@ -24,6 +25,8 @@ import java.util.List;
 @Service("cflPersonService")
 @Transactional
 public class CFLPersonServiceImpl extends HibernateOpenmrsDataDAO<PersonAttribute> implements CFLPersonService {
+
+	private static final String CONSENT_TYPE_UUID = "a5476c49-32d2-489e-a90b-d08be4b5cff9";
 
 	@Autowired
 	private DbSessionFactory sessionFactory;
@@ -45,15 +48,36 @@ public class CFLPersonServiceImpl extends HibernateOpenmrsDataDAO<PersonAttribut
 		if (CollectionUtils.isEmpty(personAttributes)) {
 			return null;
 		} else {
-			return convertToCFLPerson(personAttributes.get(0).getPerson(), phone);
+			Person person = null;
+			for (PersonAttribute personAttribute : personAttributes) {
+				if (!personAttribute.getVoided() &&
+						!personAttribute.getPerson().getVoided() &&
+						!personAttribute.getPerson().getDead()) {
+					person = personAttribute.getPerson();
+				}
+			}
+			return person == null ? null : convertToCFLPerson(person, phone);
 		}
 	}
 
 	@Override
-	public void saveConsent(int consentId, String value) {
-		PersonAttribute personAttribute = personDAO.getPersonAttribute(consentId);
-		personAttribute.setValue(value);
-		getSession().saveOrUpdate(personAttribute);
+	public void saveConsent(Integer consentId, String value, String personUuid) {
+		if (consentId == null) {
+			Person person = personDAO.getPersonByUuid(personUuid);
+
+			PersonAttributeType personAttributeType = personDAO.getPersonAttributeTypeByUuid(CONSENT_TYPE_UUID);
+
+			PersonAttribute personAttribute = new PersonAttribute();
+			personAttribute.setAttributeType(personAttributeType);
+			personAttribute.setValue(value);
+
+			person.addAttribute(personAttribute);
+			personDAO.savePerson(person);
+		} else {
+			PersonAttribute personAttribute = personDAO.getPersonAttribute(consentId);
+			personAttribute.setValue(value);
+			getSession().saveOrUpdate(personAttribute);
+		}
 	}
 
 	private DbSession getSession() {
@@ -61,13 +85,8 @@ public class CFLPersonServiceImpl extends HibernateOpenmrsDataDAO<PersonAttribut
 	}
 
 	private CFLPerson convertToCFLPerson(Person person, String phone) {
-		List<RelationshipType> relationshipTypes =
-				personDAO.getRelationshipTypes("Caregiver/Caretaker", null);
-		List<Relationship> relationships = personDAO.getRelationships(person, null,
-				CollectionUtils.isEmpty(relationshipTypes) ? null : relationshipTypes.get(0));
-
 		CFLPerson cflPerson = new CFLPerson();
-		cflPerson.setCaregiver(!CollectionUtils.isEmpty(relationships));
+		cflPerson.setCaregiver(isCaregiver(person));
 
 		PersonAttribute dndConsent = person.getAttribute("dndConsent");
 		if (dndConsent != null) {
@@ -81,6 +100,16 @@ public class CFLPersonServiceImpl extends HibernateOpenmrsDataDAO<PersonAttribut
 		}
 
 		cflPerson.setPhoneNumber(phone);
+		cflPerson.setPersonUuid(person.getUuid());
 		return cflPerson;
+	}
+
+	private boolean isCaregiver(Person person) {
+		List<RelationshipType> relationshipTypes =
+				personDAO.getRelationshipTypes("Caregiver/Caretaker", null);
+		List<Relationship> relationships = personDAO.getRelationships(person, null,
+				CollectionUtils.isEmpty(relationshipTypes) ? null : relationshipTypes.get(0));
+
+		return !CollectionUtils.isEmpty(relationships);
 	}
 }
