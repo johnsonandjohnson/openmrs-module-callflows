@@ -285,7 +285,8 @@ public class CallController extends RestController {
                                                      @RequestParam Map<String, String> params,
                                                      @RequestHeader Map<String, String> headers) {
 
-        LOGGER.debug(String.format("handleContinuation(callId=%s, params=%s, headers=%s", callId, params, headers));
+        LOGGER.debug(String.format("handleContinuation(callId=%s, params=%s, headers=%s, extension=%s",
+                callId, params, headers, extension));
 
         // The requested configuration from the URL
         Config config = null;
@@ -308,11 +309,11 @@ public class CallController extends RestController {
         try {
             // load current call here persisted from the last persistence
             call = callService.findByCallId(callId);
-
             // The configuration is part of the call, and hence why we need to retrieve the call first
             config = configService.getConfig(call.getConfig());
 
             context = initContext(config, params);
+            updateValueOfNextURL(request, extension, context, call);
 
             // merge back
             callUtil.mergeCallWithContext(call, context);
@@ -509,6 +510,20 @@ public class CallController extends RestController {
         // We couldn't find some services
         if (!notFoundServices.toString().isEmpty()) {
             throw new IllegalStateException(String.format("Didn't load some services %s", notFoundServices));
+        }
+    }
+
+    private void updateValueOfNextURL(HttpServletRequest request, String extension,
+            VelocityContext context, Call call) {
+        Map<String, Object> callContext =  call.getContext();
+        String nextUrlValue = callUtil.buildContinuationUrl(request, call, extension);
+        if (callContext != null) {
+            Map internal = (Map<String, String>) callContext.get(KEY_INTERNAL);
+            if (internal != null) {
+                internal.put(KEY_NEXT_URL, nextUrlValue);
+            }
+        } else {
+            setInInternalContext(context, KEY_NEXT_URL, nextUrlValue);
         }
     }
 
