@@ -238,6 +238,7 @@ class UserNode extends React.Component<IProps, IState> {
     const { nodeUI } = this.state;
     const node = nodeUI.model as IUserNode;
     node.continueNode = !node.continueNode;
+    node.templates = this.updateRenderedSection(node);
     nodeUI.model = node;
     this.setState({ nodeUI }, () => {
       this.props.updateNode(nodeUI, this.props.nodeIndex);
