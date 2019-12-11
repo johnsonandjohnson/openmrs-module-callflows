@@ -7,6 +7,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.runtime.log.Log4JLogChute;
+import org.openmrs.Person;
+import org.openmrs.PersonAttribute;
 import org.openmrs.api.context.ServiceContext;
 import org.openmrs.module.callflows.api.contract.OutboundCallResponse;
 import org.openmrs.module.callflows.api.domain.Call;
@@ -115,6 +117,8 @@ public class CallController extends RestController {
     private static final String HEADER_CONTENT_TYPE = "Content-Type";
     private static final int DEFAULT_FETCH_SIZE = 10000;
     private static final int NUMBER_OF_TEN_K_FILES = 5;
+    private static final String TELEPHONE_NUMBER = "Telephone Number";
+    public static final String OPENMRS_PREFIX = "openmrs/";
 
     @Autowired
     private ConfigService configService;
@@ -398,6 +402,24 @@ public class CallController extends RestController {
         return call != null ? new OutboundCallResponse(call) : null;
     }
 
+    @RequestMapping(value = "/person/{personId}/out/{configName}/flows/{name}.{extension}")
+    public String handleOutgoingByPatientUuid(@PathVariable(value = "configName") String configName,
+            @PathVariable(value = "name") String name,
+            @PathVariable(value = "extension") String extension,
+            @PathVariable(value = "personId") Person person,
+            @RequestParam(value = "returnUrl") String returnUrl) {
+        String phoneNumber = getTelephoneFromPerson(person);
+        if (StringUtils.isNotBlank(phoneNumber)) {
+            Map<String, Object> params = new HashMap<>();
+            params.put(Constants.PARAM_PHONE, phoneNumber);
+            callService.makeCall(configName, name, params);
+            return "redirect:" + createReturnUrl(returnUrl);
+        } else {
+            throw new IllegalArgumentException(String.format("Missing phone number for %s person", person));
+        }
+
+    }
+
     @RequestMapping(value = "/calls/export-details", method = RequestMethod.GET)
     @ResponseBody
     public Map<String, Object> exportCallsDetails(@RequestParam(defaultValue = "1", value = "set") Integer set,
@@ -525,6 +547,24 @@ public class CallController extends RestController {
         } else {
             setInInternalContext(context, KEY_NEXT_URL, nextUrlValue);
         }
+    }
+
+    private String createReturnUrl(String returnUrl) {
+        if (returnUrl.contains(OPENMRS_PREFIX)) {
+            returnUrl = returnUrl.replace(OPENMRS_PREFIX, StringUtils.EMPTY);
+        }
+        return returnUrl;
+    }
+
+    private String getTelephoneFromPerson(Person person) {
+        String phoneNumber = null;
+        if (person != null) {
+            PersonAttribute telephoneAttribute = person.getAttribute(TELEPHONE_NUMBER);
+            if (telephoneAttribute != null) {
+                phoneNumber = telephoneAttribute.getValue();
+            }
+        }
+        return phoneNumber;
     }
 
 }
