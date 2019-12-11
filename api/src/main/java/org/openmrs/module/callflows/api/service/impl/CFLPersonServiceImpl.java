@@ -11,6 +11,7 @@ import org.openmrs.PersonAttributeType;
 import org.openmrs.Relationship;
 import org.openmrs.RelationshipType;
 import org.openmrs.api.db.PersonDAO;
+import org.openmrs.api.db.UserDAO;
 import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.api.db.hibernate.DbSessionFactory;
 import org.openmrs.api.db.hibernate.HibernateOpenmrsDataDAO;
@@ -33,6 +34,9 @@ public class CFLPersonServiceImpl extends HibernateOpenmrsDataDAO<PersonAttribut
 
 	@Autowired
 	private PersonDAO personDAO;
+
+	@Autowired
+	private UserDAO userDAO;
 
 	public CFLPersonServiceImpl() {
 		super(PersonAttribute.class);
@@ -70,6 +74,7 @@ public class CFLPersonServiceImpl extends HibernateOpenmrsDataDAO<PersonAttribut
 			PersonAttribute personAttribute = new PersonAttribute();
 			personAttribute.setAttributeType(personAttributeType);
 			personAttribute.setValue(value);
+			personAttribute.setCreator(userDAO.getUserByUsername("admin"));
 
 			person.addAttribute(personAttribute);
 			personDAO.savePerson(person);
