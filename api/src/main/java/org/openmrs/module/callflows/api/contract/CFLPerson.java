@@ -3,7 +3,7 @@ package org.openmrs.module.callflows.api.contract;
 public class CFLPerson {
 
 	private boolean caregiver = false;
-	private boolean consent = true;
+	private boolean consent = false;
 	private boolean activated = true;
 	private String phoneNumber;
 	private Integer consentId;
