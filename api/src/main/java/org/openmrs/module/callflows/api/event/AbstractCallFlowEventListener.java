@@ -1,29 +1,42 @@
 package org.openmrs.module.callflows.api.event;
 
 import org.openmrs.api.context.Context;
+import org.openmrs.api.context.Daemon;
 import org.openmrs.event.EventListener;
+import org.openmrs.module.DaemonToken;
 import org.openmrs.module.callflows.api.exception.CallFlowRuntimeException;
 
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
 import javax.jms.JMSException;
 import javax.jms.MapMessage;
 import javax.jms.Message;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class AbstractCallFlowEventListener implements EventListener {
+
+	private DaemonToken daemonToken;
 
 	@Override
 	public void onMessage(Message message) {
 		try {
 			Map<String, Object> properties = getProperties(message);
-			handleEvent(properties);
+			Daemon.runInDaemonThread(new Runnable() {
+				@Override
+				public void run() {
+					handleEvent(properties);
+				}
+			}, daemonToken);
 		} catch(JMSException ex) {
 			throw new CallFlowRuntimeException("Error during handling Call Flow event", ex);
 		}
 	}
 
 	public abstract String getSubject();
+
+	public void setDaemonToken(DaemonToken daemonToken) {
+		this.daemonToken = daemonToken;
+	}
 
 	protected abstract void handleEvent(Map<String, Object> properties);
 

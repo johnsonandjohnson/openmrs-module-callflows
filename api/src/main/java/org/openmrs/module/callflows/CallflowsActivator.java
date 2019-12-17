@@ -11,13 +11,19 @@ package org.openmrs.module.callflows;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.BaseModuleActivator;
+import org.openmrs.module.DaemonToken;
+import org.openmrs.module.DaemonTokenAware;
+import org.openmrs.module.callflows.api.event.AbstractCallFlowEventListener;
 import org.openmrs.module.callflows.api.event.CallFlowEventListenerFactory;
+
+import java.util.List;
 
 /**
  * This class contains the logic that is run every time this module is either started or shutdown
  */
-public class CallflowsActivator extends BaseModuleActivator {
+public class CallflowsActivator extends BaseModuleActivator implements DaemonTokenAware {
 	
 	private static final Log LOGGER = LogFactory.getLog(CallflowsActivator.class);
 	
@@ -45,5 +51,14 @@ public class CallflowsActivator extends BaseModuleActivator {
 	public void stopped() {
 		LOGGER.info("Stopped Sms");
 		CallFlowEventListenerFactory.unRegisterEventListeners();
+	}
+
+	@Override
+	public void setDaemonToken(DaemonToken daemonToken) {
+		LOGGER.info("Set daemon token to Callflows Module event listeners");
+		List<AbstractCallFlowEventListener> eventComponents = Context.getRegisteredComponents(AbstractCallFlowEventListener.class);
+		for (AbstractCallFlowEventListener eventListener : eventComponents) {
+			eventListener.setDaemonToken(daemonToken);
+		}
 	}
 }
