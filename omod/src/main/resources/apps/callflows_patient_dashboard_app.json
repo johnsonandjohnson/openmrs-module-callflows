@@ -9,9 +9,9 @@
               "extensionPointId": "patientDashboard.overallActions",
               "type": "link",
               "order": 26,
-              "label": "Init call",
+              "label": "callflows.initcall.button",
               "icon":"icon-phone-sign",
-              "url": "/ws/callflows/person/{{patient.uuid}}/out/voxeo-mobile/flows/OutgoingFlow.ccxml"
+              "url": "/ws/callflows/person/{{patient.uuid}}/out/voxeo-mobile/flows/MainFlow.ccxml"
           }
       ]
   }
