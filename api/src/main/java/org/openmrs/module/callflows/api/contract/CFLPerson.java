@@ -1,13 +1,40 @@
 package org.openmrs.module.callflows.api.contract;
 
-public class CFLPerson {
+import org.openmrs.Person;
+import org.openmrs.PersonAttribute;
 
-	private boolean caregiver = false;
-	private boolean consent = false;
-	private boolean activated = true;
-	private String phoneNumber;
-	private Integer consentId;
-	private String personUuid;
+public class CFLPerson {
+	private static final String TELEPHONE_NUMBER_TYPE = "Telephone Number";
+	private Person person;
+	private String phone;
+	private boolean caregiver;
+	private boolean patient;
+	private Integer personId;
+
+	public CFLPerson(Person person, boolean caregiver) {
+		this.person = person;
+		this.personId = person.getPersonId();
+		this.caregiver = caregiver;
+		this.patient = person.getIsPatient();
+		PersonAttribute personAttribute = person.getAttribute(TELEPHONE_NUMBER_TYPE);
+		this.phone = personAttribute != null ? personAttribute.getValue() : null;
+	}
+
+	public Person getPerson() {
+		return person;
+	}
+
+	public void setPerson(Person person) {
+		this.person = person;
+	}
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
 
 	public boolean isCaregiver() {
 		return caregiver;
@@ -17,43 +44,19 @@ public class CFLPerson {
 		this.caregiver = caregiver;
 	}
 
-	public boolean isConsent() {
-		return consent;
+	public boolean isPatient() {
+		return patient;
 	}
 
-	public void setConsent(boolean consent) {
-		this.consent = consent;
+	public void setPatient(boolean patient) {
+		this.patient = patient;
 	}
 
-	public boolean isActivated() {
-		return activated;
+	public Integer getPersonId() {
+		return personId;
 	}
 
-	public void setActivated(boolean activated) {
-		this.activated = activated;
-	}
-
-	public String getPhoneNumber() {
-		return phoneNumber;
-	}
-
-	public void setPhoneNumber(String phoneNumber) {
-		this.phoneNumber = phoneNumber;
-	}
-
-	public Integer getConsentId() {
-		return consentId;
-	}
-
-	public void setConsentId(Integer consentId) {
-		this.consentId = consentId;
-	}
-
-	public String getPersonUuid() {
-		return personUuid;
-	}
-
-	public void setPersonUuid(String personUuid) {
-		this.personUuid = personUuid;
+	public void setPersonId(Integer personId) {
+		this.personId = personId;
 	}
 }

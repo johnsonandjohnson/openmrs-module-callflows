@@ -1,7 +1,6 @@
 package org.openmrs.module.callflows.api.service.impl;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
@@ -10,6 +9,7 @@ import org.openmrs.PersonAttribute;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.Relationship;
 import org.openmrs.RelationshipType;
+import org.openmrs.api.context.Context;
 import org.openmrs.api.db.PersonDAO;
 import org.openmrs.api.db.UserDAO;
 import org.openmrs.api.db.hibernate.DbSession;
@@ -21,13 +21,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service("cflPersonService")
 @Transactional
 public class CFLPersonServiceImpl extends HibernateOpenmrsDataDAO<PersonAttribute> implements CFLPersonService {
 
-	private static final String CONSENT_TYPE_UUID = "a5476c49-32d2-489e-a90b-d08be4b5cff9";
+	private static final String CAREGIVER_RELATIONSHIP_UUID = "acec590b-825e-45d2-876a-0028f174903d";
+	private static final String ADMIN_USER = "admin";
 
 	@Autowired
 	private DbSessionFactory sessionFactory;
@@ -43,45 +45,42 @@ public class CFLPersonServiceImpl extends HibernateOpenmrsDataDAO<PersonAttribut
 	}
 
 	@Override
-	public CFLPerson findByPhone(String phone) {
+	public List<CFLPerson> findByPhone(String phone, boolean dead) {
 		Criteria crit = getSession().createCriteria(this.mappedClass);
 		crit.add(Restrictions.like("value", phone, MatchMode.EXACT));
+		crit.add(Restrictions.eq("voided", false));
 
 		List<PersonAttribute> personAttributes = crit.list();
 
-		if (CollectionUtils.isEmpty(personAttributes)) {
-			return null;
-		} else {
-			Person person = null;
-			for (PersonAttribute personAttribute : personAttributes) {
-				if (!personAttribute.getVoided() &&
-						!personAttribute.getPerson().getVoided() &&
-						!personAttribute.getPerson().getDead()) {
-					person = personAttribute.getPerson();
-				}
+		List<CFLPerson> cflPersonList = new ArrayList<>();
+		for (PersonAttribute personAttribute : personAttributes) {
+			if (!personAttribute.getPerson().getVoided() &&
+					(dead || !personAttribute.getPerson().getDead())) {
+				Person person = personAttribute.getPerson();
+				cflPersonList.add(new CFLPerson(person, isCaregiver(person)));
 			}
-			return person == null ? null : convertToCFLPerson(person, phone);
 		}
+
+		return cflPersonList;
 	}
 
 	@Override
-	public void saveConsent(Integer consentId, String value, String personUuid) {
-		if (consentId == null) {
-			Person person = personDAO.getPersonByUuid(personUuid);
+	public void savePersonAttribute(Integer personId, String attributeTypeName, String attributeValue) {
+		Person person = personDAO.getPerson(personId);
 
-			PersonAttributeType personAttributeType = personDAO.getPersonAttributeTypeByUuid(CONSENT_TYPE_UUID);
+		List<PersonAttributeType> personAttributeTypes = personDAO.getPersonAttributeTypes
+				(attributeTypeName, null, null, null);
 
+		if (CollectionUtils.isNotEmpty(personAttributeTypes)) {
 			PersonAttribute personAttribute = new PersonAttribute();
-			personAttribute.setAttributeType(personAttributeType);
-			personAttribute.setValue(value);
-			personAttribute.setCreator(userDAO.getUserByUsername("admin"));
+			personAttribute.setAttributeType(personAttributeTypes.get(0));
+			personAttribute.setValue(attributeValue);
+			if (Context.isSessionOpen() && !Context.isAuthenticated()) {
+				personAttribute.setCreator(userDAO.getUserByUsername(ADMIN_USER));
+			}
 
 			person.addAttribute(personAttribute);
 			personDAO.savePerson(person);
-		} else {
-			PersonAttribute personAttribute = personDAO.getPersonAttribute(consentId);
-			personAttribute.setValue(value);
-			getSession().saveOrUpdate(personAttribute);
 		}
 	}
 
@@ -89,32 +88,14 @@ public class CFLPersonServiceImpl extends HibernateOpenmrsDataDAO<PersonAttribut
 		return sessionFactory.getCurrentSession();
 	}
 
-	private CFLPerson convertToCFLPerson(Person person, String phone) {
-		CFLPerson cflPerson = new CFLPerson();
-		cflPerson.setCaregiver(isCaregiver(person));
-
-		PersonAttribute dndConsent = person.getAttribute("dndConsent");
-		if (dndConsent != null) {
-			cflPerson.setConsent(StringUtils.equalsIgnoreCase(dndConsent.getValue(), "true"));
-			cflPerson.setConsentId(dndConsent.getId());
-		}
-
-		PersonAttribute patientStatus = person.getAttribute("Patient status");
-		if (patientStatus != null) {
-			cflPerson.setActivated(StringUtils.equalsIgnoreCase(patientStatus.getValue(), "Active"));
-		}
-
-		cflPerson.setPhoneNumber(phone);
-		cflPerson.setPersonUuid(person.getUuid());
-		return cflPerson;
-	}
-
 	private boolean isCaregiver(Person person) {
-		List<RelationshipType> relationshipTypes =
-				personDAO.getRelationshipTypes("Caregiver/Caretaker", null);
-		List<Relationship> relationships = personDAO.getRelationships(person, null,
-				CollectionUtils.isEmpty(relationshipTypes) ? null : relationshipTypes.get(0));
+		RelationshipType relationshipType = personDAO.getRelationshipTypeByUuid(CAREGIVER_RELATIONSHIP_UUID);
 
-		return !CollectionUtils.isEmpty(relationships);
+		if (relationshipType == null) {
+			return false;
+		} else {
+			List<Relationship> relationships = personDAO.getRelationships(person, null, relationshipType);
+			return !CollectionUtils.isEmpty(relationships);
+		}
 	}
 }

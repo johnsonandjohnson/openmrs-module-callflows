@@ -2,106 +2,124 @@ package org.openmrs.module.callflows.api.service.it;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.openmrs.Person;
 import org.openmrs.PersonAttribute;
-import org.openmrs.PersonAttributeType;
-import org.openmrs.PersonName;
-import org.openmrs.api.PersonService;
+import org.openmrs.api.db.PersonDAO;
 import org.openmrs.module.callflows.api.contract.CFLPerson;
+import org.openmrs.module.callflows.api.helper.PersonHelper;
 import org.openmrs.module.callflows.api.service.CFLPersonService;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
+
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 public class CFLPersonServiceITTest extends BaseModuleContextSensitiveTest {
 
-	private static final String PERSON1_PHONE = "111111111111";
-	private static final String PERSON1_CONSENT = "true";
+	private static final String XML_DATA_SET_PATH = "datasets/";
+	private static final String PERSON_DATA_SET = "PersonDataSet.xml";
 
-	private static final String PERSON2_PHONE = "2222222222";
-	private static final String PERSON2_CONSENT = "false";
+	private static final String PATIENT_STATUS_TYPE = "Patient status";
 
 	@Autowired
 	private CFLPersonService cflPersonService;
 
 	@Autowired
-	private PersonService personService;
-
-	private PersonAttributeType phoneType;
-	private PersonAttributeType consentType;
-
-	private PersonAttribute consentAttribute1;
-	private PersonAttribute consentAttribute2;
+	private PersonDAO personDAO;
 
 	@Before
-	public void setUp() {
-		phoneType = new PersonAttributeType();
-		phoneType.setName("Telephone Number");
-		phoneType.setFormat(String.class.getName());
-
-		consentType = new PersonAttributeType();
-		consentType.setName("dndConsent");
-		consentType.setFormat(String.class.getName());
-
-		personService.savePersonAttributeType(phoneType);
-		personService.savePersonAttributeType(consentType);
-
-		consentAttribute1 = new PersonAttribute();
-		consentAttribute1.setAttributeType(consentType);
-		consentAttribute1.setValue(PERSON1_CONSENT);
-
-		consentAttribute2 = new PersonAttribute();
-		consentAttribute2.setAttributeType(consentType);
-		consentAttribute2.setValue(PERSON2_CONSENT);
-
-		createPersonWithData(PERSON1_PHONE, consentAttribute1);
-		createPersonWithData(PERSON2_PHONE, consentAttribute2);
+	public void setUp() throws Exception {
+		executeDataSet(XML_DATA_SET_PATH + PERSON_DATA_SET);
 	}
 
 	@Test
-	public void shouldReturnProperCFLPerson() {
-		CFLPerson actual = cflPersonService.findByPhone(PERSON1_PHONE);
+	public void shouldFind3PersonsByPhoneWithDeadFalse() {
+		List<CFLPerson> persons = cflPersonService.findByPhone(PersonHelper.PHONE_NUMBER1, false);
 
-		assertThat(actual.getPhoneNumber(), equalTo(PERSON1_PHONE));
-		assertTrue(actual.isConsent());
+		assertThat(persons.size(), equalTo(3));
+		assertThat(PersonHelper.containsPerson(persons, PersonHelper.FIRST_CAREGIVER_NAME), equalTo(true));
+		assertThat(PersonHelper.containsPerson(persons, PersonHelper.SECOND_CAREGIVER_NAME), equalTo(true));
+		assertThat(PersonHelper.containsPerson(persons, PersonHelper.NO_CONSENT_PATIENT_NAME), equalTo(true));
 	}
 
 	@Test
-	public void shouldReturnNullIfCFLPersonNotFound() {
-		CFLPerson actual = cflPersonService.findByPhone("wrong number");
+	public void shouldFind1PersonByPhoneExcludingVoidedNumberWithDeadFalse() {
+		List<CFLPerson> persons = cflPersonService.findByPhone(PersonHelper.PHONE_NUMBER2, false);
 
-		assertNull(actual);
+		assertThat(persons.size(), equalTo(1));
+		assertTrue(PersonHelper.containsPerson(persons, PersonHelper.THIRD_CAREGIVER_NAME));
+		assertThat(persons.get(0).getPhone(), equalTo(PersonHelper.PHONE_NUMBER2));
+		assertNotNull(persons.get(0).getPerson());
+		assertTrue(persons.get(0).isCaregiver());
+		assertFalse(persons.get(0).isPatient());
+		assertThat(persons.get(0).getPersonId(), equalTo(PersonHelper.THIRD_CAREGIVER_ID));
 	}
 
 	@Test
-	public void shouldUpdateExistingConsent() {
-		assertThat(consentAttribute1.getValue(), equalTo(PERSON1_CONSENT));
+	public void shouldFind2PersonsByPhoneWithDeadTrue() {
+		List<CFLPerson> persons = cflPersonService.findByPhone(PersonHelper.PHONE_NUMBER2, true);
 
-		cflPersonService.saveConsent(consentAttribute1.getId(), PERSON2_CONSENT, "test");
-
-		assertThat(
-				personService.getPersonAttribute(consentAttribute1.getId()).getValue(), equalTo(PERSON2_CONSENT));
+		assertThat(persons.size(), equalTo(2));
+		assertTrue(PersonHelper.containsPerson(persons, PersonHelper.THIRD_CAREGIVER_NAME));
+		assertTrue(PersonHelper.containsPerson(persons, PersonHelper.DEAD_PATIENT_NAME));
 	}
 
-	private void createPersonWithData(String phoneNumber, PersonAttribute consentAttribute) {
-		Person person = new Person();
+	@Test
+	public void shouldFind1PersonByPhoneWithDeadFalse() {
+		List<CFLPerson> persons = cflPersonService.findByPhone(PersonHelper.PHONE_NUMBER3, false);
 
-		PersonName personName = new PersonName();
-		personName.setFamilyName("Family Name");
-		personName.setGivenName("Given Name");
-		person.addName(personName);
+		assertThat(persons.size(), equalTo(1));
+		assertTrue(PersonHelper.containsPerson(persons, PersonHelper.ACTIVE_PATIENT_NAME));
+		assertThat(persons.get(0).getPhone(), equalTo(PersonHelper.PHONE_NUMBER3));
+		assertNotNull(persons.get(0).getPerson());
+		assertFalse(persons.get(0).isCaregiver());
+		assertTrue(persons.get(0).isPatient());
+		assertThat(persons.get(0).getPersonId(), equalTo(PersonHelper.ACTIVE_PATIENT_ID));
+	}
 
-		PersonAttribute phoneAttribute = new PersonAttribute();
-		phoneAttribute.setAttributeType(phoneType);
-		phoneAttribute.setValue(phoneNumber);
+	@Test
+	public void shouldSavePersonStatusIfNotExisting() {
+		final String statusValue = "ACTIVE";
 
-		person.addAttribute(phoneAttribute);
-		person.addAttribute(consentAttribute);
+		cflPersonService.savePersonAttribute(
+				PersonHelper.FIRST_CAREGIVER_ID, PATIENT_STATUS_TYPE, statusValue);
 
-		personService.savePerson(person);
+		PersonAttribute personAttribute =
+				personDAO.getPerson(PersonHelper.FIRST_CAREGIVER_ID).getAttribute(PATIENT_STATUS_TYPE);
+
+		assertNotNull(personAttribute);
+		assertThat(personAttribute.getValue(), equalTo(statusValue));
+	}
+
+	@Test
+	public void shouldSavePersonStatusWithExistingCurrentValue() {
+		final String statusValue = "DEACTIVATE";
+
+		cflPersonService.savePersonAttribute(
+				PersonHelper.NO_CONSENT_PATIENT_ID, PATIENT_STATUS_TYPE, statusValue);
+
+		PersonAttribute personAttribute =
+				personDAO.getPerson(PersonHelper.NO_CONSENT_PATIENT_ID).getAttribute(PATIENT_STATUS_TYPE);
+
+		assertNotNull(personAttribute);
+		assertThat(personAttribute.getValue(), equalTo(statusValue));
+	}
+
+	@Test
+	public void shouldSavePersonStatusWithExistingCurrentValueAndWithTheVoidedOne() {
+		final String statusValue = "NO_CONSENT";
+
+		cflPersonService.savePersonAttribute(
+				PersonHelper.DEAD_PATIENT_ID, PATIENT_STATUS_TYPE, statusValue);
+
+		PersonAttribute personAttribute =
+				personDAO.getPerson(PersonHelper.DEAD_PATIENT_ID).getAttribute(PATIENT_STATUS_TYPE);
+
+		assertNotNull(personAttribute);
+		assertThat(personAttribute.getValue(), equalTo(statusValue));
 	}
 }
