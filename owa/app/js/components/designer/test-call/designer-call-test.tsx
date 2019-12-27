@@ -27,7 +27,7 @@ import Tooltip from '../../tooltip';
 import * as Msg from '../../../shared/utils/messages';
 import { validateForm, validateField } from '../../../shared/utils/validation-util'
 import { IFlowCallError, validationSchema } from '../../../shared/model/flow-test.model';
-import ErrorDesc from '../../error-desc';
+import ErrorDesc from '@bit/soldevelo-omrs.cfl-components.error-description';
 import { CONFIG_EXTENSIONS } from '../../../constants';
 import { handleCarret } from '../../../shared/utils/form-handling-util';
 import 'react-chat-elements/dist/main.css';

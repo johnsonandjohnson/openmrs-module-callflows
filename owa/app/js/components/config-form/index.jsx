@@ -25,7 +25,7 @@ import _ from 'lodash';
 import ConfigUI from './config-ui';
 import * as Msg from '../../shared/utils/messages';
 import MapFields from '../MapFields';
-import ErrorDesc from '../error-desc';
+import ErrorDesc from '@bit/soldevelo-omrs.cfl-components.error-description';
 import { validateField } from '../../shared/utils/validation-util';
 
 const ConfigForm = (props) => {
