@@ -17,6 +17,7 @@ import org.openmrs.module.DaemonToken;
 import org.openmrs.module.DaemonTokenAware;
 import org.openmrs.module.callflows.api.event.AbstractCallFlowEventListener;
 import org.openmrs.module.callflows.api.event.CallFlowEventListenerFactory;
+import org.openmrs.module.callflows.api.evaluation.EvaluationCommand;
 
 import java.util.List;
 
@@ -60,5 +61,9 @@ public class CallflowsActivator extends BaseModuleActivator implements DaemonTok
 		for (AbstractCallFlowEventListener eventListener : eventComponents) {
 			eventListener.setDaemonToken(daemonToken);
 		}
+
+		EvaluationCommand evaluationCommand = Context.getRegisteredComponent("callflows.baseEvaluationCommand",
+				EvaluationCommand.class);
+		evaluationCommand.setDaemonToken(daemonToken);
 	}
 }

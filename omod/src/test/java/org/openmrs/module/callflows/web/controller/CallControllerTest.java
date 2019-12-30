@@ -9,6 +9,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.openmrs.api.context.ServiceContext;
+import org.openmrs.module.DaemonToken;
+import org.openmrs.module.Module;
+import org.openmrs.module.ModuleFactory;
 import org.openmrs.module.callflows.BaseTest;
 import org.openmrs.module.callflows.Constants;
 import org.openmrs.module.callflows.api.domain.Call;
@@ -27,9 +30,11 @@ import org.openmrs.module.callflows.api.helper.CallHelper;
 import org.openmrs.module.callflows.api.helper.ConfigHelper;
 import org.openmrs.module.callflows.api.helper.FlowHelper;
 import org.openmrs.module.callflows.api.helper.RendererHelper;
+import org.openmrs.module.callflows.api.evaluation.impl.BaseEvaluationCommand;
 import org.openmrs.module.callflows.api.service.CallFlowService;
 import org.openmrs.module.callflows.api.service.CallService;
 import org.openmrs.module.callflows.api.service.ConfigService;
+import org.openmrs.module.callflows.api.evaluation.EvaluationCommand;
 import org.openmrs.module.callflows.api.service.FlowService;
 import org.openmrs.module.callflows.api.util.CallUtil;
 import org.openmrs.module.callflows.api.util.FlowUtil;
@@ -45,6 +50,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -105,6 +112,8 @@ public class CallControllerTest extends BaseTest {
     @InjectMocks
     private FlowUtil flowUtil = new FlowUtil();
 
+    private EvaluationCommand evaluationCommand = new BaseEvaluationCommand();
+
     @Spy
     @InjectMocks
     private CallUtil callUtil = new CallUtil();
@@ -155,7 +164,7 @@ public class CallControllerTest extends BaseTest {
     private static final String CALL_SERVICE_BEAN_NAME = "callService";
 
     @Before
-    public void setUp() throws IOException {
+    public void setUp() throws IOException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         // initialize
         PowerMockito.mockStatic(ServiceContext.class);
         given(ServiceContext.getInstance()).willReturn(mock(ServiceContext.class));
@@ -240,6 +249,13 @@ public class CallControllerTest extends BaseTest {
         outboundNextURLJson = String.format(nextURLFormat,
                                             Constants.OUTBOUND_CALL_ID.toString(),
                                             Constants.CONFIG_RENDERER_JSON);
+        Module module = new Module("callflows");
+        module.setModuleId("callflows");
+        Method m = ModuleFactory.class.getDeclaredMethod("getDaemonToken", Module.class);
+        m.setAccessible(true); //if security settings allow this
+        Object o = m.invoke(null, module); //use null if the method is static
+        evaluationCommand.setDaemonToken((DaemonToken) o);
+        flowUtil.setEvaluationCommand(evaluationCommand);
     }
 
     @Test

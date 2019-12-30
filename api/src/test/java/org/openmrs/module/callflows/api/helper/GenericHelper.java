@@ -20,9 +20,9 @@ public final class GenericHelper {
     }
 
     public static Map<String, String> buildServicesMap() {
-        // OSGI Services
         Map<String, String> servicesMap = new HashMap<>();
         servicesMap.put(Constants.CONFIG_SRVC_CALL, Constants.CONFIG_SRVC_CALL_BEAN_NAME);
+        servicesMap.put(Constants.CONFIG_PERSON_SERV, Constants.CONFIG_PERSON_SERV_BEAN_NAME);
         return servicesMap;
     }
 

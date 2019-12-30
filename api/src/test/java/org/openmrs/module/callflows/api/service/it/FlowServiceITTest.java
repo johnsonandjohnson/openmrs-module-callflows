@@ -1,5 +1,9 @@
 package org.openmrs.module.callflows.api.service.it;
 
+import org.openmrs.api.context.Context;
+import org.openmrs.module.DaemonToken;
+import org.openmrs.module.Module;
+import org.openmrs.module.ModuleFactory;
 import org.openmrs.module.callflows.Constants;
 import org.openmrs.module.callflows.api.domain.CallFlow;
 import org.openmrs.module.callflows.api.domain.FlowPosition;
@@ -9,6 +13,7 @@ import org.openmrs.module.callflows.api.domain.flow.Node;
 import org.openmrs.module.callflows.api.helper.CallFlowHelper;
 import org.openmrs.module.callflows.api.helper.FlowHelper;
 import org.openmrs.module.callflows.api.dao.CallFlowDao;
+import org.openmrs.module.callflows.api.evaluation.EvaluationCommand;
 import org.openmrs.module.callflows.api.service.FlowService;
 import org.openmrs.module.callflows.api.util.TestUtil;
 
@@ -21,6 +26,8 @@ import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
@@ -41,6 +48,9 @@ public class FlowServiceITTest extends BaseModuleContextSensitiveTest {
     @Autowired
     private CallFlowDao callFlowDao;
 
+    @Autowired
+    private EvaluationCommand evaluationCommand;
+
     private CallFlow mainFlow;
 
     private Flow loadedFlow;
@@ -58,7 +68,7 @@ public class FlowServiceITTest extends BaseModuleContextSensitiveTest {
     private ObjectMapper objectMapper;
 
     @Before
-    public void setUp() throws IOException {
+    public void setUp() throws IOException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         mainFlow = CallFlowHelper.createMainFlow();
         String raw = TestUtil.loadFile("main_flow.json");
         mainFlow.setRaw(raw);
@@ -72,6 +82,13 @@ public class FlowServiceITTest extends BaseModuleContextSensitiveTest {
 
         objectMapper = new ObjectMapper();
         context = new VelocityContext();
+        Context.logout();
+        Module module = new Module("callflows");
+        module.setModuleId("callflows");
+        Method m = ModuleFactory.class.getDeclaredMethod("getDaemonToken", Module.class);
+        m.setAccessible(true); //if security settings allow this
+        Object o = m.invoke(null, module); //use null if the method is static
+        evaluationCommand.setDaemonToken((DaemonToken) o);
     }
 
     @After

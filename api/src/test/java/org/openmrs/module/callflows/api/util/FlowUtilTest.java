@@ -6,6 +6,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.openmrs.api.context.Context;
+import org.openmrs.module.DaemonToken;
+import org.openmrs.module.Module;
+import org.openmrs.module.ModuleFactory;
 import org.openmrs.module.callflows.BaseTest;
 import org.openmrs.module.callflows.Constants;
 import org.openmrs.module.callflows.api.domain.flow.FieldElement;
@@ -13,9 +17,13 @@ import org.openmrs.module.callflows.api.domain.flow.Flow;
 import org.openmrs.module.callflows.api.domain.flow.Node;
 import org.openmrs.module.callflows.api.domain.flow.UserNode;
 import org.openmrs.module.callflows.api.helper.FlowHelper;
+import org.openmrs.module.callflows.api.evaluation.impl.BaseEvaluationCommand;
+import org.openmrs.module.callflows.api.evaluation.EvaluationCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,16 +43,26 @@ public class FlowUtilTest extends BaseTest {
     @Autowired
     private FlowUtil flowUtil = new FlowUtil();
 
+    private EvaluationCommand evaluationCommand = new BaseEvaluationCommand();
+
     private Flow flow;
 
     private VelocityContext context;
 
     @Before
-    public void setUp() throws IOException {
+    public void setUp() throws IOException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         String flowString = TestUtil.loadFile("main_flow.json");
         flow = FlowHelper.createFlow(flowString);
 
         context = new VelocityContext();
+        Context.logout();
+        Module module = new Module("callflows");
+        module.setModuleId("callflows");
+        Method m = ModuleFactory.class.getDeclaredMethod("getDaemonToken", Module.class);
+        m.setAccessible(true); //if security settings allow this
+        Object o = m.invoke(null, module); //use null if the method is static
+        evaluationCommand.setDaemonToken((DaemonToken) o);
+        flowUtil.setEvaluationCommand(evaluationCommand);
     }
 
     // parse

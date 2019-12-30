@@ -5,8 +5,6 @@ import org.openmrs.api.db.UserDAO;
 import org.openmrs.module.callflows.api.dao.CallFlowDao;
 import org.openmrs.module.callflows.api.domain.CallFlow;
 import org.openmrs.module.callflows.api.service.CallFlowService;
-import org.openmrs.module.callflows.api.service.FlowService;
-import org.openmrs.module.callflows.api.util.FlowUtil;
 import org.openmrs.module.callflows.api.util.ValidationComponent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,12 +29,6 @@ public class CallFlowServiceImpl implements CallFlowService {
 
     @Autowired
     private UserDAO userDAO;
-
-    @Autowired
-    private FlowUtil flowUtil;
-
-    @Autowired
-    private FlowService flowService;
 
     @Autowired
     private ValidationComponent validationComponent;
@@ -99,4 +91,3 @@ public class CallFlowServiceImpl implements CallFlowService {
         }
     }
 }
-
