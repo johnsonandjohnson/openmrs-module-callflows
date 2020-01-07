@@ -1,12 +1,15 @@
 package org.openmrs.module.callflows.api.service.it;
 
+import org.hibernate.SessionFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.api.context.Context;
+import org.openmrs.api.db.hibernate.DbSessionFactory;
 import org.openmrs.module.callflows.Constants;
 import org.openmrs.module.callflows.api.dao.CallDao;
 import org.openmrs.module.callflows.api.dao.CallFlowDao;
+import org.openmrs.module.callflows.api.dao.impl.CallDaoImpl;
 import org.openmrs.module.callflows.api.domain.Call;
 import org.openmrs.module.callflows.api.domain.CallFlow;
 import org.openmrs.module.callflows.api.domain.Config;
@@ -20,7 +23,10 @@ import org.openmrs.module.callflows.api.service.ConfigService;
 import org.openmrs.module.callflows.api.util.CallAssert;
 import org.openmrs.module.callflows.api.util.TestUtil;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
+import org.springframework.aop.framework.Advised;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -43,6 +49,11 @@ public class CallServiceITTest extends BaseModuleContextSensitiveTest {
     private CallService callService;
 
     @Autowired
+    private DbSessionFactory dbSessionFactory;
+
+    @Autowired
+    protected SessionFactory sessionFactory;
+
     private CallDao callDao;
 
     @Autowired
@@ -67,6 +78,12 @@ public class CallServiceITTest extends BaseModuleContextSensitiveTest {
 
     @Before
     public void setUp() throws IOException {
+        // Used to avoid the issues with the H2 when multiple transactions are used
+        CallDaoImpl callDaoImpl = new CallDaoImpl();
+        ReflectionTestUtils.setField(callDaoImpl, "dbSessionFactory", dbSessionFactory);
+        ReflectionTestUtils.setField(callDaoImpl, "sessionFactory", sessionFactory);
+        callDao = callDaoImpl;
+        ReflectionTestUtils.setField(unwrapProxy(callService), null, callDao, CallDao.class);
         // create a call flow
         mainFlow = CallFlowHelper.createMainFlow();
         mainFlow.setRaw(TestUtil.loadFile("main_flow.json"));
@@ -317,6 +334,20 @@ public class CallServiceITTest extends BaseModuleContextSensitiveTest {
     @Test
     public void shouldReturnProperCountOfCalls() {
         assertThat(callService.retrieveCount(), equalTo(2L));
+    }
+
+
+    private static <T> T unwrapProxy(T bean) {
+        try {
+            if (AopUtils.isAopProxy(bean) && bean instanceof Advised) {
+                Advised advised = (Advised) bean;
+                bean = (T) advised.getTargetSource().getTarget();
+            }
+            return bean;
+        }
+        catch (Exception e) {
+            throw new RuntimeException("Could not unwrap proxy!", e);
+        }
     }
 }
 

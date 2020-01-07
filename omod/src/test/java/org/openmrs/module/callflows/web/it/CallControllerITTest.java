@@ -2,16 +2,19 @@ package org.openmrs.module.callflows.web.it;
 
 import org.apache.http.HttpStatus;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.hibernate.SessionFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.api.context.Context;
+import org.openmrs.api.db.hibernate.DbSessionFactory;
 import org.openmrs.module.DaemonToken;
 import org.openmrs.module.Module;
 import org.openmrs.module.ModuleFactory;
 import org.openmrs.module.callflows.Constants;
 import org.openmrs.module.callflows.api.dao.CallDao;
 import org.openmrs.module.callflows.api.dao.CallFlowDao;
+import org.openmrs.module.callflows.api.dao.impl.CallDaoImpl;
 import org.openmrs.module.callflows.api.domain.Call;
 import org.openmrs.module.callflows.api.domain.CallFlow;
 import org.openmrs.module.callflows.api.domain.Config;
@@ -32,9 +35,12 @@ import org.openmrs.module.callflows.api.evaluation.EvaluationCommand;
 import org.openmrs.module.callflows.api.service.FlowService;
 import org.openmrs.module.callflows.api.util.TestUtil;
 import org.openmrs.web.test.BaseModuleWebContextSensitiveTest;
+import org.springframework.aop.framework.Advised;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -50,7 +56,6 @@ import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.fail;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -72,6 +77,11 @@ public class CallControllerITTest extends BaseModuleWebContextSensitiveTest {
 	private ConfigService configService;
 
 	@Autowired
+	private DbSessionFactory dbSessionFactory;
+
+	@Autowired
+	protected SessionFactory sessionFactory;
+
 	private CallDao callDao;
 
 	@Autowired
@@ -114,6 +124,12 @@ public class CallControllerITTest extends BaseModuleWebContextSensitiveTest {
 	@Before
 	public void setUp() throws IOException, CallFlowAlreadyExistsException, NoSuchMethodException, InvocationTargetException,
 			IllegalAccessException {
+		// Used to avoid the issues with the H2 when multiple transactions are used
+		CallDaoImpl callDaoImpl = new CallDaoImpl();
+		ReflectionTestUtils.setField(callDaoImpl, "dbSessionFactory", dbSessionFactory);
+		ReflectionTestUtils.setField(callDaoImpl, "sessionFactory", sessionFactory);
+		callDao = callDaoImpl;
+		ReflectionTestUtils.setField(unwrapProxy(callService), null, callDao, CallDao.class);
 		// Save only voxeo in the DB and not yo
 		configs = ConfigHelper.createConfigs();
 		configs.remove(1);
@@ -161,17 +177,17 @@ public class CallControllerITTest extends BaseModuleWebContextSensitiveTest {
 	@Test
 	public void shouldHandleIncomingUseOutboundCallAndUpdateContext() throws Exception {
 		mainFlow.setRaw(TestUtil.loadFile("main_flow_with_auth.json"));
-		MvcResult result = mockMvc.perform(get("/callflows/in/voxeo/flows/MainFlow.vxml")
+		mockMvc.perform(get("/callflows/in/voxeo/flows/MainFlow.vxml")
 				.param("callId", outboundCall.getCallId())
 				.param("jumpTo", "MainFlow"))
 				.andExpect(status().is(HttpStatus.SC_OK))
 				.andExpect(content().contentType(Constants.APPLICATION_VXML)).andReturn();
 		assertThat(outboundCall.getContext().size(), is(2));
-		result = mockMvc.perform(get("/callflows/status/" + outboundCall.getCallId())
+		mockMvc.perform(get("/callflows/status/" + outboundCall.getCallId())
 				.param("status", "IN_PROGRESS")
 				.param("reason", "dialog start"))
 				.andExpect(status().is(HttpStatus.SC_OK)).andReturn();
-		result = mockMvc.perform(get("/callflows/calls/" + outboundCall.getCallId() + ".vxml")
+		MvcResult result = mockMvc.perform(get("/callflows/calls/" + outboundCall.getCallId() + ".vxml")
 				.param("callId", outboundCall.getCallId())
 				.param("input", "1"))
 				.andExpect(status().is(HttpStatus.SC_OK))
@@ -381,5 +397,18 @@ public class CallControllerITTest extends BaseModuleWebContextSensitiveTest {
 
 	private String json(Object obj) throws IOException {
 		return new ObjectMapper().writeValueAsString(obj);
+	}
+
+	private static <T> T unwrapProxy(T bean) {
+		try {
+			if (AopUtils.isAopProxy(bean) && bean instanceof Advised) {
+				Advised advised = (Advised) bean;
+				bean = (T) advised.getTargetSource().getTarget();
+			}
+			return bean;
+		}
+		catch (Exception e) {
+			throw new RuntimeException("Could not unwrap proxy!", e);
+		}
 	}
 }

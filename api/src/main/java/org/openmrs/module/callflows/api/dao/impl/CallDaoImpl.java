@@ -16,6 +16,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Set;
+
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Repository("callFlow.CallDao")
@@ -23,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CallDaoImpl extends HibernateOpenmrsDataDAO<Call> implements CallDao {
 
     @Autowired
-    private DbSessionFactory sessionFactory;
+    private DbSessionFactory dbSessionFactory;
 
     public CallDaoImpl(){
         super(Call.class);
@@ -57,9 +59,21 @@ public class CallDaoImpl extends HibernateOpenmrsDataDAO<Call> implements CallDa
         return saveOrUpdate(call);
     }
 
+    /**
+     * Updates the call using the {@link org.openmrs.api.db.hibernate.DbSession#merge(Object)} method.
+     * The following propagation is used {@link org.springframework.transaction.annotation.Propagation#REQUIRES_NEW}.
+     *
+     * The new transaction and merge methods are used because of we want to update always the latest value in case of
+     * processing the call flow by many threads.
+     *
+     * @param call- call resource which should be update
+     * @return the updated value of the call
+     */
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Call update(Call call) {
-        return saveOrUpdate(call);
+        getSession().merge(call);
+        return call;
     }
 
     @Override
@@ -89,7 +103,7 @@ public class CallDaoImpl extends HibernateOpenmrsDataDAO<Call> implements CallDa
     }
 
     private DbSession getSession() {
-        return sessionFactory.getCurrentSession();
+        return dbSessionFactory.getCurrentSession();
     }
 
     private Criteria createCriteriaForFinding(CallDirection direction, Set<CallStatus> statusSet) {

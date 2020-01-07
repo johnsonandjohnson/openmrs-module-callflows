@@ -181,4 +181,18 @@
             ALTER TABLE cfl_callflows MODIFY raw LONGTEXT;
         </sql>
     </changeSet>
+
+    <changeSet id="callFlow-2020-01-03-11:00" author="Arkadiusz Lalo">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="cfl_calls"/>
+            <tableExists tableName="cfl_calls_providerdata"/>
+        </preConditions>
+        <comment>Update the cfl_calls table</comment>
+        <dropForeignKeyConstraint baseTableName="cfl_calls_providerdata" constraintName="cfl_calls_providerdata_fk" />
+        <dropTable tableName="cfl_calls_providerdata" />
+        <addColumn tableName="cfl_calls">
+            <column name="provider_data" type="mediumblob"></column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

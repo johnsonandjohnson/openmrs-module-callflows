@@ -200,10 +200,8 @@ public class Call extends AbstractBaseOpenmrsData {
     /**
      * Data from the provider
      */
-    @ElementCollection
-    @CollectionTable(name = "cfl_calls_providerdata", joinColumns=@JoinColumn(name="id_oid"))
-    @MapKeyJoinColumn(name = "key")
-    @Column(name = "value")
+    @Column(name = "provider_data")
+    @Convert(converter = MapConverter.class)
     private Map<String, String> providerData = new HashMap<>();
 
     @Column
