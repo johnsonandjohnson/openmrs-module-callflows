@@ -29,7 +29,6 @@ import java.util.List;
 public class CFLPersonServiceImpl extends HibernateOpenmrsDataDAO<PersonAttribute> implements CFLPersonService {
 
 	private static final String CAREGIVER_RELATIONSHIP_UUID = "acec590b-825e-45d2-876a-0028f174903d";
-	private static final String ADMIN_USER = "admin";
 
 	@Autowired
 	private DbSessionFactory sessionFactory;
@@ -75,10 +74,7 @@ public class CFLPersonServiceImpl extends HibernateOpenmrsDataDAO<PersonAttribut
 			PersonAttribute personAttribute = new PersonAttribute();
 			personAttribute.setAttributeType(personAttributeTypes.get(0));
 			personAttribute.setValue(attributeValue);
-			if (Context.isSessionOpen() && !Context.isAuthenticated()) {
-				personAttribute.setCreator(userDAO.getUserByUsername(ADMIN_USER));
-			}
-
+			personAttribute.setCreator(Context.getAuthenticatedUser());
 			person.addAttribute(personAttribute);
 			personDAO.savePerson(person);
 		}
