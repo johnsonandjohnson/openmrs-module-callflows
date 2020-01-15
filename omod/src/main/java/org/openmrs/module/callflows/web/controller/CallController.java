@@ -9,6 +9,7 @@ import org.apache.velocity.app.Velocity;
 import org.apache.velocity.runtime.log.Log4JLogChute;
 import org.openmrs.Person;
 import org.openmrs.PersonAttribute;
+import org.openmrs.api.PersonService;
 import org.openmrs.api.context.ServiceContext;
 import org.openmrs.module.callflows.api.contract.OutboundCallResponse;
 import org.openmrs.module.callflows.api.domain.Call;
@@ -137,6 +138,9 @@ public class CallController extends RestController {
 
     @Autowired
     private CallUtil callUtil;
+
+    @Autowired
+    private PersonService personService;
 
     @PostConstruct
     public void initialize() {
@@ -402,22 +406,29 @@ public class CallController extends RestController {
         return call != null ? new OutboundCallResponse(call) : null;
     }
 
-    @RequestMapping(value = "/person/{personId}/out/{configName}/flows/{name}.{extension}")
-    public String handleOutgoingByPatientUuid(@PathVariable(value = "configName") String configName,
+    @RequestMapping(value = "/person/{personUuid}/out/{configName}/flows/{name}.{extension}")
+    @ResponseBody
+    public String handleOutgoingByPersonUuid(@PathVariable(value = "configName") String configName,
             @PathVariable(value = "name") String name,
             @PathVariable(value = "extension") String extension,
-            @PathVariable(value = "personId") Person person,
-            @RequestParam(value = "returnUrl") String returnUrl) {
+            @PathVariable(value = "personUuid") String personUuid,
+            @RequestParam Map<String, Object> params) {
+        Person person = personService.getPersonByUuid(personUuid);
         String phoneNumber = getTelephoneFromPerson(person);
         if (StringUtils.isNotBlank(phoneNumber)) {
-            Map<String, Object> params = new HashMap<>();
-            params.put(Constants.PARAM_PHONE, phoneNumber);
-            callService.makeCall(configName, name, params);
-            return "redirect:" + createReturnUrl(returnUrl);
-        } else {
-            throw new IllegalArgumentException(String.format("Missing phone number for %s person", person));
-        }
+            Map<String, Object> additionalParams = new HashMap<>();
+            additionalParams.put(Constants.PARAM_PHONE, phoneNumber);
+            additionalParams.put(Constants.PARAM_PERSON_ID, person.getPersonId());
+            if (params.containsKey(Constants.PARAM_ACTOR_TYPE)) {
+                additionalParams.put(Constants.PARAM_ACTOR_TYPE, params.get(Constants.PARAM_ACTOR_TYPE));
+            }
+            callService.makeCall(configName, name, additionalParams);
 
+            Object returnUrl = params.get("returnUrl");
+            return returnUrl != null ? "redirect:" + createReturnUrl(returnUrl.toString()) : "";
+        } else {
+            throw new IllegalArgumentException(String.format("Missing phone number for %s person", personUuid));
+        }
     }
 
     @RequestMapping(value = "/calls/export-details", method = RequestMethod.GET)

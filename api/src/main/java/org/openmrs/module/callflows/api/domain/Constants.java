@@ -19,6 +19,8 @@ public final class Constants {
 
     public static final String PARAM_ACTOR_ID = "actorId";
 
+    public static final String PARAM_PERSON_ID = "personId";
+
     public static final String PARAM_ACTOR_TYPE = "actorType";
 
     public static final String PARAM_EXTERNAL_ID = "externalId";

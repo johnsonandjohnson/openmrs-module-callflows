@@ -11,7 +11,7 @@
               "order": 26,
               "label": "callflows.initcall.button",
               "icon":"icon-phone-sign",
-              "url": "/ws/callflows/person/{{patient.uuid}}/out/voxeo-mobile/flows/MainFlow.ccxml"
+              "url": "/ws/callflows/person/{{patient.uuid}}/out/voxeo-mobile/flows/MainFlow.ccxml?actorType=Patient"
           }
       ]
   }

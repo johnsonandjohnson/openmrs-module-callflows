@@ -8,6 +8,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
+import org.openmrs.Person;
+import org.openmrs.PersonAttribute;
+import org.openmrs.api.PersonService;
 import org.openmrs.api.context.ServiceContext;
 import org.openmrs.module.DaemonToken;
 import org.openmrs.module.Module;
@@ -108,6 +111,9 @@ public class CallControllerTest extends BaseTest {
     @Mock
     private FlowService flowService;
 
+    @Mock
+    private PersonService personService;
+
     @Spy
     @InjectMocks
     private FlowUtil flowUtil = new FlowUtil();
@@ -120,6 +126,12 @@ public class CallControllerTest extends BaseTest {
 
     @Mock
     private HttpServletRequest request;
+
+    @Mock
+    private Person person;
+
+    @Mock
+    private PersonAttribute personAttribute;
 
     private ArgumentCaptor<VelocityContext> velocityContextCaptor;
 
@@ -770,6 +782,68 @@ public class CallControllerTest extends BaseTest {
         verify(callService, times(1)).retrieveCount();
         verify(callService, times(1)).findAll(1,10000);
         verify(callUtil, times(1)).generateReports(anyString(), anyListOf(Call.class));
+    }
+
+    @Test
+    public void shouldMakeCallWithProperParamsForHandleOutgoingByPersonUuidWithReturnUrlAndActorType() throws Exception {
+        final String returnUrl = "/openmrs/coreapps/clinicianfacing/patient.page?patientId=af57f285-8ad5-49ab-a5dd-2aa6d265710a";
+        final String personUuid = "af57f285-8ad5-49ab-a5dd-2aa6d265710a";
+        final String phone = "1234567890";
+        final String actorType = "Patient";
+        final Integer personId = 2;
+
+        Map<String, Object> additionalParams = new HashMap<>();
+        additionalParams.put("phone", phone);
+        additionalParams.put("personId", personId);
+        additionalParams.put("actorType", actorType);
+        // Given
+        given(personService.getPersonByUuid(personUuid)).willReturn(person);
+        given(person.getAttribute("Telephone Number")).willReturn(personAttribute);
+        given(person.getPersonId()).willReturn(personId);
+        given(personAttribute.getValue()).willReturn(phone);
+        given(callService.makeCall(eq(Constants.CONFIG_VOXEO), eq(Constants.CALLFLOW_MAIN), eq(additionalParams))).willReturn(
+                outboundCall);
+
+        // When
+        mockMvc.perform(customGet(String.format("/callflows/person/%s/out/voxeo/flows/MainFlow.vxml"
+                        + "?returnUrl=%s&actorType=%s",
+                personUuid, returnUrl, actorType)))
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(content().string("redirect:/coreapps/clinicianfacing/patient.page?patientId=af57f285-8ad5-49ab-a5dd-2aa6d265710a"));
+
+        // Then
+        verify(callService, times(1)).makeCall(
+                eq(Constants.CONFIG_VOXEO), eq(Constants.CALLFLOW_MAIN), eq(additionalParams));
+    }
+
+    @Test
+    public void shouldMakeCallWithProperParamsForHandleOutgoingByPersonUuidWithReturnUrl() throws Exception {
+        final String returnUrl = "/openmrs/coreapps/clinicianfacing/patient.page?patientId=af57f285-8ad5-49ab-a5dd-2aa6d265710a";
+        final String personUuid = "af57f285-8ad5-49ab-a5dd-2aa6d265710a";
+        final String phone = "1234567890";
+        final Integer personId = 2;
+
+        Map<String, Object> additionalParams = new HashMap<>();
+        additionalParams.put("phone", phone);
+        additionalParams.put("personId", personId);
+        // Given
+        given(personService.getPersonByUuid(personUuid)).willReturn(person);
+        given(person.getAttribute("Telephone Number")).willReturn(personAttribute);
+        given(person.getPersonId()).willReturn(personId);
+        given(personAttribute.getValue()).willReturn(phone);
+        given(callService.makeCall(eq(Constants.CONFIG_VOXEO), eq(Constants.CALLFLOW_MAIN), eq(additionalParams))).willReturn(
+                outboundCall);
+
+        // When
+        mockMvc.perform(customGet(String.format("/callflows/person/%s/out/voxeo/flows/MainFlow.vxml"
+                        + "?returnUrl=%s",
+                personUuid, returnUrl)))
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(content().string("redirect:/coreapps/clinicianfacing/patient.page?patientId=af57f285-8ad5-49ab-a5dd-2aa6d265710a"));
+
+        // Then
+        verify(callService, times(1)).makeCall(
+                eq(Constants.CONFIG_VOXEO), eq(Constants.CALLFLOW_MAIN), eq(additionalParams));
     }
 
     private Call setUpCall() {
