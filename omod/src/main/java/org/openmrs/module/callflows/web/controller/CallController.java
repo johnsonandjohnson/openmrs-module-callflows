@@ -30,6 +30,7 @@ import org.openmrs.module.callflows.api.util.CallUtil;
 import org.openmrs.module.callflows.api.util.DateUtil;
 import org.openmrs.module.callflows.api.util.FlowUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -39,6 +40,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
@@ -408,6 +410,7 @@ public class CallController extends RestController {
 
     @RequestMapping(value = "/person/{personUuid}/out/{configName}/flows/{name}.{extension}")
     @ResponseBody
+    @ResponseStatus(value = HttpStatus.FOUND)
     public String handleOutgoingByPersonUuid(@PathVariable(value = "configName") String configName,
             @PathVariable(value = "name") String name,
             @PathVariable(value = "extension") String extension,
@@ -419,12 +422,13 @@ public class CallController extends RestController {
             Map<String, Object> additionalParams = new HashMap<>();
             additionalParams.put(Constants.PARAM_PHONE, phoneNumber);
             additionalParams.put(Constants.PARAM_PERSON_ID, person.getPersonId());
-            if (params.containsKey(Constants.PARAM_ACTOR_TYPE)) {
-                additionalParams.put(Constants.PARAM_ACTOR_TYPE, params.get(Constants.PARAM_ACTOR_TYPE));
-            }
-            callService.makeCall(configName, name, additionalParams);
 
             Object returnUrl = params.get("returnUrl");
+            params.remove("returnUrl");
+            additionalParams.putAll(params);
+
+            callService.makeCall(configName, name, additionalParams);
+
             return returnUrl != null ? "redirect:" + createReturnUrl(returnUrl.toString()) : "";
         } else {
             throw new IllegalArgumentException(String.format("Missing phone number for %s person", personUuid));

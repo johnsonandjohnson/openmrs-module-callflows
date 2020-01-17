@@ -808,7 +808,7 @@ public class CallControllerTest extends BaseTest {
         mockMvc.perform(customGet(String.format("/callflows/person/%s/out/voxeo/flows/MainFlow.vxml"
                         + "?returnUrl=%s&actorType=%s",
                 personUuid, returnUrl, actorType)))
-                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(status().is(HttpStatus.FOUND.value()))
                 .andExpect(content().string("redirect:/coreapps/clinicianfacing/patient.page?patientId=af57f285-8ad5-49ab-a5dd-2aa6d265710a"));
 
         // Then
@@ -821,11 +821,13 @@ public class CallControllerTest extends BaseTest {
         final String returnUrl = "/openmrs/coreapps/clinicianfacing/patient.page?patientId=af57f285-8ad5-49ab-a5dd-2aa6d265710a";
         final String personUuid = "af57f285-8ad5-49ab-a5dd-2aa6d265710a";
         final String phone = "1234567890";
+        final String customParam = "customParam";
         final Integer personId = 2;
 
         Map<String, Object> additionalParams = new HashMap<>();
         additionalParams.put("phone", phone);
         additionalParams.put("personId", personId);
+        additionalParams.put("customParam", customParam);
         // Given
         given(personService.getPersonByUuid(personUuid)).willReturn(person);
         given(person.getAttribute("Telephone Number")).willReturn(personAttribute);
@@ -836,9 +838,9 @@ public class CallControllerTest extends BaseTest {
 
         // When
         mockMvc.perform(customGet(String.format("/callflows/person/%s/out/voxeo/flows/MainFlow.vxml"
-                        + "?returnUrl=%s",
-                personUuid, returnUrl)))
-                .andExpect(status().is(HttpStatus.OK.value()))
+                        + "?returnUrl=%s&customParam=%s",
+                personUuid, returnUrl, customParam)))
+                .andExpect(status().is(HttpStatus.FOUND.value()))
                 .andExpect(content().string("redirect:/coreapps/clinicianfacing/patient.page?patientId=af57f285-8ad5-49ab-a5dd-2aa6d265710a"));
 
         // Then
