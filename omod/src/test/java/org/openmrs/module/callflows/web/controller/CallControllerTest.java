@@ -77,6 +77,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
@@ -809,7 +810,8 @@ public class CallControllerTest extends BaseTest {
                         + "?returnUrl=%s&actorType=%s",
                 personUuid, returnUrl, actorType)))
                 .andExpect(status().is(HttpStatus.FOUND.value()))
-                .andExpect(content().string("redirect:/coreapps/clinicianfacing/patient.page?patientId=af57f285-8ad5-49ab-a5dd-2aa6d265710a"));
+                .andExpect(header().string("Location",
+                        "/openmrs/coreapps/clinicianfacing/patient.page?patientId=af57f285-8ad5-49ab-a5dd-2aa6d265710a"));
 
         // Then
         verify(callService, times(1)).makeCall(
@@ -841,7 +843,8 @@ public class CallControllerTest extends BaseTest {
                         + "?returnUrl=%s&customParam=%s",
                 personUuid, returnUrl, customParam)))
                 .andExpect(status().is(HttpStatus.FOUND.value()))
-                .andExpect(content().string("redirect:/coreapps/clinicianfacing/patient.page?patientId=af57f285-8ad5-49ab-a5dd-2aa6d265710a"));
+                .andExpect(header().string("Location",
+                        "/openmrs/coreapps/clinicianfacing/patient.page?patientId=af57f285-8ad5-49ab-a5dd-2aa6d265710a"));
 
         // Then
         verify(callService, times(1)).makeCall(

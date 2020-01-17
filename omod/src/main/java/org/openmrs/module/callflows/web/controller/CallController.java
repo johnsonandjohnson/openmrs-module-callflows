@@ -409,7 +409,6 @@ public class CallController extends RestController {
     }
 
     @RequestMapping(value = "/person/{personUuid}/out/{configName}/flows/{name}.{extension}")
-    @ResponseBody
     @ResponseStatus(value = HttpStatus.FOUND)
     public String handleOutgoingByPersonUuid(@PathVariable(value = "configName") String configName,
             @PathVariable(value = "name") String name,
