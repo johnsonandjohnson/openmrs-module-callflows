@@ -26,6 +26,7 @@ import org.openmrs.module.callflows.api.util.CallUtil;
 import org.openmrs.module.callflows.api.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.naming.OperationNotSupportedException;
@@ -135,7 +136,6 @@ public class CallServiceImpl implements CallService {
     }
 
     @Override
-    @Transactional
     public Call update(Call call) {
         Call currentCall = callDao.findById(call.getId());
 
@@ -200,7 +200,7 @@ public class CallServiceImpl implements CallService {
     }
 
     @Override
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRED)
     public Call findByCallId(String callId) {
         return callDao.findByCallId(callId);
     }
@@ -255,13 +255,11 @@ public class CallServiceImpl implements CallService {
     }
 
     @Override
-    @Transactional
     public List<Call> findAll(int startingRecord, int recordsAmount) {
         return callDao.retrieveAll((startingRecord - 1) * recordsAmount, recordsAmount);
     }
 
     @Override
-    @Transactional
     public long retrieveCount() {
         return callDao.count();
     }

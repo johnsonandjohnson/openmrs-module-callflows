@@ -13,12 +13,11 @@ import org.openmrs.module.callflows.api.domain.types.CallDirection;
 import org.openmrs.module.callflows.api.domain.types.CallStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
-
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 @Repository("callFlow.CallDao")
 @Transactional
@@ -31,12 +30,24 @@ public class CallDaoImpl extends HibernateOpenmrsDataDAO<Call> implements CallDa
         super(Call.class);
     }
 
+    /**
+     * Looking the specific {@link Call} object based on provided callId.
+     * If the object is not null then {@link DbSession#refresh(Object)} method is called in order to
+     * make sure that the latest value will be returned in case of
+     * processing the call flow by many threads.
+     *
+     * @param callId - provided call id
+     * @return - found call object
+     */
     @Override
     public Call findByCallId(String callId) {
         Criteria crit = getSession().createCriteria(this.mappedClass);
         crit.add(Restrictions.eq("callId", callId));
-
-        return (Call) crit.uniqueResult();
+        Call call = (Call) crit.uniqueResult();
+        if (call != null) {
+            getSession().refresh(call);
+        }
+        return call;
     }
 
     @Override
@@ -60,11 +71,11 @@ public class CallDaoImpl extends HibernateOpenmrsDataDAO<Call> implements CallDa
     }
 
     /**
-     * Updates the call using the {@link org.openmrs.api.db.hibernate.DbSession#merge(Object)} method.
+     * Updates the call using the {@link org.openmrs.api.db.hibernate.DbSession#update(Object)} method.
      * The following propagation is used {@link org.springframework.transaction.annotation.Propagation#REQUIRES_NEW}.
      *
-     * The new transaction and merge methods are used because of we want to update always the latest value in case of
-     * processing the call flow by many threads.
+     * The new transaction is used because of we want to update always the latest value in case of
+     * processing the call flow by many threads. Additionally {@link DbSession#flush()} is called after update.
      *
      * @param call- call resource which should be update
      * @return the updated value of the call
@@ -72,7 +83,8 @@ public class CallDaoImpl extends HibernateOpenmrsDataDAO<Call> implements CallDa
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Call update(Call call) {
-        getSession().merge(call);
+        getSession().update(call);
+        getSession().flush();
         return call;
     }
 

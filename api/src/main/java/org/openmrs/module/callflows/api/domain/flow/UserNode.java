@@ -41,7 +41,8 @@ public class UserNode extends Node {
     @Override
     public String toString() {
         return "UserNode{" +
-                "blocks=" + blocks +
+                "name=" + getStep() +
+                ", blocks=" + blocks +
                 '}';
     }
 }

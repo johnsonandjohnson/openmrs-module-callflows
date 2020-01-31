@@ -15,7 +15,6 @@ import org.openmrs.module.callflows.api.service.FlowService;
 import org.openmrs.module.callflows.api.util.FlowUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,7 +26,6 @@ import java.util.List;
  * @author bramak09
  */
 @Service("flowService")
-@Transactional
 public class FlowServiceImpl implements FlowService {
 
     private static final Log LOGGER = LogFactory.getLog(FlowServiceImpl.class);

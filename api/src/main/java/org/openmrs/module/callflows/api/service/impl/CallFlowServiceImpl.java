@@ -18,7 +18,6 @@ import java.util.List;
  * @author bramak09
  */
 @Service("callFlowService")
-@Transactional
 public class CallFlowServiceImpl implements CallFlowService {
 
 
@@ -34,6 +33,7 @@ public class CallFlowServiceImpl implements CallFlowService {
     private ValidationComponent validationComponent;
 
     @Override
+    @Transactional
     public CallFlow create(CallFlow callflow) {
         validationComponent.validate(callflow);
         if (Context.isSessionOpen() && !Context.isAuthenticated()) {
@@ -43,6 +43,7 @@ public class CallFlowServiceImpl implements CallFlowService {
     }
 
     @Override
+    @Transactional
     public CallFlow update(CallFlow callflow) {
         validationComponent.validate(callflow);
 
@@ -67,6 +68,7 @@ public class CallFlowServiceImpl implements CallFlowService {
     }
 
     @Override
+    @Transactional
     public List<CallFlow> findAllByNamePrefix(String prefix) {
         return callFlowDao.findAllByName(prefix);
     }
