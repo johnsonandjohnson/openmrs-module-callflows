@@ -39,6 +39,8 @@ export const DESIGNER_FLOW_TEST_TITLE = 'Designer';
 export const DESIGNER_FLOW_TEST_CREATE_BTN = 'Create';
 export const DESIGNER_NEW_FLOW_BREADCRUMB = 'Designer';
 export const DESIGNER_NEW_FLOW_BREADCRUMB_NEW = 'New';
+export const INIT_CALL_MODAL_TITLE = 'Initiate Test Call';
+export const INIT_CALL_MODAL_TEXT = 'Are you sure you want to initiate a test call?';
 
 // Config form
 export const CONFIG_FORM_NAME_HEADER = 'Name';

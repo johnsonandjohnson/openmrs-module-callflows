@@ -29,7 +29,9 @@ export const ACTION_TYPES = {
   RESET_MESSAGES: 'designerReducer/RESET_MESSAGES',
   NODE_PROCESSED: 'designerReducer/NODE_PROCESSED',
   DELETE_INTERACTION_NODE: 'designerReducer/DELETE_INTERACTION_NODE',
-  ADD_EMPTY_USER_AND_SYSTEM_NODES: 'designerReducer/ADD_EMPTY_USER_AND_SYSTEM_NODES'
+  ADD_EMPTY_USER_AND_SYSTEM_NODES: 'designerReducer/ADD_EMPTY_USER_AND_SYSTEM_NODES',
+  OPEN_MODAL: 'providersReducer/OPEN_MODAL',
+  CLOSE_MODAL: 'providersReducer/CLOSE_MODAL'
 };
 
 const initialState = {
@@ -152,7 +154,7 @@ export default (state: DesignerState = initialState, action): DesignerState => {
       handleSuccessMessage(action.payload.data, action.meta);
       return {
         ...state,
-      }
+      };
     case ACTION_TYPES.NODE_PROCESSED: {
       return {
         ...state,
@@ -192,6 +194,18 @@ export default (state: DesignerState = initialState, action): DesignerState => {
         ...state,
         nodes: removeInteractioNode(state.nodes, action.payload)
       }
+    }
+    case ACTION_TYPES.OPEN_MODAL: {
+      return {
+        ...state,
+        showModal: true,
+      };
+    }
+    case ACTION_TYPES.CLOSE_MODAL: {
+      return {
+        ...state,
+        showModal: false,
+      };
     }
     default:
       return state;
@@ -385,6 +399,14 @@ export const postFlow = (flow: IFlow, nodes: Array<NodeUI>) => async (dispatch) 
     Msg.DESIGNER_FLOW_CREATE_SUCCESS,
     Msg.DESIGNER_FLOW_CREATE_FAILURE);
 };
+
+export const openModal = () => ({
+  type: ACTION_TYPES.OPEN_MODAL,
+});
+
+export const closeModal = () => ({
+  type: ACTION_TYPES.CLOSE_MODAL
+});
 
 const addNewUserAndSystemNodes = (nodes: Array<NodeUI>): Array<NodeUI> => {
   return [

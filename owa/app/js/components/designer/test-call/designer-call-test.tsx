@@ -13,7 +13,9 @@ import { RouteComponentProps } from 'react-router-dom';
 import {
   getConfigs,
   getFlow,
-  makeTestCall
+  makeTestCall,
+  openModal,
+  closeModal
 } from '../../../reducers/designer.reducer';
 import { IRootState } from '../../../reducers';
 import {
@@ -30,6 +32,7 @@ import { IFlowCallError, validationSchema } from '../../../shared/model/flow-tes
 import ErrorDesc from '@bit/soldevelo-omrs.cfl-components.error-description';
 import { CONFIG_EXTENSIONS } from '../../../constants';
 import { handleCarret } from '../../../shared/utils/form-handling-util';
+import OpenMRSModal from '../../OpenMRSModal';
 import 'react-chat-elements/dist/main.css';
 
 export interface IDesignerCallTestProps extends StateProps, DispatchProps, RouteComponentProps<{ flowName: string }> {
@@ -126,19 +129,12 @@ export class DesignerCallTest extends React.PureComponent<IDesignerCallTestProps
           errors
         });
       });
-  }
+  };
 
-  handleSubmit = (e) => {
-    e.preventDefault();
+  handleInitCallButton = () => {
     validateForm(this.state, validationSchema)
       .then(() => {
-        const flowName = this.props.flowName ? this.props.flowName : this.props.flow.name as string;
-        this.props.makeTestCall(
-          this.state.configuration,
-          flowName,
-          this.state.phoneNumber,
-          this.state.extension
-        );
+        this.props.openModal();
       })
       .catch((errors) => {
         this.setState({
@@ -146,7 +142,23 @@ export class DesignerCallTest extends React.PureComponent<IDesignerCallTestProps
           errors
         });
       });
-  }
+  };
+
+  handleClose = () => {
+    this.props.closeModal();
+  };
+
+  handleConfirm = () => {
+    const flowName = this.props.flowName ? this.props.flowName : this.props.flow.name as string;
+    this.props.makeTestCall(
+      this.state.configuration,
+      flowName,
+      this.state.phoneNumber,
+      this.state.extension
+    );
+    this.props.closeModal();
+  };
+
 
   renderError(fieldName: string) {
     if (this.state.errors) {
@@ -159,7 +171,13 @@ export class DesignerCallTest extends React.PureComponent<IDesignerCallTestProps
     const errorFormClass = formClass + ' error-field';
     const { errors } = this.state;
     return (
-      <Form className="form" onSubmit={this.handleSubmit}>
+      <Form className="form">
+        <OpenMRSModal
+          deny={this.handleClose}
+          confirm={this.handleConfirm}
+          show={this.props.showModal}
+          title={Msg.INIT_CALL_MODAL_TITLE}
+          txt={Msg.INIT_CALL_MODAL_TEXT} />
         <FormGroup controlId="general-description">
           <Tooltip message={Msg.DESIGNER_TEST_CALL_GENERAL_DESCRIPTION} />
         </FormGroup>
@@ -198,7 +216,11 @@ export class DesignerCallTest extends React.PureComponent<IDesignerCallTestProps
             className={errors && errors.phoneNumber ? errorFormClass : formClass} />
           {this.renderError('phoneNumber')}
         </FormGroup>
-        <Button className="btn btn-primary btn-md" type="submit">Initiate Test Call</Button>
+        <Button
+          className="btn btn-primary btn-md"
+          onClick={this.handleInitCallButton}>
+          Initiate Test Call
+        </Button>
       </Form>
     );
   }
@@ -209,7 +231,9 @@ export const mapStateToProps = ({ designerReducer }: IRootState) => (designerRed
 const mapDispatchToProps = ({
   getConfigs,
   getFlow,
-  makeTestCall
+  makeTestCall,
+  openModal,
+  closeModal
 });
 
 type StateProps = ReturnType<typeof mapStateToProps>;
