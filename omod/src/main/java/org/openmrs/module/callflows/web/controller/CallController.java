@@ -234,8 +234,14 @@ public class CallController extends RestController {
                 if (call == null) {
                     throw new IllegalArgumentException(String.format("Call with id %s cannot be found", callId));
                 }
-                // merge back
-                callUtil.mergeCallWithContext(call, context);
+                if (CallDirection.INCOMING.equals(call.getDirection())) {
+                    // it happens when we use ccxml extension which redirects to vxml. We should never use context from ccxml,
+                    // it can cause a lot of problems, it is a reason why context has been reset.
+                    call.setContext(new HashMap<>());
+                } else {
+                    // merge back
+                    callUtil.mergeCallWithContext(call, context);
+                }
             }
 
             // Link the nextURL to submit the conversation to
