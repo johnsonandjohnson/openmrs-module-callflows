@@ -263,8 +263,12 @@ class UserNode extends React.Component<IProps, IState> {
           </Col>
           <Col md={5}>
             <AddButton handleAdd={this.addBlock} txt="Form" />
-            <AddButton handleAdd={this.addField} txt="Field" />
-            <AddButton handleAdd={this.addTTS} txt="TTS" />
+            {!_.isEmpty(node.blocks) && selectedBlock &&
+              <AddButton handleAdd={this.addField} txt="Field" />
+            }
+            {!_.isEmpty(node.blocks) && selectedBlock &&
+              <AddButton handleAdd={this.addTTS} txt="TTS" />
+            }
           </Col>
         </Row>
         <Row>
