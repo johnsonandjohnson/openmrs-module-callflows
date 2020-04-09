@@ -77,7 +77,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
@@ -787,7 +786,6 @@ public class CallControllerTest extends BaseTest {
 
     @Test
     public void shouldMakeCallWithProperParamsForHandleOutgoingByPersonUuidWithReturnUrlAndActorType() throws Exception {
-        final String returnUrl = "/openmrs/coreapps/clinicianfacing/patient.page?patientId=af57f285-8ad5-49ab-a5dd-2aa6d265710a";
         final String personUuid = "af57f285-8ad5-49ab-a5dd-2aa6d265710a";
         final String phone = "1234567890";
         final String actorType = "Patient";
@@ -806,12 +804,9 @@ public class CallControllerTest extends BaseTest {
                 outboundCall);
 
         // When
-        mockMvc.perform(customGet(String.format("/callflows/person/%s/out/voxeo/flows/MainFlow.vxml"
-                        + "?returnUrl=%s&actorType=%s",
-                personUuid, returnUrl, actorType)))
-                .andExpect(status().is(HttpStatus.FOUND.value()))
-                .andExpect(header().string("Location",
-                        "/openmrs/coreapps/clinicianfacing/patient.page?patientId=af57f285-8ad5-49ab-a5dd-2aa6d265710a"));
+        mockMvc.perform(customGet(String.format("/callflows/person/%s/out/voxeo/flows/MainFlow.vxml?&actorType=%s",
+                personUuid, actorType)))
+                .andExpect(status().is(HttpStatus.OK.value()));
 
         // Then
         verify(callService, times(1)).makeCall(
@@ -820,7 +815,6 @@ public class CallControllerTest extends BaseTest {
 
     @Test
     public void shouldMakeCallWithProperParamsForHandleOutgoingByPersonUuidWithReturnUrl() throws Exception {
-        final String returnUrl = "/openmrs/coreapps/clinicianfacing/patient.page?patientId=af57f285-8ad5-49ab-a5dd-2aa6d265710a";
         final String personUuid = "af57f285-8ad5-49ab-a5dd-2aa6d265710a";
         final String phone = "1234567890";
         final String customParam = "customParam";
@@ -839,12 +833,9 @@ public class CallControllerTest extends BaseTest {
                 outboundCall);
 
         // When
-        mockMvc.perform(customGet(String.format("/callflows/person/%s/out/voxeo/flows/MainFlow.vxml"
-                        + "?returnUrl=%s&customParam=%s",
-                personUuid, returnUrl, customParam)))
-                .andExpect(status().is(HttpStatus.FOUND.value()))
-                .andExpect(header().string("Location",
-                        "/openmrs/coreapps/clinicianfacing/patient.page?patientId=af57f285-8ad5-49ab-a5dd-2aa6d265710a"));
+        mockMvc.perform(customGet(String.format("/callflows/person/%s/out/voxeo/flows/MainFlow.vxml?&customParam=%s",
+                personUuid, customParam)))
+                .andExpect(status().is(HttpStatus.OK.value()));
 
         // Then
         verify(callService, times(1)).makeCall(

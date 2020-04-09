@@ -121,7 +121,6 @@ public class CallController extends RestController {
     private static final int DEFAULT_FETCH_SIZE = 10000;
     private static final int NUMBER_OF_TEN_K_FILES = 5;
     private static final String TELEPHONE_NUMBER = "Telephone Number";
-    public static final String OPENMRS_PREFIX = "openmrs/";
 
     @Autowired
     private ConfigService configService;
@@ -415,8 +414,8 @@ public class CallController extends RestController {
     }
 
     @RequestMapping(value = "/person/{personUuid}/out/{configName}/flows/{name}.{extension}")
-    @ResponseStatus(value = HttpStatus.FOUND)
-    public String handleOutgoingByPersonUuid(@PathVariable(value = "configName") String configName,
+    @ResponseStatus(value = HttpStatus.OK)
+    public void handleOutgoingByPersonUuid(@PathVariable(value = "configName") String configName,
             @PathVariable(value = "name") String name,
             @PathVariable(value = "extension") String extension,
             @PathVariable(value = "personUuid") String personUuid,
@@ -428,13 +427,11 @@ public class CallController extends RestController {
             additionalParams.put(Constants.PARAM_PHONE, phoneNumber);
             additionalParams.put(Constants.PARAM_PERSON_ID, person.getPersonId());
 
-            Object returnUrl = params.get("returnUrl");
             params.remove("returnUrl");
             additionalParams.putAll(params);
 
             callService.makeCall(configName, name, additionalParams);
 
-            return returnUrl != null ? "redirect:" + createReturnUrl(returnUrl.toString()) : "";
         } else {
             throw new IllegalArgumentException(String.format("Missing phone number for %s person", personUuid));
         }
@@ -567,13 +564,6 @@ public class CallController extends RestController {
         } else {
             setInInternalContext(context, KEY_NEXT_URL, nextUrlValue);
         }
-    }
-
-    private String createReturnUrl(String returnUrl) {
-        if (returnUrl.contains(OPENMRS_PREFIX)) {
-            returnUrl = returnUrl.replace(OPENMRS_PREFIX, StringUtils.EMPTY);
-        }
-        return returnUrl;
     }
 
     private String getTelephoneFromPerson(Person person) {
