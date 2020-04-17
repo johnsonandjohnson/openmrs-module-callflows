@@ -109,6 +109,85 @@
 		</plugins>
 	</build>
 
+	<profiles>
+		<profile>
+			<id>default</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<version>${surefireVersion}</version>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>code-coverage</id>
+			<dependencies>
+				<dependency>
+					<groupId>org.jacoco</groupId>
+					<artifactId>org.jacoco.agent</artifactId>
+					<classifier>runtime</classifier>
+					<version>${jacocoVersion}</version>
+				</dependency>
+			</dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+						<version>${jacocoVersion}</version>
+						<executions>
+							<!-- Off line instrumentation is needed to compute coverage for Power Mock tests -->
+							<execution>
+								<id>default-instrument</id>
+								<goals>
+									<goal>instrument</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>default-restore-instrumented-classes</id>
+								<goals>
+									<goal>restore-instrumented-classes</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>default-report</id>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>report</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<version>${surefireVersion}</version>
+						<dependencies>
+							<dependency>
+								<groupId>org.apache.maven.surefire</groupId>
+								<artifactId>surefire-junit47</artifactId>
+								<version>${surefireVersion}</version>
+							</dependency>
+						</dependencies>
+						<configuration>
+							<!-- Workaround to https://code.google.com/p/powermock/issues/detail?id=504 -->
+							<argLine>-XX:-UseSplitVerifier</argLine>
+							<systemPropertyVariables>
+								<jacoco-agent.destfile>target/jacoco.exec</jacoco-agent.destfile>
+							</systemPropertyVariables>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
 	<repositories>
 		<repository>
 			<id>openmrs-repo</id>
@@ -146,5 +225,7 @@
 		<javax.servlet.version>3.0.1</javax.servlet.version>
 		<jjwtVersion>0.9.1</jjwtVersion>
 		<jsonPathAssertVersion>0.8.1</jsonPathAssertVersion>
+		<jacocoVersion>0.8.2</jacocoVersion>
+		<surefireVersion>2.17</surefireVersion>
 	</properties>
 </project>
