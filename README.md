@@ -102,6 +102,18 @@ You can build .omod file with skip tests:
 
 It creates *.omod file in omod/target directory.
 
+##### Code coverage
+
+You can also build module with code coverage profile using:
+
+`mvn clean install -Pcode-coverage`
+
+Apart from creation .omod file it generates code coverage reports which are available in:
+
+api/target/site/jacoco/index.html
+
+omod/target/site/jacoco/index.html
+
 2.Use the OpenMRS Administration > Manage Modules screen to upload and install the .omod file.
 
 If uploads are not allowed from the web (changable via a runtime property), you can drop the omod
