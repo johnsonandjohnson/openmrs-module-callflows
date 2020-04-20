@@ -1,10 +1,11 @@
 package org.openmrs.module.callflows.api.contract;
 
-import java.util.List;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.openmrs.module.callflows.api.validate.annotation.UniqueName;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @UniqueName
 public class ConfigContracts {

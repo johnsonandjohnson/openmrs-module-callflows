@@ -1,14 +1,14 @@
 package org.openmrs.module.callflows.api.exception;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.Collections;
-import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.openmrs.module.callflows.BaseTest;
+import static org.junit.Assert.assertEquals;
+
+import java.util.Collections;
+import java.util.Map;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ValidationExceptionTest extends BaseTest {

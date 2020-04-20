@@ -2,6 +2,7 @@ package org.openmrs.module.callflows.api.domain.flow;
 
 import org.codehaus.jackson.annotate.JsonSubTypes;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
+
 import java.util.List;
 
 /**
@@ -16,7 +17,7 @@ import java.util.List;
         // we have a form level block
         @JsonSubTypes.Type(value = FormBlock.class, name = "form"),
         // and a menu level block
-        @JsonSubTypes.Type(value = MenuBlock.class, name = "menu") })
+        @JsonSubTypes.Type(value = MenuBlock.class, name = "menu")})
 public class Block {
 
     /**

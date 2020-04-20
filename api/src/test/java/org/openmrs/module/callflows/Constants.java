@@ -22,10 +22,10 @@ public final class Constants {
     }
 
     public static final MediaType APPLICATION_JSON_UTF8 = new MediaType("application", "json",
-                                                                        Charset.forName("UTF-8"));
+            Charset.forName("UTF-8"));
 
     public static final MediaType APPLICATION_VXML = new MediaType("application", "voicexml+xml",
-                                                                   Charset.forName("UTF-8"));
+            Charset.forName("UTF-8"));
 
     public static final MediaType PLAIN_TEXT = new MediaType("text", "plain", Charset.forName("UTF-8"));
 
@@ -186,10 +186,10 @@ public final class Constants {
     public static final String STATUS_TEXT = "was busy";
 
     public static final String NEXT_URL_JSON = "http://localhost/openmrs/ws/callflows/calls" +
-        "/6acafc03-3818-4e36-b40a-8881fe5ac71b.json";
+            "/6acafc03-3818-4e36-b40a-8881fe5ac71b.json";
 
     public static final String NEXT_URL_VXML = "http://localhost/openmrs/ws/callflows/calls" +
-        "/6acafc03-3818-4e36-b40a-8881fe5ac71b.vxml";
+            "/6acafc03-3818-4e36-b40a-8881fe5ac71b.vxml";
 
     public static final String ERROR_SCRIPT = "error:SCRIPT:error in script";
 

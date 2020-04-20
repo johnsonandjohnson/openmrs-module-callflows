@@ -7,10 +7,10 @@ import java.io.InputStream;
 
 public interface SettingsManagerService extends OpenmrsService {
 
-	void saveRawConfig(String configFileName, ByteArrayResource resource);
+    void saveRawConfig(String configFileName, ByteArrayResource resource);
 
-	InputStream getRawConfig(String configFileName);
+    InputStream getRawConfig(String configFileName);
 
-	boolean configurationExist(String configurationFileName);
+    boolean configurationExist(String configurationFileName);
 
 }

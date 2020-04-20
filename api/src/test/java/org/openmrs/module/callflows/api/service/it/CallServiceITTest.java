@@ -214,7 +214,7 @@ public class CallServiceITTest extends BaseModuleContextSensitiveTest {
 
         // Then
         CallAssert.assertNoChangeToNonChangeableFields(returnedCall,
-                                                       outboundCall.getCallId());
+                outboundCall.getCallId());
         CallAssert.assertChangeToChangeableFields(returnedCall);
         CallAssert.assertActorUpdated(returnedCall);
         CallAssert.assertExternalUpdated(returnedCall);
@@ -239,7 +239,7 @@ public class CallServiceITTest extends BaseModuleContextSensitiveTest {
         // Then
         assertNotNull(returnedCall);
         CallAssert.assertNoChangeToNonChangeableFields(returnedCall,
-                                                       outboundCall.getCallId());
+                outboundCall.getCallId());
         CallAssert.assertChangeToChangeableFields(returnedCall);
         CallAssert.assertActor(returnedCall);
     }
@@ -344,8 +344,7 @@ public class CallServiceITTest extends BaseModuleContextSensitiveTest {
                 bean = (T) advised.getTargetSource().getTarget();
             }
             return bean;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException("Could not unwrap proxy!", e);
         }
     }

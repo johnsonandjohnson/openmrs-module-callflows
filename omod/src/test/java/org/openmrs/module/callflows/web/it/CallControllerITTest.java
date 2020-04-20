@@ -24,16 +24,16 @@ import org.openmrs.module.callflows.api.domain.flow.Template;
 import org.openmrs.module.callflows.api.domain.flow.TextElement;
 import org.openmrs.module.callflows.api.domain.flow.UserNode;
 import org.openmrs.module.callflows.api.domain.types.CallDirection;
+import org.openmrs.module.callflows.api.evaluation.EvaluationCommand;
 import org.openmrs.module.callflows.api.exception.CallFlowAlreadyExistsException;
-import org.openmrs.module.callflows.api.util.TestUtil;
 import org.openmrs.module.callflows.api.helper.CallFlowHelper;
 import org.openmrs.module.callflows.api.helper.ConfigHelper;
 import org.openmrs.module.callflows.api.helper.RendererHelper;
 import org.openmrs.module.callflows.api.service.CallFlowService;
 import org.openmrs.module.callflows.api.service.CallService;
 import org.openmrs.module.callflows.api.service.ConfigService;
-import org.openmrs.module.callflows.api.evaluation.EvaluationCommand;
 import org.openmrs.module.callflows.api.service.FlowService;
+import org.openmrs.module.callflows.api.util.TestUtil;
 import org.openmrs.web.test.BaseModuleWebContextSensitiveTest;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.support.AopUtils;
@@ -68,347 +68,346 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebAppConfiguration
 public class CallControllerITTest extends BaseModuleWebContextSensitiveTest {
 
-	private static final String NOT_EXISTING_SERVICE_BEAN_NAME = "not.existing.Service";
+    private static final String NOT_EXISTING_SERVICE_BEAN_NAME = "not.existing.Service";
 
-	private static final String EXPECTED_RESULT = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<vxml version=\"2.1\">\n\t"
-			+ "<form>\n\t\t<block><prompt>Welcome to the active node test</prompt></block>\n\t</form>\n</vxml>";
+    private static final String EXPECTED_RESULT = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<vxml version=\"2.1\">\n\t"
+            + "<form>\n\t\t<block><prompt>Welcome to the active node test</prompt></block>\n\t</form>\n</vxml>";
 
-	@Autowired
-	private ConfigService configService;
+    @Autowired
+    private ConfigService configService;
 
-	@Autowired
-	private DbSessionFactory dbSessionFactory;
+    @Autowired
+    private DbSessionFactory dbSessionFactory;
 
-	@Autowired
-	protected SessionFactory sessionFactory;
+    @Autowired
+    protected SessionFactory sessionFactory;
 
-	private CallDao callDao;
+    private CallDao callDao;
 
-	@Autowired
-	private CallFlowService callFlowService;
+    @Autowired
+    private CallFlowService callFlowService;
 
-	@Autowired
-	private CallService callService;
+    @Autowired
+    private CallService callService;
 
-	@Autowired
-	private FlowService flowService;
+    @Autowired
+    private FlowService flowService;
 
-	@Autowired
-	private CallFlowDao callFlowDao;
+    @Autowired
+    private CallFlowDao callFlowDao;
 
-	@Autowired
-	@Qualifier("callflows.baseEvaluationCommand")
-	private EvaluationCommand evaluationCommand;
+    @Autowired
+    @Qualifier("callflows.baseEvaluationCommand")
+    private EvaluationCommand evaluationCommand;
 
-	private List<Config> configs;
+    private List<Config> configs;
 
-	private List<Renderer> renderers;
+    private List<Renderer> renderers;
 
-	private CallFlow mainFlow;
+    private CallFlow mainFlow;
 
-	private Call outboundCall;
+    private Call outboundCall;
 
-	private Map<String, Object> params;
+    private Map<String, Object> params;
 
-	private Flow flow;
+    private Flow flow;
 
-	private UserNode userNode;
+    private UserNode userNode;
 
-	private Template vxmlTemplate;
+    private Template vxmlTemplate;
 
-	private MockMvc mockMvc;
+    private MockMvc mockMvc;
 
-	@Autowired
-	private WebApplicationContext webApplicationContext;
+    @Autowired
+    private WebApplicationContext webApplicationContext;
 
-	@Before
-	public void setUp() throws IOException, CallFlowAlreadyExistsException, NoSuchMethodException, InvocationTargetException,
-			IllegalAccessException {
-		// Used to avoid the issues with the H2 when multiple transactions are used
-		CallDaoImpl callDaoImpl = new CallDaoImpl();
-		ReflectionTestUtils.setField(callDaoImpl, "dbSessionFactory", dbSessionFactory);
-		ReflectionTestUtils.setField(callDaoImpl, "sessionFactory", sessionFactory);
-		callDao = callDaoImpl;
-		ReflectionTestUtils.setField(unwrapProxy(callService), null, callDao, CallDao.class);
-		// Save only voxeo in the DB and not yo
-		configs = ConfigHelper.createConfigs();
-		configs.remove(1);
-		configService.updateConfigs(configs);
+    @Before
+    public void setUp() throws IOException, CallFlowAlreadyExistsException, NoSuchMethodException, InvocationTargetException,
+            IllegalAccessException {
+        // Used to avoid the issues with the H2 when multiple transactions are used
+        CallDaoImpl callDaoImpl = new CallDaoImpl();
+        ReflectionTestUtils.setField(callDaoImpl, "dbSessionFactory", dbSessionFactory);
+        ReflectionTestUtils.setField(callDaoImpl, "sessionFactory", sessionFactory);
+        callDao = callDaoImpl;
+        ReflectionTestUtils.setField(unwrapProxy(callService), null, callDao, CallDao.class);
+        // Save only voxeo in the DB and not yo
+        configs = ConfigHelper.createConfigs();
+        configs.remove(1);
+        configService.updateConfigs(configs);
 
-		renderers = RendererHelper.createRenderers();
-		renderers.remove(1);
-		configService.updateRenderers(renderers);
+        renderers = RendererHelper.createRenderers();
+        renderers.remove(1);
+        configService.updateRenderers(renderers);
 
-		// create a callflow
-		mainFlow = CallFlowHelper.createMainFlow();
-		mainFlow.setRaw(TestUtil.loadFile("main_flow.json"));
-		callFlowService.create(mainFlow);
+        // create a callflow
+        mainFlow = CallFlowHelper.createMainFlow();
+        mainFlow.setRaw(TestUtil.loadFile("main_flow.json"));
+        callFlowService.create(mainFlow);
 
-		// create a outbound call
-		params = new HashMap<>();
-		outboundCall = callService.create(Constants.CONFIG_VOXEO,
-				mainFlow,
-				Constants.CALLFLOW_MAIN_ENTRY,
-				CallDirection.OUTGOING,
-				params);
+        // create a outbound call
+        params = new HashMap<>();
+        outboundCall = callService.create(Constants.CONFIG_VOXEO,
+                mainFlow,
+                Constants.CALLFLOW_MAIN_ENTRY,
+                CallDirection.OUTGOING,
+                params);
 
-		// load flow
-		flow = flowService.load(Constants.CALLFLOW_MAIN);
-		userNode = (UserNode) flow.getNodes().get(0);
-		vxmlTemplate = userNode.getTemplates().get(Constants.CONFIG_RENDERER_VXML);
+        // load flow
+        flow = flowService.load(Constants.CALLFLOW_MAIN);
+        userNode = (UserNode) flow.getNodes().get(0);
+        vxmlTemplate = userNode.getTemplates().get(Constants.CONFIG_RENDERER_VXML);
 
-		mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-		Context.getUserContext().logout();
-		Module module = new Module("callflows");
-		module.setModuleId("callflows");
-		Method m = ModuleFactory.class.getDeclaredMethod("getDaemonToken", Module.class);
-		m.setAccessible(true); //if security settings allow this
-		Object o = m.invoke(null, module); //use null if the method is static
-		evaluationCommand.setDaemonToken((DaemonToken) o);
-	}
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        Context.getUserContext().logout();
+        Module module = new Module("callflows");
+        module.setModuleId("callflows");
+        Method m = ModuleFactory.class.getDeclaredMethod("getDaemonToken", Module.class);
+        m.setAccessible(true); //if security settings allow this
+        Object o = m.invoke(null, module); //use null if the method is static
+        evaluationCommand.setDaemonToken((DaemonToken) o);
+    }
 
-	@After
-	public void tearDown() {
-		configService.updateConfigs(new ArrayList());
-		callDao.deleteAll();
-		callFlowDao.deleteAll();
-	}
+    @After
+    public void tearDown() {
+        configService.updateConfigs(new ArrayList());
+        callDao.deleteAll();
+        callFlowDao.deleteAll();
+    }
 
-	@Test
-	public void shouldHandleIncomingUseOutboundCallAndUpdateContext() throws Exception {
-		mainFlow.setRaw(TestUtil.loadFile("main_flow_with_auth.json"));
-		mockMvc.perform(get("/callflows/in/voxeo/flows/MainFlow.vxml")
-				.param("callId", outboundCall.getCallId())
-				.param("jumpTo", "MainFlow"))
-				.andExpect(status().is(HttpStatus.SC_OK))
-				.andExpect(content().contentType(Constants.APPLICATION_VXML)).andReturn();
-		assertThat(outboundCall.getContext().size(), is(2));
-		mockMvc.perform(get("/callflows/status/" + outboundCall.getCallId())
-				.param("status", "IN_PROGRESS")
-				.param("reason", "dialog start"))
-				.andExpect(status().is(HttpStatus.SC_OK)).andReturn();
-		MvcResult result = mockMvc.perform(get("/callflows/calls/" + outboundCall.getCallId() + ".vxml")
-				.param("callId", outboundCall.getCallId())
-				.param("input", "1"))
-				.andExpect(status().is(HttpStatus.SC_OK))
-				.andExpect(content().contentType(Constants.APPLICATION_VXML)).andReturn();
-		assertThat(result.getResponse().getContentAsString(), is(EXPECTED_RESULT));
-	}
+    @Test
+    public void shouldHandleIncomingUseOutboundCallAndUpdateContext() throws Exception {
+        mainFlow.setRaw(TestUtil.loadFile("main_flow_with_auth.json"));
+        mockMvc.perform(get("/callflows/in/voxeo/flows/MainFlow.vxml")
+                .param("callId", outboundCall.getCallId())
+                .param("jumpTo", "MainFlow"))
+                .andExpect(status().is(HttpStatus.SC_OK))
+                .andExpect(content().contentType(Constants.APPLICATION_VXML)).andReturn();
+        assertThat(outboundCall.getContext().size(), is(2));
+        mockMvc.perform(get("/callflows/status/" + outboundCall.getCallId())
+                .param("status", "IN_PROGRESS")
+                .param("reason", "dialog start"))
+                .andExpect(status().is(HttpStatus.SC_OK)).andReturn();
+        MvcResult result = mockMvc.perform(get("/callflows/calls/" + outboundCall.getCallId() + ".vxml")
+                .param("callId", outboundCall.getCallId())
+                .param("input", "1"))
+                .andExpect(status().is(HttpStatus.SC_OK))
+                .andExpect(content().contentType(Constants.APPLICATION_VXML)).andReturn();
+        assertThat(result.getResponse().getContentAsString(), is(EXPECTED_RESULT));
+    }
 
-	@Test
-	public void shouldHandleIncoming() throws Exception {
-		mockMvc.perform(get("/callflows/in/voxeo/flows/MainFlow.vxml"))
-				.andExpect(status().is(HttpStatus.SC_OK))
-				.andExpect(content().contentType(Constants.APPLICATION_VXML));
-	}
+    @Test
+    public void shouldHandleIncoming() throws Exception {
+        mockMvc.perform(get("/callflows/in/voxeo/flows/MainFlow.vxml"))
+                .andExpect(status().is(HttpStatus.SC_OK))
+                .andExpect(content().contentType(Constants.APPLICATION_VXML));
+    }
 
-	@Test
-	public void shouldHandleIncomingWithJsonExtension() throws Exception {
-		mockMvc.perform(get("/callflows/in/voxeo/flows/MainFlow.json"))
-				.andExpect(status().is(HttpStatus.SC_OK))
-				.andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8));
-	}
+    @Test
+    public void shouldHandleIncomingWithJsonExtension() throws Exception {
+        mockMvc.perform(get("/callflows/in/voxeo/flows/MainFlow.json"))
+                .andExpect(status().is(HttpStatus.SC_OK))
+                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8));
+    }
 
-	@Test
-	public void shouldHandleIncomingWithCallIdParamAndUseExistingOutboundCall() throws Exception {
-		mockMvc.perform(get("/callflows/in/voxeo/flows/MainFlow.vxml")
-				.param("internal.callid", outboundCall.getCallId()))
-				.andExpect(status().is(HttpStatus.SC_OK))
-				.andExpect(content().contentType(Constants.APPLICATION_VXML));
-	}
+    @Test
+    public void shouldHandleIncomingWithCallIdParamAndUseExistingOutboundCall() throws Exception {
+        mockMvc.perform(get("/callflows/in/voxeo/flows/MainFlow.vxml")
+                .param("internal.callid", outboundCall.getCallId()))
+                .andExpect(status().is(HttpStatus.SC_OK))
+                .andExpect(content().contentType(Constants.APPLICATION_VXML));
+    }
 
-	@Test
-	public void shouldHandleIncomingWithJsonExtensionAndCallIdParamAndUseExistingOutboundCall() throws Exception {
-		mockMvc.perform(get("/callflows/in/voxeo/flows/MainFlow.json")
-				.param("internal.callid", outboundCall.getCallId()))
-				.andExpect(status().is(HttpStatus.SC_OK))
-				.andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8));
-	}
+    @Test
+    public void shouldHandleIncomingWithJsonExtensionAndCallIdParamAndUseExistingOutboundCall() throws Exception {
+        mockMvc.perform(get("/callflows/in/voxeo/flows/MainFlow.json")
+                .param("internal.callid", outboundCall.getCallId()))
+                .andExpect(status().is(HttpStatus.SC_OK))
+                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8));
+    }
 
-	@Test
-	public void shouldReturnInternalServerErrorIfScriptErrorInHandleIncoming() throws Exception {
-		// Given a velocity directive that's missing a #end
-		vxmlTemplate.setContent("#if ($missing) no end hee hee hee");
-		mainFlow.setRaw(json(flow));
-		callFlowService.update(mainFlow);
+    @Test
+    public void shouldReturnInternalServerErrorIfScriptErrorInHandleIncoming() throws Exception {
+        // Given a velocity directive that's missing a #end
+        vxmlTemplate.setContent("#if ($missing) no end hee hee hee");
+        mainFlow.setRaw(json(flow));
+        callFlowService.update(mainFlow);
 
-		mockMvc.perform(get("/callflows/in/voxeo/flows/MainFlow.vxml"))
-				.andExpect(status().is(HttpStatus.SC_INTERNAL_SERVER_ERROR))
-				.andExpect(content().contentType(Constants.PLAIN_TEXT));
-	}
+        mockMvc.perform(get("/callflows/in/voxeo/flows/MainFlow.vxml"))
+                .andExpect(status().is(HttpStatus.SC_INTERNAL_SERVER_ERROR))
+                .andExpect(content().contentType(Constants.PLAIN_TEXT));
+    }
 
-	@Test
-	public void shouldReturnInternalServerErrorIfScriptErrorInHandleIncomingWithJsonExtension() throws Exception {
-		// Given a velocity directive that's missing a #end in the text element used for json
-		((TextElement) userNode.getBlocks().get(0).getElements().get(0)).setTxt("#if ($x) we won't close!");
-		mainFlow.setRaw(json(flow));
-		callFlowService.update(mainFlow);
+    @Test
+    public void shouldReturnInternalServerErrorIfScriptErrorInHandleIncomingWithJsonExtension() throws Exception {
+        // Given a velocity directive that's missing a #end in the text element used for json
+        ((TextElement) userNode.getBlocks().get(0).getElements().get(0)).setTxt("#if ($x) we won't close!");
+        mainFlow.setRaw(json(flow));
+        callFlowService.update(mainFlow);
 
-		mockMvc.perform(get("/callflows/in/voxeo/flows/MainFlow.json"))
-				.andExpect(status().is(HttpStatus.SC_INTERNAL_SERVER_ERROR))
-				.andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8));
-	}
+        mockMvc.perform(get("/callflows/in/voxeo/flows/MainFlow.json"))
+                .andExpect(status().is(HttpStatus.SC_INTERNAL_SERVER_ERROR))
+                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8));
+    }
 
-	@Test
-	public void shouldReturnInternalServerErrorIfServicesCouldNotBeLoadedInHandleIncoming() throws Exception {
-		// Given a bad service input by a call flow designer
-		givenABadServiceExists();
+    @Test
+    public void shouldReturnInternalServerErrorIfServicesCouldNotBeLoadedInHandleIncoming() throws Exception {
+        // Given a bad service input by a call flow designer
+        givenABadServiceExists();
 
-		mockMvc.perform(get("/callflows/in/voxeo/flows/MainFlow.vxml"))
-				.andExpect(status().is(HttpStatus.SC_INTERNAL_SERVER_ERROR))
-				.andExpect(content().contentType(Constants.PLAIN_TEXT));
-	}
+        mockMvc.perform(get("/callflows/in/voxeo/flows/MainFlow.vxml"))
+                .andExpect(status().is(HttpStatus.SC_INTERNAL_SERVER_ERROR))
+                .andExpect(content().contentType(Constants.PLAIN_TEXT));
+    }
 
-	@Test
-	public void shouldReturnInternalServerErrorIfServicesCouldNotBeLoadedInHandleIncomingWithJsonExtension()
-			throws Exception {
-		// Given
-		givenABadServiceExists();
+    @Test
+    public void shouldReturnInternalServerErrorIfServicesCouldNotBeLoadedInHandleIncomingWithJsonExtension()
+            throws Exception {
+        // Given
+        givenABadServiceExists();
 
-		mockMvc.perform(get("/callflows/in/voxeo/flows/MainFlow.json"))
-				.andExpect(status().is(HttpStatus.SC_INTERNAL_SERVER_ERROR))
-				.andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8));
-	}
+        mockMvc.perform(get("/callflows/in/voxeo/flows/MainFlow.json"))
+                .andExpect(status().is(HttpStatus.SC_INTERNAL_SERVER_ERROR))
+                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8));
+    }
 
-	@Test
-	public void shouldReturnBadRequestIfBadConfigIsUsedInHandleIncomingCall() throws Exception {
-		mockMvc.perform(get("/callflows/in/yo-i-dont-exist/flows/MainFlow.vxml"))
-				.andExpect(status().is(HttpStatus.SC_BAD_REQUEST))
-				.andExpect(content().contentType(Constants.PLAIN_TEXT));
-	}
+    @Test
+    public void shouldReturnBadRequestIfBadConfigIsUsedInHandleIncomingCall() throws Exception {
+        mockMvc.perform(get("/callflows/in/yo-i-dont-exist/flows/MainFlow.vxml"))
+                .andExpect(status().is(HttpStatus.SC_BAD_REQUEST))
+                .andExpect(content().contentType(Constants.PLAIN_TEXT));
+    }
 
-	@Test
-	public void shouldReturnBadRequestIfBadConfigIsUsedInHandleIncomingCallWithJsonExtension() throws Exception {
-		mockMvc.perform(get("/callflows/in/yo-i-dont-exist/flows/MainFlow.json"))
-				.andExpect(status().is(HttpStatus.SC_BAD_REQUEST))
-				.andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8));
-	}
+    @Test
+    public void shouldReturnBadRequestIfBadConfigIsUsedInHandleIncomingCallWithJsonExtension() throws Exception {
+        mockMvc.perform(get("/callflows/in/yo-i-dont-exist/flows/MainFlow.json"))
+                .andExpect(status().is(HttpStatus.SC_BAD_REQUEST))
+                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8));
+    }
 
-	@Test
-	public void shouldReturnBadRequestIfBadFlowNameIsUsedInHandleIncomingCall() throws Exception {
-		mockMvc.perform(get("/callflows/in/voxeo/flows/DontExistHereOrAnyWhereElse.vxml"))
-				.andExpect(status().is(HttpStatus.SC_BAD_REQUEST))
-				.andExpect(content().contentType(Constants.PLAIN_TEXT));
-	}
+    @Test
+    public void shouldReturnBadRequestIfBadFlowNameIsUsedInHandleIncomingCall() throws Exception {
+        mockMvc.perform(get("/callflows/in/voxeo/flows/DontExistHereOrAnyWhereElse.vxml"))
+                .andExpect(status().is(HttpStatus.SC_BAD_REQUEST))
+                .andExpect(content().contentType(Constants.PLAIN_TEXT));
+    }
 
-	@Test
-	public void shouldReturnBadRequestIfBadFlowNameIsUsedInHandleIncomingCallWithJsonExtension() throws Exception {
-		mockMvc.perform(get("/callflows/in/voxeo/flows/DontExistHereOrAnyWhereElse.json"))
-				.andExpect(status().is(HttpStatus.SC_BAD_REQUEST))
-				.andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8));
-	}
+    @Test
+    public void shouldReturnBadRequestIfBadFlowNameIsUsedInHandleIncomingCallWithJsonExtension() throws Exception {
+        mockMvc.perform(get("/callflows/in/voxeo/flows/DontExistHereOrAnyWhereElse.json"))
+                .andExpect(status().is(HttpStatus.SC_BAD_REQUEST))
+                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8));
+    }
 
-	/* Call Continuation */
-	/* ================= */
+    /* Call Continuation */
+    /* ================= */
 
-	@Test
-	public void shouldHandleCallContinuation() throws Exception {
-		mockMvc.perform(get("/callflows/calls/" + outboundCall.getCallId() + ".vxml"))
-				.andExpect(status().is(HttpStatus.SC_OK))
-				.andExpect(content().contentType(Constants.APPLICATION_VXML));
-	}
+    @Test
+    public void shouldHandleCallContinuation() throws Exception {
+        mockMvc.perform(get("/callflows/calls/" + outboundCall.getCallId() + ".vxml"))
+                .andExpect(status().is(HttpStatus.SC_OK))
+                .andExpect(content().contentType(Constants.APPLICATION_VXML));
+    }
 
-	@Test
-	public void shouldHandleContinuationWithAuth() throws Exception {
-		mainFlow.setRaw(TestUtil.loadFile("main_flow_with_auth.json"));
-		mockMvc.perform(get("/callflows/calls/" + outboundCall.getCallId() + ".vxml")
-				.param("input", "1"))
-				.andExpect(status().is(HttpStatus.SC_OK))
-				.andExpect(content().contentType(Constants.APPLICATION_VXML));
-	}
+    @Test
+    public void shouldHandleContinuationWithAuth() throws Exception {
+        mainFlow.setRaw(TestUtil.loadFile("main_flow_with_auth.json"));
+        mockMvc.perform(get("/callflows/calls/" + outboundCall.getCallId() + ".vxml")
+                .param("input", "1"))
+                .andExpect(status().is(HttpStatus.SC_OK))
+                .andExpect(content().contentType(Constants.APPLICATION_VXML));
+    }
 
-	@Test
-	public void shouldHandleCallContinuationWithJsonExtension() throws Exception {
-		mockMvc.perform(get("/callflows/calls/" + outboundCall.getCallId() + ".json"))
-				.andExpect(status().is(HttpStatus.SC_OK))
-				.andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8));
-	}
+    @Test
+    public void shouldHandleCallContinuationWithJsonExtension() throws Exception {
+        mockMvc.perform(get("/callflows/calls/" + outboundCall.getCallId() + ".json"))
+                .andExpect(status().is(HttpStatus.SC_OK))
+                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8));
+    }
 
-	@Test
-	public void shouldHandleCallContinuationWhenJumpToIsSpecified() throws Exception {
+    @Test
+    public void shouldHandleCallContinuationWhenJumpToIsSpecified() throws Exception {
 
-		CallFlow testFlow = CallFlowHelper.createTestFlow();
-		testFlow.setRaw(TestUtil.loadFile("test_flow.json"));
-		callFlowService.create(testFlow);
-		mockMvc.perform(get("/callflows/calls/" + outboundCall.getCallId() + ".json")
-				.param("jumpTo", "TestFlow"))
-				.andExpect(status().is(HttpStatus.SC_OK))
-				.andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8));
-	}
+        CallFlow testFlow = CallFlowHelper.createTestFlow();
+        testFlow.setRaw(TestUtil.loadFile("test_flow.json"));
+        callFlowService.create(testFlow);
+        mockMvc.perform(get("/callflows/calls/" + outboundCall.getCallId() + ".json")
+                .param("jumpTo", "TestFlow"))
+                .andExpect(status().is(HttpStatus.SC_OK))
+                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8));
+    }
 
-	@Test
-	public void shouldTerminateCallInHandleCallContinuationIfNotAbleToGetToAUserNode() throws Exception {
-		// Given
-		givenABadJumpFromASystemNodeThatLeadsToNowhere();
-		mockMvc.perform(get("/callflows/calls/" + outboundCall.getCallId() + ".vxml"))
-				.andExpect(status().is(HttpStatus.SC_OK))
-				.andExpect(content().contentType(Constants.APPLICATION_VXML));
-	}
+    @Test
+    public void shouldTerminateCallInHandleCallContinuationIfNotAbleToGetToAUserNode() throws Exception {
+        // Given
+        givenABadJumpFromASystemNodeThatLeadsToNowhere();
+        mockMvc.perform(get("/callflows/calls/" + outboundCall.getCallId() + ".vxml"))
+                .andExpect(status().is(HttpStatus.SC_OK))
+                .andExpect(content().contentType(Constants.APPLICATION_VXML));
+    }
 
-	@Test
-	public void shouldTerminateCallInHandleCallContinuationWithJsonExtensionIfNotAbleToGetToAUserNode() throws Exception {
-		// Given
-		givenABadJumpFromASystemNodeThatLeadsToNowhere();
-		mockMvc.perform(get("/callflows/calls/" + outboundCall.getCallId() + ".json"))
-				.andExpect(status().is(HttpStatus.SC_OK))
-				.andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8));
-	}
+    @Test
+    public void shouldTerminateCallInHandleCallContinuationWithJsonExtensionIfNotAbleToGetToAUserNode() throws Exception {
+        // Given
+        givenABadJumpFromASystemNodeThatLeadsToNowhere();
+        mockMvc.perform(get("/callflows/calls/" + outboundCall.getCallId() + ".json"))
+                .andExpect(status().is(HttpStatus.SC_OK))
+                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8));
+    }
 
-	@Test
-	public void shouldReturnInternalServerErrorForCyclicLoopDetectionInHandleCallContinuation() throws Exception {
-		// Given
-		givenACyclicLoopExists();
-		mockMvc.perform(get("/callflows/calls/" + outboundCall.getCallId() + ".vxml"))
-				.andExpect(status().is(HttpStatus.SC_INTERNAL_SERVER_ERROR))
-				.andExpect(content().contentType(Constants.PLAIN_TEXT));
-	}
+    @Test
+    public void shouldReturnInternalServerErrorForCyclicLoopDetectionInHandleCallContinuation() throws Exception {
+        // Given
+        givenACyclicLoopExists();
+        mockMvc.perform(get("/callflows/calls/" + outboundCall.getCallId() + ".vxml"))
+                .andExpect(status().is(HttpStatus.SC_INTERNAL_SERVER_ERROR))
+                .andExpect(content().contentType(Constants.PLAIN_TEXT));
+    }
 
-	@Test
-	public void shouldReturnInternalServerErrorForCyclicLoopDetectionInHandleCallContinuationWithJsonExtension()
-			throws Exception {
-		// Given
-		givenACyclicLoopExists();
-		mockMvc.perform(get("/callflows/calls/" + outboundCall.getCallId() + ".json"))
-				.andExpect(status().is(HttpStatus.SC_INTERNAL_SERVER_ERROR))
-				.andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8));
-	}
+    @Test
+    public void shouldReturnInternalServerErrorForCyclicLoopDetectionInHandleCallContinuationWithJsonExtension()
+            throws Exception {
+        // Given
+        givenACyclicLoopExists();
+        mockMvc.perform(get("/callflows/calls/" + outboundCall.getCallId() + ".json"))
+                .andExpect(status().is(HttpStatus.SC_INTERNAL_SERVER_ERROR))
+                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8));
+    }
 
-	private void givenACyclicLoopExists() throws IOException, CallFlowAlreadyExistsException {
-		flow.getNodes().get(1).getTemplates().get(Constants.VELOCITY).setContent("|active-handler|");
-		flow.getNodes().get(3).getTemplates().get(Constants.VELOCITY).setContent("|entry-handler|");
-		mainFlow.setRaw(json(flow));
-		callFlowService.update(mainFlow);
-	}
+    private void givenACyclicLoopExists() throws IOException, CallFlowAlreadyExistsException {
+        flow.getNodes().get(1).getTemplates().get(Constants.VELOCITY).setContent("|active-handler|");
+        flow.getNodes().get(3).getTemplates().get(Constants.VELOCITY).setContent("|entry-handler|");
+        mainFlow.setRaw(json(flow));
+        callFlowService.update(mainFlow);
+    }
 
-	private void givenABadJumpFromASystemNodeThatLeadsToNowhere() throws IOException, CallFlowAlreadyExistsException {
-		flow.getNodes().get(1).getTemplates().get(Constants.VELOCITY).setContent("|active-handler|");
-		flow.getNodes().get(3).getTemplates().get(Constants.VELOCITY).setContent("|inactive-handler|");
-		flow.getNodes().get(5).getTemplates().get(Constants.VELOCITY).setContent("no where in particular");
-		mainFlow.setRaw(json(flow));
-		callFlowService.update(mainFlow);
-	}
+    private void givenABadJumpFromASystemNodeThatLeadsToNowhere() throws IOException, CallFlowAlreadyExistsException {
+        flow.getNodes().get(1).getTemplates().get(Constants.VELOCITY).setContent("|active-handler|");
+        flow.getNodes().get(3).getTemplates().get(Constants.VELOCITY).setContent("|inactive-handler|");
+        flow.getNodes().get(5).getTemplates().get(Constants.VELOCITY).setContent("no where in particular");
+        mainFlow.setRaw(json(flow));
+        callFlowService.update(mainFlow);
+    }
 
-	private void givenABadServiceExists() {
-		Map<String, String> badServices = new HashMap<>();
-		badServices.put("badSrvc", NOT_EXISTING_SERVICE_BEAN_NAME);
-		configs.get(0).setServicesMap(badServices);
-		configService.updateConfigs(configs);
-	}
+    private void givenABadServiceExists() {
+        Map<String, String> badServices = new HashMap<>();
+        badServices.put("badSrvc", NOT_EXISTING_SERVICE_BEAN_NAME);
+        configs.get(0).setServicesMap(badServices);
+        configService.updateConfigs(configs);
+    }
 
-	private String json(Object obj) throws IOException {
-		return new ObjectMapper().writeValueAsString(obj);
-	}
+    private String json(Object obj) throws IOException {
+        return new ObjectMapper().writeValueAsString(obj);
+    }
 
-	private static <T> T unwrapProxy(T bean) {
-		try {
-			if (AopUtils.isAopProxy(bean) && bean instanceof Advised) {
-				Advised advised = (Advised) bean;
-				bean = (T) advised.getTargetSource().getTarget();
-			}
-			return bean;
-		}
-		catch (Exception e) {
-			throw new RuntimeException("Could not unwrap proxy!", e);
-		}
-	}
+    private static <T> T unwrapProxy(T bean) {
+        try {
+            if (AopUtils.isAopProxy(bean) && bean instanceof Advised) {
+                Advised advised = (Advised) bean;
+                bean = (T) advised.getTargetSource().getTarget();
+            }
+            return bean;
+        } catch (Exception e) {
+            throw new RuntimeException("Could not unwrap proxy!", e);
+        }
+    }
 }

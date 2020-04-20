@@ -308,7 +308,7 @@ public class CallServiceImpl implements CallService {
 
         // create the call
         return create(config.getName(), callFlow, startNode, CallDirection.OUTGOING, actorId, actorType, externalId,
-                      externalType, playedMessages, refKey, context);
+                externalType, playedMessages, refKey, context);
     }
 
     private void makeOutboundRequest(HttpUriRequest request, Call call, Map<String, Object> params) throws IOException {
@@ -316,7 +316,7 @@ public class CallServiceImpl implements CallService {
         HttpResponse response = new DefaultHttpClient().execute(request);
 
         LOGGER.debug(String.format("Response for call %s -> %s  headers : %s  ", call.getCallId(),
-                     response.getStatusLine().toString(), response.getAllHeaders()));
+                response.getStatusLine().toString(), response.getAllHeaders()));
 
 
         // check status code for any possible issues

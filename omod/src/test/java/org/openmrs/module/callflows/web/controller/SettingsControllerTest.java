@@ -1,8 +1,6 @@
 package org.openmrs.module.callflows.web.controller;
 
 import com.google.gson.GsonBuilder;
-import java.util.HashMap;
-import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,7 +32,9 @@ import org.springframework.http.converter.json.MappingJacksonHttpMessageConverte
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
@@ -149,9 +149,9 @@ public class SettingsControllerTest extends BaseTest {
 
         // When and Then
         mockMvc.perform(get("/callflows/configs").contentType(MediaType.APPLICATION_JSON))
-               .andExpect(status().is(HttpStatus.OK.value()))
-               .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
-               .andExpect(content().string(gsonFormatOfJson(configContracts)));
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
+                .andExpect(content().string(gsonFormatOfJson(configContracts)));
 
         // Then no incoming, so no builders
         verify(configBuilder, never()).createFrom(any(ConfigContract.class));
@@ -177,9 +177,9 @@ public class SettingsControllerTest extends BaseTest {
 
         // When and Then
         mockMvc.perform(post("/callflows/configs").contentType(MediaType.APPLICATION_JSON).content(jsonBytes(configContracts)))
-               .andExpect(status().is(HttpStatus.OK.value()))
-               .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
-               .andExpect(content().string(gsonFormatOfJson(configContracts)));
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
+                .andExpect(content().string(gsonFormatOfJson(configContracts)));
 
         // Then two builders for request
         verify(configBuilder, times(3)).createFrom(any(ConfigContract.class));
@@ -201,16 +201,16 @@ public class SettingsControllerTest extends BaseTest {
         violations.put(path, message);
 
         doThrow(new ValidationException(violations))
-            .when(validationComponent).validate(Mockito.any(ConfigContracts.class));
+                .when(validationComponent).validate(Mockito.any(ConfigContracts.class));
 
         // When and Then
         mockMvc.perform(post("/callflows/configs")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonBytes(configContracts)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonBytes(configContracts)))
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$.constraintViolations['" + path + "']")
-                    .value(message));
+                        .value(message));
     }
 
     @Test
@@ -223,9 +223,9 @@ public class SettingsControllerTest extends BaseTest {
 
         // When and Then
         mockMvc.perform(get("/callflows/renderers").contentType(MediaType.APPLICATION_JSON))
-               .andExpect(status().is(HttpStatus.OK.value()))
-               .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
-               .andExpect(content().string(gsonFormatOfJson(rendererContracts)));
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
+                .andExpect(content().string(gsonFormatOfJson(rendererContracts)));
 
         // Then no incoming, so no builders
         verify(configBuilder, never()).createFrom(any(ConfigContract.class));
@@ -248,9 +248,9 @@ public class SettingsControllerTest extends BaseTest {
 
         // When and Then
         mockMvc.perform(post("/callflows/renderers").contentType(MediaType.APPLICATION_JSON).content(jsonBytes(rendererContracts)))
-               .andExpect(status().is(HttpStatus.OK.value()))
-               .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
-               .andExpect(content().string(gsonFormatOfJson(rendererContracts)));
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
+                .andExpect(content().string(gsonFormatOfJson(rendererContracts)));
 
         // Then two builders for request
         verify(rendererBuilder, times(2)).createFrom(any(RendererContract.class));
@@ -264,10 +264,10 @@ public class SettingsControllerTest extends BaseTest {
 
     private String gsonFormatOfJson(Object obj) {
         return new GsonBuilder()
-            .disableHtmlEscaping()
-            .serializeNulls()
-            .create()
-            .toJson(obj);
+                .disableHtmlEscaping()
+                .serializeNulls()
+                .create()
+                .toJson(obj);
     }
 
     private List<ConfigContract> buildNotUniqueConfigContacts() {

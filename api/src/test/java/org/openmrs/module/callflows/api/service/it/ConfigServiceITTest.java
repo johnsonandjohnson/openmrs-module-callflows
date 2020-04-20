@@ -1,14 +1,14 @@
 package org.openmrs.module.callflows.api.service.it;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.openmrs.module.callflows.Constants;
 import org.openmrs.module.callflows.api.domain.Config;
 import org.openmrs.module.callflows.api.domain.Renderer;
 import org.openmrs.module.callflows.api.helper.ConfigHelper;
 import org.openmrs.module.callflows.api.helper.RendererHelper;
 import org.openmrs.module.callflows.api.service.ConfigService;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 

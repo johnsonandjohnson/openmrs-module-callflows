@@ -1,19 +1,20 @@
 package org.openmrs.module.callflows.api.util;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.when;
-import static org.openmrs.module.callflows.api.util.AuthUtil.APPLICATION_ID_CLAIM;
-import static org.openmrs.module.callflows.api.util.AuthUtil.JTI_CLAIM;
-import static org.openmrs.module.callflows.api.util.AuthUtil.TYPE;
-import static org.openmrs.module.callflows.api.util.AuthUtil.TYPE_HEADER;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jwt;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.apache.commons.lang3.reflect.FieldUtils;
+import org.apache.commons.lang3.time.DateUtils;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.openmrs.module.callflows.api.service.SettingsManagerService;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,15 +25,15 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
 import java.util.Properties;
 import java.util.UUID;
-import org.apache.commons.lang3.reflect.FieldUtils;
-import org.apache.commons.lang3.time.DateUtils;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-import org.openmrs.module.callflows.api.service.SettingsManagerService;
+
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.when;
+import static org.openmrs.module.callflows.api.util.AuthUtil.APPLICATION_ID_CLAIM;
+import static org.openmrs.module.callflows.api.util.AuthUtil.JTI_CLAIM;
+import static org.openmrs.module.callflows.api.util.AuthUtil.TYPE;
+import static org.openmrs.module.callflows.api.util.AuthUtil.TYPE_HEADER;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AuthUtilTest {
@@ -54,13 +55,13 @@ public class AuthUtilTest {
 
     @Before
     public void setUp() throws IOException, NoSuchAlgorithmException, InvalidKeyException,
-        InvalidKeySpecException, IllegalAccessException {
+            InvalidKeySpecException, IllegalAccessException {
         when(settingsManagerService.getRawConfig(AuthUtil.PRIVATE_KEY_FILE_NAME))
-            .thenReturn(loadConfigFile(TEST_PRIVATE_KEY));
+                .thenReturn(loadConfigFile(TEST_PRIVATE_KEY));
         authUtil.loadPrivateKey();
 
         when(settingsManagerService.getRawConfig(AuthUtil.IVR_PROPERTIES_FILE_NAME))
-            .thenReturn(loadConfigFile(TEST_IVR_PROPS));
+                .thenReturn(loadConfigFile(TEST_IVR_PROPS));
 
         authUtil.loadProperties();
         Properties properties = new Properties();
@@ -77,7 +78,7 @@ public class AuthUtilTest {
 
         String token = authUtil.generateToken();
         String[] splitToken = token.split("\\.");
-        Jwt<Header,Claims> parsedToken = Jwts.parser().parse(splitToken[0] + "." + splitToken[1] + ".");
+        Jwt<Header, Claims> parsedToken = Jwts.parser().parse(splitToken[0] + "." + splitToken[1] + ".");
         Header header = parsedToken.getHeader();
         Claims body = parsedToken.getBody();
 
@@ -93,13 +94,13 @@ public class AuthUtilTest {
     public void shouldReturnInvalidTokenStatus() {
         Date now = new Date();
         String token = Jwts.builder()
-            .setHeaderParam(TYPE_HEADER, TYPE)
-            .setIssuedAt(now)
-            .setExpiration(DateUtils.addDays(now, -1))
-            .claim(APPLICATION_ID_CLAIM, applicationId)
-            .claim(JTI_CLAIM, UUID.randomUUID().toString())
-            .signWith(SignatureAlgorithm.RS256, key)
-            .compact();
+                .setHeaderParam(TYPE_HEADER, TYPE)
+                .setIssuedAt(now)
+                .setExpiration(DateUtils.addDays(now, -1))
+                .claim(APPLICATION_ID_CLAIM, applicationId)
+                .claim(JTI_CLAIM, UUID.randomUUID().toString())
+                .signWith(SignatureAlgorithm.RS256, key)
+                .compact();
 
         boolean tokenValid = authUtil.isTokenValid(token);
         assertThat(tokenValid, equalTo(false));
@@ -109,13 +110,13 @@ public class AuthUtilTest {
     public void shouldReturnValidTokenStatus() {
         Date now = new Date();
         String token = Jwts.builder()
-            .setHeaderParam(TYPE_HEADER, TYPE)
-            .setIssuedAt(now)
-            .setExpiration(DateUtils.addDays(now, 1))
-            .claim(APPLICATION_ID_CLAIM, applicationId)
-            .claim(JTI_CLAIM, UUID.randomUUID().toString())
-            .signWith(SignatureAlgorithm.RS256, key)
-            .compact();
+                .setHeaderParam(TYPE_HEADER, TYPE)
+                .setIssuedAt(now)
+                .setExpiration(DateUtils.addDays(now, 1))
+                .claim(APPLICATION_ID_CLAIM, applicationId)
+                .claim(JTI_CLAIM, UUID.randomUUID().toString())
+                .signWith(SignatureAlgorithm.RS256, key)
+                .compact();
 
         boolean tokenValid = authUtil.isTokenValid(token);
         assertThat(tokenValid, equalTo(true));

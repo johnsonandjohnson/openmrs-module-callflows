@@ -2,6 +2,7 @@ package org.openmrs.module.callflows.api.domain.flow;
 
 import org.codehaus.jackson.annotate.JsonSubTypes;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
+
 import java.util.Map;
 import java.util.Objects;
 
@@ -18,7 +19,7 @@ import java.util.Objects;
         // we have a user node
         @JsonSubTypes.Type(value = UserNode.class, name = "user"),
         // and a system node
-        @JsonSubTypes.Type(value = SystemNode.class, name = "system") })
+        @JsonSubTypes.Type(value = SystemNode.class, name = "system")})
 public class Node {
 
     /**

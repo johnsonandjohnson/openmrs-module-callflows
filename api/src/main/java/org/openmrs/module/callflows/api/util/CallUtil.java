@@ -117,8 +117,8 @@ public class CallUtil {
     private static final String CSV = ".csv";
     private static final String FILE_NAME_INITIALS = "cfl_calls_";
 
-    private final String[] headers = { "id", "actorId", "phone", "actorType", "callId", "direction", "creationDate",
-            "callReference", "status", "statusText", "startTime", "endTime" };
+    private final String[] headers = {"id", "actorId", "phone", "actorType", "callId", "direction", "creationDate",
+            "callReference", "status", "statusText", "startTime", "endTime"};
 
     private static final String DATE_TIME_PATTERN_1 = "MM/dd/yyyy HH:mm:ss";
 
@@ -482,7 +482,7 @@ public class CallUtil {
                 request = post;
             }
             LOGGER.debug(String.format("Generated headers: %s, request: %s for call %s",
-                request.getAllHeaders(), request.toString(), call.getCallId()));
+                    request.getAllHeaders(), request.toString(), call.getCallId()));
         } catch (URISyntaxException | UnsupportedEncodingException e) {
             throw new IllegalArgumentException("Unexpected error creating a URI", e);
         }
@@ -524,7 +524,7 @@ public class CallUtil {
 
         if (null != call) {
             LOGGER.debug(String.format("Triggering call status changed event for call=%s, status=%s, reason=%s", call.getCallId(),
-                         call.getStatus(), call.getStatusText()));
+                    call.getStatus(), call.getStatusText()));
             data.put(Constants.PARAM_CALL_ID, call.getCallId());
             // We are sending status to clients, to whom we shouldn't expose our domain objects
             data.put(Constants.PARAM_STATUS, call.getStatus().name());
@@ -578,7 +578,7 @@ public class CallUtil {
                         }
                     } catch (Exception e) {
                         LOGGER.error(String.format("Exception occurred for call record having id:%s with exception message: %s",
-                                     call.getId(), e.getMessage()));
+                                call.getId(), e.getMessage()));
                     }
                 }
             }
@@ -597,7 +597,7 @@ public class CallUtil {
     public String generateFileName(String tempDir, int fileNumber) {
 
         return new StringBuilder(tempDir).append(File.separator).append(FILE_NAME_INITIALS).append(fileNumber)
-                                         .append(CSV).toString();
+                .append(CSV).toString();
     }
 
     public void createZip(HttpServletResponse response, Map<String, String> fileNames) throws IOException {
@@ -613,7 +613,7 @@ public class CallUtil {
                     }
                 } catch (Exception e) {
                     LOGGER.error(String.format("Error in creating zip entry for file: %s with error message: %s",
-                                 currentFileName + CSV, e.getMessage()));
+                            currentFileName + CSV, e.getMessage()));
                 }
             }
         }

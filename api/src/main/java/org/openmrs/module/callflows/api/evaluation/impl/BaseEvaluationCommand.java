@@ -132,19 +132,19 @@ public class BaseEvaluationCommand implements EvaluationCommand {
     }
 
     private void mergeTextProperties(TextElement textElement,
-            Map<String, Object> part,
-            Flow flow,
-            Node node,
-            VelocityContext context) throws IOException {
+                                     Map<String, Object> part,
+                                     Flow flow,
+                                     Node node,
+                                     VelocityContext context) throws IOException {
         String template = textElement.getTxt();
         part.put(VAR_SPEAK, evalTemplate(flow, node, context, template));
     }
 
     private void mergeFieldProperties(FieldElement fieldElement,
-            Map<String, Object> part,
-            Flow flow,
-            Node node,
-            VelocityContext context) throws IOException {
+                                      Map<String, Object> part,
+                                      Flow flow,
+                                      Node node,
+                                      VelocityContext context) throws IOException {
         String template = fieldElement.getTxt();
         part.put(VAR_SPEAK, evalTemplate(flow, node, context, template));
         part.put(VAR_ASK, fieldElement.getName());

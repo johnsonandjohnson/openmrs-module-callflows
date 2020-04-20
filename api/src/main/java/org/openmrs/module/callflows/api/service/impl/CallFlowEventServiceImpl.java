@@ -13,18 +13,18 @@ import java.util.Map;
 @Service("callFlow.eventService")
 public class CallFlowEventServiceImpl extends BaseOpenmrsService implements CallFlowEventService {
 
-	@Override
-	public void sendEventMessage(CallFlowEvent event) {
-		Event.fireEvent(event.getSubject(), convertParamsToEventMessage(event.getParameters()));
-	}
+    @Override
+    public void sendEventMessage(CallFlowEvent event) {
+        Event.fireEvent(event.getSubject(), convertParamsToEventMessage(event.getParameters()));
+    }
 
-	private EventMessage convertParamsToEventMessage(Map<String, Object> params) {
-		EventMessage eventMessage = new EventMessage();
+    private EventMessage convertParamsToEventMessage(Map<String, Object> params) {
+        EventMessage eventMessage = new EventMessage();
 
-		for(String key : params.keySet()) {
-			eventMessage.put(key, (Serializable) params.get(key));
-		}
+        for (String key : params.keySet()) {
+            eventMessage.put(key, (Serializable) params.get(key));
+        }
 
-		return eventMessage;
-	}
+        return eventMessage;
+    }
 }

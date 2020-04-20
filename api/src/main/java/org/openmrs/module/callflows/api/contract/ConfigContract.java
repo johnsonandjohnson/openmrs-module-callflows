@@ -1,11 +1,12 @@
 package org.openmrs.module.callflows.api.contract;
 
+import org.hibernate.validator.constraints.NotBlank;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import org.hibernate.validator.constraints.NotBlank;
 
 /**
  * Configuration Contract, used in both requests and responses

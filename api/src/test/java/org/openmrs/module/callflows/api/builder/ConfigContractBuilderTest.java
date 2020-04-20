@@ -1,15 +1,15 @@
 package org.openmrs.module.callflows.api.builder;
 
-import org.openmrs.module.callflows.BaseTest;
-import org.openmrs.module.callflows.api.contract.ConfigContract;
-import org.openmrs.module.callflows.api.domain.Config;
-import org.openmrs.module.callflows.api.helper.ConfigHelper;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.openmrs.module.callflows.BaseTest;
+import org.openmrs.module.callflows.api.contract.ConfigContract;
+import org.openmrs.module.callflows.api.domain.Config;
+import org.openmrs.module.callflows.api.helper.ConfigHelper;
+
 import java.io.IOException;
 
 import static org.hamcrest.CoreMatchers.equalTo;

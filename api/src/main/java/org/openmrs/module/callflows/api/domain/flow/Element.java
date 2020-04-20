@@ -10,9 +10,9 @@ import org.codehaus.jackson.annotate.JsonTypeInfo;
  */
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
-@JsonSubTypes({ @JsonSubTypes.Type(value = TextElement.class, name = "txt"),
+@JsonSubTypes({@JsonSubTypes.Type(value = TextElement.class, name = "txt"),
         @JsonSubTypes.Type(value = FieldElement.class, name = "field"),
-        @JsonSubTypes.Type(value = MenuElement.class, name = "menu"), })
+        @JsonSubTypes.Type(value = MenuElement.class, name = "menu"),})
 public class Element {
 
     /**

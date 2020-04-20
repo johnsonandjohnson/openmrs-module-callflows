@@ -4,7 +4,6 @@ import org.openmrs.module.callflows.api.domain.Call;
 import org.openmrs.module.callflows.api.domain.CallFlow;
 import org.openmrs.module.callflows.api.domain.types.CallDirection;
 
-
 import java.util.List;
 import java.util.Map;
 
@@ -116,7 +115,7 @@ public interface CallService {
      * amount of records we want to fetch
      *
      * @param startingRecord indicating number of record from which we want to start fetching data
-     * @param recordsAmount indicating amount of records which we want to fetch
+     * @param recordsAmount  indicating amount of records which we want to fetch
      * @return list of calls
      */
     List<Call> findAll(int startingRecord, int recordsAmount);

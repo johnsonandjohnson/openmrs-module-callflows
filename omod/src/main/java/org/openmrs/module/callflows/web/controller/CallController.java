@@ -337,7 +337,7 @@ public class CallController extends RestController {
             Flow flow = flowService.load(call.getEndFlow().getName());
 
             String jumpTo = params.get(Constants.PARAM_JUMP_TO);
-            if (! StringUtils.isBlank(jumpTo)) {
+            if (!StringUtils.isBlank(jumpTo)) {
                 // See if there is some jump to some other flow
                 flow = flowService.load(jumpTo);
                 currentNode = flow.getNodes().get(0);
@@ -364,8 +364,8 @@ public class CallController extends RestController {
             //update the played messages only when the data coming in as part of params
             if (StringUtils.isNotBlank(params.get(Constants.PARAM_PLAYED_MESSAGES))) {
                 call.setPlayedMessages(StringUtils.isNotBlank(playedMessages) ?
-                                               playedMessages.concat(SEPERATOR_MESSAGE).concat(params.get(Constants.PARAM_PLAYED_MESSAGES)) :
-                                               params.get(Constants.PARAM_PLAYED_MESSAGES));
+                        playedMessages.concat(SEPERATOR_MESSAGE).concat(params.get(Constants.PARAM_PLAYED_MESSAGES)) :
+                        params.get(Constants.PARAM_PLAYED_MESSAGES));
             }
 
             LOGGER.debug("\nOn Setting playedMessages : " + call.getPlayedMessages());
@@ -385,7 +385,7 @@ public class CallController extends RestController {
         } catch (Exception e) {
             error = e;
             LOGGER.error(String.format("ERROR has been caused by request: \n" +
-                "handleContinuation(callId=%s, params=%s, headers=%s", callId, params, headers));
+                    "handleContinuation(callId=%s, params=%s, headers=%s", callId, params, headers));
             handleError(call, error);
         }
         return buildOutput(error, output, currentNode, call, extension, config);
@@ -416,10 +416,10 @@ public class CallController extends RestController {
     @RequestMapping(value = "/person/{personUuid}/out/{configName}/flows/{name}.{extension}")
     @ResponseStatus(value = HttpStatus.OK)
     public void handleOutgoingByPersonUuid(@PathVariable(value = "configName") String configName,
-            @PathVariable(value = "name") String name,
-            @PathVariable(value = "extension") String extension,
-            @PathVariable(value = "personUuid") String personUuid,
-            @RequestParam Map<String, Object> params) {
+                                           @PathVariable(value = "name") String name,
+                                           @PathVariable(value = "extension") String extension,
+                                           @PathVariable(value = "personUuid") String personUuid,
+                                           @RequestParam Map<String, Object> params) {
         Person person = personService.getPersonByUuid(personUuid);
         String phoneNumber = getTelephoneFromPerson(person);
         if (StringUtils.isNotBlank(phoneNumber)) {
@@ -467,7 +467,7 @@ public class CallController extends RestController {
                     callUtil.generateReports(fileNames.get(currentFileName), outboundCalls);
                 }
             }
-            if (! fileNames.isEmpty()) {
+            if (!fileNames.isEmpty()) {
                 callUtil.createZip(response, fileNames);
                 callUtil.deleteTempFile(tempDir, fileNames);
             }
@@ -485,8 +485,8 @@ public class CallController extends RestController {
         // We want very fine grained control over the final responses as they vary with extension, errors, content, etc
         // So here we control all aspects of the output rather than deferring to the RestController
         return new ResponseEntity<String>(callUtil.buildOutput(error, output, node, call, extension),
-                                          callUtil.buildHeaders(error, extension, config, renderer),
-                                          callUtil.buildStatus(error));
+                callUtil.buildHeaders(error, extension, config, renderer),
+                callUtil.buildStatus(error));
     }
 
     private void handleError(Call call, Exception error) {
@@ -553,8 +553,8 @@ public class CallController extends RestController {
     }
 
     private void updateValueOfNextURL(HttpServletRequest request, String extension,
-            VelocityContext context, Call call) {
-        Map<String, Object> callContext =  call.getContext();
+                                      VelocityContext context, Call call) {
+        Map<String, Object> callContext = call.getContext();
         String nextUrlValue = callUtil.buildContinuationUrl(request, call, extension);
         if (callContext != null) {
             Map internal = (Map<String, String>) callContext.get(KEY_INTERNAL);

@@ -110,9 +110,9 @@ public class FlowServiceImpl implements FlowService {
                 // sanity check
                 if (jumpNo > MAX_JUMPS) {
                     throw new IllegalStateException(String.format("Flow %s exceeded %d jumps. Last seen at %s",
-                                                                  currentFlow.getName(),
-                                                                  MAX_JUMPS,
-                                                                  buildVisited(visited)));
+                            currentFlow.getName(),
+                            MAX_JUMPS,
+                            buildVisited(visited)));
                 }
                 visited.add(currentNode);
                 LOGGER.debug(String.format("evalNode:[LOOP] %s of flow %s ", currentNode, currentFlow));
@@ -139,12 +139,12 @@ public class FlowServiceImpl implements FlowService {
                                            String output,
                                            boolean terminated) {
         return new FlowPosition().setStartFlow(startFlow)
-                                 .setEndFlow(endFlow)
-                                 .setStart(start)
-                                 .setEnd(end)
-                                 .setVisited(visited)
-                                 .setOutput(output)
-                                 .setTerminated(terminated);
+                .setEndFlow(endFlow)
+                .setStart(start)
+                .setEnd(end)
+                .setVisited(visited)
+                .setOutput(output)
+                .setTerminated(terminated);
     }
 
     private String buildVisited(List<Node> visited) {

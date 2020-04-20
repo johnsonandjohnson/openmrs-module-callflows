@@ -1,5 +1,17 @@
 package org.openmrs.module.callflows.api.util;
 
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.velocity.VelocityContext;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Matchers;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.openmrs.module.callflows.BaseTest;
 import org.openmrs.module.callflows.Constants;
 import org.openmrs.module.callflows.api.dao.CallDao;
@@ -18,19 +30,6 @@ import org.openmrs.module.callflows.api.service.CallFlowEventService;
 import org.openmrs.module.callflows.api.service.CallFlowSchedulerService;
 import org.openmrs.module.callflows.api.service.impl.CallServiceImpl;
 import org.openmrs.module.callflows.api.task.CallFlowScheduledTask;
-
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.velocity.VelocityContext;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.InjectMocks;
-import org.mockito.Matchers;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -38,6 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.supercsv.io.CsvMapWriter;
 import org.supercsv.prefs.CsvPreference;
+
 import javax.naming.OperationNotSupportedException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedWriter;
@@ -77,8 +77,8 @@ import static org.mockito.internal.verification.VerificationModeFactory.times;
  * @author bramak09
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ CallUtil.class, DateUtil.class, BufferedWriter.class, OutputStreamWriter.class,
-        FileOutputStream.class, CsvMapWriter.class })
+@PrepareForTest({CallUtil.class, DateUtil.class, BufferedWriter.class, OutputStreamWriter.class,
+        FileOutputStream.class, CsvMapWriter.class})
 public class CallUtilTest extends BaseTest {
 
     private static final String AUTH_TOKEN = "2323232wewewe";
@@ -199,7 +199,7 @@ public class CallUtilTest extends BaseTest {
         // Then
         assertNotNull(url);
         assertThat(url, equalTo("http://localhost/openmrs/ws/callflows" +
-            "/calls/" + inboundCall.getCallId() + ".vxml"));
+                "/calls/" + inboundCall.getCallId() + ".vxml"));
 
     }
 
@@ -230,7 +230,7 @@ public class CallUtilTest extends BaseTest {
         assertNotNull(uriRequest);
         assertThat(uriRequest.getMethod(), equalTo("GET"));
         assertThat(uriRequest.getURI(),
-                   equalTo(new URI("http://to-outer-space?callId=" + inboundCall.getCallId() + "&myParam=testValue")));
+                equalTo(new URI("http://to-outer-space?callId=" + inboundCall.getCallId() + "&myParam=testValue")));
     }
 
     @Test
@@ -246,7 +246,7 @@ public class CallUtilTest extends BaseTest {
         assertNotNull(uriRequest);
         assertThat(uriRequest.getMethod(), equalTo("POST"));
         assertThat(uriRequest.getURI(),
-                   equalTo(new URI("http://to-outer-space?callId=" + inboundCall.getCallId() + "&myParam=testValue")));
+                equalTo(new URI("http://to-outer-space?callId=" + inboundCall.getCallId() + "&myParam=testValue")));
 
     }
 
@@ -255,7 +255,7 @@ public class CallUtilTest extends BaseTest {
         // Given
         voxeo.setOutgoingCallUriTemplate("http://to-outer-space?callId=[internal.callId]&myParam=[testParam]");
         voxeo.getTestUsersMap()
-             .put("1234567890", "http://i-should-override-everything?callId=[internal.callId]&myParam=[testParam]");
+                .put("1234567890", "http://i-should-override-everything?callId=[internal.callId]&myParam=[testParam]");
         voxeo.setOutgoingCallMethod("POST");
 
         // When
@@ -265,8 +265,8 @@ public class CallUtilTest extends BaseTest {
         assertNotNull(uriRequest);
         assertThat(uriRequest.getMethod(), equalTo("POST"));
         assertThat(uriRequest.getURI(),
-                   equalTo(new URI("http://i-should-override-everything?callId=" + inboundCall.getCallId() +
-                                           "&myParam=testValue")));
+                equalTo(new URI("http://i-should-override-everything?callId=" + inboundCall.getCallId() +
+                        "&myParam=testValue")));
 
     }
 
@@ -287,7 +287,7 @@ public class CallUtilTest extends BaseTest {
         assertNotNull(uriRequest);
         assertThat(uriRequest.getMethod(), equalTo("POST"));
         assertThat(uriRequest.getURI(),
-            equalTo(new URI("http://to-outer-space?callId=" + inboundCall.getCallId() + "&myParam=testValue")));
+                equalTo(new URI("http://to-outer-space?callId=" + inboundCall.getCallId() + "&myParam=testValue")));
         assertThat(voxeo.getAuthToken(), equalTo(NEW_AUTH_TOKEN));
 
         verify(authUtil, times(1)).generateToken();
@@ -311,7 +311,7 @@ public class CallUtilTest extends BaseTest {
         assertNotNull(uriRequest);
         assertThat(uriRequest.getMethod(), equalTo("POST"));
         assertThat(uriRequest.getURI(),
-            equalTo(new URI("http://to-outer-space?callId=" + inboundCall.getCallId() + "&myParam=testValue")));
+                equalTo(new URI("http://to-outer-space?callId=" + inboundCall.getCallId() + "&myParam=testValue")));
         assertThat(voxeo.getAuthToken(), equalTo(NEW_AUTH_TOKEN));
 
         verify(authUtil, times(1)).isTokenValid(anyString());
@@ -335,7 +335,7 @@ public class CallUtilTest extends BaseTest {
         assertNotNull(uriRequest);
         assertThat(uriRequest.getMethod(), equalTo("POST"));
         assertThat(uriRequest.getURI(),
-            equalTo(new URI("http://to-outer-space?callId=" + inboundCall.getCallId() + "&myParam=testValue")));
+                equalTo(new URI("http://to-outer-space?callId=" + inboundCall.getCallId() + "&myParam=testValue")));
         assertThat(voxeo.getAuthToken(), equalTo(AUTH_TOKEN));
 
         verify(authUtil, times(1)).isTokenValid(anyString());
@@ -356,7 +356,7 @@ public class CallUtilTest extends BaseTest {
         assertNotNull(uriRequest);
         assertThat(uriRequest.getMethod(), equalTo("POST"));
         assertThat(uriRequest.getURI(),
-            equalTo(new URI("http://to-outer-space?callId=" + inboundCall.getCallId() + "&myParam=testValue")));
+                equalTo(new URI("http://to-outer-space?callId=" + inboundCall.getCallId() + "&myParam=testValue")));
 
         verify(authUtil, Mockito.never()).isTokenValid(anyString());
         verify(authUtil, Mockito.never()).generateToken();
@@ -393,7 +393,7 @@ public class CallUtilTest extends BaseTest {
         // Given
         voxeo.setOutgoingCallUriTemplate("http://bad-url?% ");
         voxeo.getTestUsersMap()
-             .put("1234567890", "http://i-should-override-everything?callId=[internal.callId]&myParam=[testParam]&%");
+                .put("1234567890", "http://i-should-override-everything?callId=[internal.callId]&myParam=[testParam]&%");
         voxeo.setOutgoingCallMethod("POST");
 
         // When
@@ -450,7 +450,7 @@ public class CallUtilTest extends BaseTest {
         verify(callDao, times(1)).countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet);
         assertThat(eventParams.get(Constants.PARAM_RETRY_ATTEMPTS).toString(), equalTo("2"));
         verify(schedulerService, times(1)).scheduleRunOnceJob(callFlowEvent,
-               DateUtil.plusSeconds(DateUtil.now(), Constants.CONFIG_VOXEO_OUTBOUND_CALL_RETRY_SECONDS), new CallFlowScheduledTask());
+                DateUtil.plusSeconds(DateUtil.now(), Constants.CONFIG_VOXEO_OUTBOUND_CALL_RETRY_SECONDS), new CallFlowScheduledTask());
     }
 
     @Test(expected = OperationNotSupportedException.class)
@@ -505,12 +505,12 @@ public class CallUtilTest extends BaseTest {
         long longValue = 10L;
         Integer integerWrapperValue = new Integer(integerValue);
         Long longWrapperValue = new Long(longValue);
-        int[] arrayOfInt = { 1, 2, 3, 4 };
-        long[] arrayOfLong = { 1L, 2L, 3L, 4L };
-        float[] arrayOfFloat = { 1.1f, 2.2f, 3.3f };
+        int[] arrayOfInt = {1, 2, 3, 4};
+        long[] arrayOfLong = {1L, 2L, 3L, 4L};
+        float[] arrayOfFloat = {1.1f, 2.2f, 3.3f};
         List<Integer> listOfInteger = Arrays.asList(1, 2, 3, 4);
         List<String> listOfString = Arrays.asList("One", "Two", "Three");
-        String[] arrayOfString = { "One", "Two", "Three" };
+        String[] arrayOfString = {"One", "Two", "Three"};
         Map<String, String> internalMap = new HashMap<String, String>();
         internalMap.put("test", "test");
 
@@ -576,7 +576,7 @@ public class CallUtilTest extends BaseTest {
         verify(callFlowEventService, times(1)).sendEventMessage(CallFlowEventArgumentCaptor.capture());
         CallFlowEvent capturedEvent = CallFlowEventArgumentCaptor.getValue();
         assertThat((String) capturedEvent.getParameters().get(Constants.PARAM_CALL_ID),
-                   equalTo(outboundCall.getCallId()));
+                equalTo(outboundCall.getCallId()));
         assertCallStatusEvent(capturedEvent);
     }
 
@@ -633,17 +633,17 @@ public class CallUtilTest extends BaseTest {
         //Given
         List<Call> calls = new ArrayList<>(1);
         calls.add(setupCallData());
-        final String[] headers = { "id", "actorId", "phone", "actorType", "callId", "direction", "creationDate",
-                "callReference", "status", "statusText", "startTime", "endTime" };
+        final String[] headers = {"id", "actorId", "phone", "actorType", "callId", "direction", "creationDate",
+                "callReference", "status", "statusText", "startTime", "endTime"};
 
         LinkedHashMap<String, Object> linkedHashMap = new LinkedHashMap<>();
 
         PowerMockito.whenNew(FileOutputStream.class).withArguments(anyString()).thenReturn(fileOutputStream);
         PowerMockito.whenNew(OutputStreamWriter.class).withArguments(fileOutputStream, Charset.forName(UTF_8))
-                    .thenReturn(outputStreamWriter);
+                .thenReturn(outputStreamWriter);
         PowerMockito.whenNew(BufferedWriter.class).withArguments(outputStreamWriter).thenReturn(bufferedWriter);
         PowerMockito.whenNew(CsvMapWriter.class).withArguments(bufferedWriter, CsvPreference.STANDARD_PREFERENCE)
-                    .thenReturn(csvMapWriter);
+                .thenReturn(csvMapWriter);
         PowerMockito.whenNew(LinkedHashMap.class).withArguments(anyInt()).thenReturn(linkedHashMap);
 
         //When

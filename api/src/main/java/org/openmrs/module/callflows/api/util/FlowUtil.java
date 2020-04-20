@@ -1,16 +1,16 @@
 package org.openmrs.module.callflows.api.util;
 
-import org.openmrs.module.callflows.api.evaluation.EvalNodeDaemon;
-import org.openmrs.module.callflows.api.domain.flow.Flow;
-import org.openmrs.module.callflows.api.domain.flow.Node;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
+import org.openmrs.module.callflows.api.domain.flow.Flow;
+import org.openmrs.module.callflows.api.domain.flow.Node;
+import org.openmrs.module.callflows.api.evaluation.EvalNodeDaemon;
 import org.openmrs.module.callflows.api.evaluation.EvaluationCommand;
 import org.openmrs.module.callflows.api.evaluation.EvaluationContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -105,7 +105,7 @@ public class FlowUtil {
 
         inputWithoutPipes = inputWithoutPipes.trim();
         // the output components
-        String[] parsed = { null, null };
+        String[] parsed = {null, null};
 
         if (inputWithoutPipes.endsWith(DOT)) {
             // only flow information is present, "MainFlow."

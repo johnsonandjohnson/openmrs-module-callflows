@@ -1,13 +1,5 @@
 package org.openmrs.module.callflows.api.validate.validator;
 
-import static org.openmrs.module.callflows.ValidationMessages.CALL_FLOW_NAME_BLANK_OR_NON_ALFA_NUMERIC;
-import static org.openmrs.module.callflows.ValidationMessages.CALL_FLOW_NAME_DUPLICATION;
-import static org.openmrs.module.callflows.ValidationMessages.CALL_FLOW_NODES_NULL;
-import static org.openmrs.module.callflows.ValidationMessages.CALL_FLOW_NODE_NAME_BLANK_OR_NON_ALFA_NUMERIC;
-
-import java.util.regex.Pattern;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
 import org.apache.commons.lang.StringUtils;
 import org.openmrs.module.callflows.api.dao.CallFlowDao;
 import org.openmrs.module.callflows.api.domain.CallFlow;
@@ -18,6 +10,15 @@ import org.openmrs.module.callflows.api.service.FlowService;
 import org.openmrs.module.callflows.api.validate.annotation.ValidCallFlow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+import java.util.regex.Pattern;
+
+import static org.openmrs.module.callflows.ValidationMessages.CALL_FLOW_NAME_BLANK_OR_NON_ALFA_NUMERIC;
+import static org.openmrs.module.callflows.ValidationMessages.CALL_FLOW_NAME_DUPLICATION;
+import static org.openmrs.module.callflows.ValidationMessages.CALL_FLOW_NODES_NULL;
+import static org.openmrs.module.callflows.ValidationMessages.CALL_FLOW_NODE_NAME_BLANK_OR_NON_ALFA_NUMERIC;
 
 @Component
 public class CallFlowValidator implements ConstraintValidator<ValidCallFlow, CallFlow> {
@@ -72,7 +73,7 @@ public class CallFlowValidator implements ConstraintValidator<ValidCallFlow, Cal
         if (nameAlreadyExists) {
             if (isNew || !isTheSameInstance) {
                 addErrorToContext(ctx, NAME_PATH, String.format(CALL_FLOW_NAME_DUPLICATION,
-                    callflow.getName()));
+                        callflow.getName()));
                 isValid = false;
             }
         }
@@ -91,7 +92,7 @@ public class CallFlowValidator implements ConstraintValidator<ValidCallFlow, Cal
 
         if (StringUtils.isEmpty(flow.getName()) || !ALPHA_NUMERIC.matcher(flow.getName()).matches()) {
             addErrorToContext(ctx, RAW_NAME_PATH, String.format(CALL_FLOW_NAME_DUPLICATION,
-                flow.getName()));
+                    flow.getName()));
             isValid = false;
         }
 
@@ -112,7 +113,7 @@ public class CallFlowValidator implements ConstraintValidator<ValidCallFlow, Cal
     private void addErrorToContext(ConstraintValidatorContext context, String path,
                                    String message) {
         context.buildConstraintViolationWithTemplate(message)
-            .addNode(path)
-            .addConstraintViolation();
+                .addNode(path)
+                .addConstraintViolation();
     }
 }

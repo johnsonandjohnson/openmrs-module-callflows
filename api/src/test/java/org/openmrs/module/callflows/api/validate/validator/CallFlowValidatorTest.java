@@ -1,11 +1,5 @@
 package org.openmrs.module.callflows.api.validate.validator;
 
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.when;
-
-import java.io.IOException;
-import javax.validation.ConstraintValidatorContext;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Before;
@@ -14,16 +8,21 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.openmrs.User;
 import org.openmrs.module.callflows.BaseTest;
 import org.openmrs.module.callflows.api.dao.CallFlowDao;
 import org.openmrs.module.callflows.api.domain.CallFlow;
 import org.openmrs.module.callflows.api.domain.flow.Flow;
-import org.openmrs.module.callflows.api.domain.flow.Node;
 import org.openmrs.module.callflows.api.domain.flow.SystemNode;
 import org.openmrs.module.callflows.api.domain.flow.UserNode;
 import org.openmrs.module.callflows.api.helper.CallFlowHelper;
 import org.openmrs.module.callflows.api.service.FlowService;
+
+import javax.validation.ConstraintValidatorContext;
+import java.io.IOException;
+
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CallFlowValidatorTest extends BaseTest {
@@ -60,9 +59,9 @@ public class CallFlowValidatorTest extends BaseTest {
         CallFlow mainFlow = CallFlowHelper.createMainFlow();
 
         when(callFlowDao.findByName(mainFlow.getName()))
-            .thenReturn(null);
+                .thenReturn(null);
         when(flowService.loadByJson(mainFlow.getRaw()))
-            .thenReturn(objectMapper.readValue(mainFlow.getRaw(), Flow.class));
+                .thenReturn(objectMapper.readValue(mainFlow.getRaw(), Flow.class));
 
         Assert.assertTrue(validator.isValid(mainFlow, context));
     }
@@ -73,33 +72,33 @@ public class CallFlowValidatorTest extends BaseTest {
         CallFlow mainFlow2 = CallFlowHelper.createMainFlow();
         mainFlow2.setName(mainFlow.getName());
         when(callFlowDao.findByName(mainFlow.getName()))
-            .thenReturn(mainFlow2);
+                .thenReturn(mainFlow2);
         when(flowService.loadByJson(mainFlow.getRaw()))
-            .thenReturn(objectMapper.readValue(mainFlow.getRaw(), Flow.class));
+                .thenReturn(objectMapper.readValue(mainFlow.getRaw(), Flow.class));
 
         Assert.assertFalse(validator.isValid(mainFlow, context));
     }
 
     @Test
-    public void shouldBeValidWhenNameItIsSameInstanceUpdate()throws IOException {
+    public void shouldBeValidWhenNameItIsSameInstanceUpdate() throws IOException {
         CallFlow mainFlow = CallFlowHelper.createMainFlow();
         mainFlow.setId(5);
         when(callFlowDao.findByName(mainFlow.getName()))
-            .thenReturn(mainFlow);
+                .thenReturn(mainFlow);
         when(flowService.loadByJson(mainFlow.getRaw()))
-            .thenReturn(objectMapper.readValue(mainFlow.getRaw(), Flow.class));
+                .thenReturn(objectMapper.readValue(mainFlow.getRaw(), Flow.class));
 
         Assert.assertTrue(validator.isValid(mainFlow, context));
     }
 
     @Test
-    public void shouldBeInvalidWhenNameItIsSameInstanceCreation()throws IOException {
+    public void shouldBeInvalidWhenNameItIsSameInstanceCreation() throws IOException {
         CallFlow mainFlow = CallFlowHelper.createMainFlow();
         mainFlow.setId(null);
         when(callFlowDao.findByName(mainFlow.getName()))
-            .thenReturn(mainFlow);
+                .thenReturn(mainFlow);
         when(flowService.loadByJson(mainFlow.getRaw()))
-            .thenReturn(objectMapper.readValue(mainFlow.getRaw(), Flow.class));
+                .thenReturn(objectMapper.readValue(mainFlow.getRaw(), Flow.class));
 
         Assert.assertFalse(validator.isValid(mainFlow, context));
     }
@@ -110,9 +109,9 @@ public class CallFlowValidatorTest extends BaseTest {
         mainFlow.setName("*&5@");
 
         when(callFlowDao.findByName(mainFlow.getName()))
-            .thenReturn(null);
+                .thenReturn(null);
         when(flowService.loadByJson(mainFlow.getRaw()))
-            .thenReturn(objectMapper.readValue(mainFlow.getRaw(), Flow.class));
+                .thenReturn(objectMapper.readValue(mainFlow.getRaw(), Flow.class));
 
         Assert.assertFalse(validator.isValid(mainFlow, context));
     }
@@ -123,9 +122,9 @@ public class CallFlowValidatorTest extends BaseTest {
         mainFlow.setName("");
 
         when(callFlowDao.findByName(mainFlow.getName()))
-            .thenReturn(null);
+                .thenReturn(null);
         when(flowService.loadByJson(mainFlow.getRaw()))
-            .thenReturn(objectMapper.readValue(mainFlow.getRaw(), Flow.class));
+                .thenReturn(objectMapper.readValue(mainFlow.getRaw(), Flow.class));
 
         Assert.assertFalse(validator.isValid(mainFlow, context));
     }
@@ -137,9 +136,9 @@ public class CallFlowValidatorTest extends BaseTest {
         flow.setNodes(null);
 
         when(callFlowDao.findByName(mainFlow.getName()))
-            .thenReturn(null);
+                .thenReturn(null);
         when(flowService.loadByJson(mainFlow.getRaw()))
-            .thenReturn(flow);
+                .thenReturn(flow);
 
         Assert.assertFalse(validator.isValid(mainFlow, context));
     }
@@ -153,9 +152,9 @@ public class CallFlowValidatorTest extends BaseTest {
             setNodeType("user");
         }});
         when(callFlowDao.findByName(mainFlow.getName()))
-            .thenReturn(null);
+                .thenReturn(null);
         when(flowService.loadByJson(mainFlow.getRaw()))
-            .thenReturn(flow);
+                .thenReturn(flow);
 
         Assert.assertFalse(validator.isValid(mainFlow, context));
     }
@@ -169,9 +168,9 @@ public class CallFlowValidatorTest extends BaseTest {
             setNodeType("system");
         }});
         when(callFlowDao.findByName(mainFlow.getName()))
-            .thenReturn(null);
+                .thenReturn(null);
         when(flowService.loadByJson(mainFlow.getRaw()))
-            .thenReturn(flow);
+                .thenReturn(flow);
 
         Assert.assertTrue(validator.isValid(mainFlow, context));
     }

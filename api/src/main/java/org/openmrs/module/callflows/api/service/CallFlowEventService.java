@@ -5,5 +5,5 @@ import org.openmrs.module.callflows.api.event.CallFlowEvent;
 
 public interface CallFlowEventService extends OpenmrsService {
 
-	void sendEventMessage(CallFlowEvent event);
+    void sendEventMessage(CallFlowEvent event);
 }

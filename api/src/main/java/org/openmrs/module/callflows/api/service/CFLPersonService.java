@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface CFLPersonService {
 
-	List<CFLPerson> findByPhone(String phone, boolean dead);
+    List<CFLPerson> findByPhone(String phone, boolean dead);
 
-	void savePersonAttribute(Integer personId, String attributeTypeName, String attributeValue);
+    void savePersonAttribute(Integer personId, String attributeTypeName, String attributeValue);
 }

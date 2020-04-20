@@ -4,7 +4,6 @@ import java.util.Map;
 
 /**
  * Error Response Contract extended with constraint validation details
- *
  */
 public class ValidationErrorResponse extends ErrorResponse {
 

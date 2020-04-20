@@ -1,11 +1,11 @@
 package org.openmrs.module.callflows.api.service;
 
+import org.apache.velocity.VelocityContext;
 import org.openmrs.module.callflows.api.domain.FlowPosition;
 import org.openmrs.module.callflows.api.domain.FlowStep;
 import org.openmrs.module.callflows.api.domain.flow.Flow;
 import org.openmrs.module.callflows.api.domain.flow.Node;
 
-import org.apache.velocity.VelocityContext;
 import java.io.IOException;
 
 /**
@@ -22,12 +22,12 @@ public interface FlowService {
      * All formats are delimited by pipes, as in velocity templates they are aesthetically pleasant to visualize
      * and they also communicate that this is a pipe to elsewhere, i.e a pipe to another flow or step
      * Supported formats:
-     * <p />
+     * <p/>
      * |MainFlow.| => flow = MainFlow, step = entry, where entry is the first node in the MainFlow
      * |MainFlow.active| => flow = MainFlow, step = active, where active is a valid node in the MainFlow flow
      * |entry| => flow = MainFlow, step = entry, where MainFlow is the currentFlow. currentFlow is mandatory here
      * |.entry| => flow = MainFlow, step = entry, where MainFlow is the currentFlow. currentFlow is mandatory here
-     * <p />
+     * <p/>
      * Note: spaces are supported liberally all across the pattern and will be truncated before parse
      *
      * @param input       to parse

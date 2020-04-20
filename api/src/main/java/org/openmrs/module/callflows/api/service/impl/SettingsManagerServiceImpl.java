@@ -18,37 +18,37 @@ import java.io.InputStream;
 @Service("cf.settings.manager")
 public class SettingsManagerServiceImpl extends BaseOpenmrsService implements SettingsManagerService {
 
-	@Override
-	public void saveRawConfig(String configFileName, ByteArrayResource resource) {
-		File destinationFile = getDestinationFile(configFileName);
-		try (InputStream is = resource.getInputStream(); FileOutputStream fos = new FileOutputStream(destinationFile)) {
-			IOUtils.copy(is, fos);
-		} catch (IOException e) {
-			throw new CallFlowRuntimeException("Error saving file " + configFileName, e);
-		}
-	}
+    @Override
+    public void saveRawConfig(String configFileName, ByteArrayResource resource) {
+        File destinationFile = getDestinationFile(configFileName);
+        try (InputStream is = resource.getInputStream(); FileOutputStream fos = new FileOutputStream(destinationFile)) {
+            IOUtils.copy(is, fos);
+        } catch (IOException e) {
+            throw new CallFlowRuntimeException("Error saving file " + configFileName, e);
+        }
+    }
 
-	@Override
-	public InputStream getRawConfig(String configFileName) {
-		InputStream is = null;
-		try {
-			File configurationFile = getDestinationFile(configFileName);
-			if (configurationFile.exists()) {
-				is = new FileInputStream(configurationFile);
-			}
-		} catch (IOException e) {
-			throw new CallFlowRuntimeException("Error loading file " + configFileName, e);
-		}
-		return is;
-	}
+    @Override
+    public InputStream getRawConfig(String configFileName) {
+        InputStream is = null;
+        try {
+            File configurationFile = getDestinationFile(configFileName);
+            if (configurationFile.exists()) {
+                is = new FileInputStream(configurationFile);
+            }
+        } catch (IOException e) {
+            throw new CallFlowRuntimeException("Error loading file " + configFileName, e);
+        }
+        return is;
+    }
 
-	@Override
-	public boolean configurationExist(String configurationFileName) {
-		return getDestinationFile(configurationFileName).exists();
-	}
+    @Override
+    public boolean configurationExist(String configurationFileName) {
+        return getDestinationFile(configurationFileName).exists();
+    }
 
-	private File getDestinationFile(String filename) {
-		File configFileFolder = OpenmrsUtil.getDirectoryInApplicationDataDirectory(CallFlowConstants.CONFIG_DIR);
-		return new File(configFileFolder, filename);
-	}
+    private File getDestinationFile(String filename) {
+        File configFileFolder = OpenmrsUtil.getDirectoryInApplicationDataDirectory(CallFlowConstants.CONFIG_DIR);
+        return new File(configFileFolder, filename);
+    }
 }

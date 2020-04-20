@@ -1,17 +1,18 @@
 package org.openmrs.module.callflows.api.validate.validator;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
 import org.apache.commons.lang.StringUtils;
 import org.openmrs.module.callflows.ValidationMessages;
 import org.openmrs.module.callflows.api.contract.ConfigContract;
 import org.openmrs.module.callflows.api.contract.ConfigContracts;
 import org.openmrs.module.callflows.api.validate.annotation.UniqueName;
+
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class ConfigContractsUniqueNameValidator implements ConstraintValidator<UniqueName, ConfigContracts> {
 

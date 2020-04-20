@@ -24,46 +24,46 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebAppConfiguration
 public class CallStatusControllerITTest extends BaseModuleWebContextSensitiveTest {
 
-	@Autowired
-	private CallDao callDao;
+    @Autowired
+    private CallDao callDao;
 
-	@Autowired
-	private CallFlowDao callFlowDao;
+    @Autowired
+    private CallFlowDao callFlowDao;
 
-	@Autowired
-	private WebApplicationContext webApplicationContext;
+    @Autowired
+    private WebApplicationContext webApplicationContext;
 
-	private MockMvc mockMvc;
+    private MockMvc mockMvc;
 
-	@Before
-	public void setUp() {
-		mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-	}
+    @Before
+    public void setUp() {
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+    }
 
-	@After
-	public void tearDown() {
-		callDao.deleteAll();
-		callFlowDao.deleteAll();
-	}
+    @After
+    public void tearDown() {
+        callDao.deleteAll();
+        callFlowDao.deleteAll();
+    }
 
-	@Test
-	public void shouldReturnStatusOkIfTheCallStatusUpdateIsSuccessful() throws Exception {
-		//Given
-		Call call = CallHelper.createOutboundCall();
-		callDao.create(call);
+    @Test
+    public void shouldReturnStatusOkIfTheCallStatusUpdateIsSuccessful() throws Exception {
+        //Given
+        Call call = CallHelper.createOutboundCall();
+        callDao.create(call);
 
-		mockMvc.perform(get("/callflows/status/" + call.getId().toString())
-				.param("status", "ANSWERED")
-				.param("reason", "call answered"))
-				.andExpect(status().is(HttpStatus.SC_OK));
-	}
+        mockMvc.perform(get("/callflows/status/" + call.getId().toString())
+                .param("status", "ANSWERED")
+                .param("reason", "call answered"))
+                .andExpect(status().is(HttpStatus.SC_OK));
+    }
 
-	@Test
-	public void shouldReturnStatusOkIfTheCallIDIsNotFoundInDatabase() throws Exception {
-		mockMvc.perform(get("/callflows/status/22")
-				.param("status", "ANSWERED")
-				.param("reason", "call answered"))
-				.andExpect(status().is(HttpStatus.SC_OK));
-	}
+    @Test
+    public void shouldReturnStatusOkIfTheCallIDIsNotFoundInDatabase() throws Exception {
+        mockMvc.perform(get("/callflows/status/22")
+                .param("status", "ANSWERED")
+                .param("reason", "call answered"))
+                .andExpect(status().is(HttpStatus.SC_OK));
+    }
 
 }

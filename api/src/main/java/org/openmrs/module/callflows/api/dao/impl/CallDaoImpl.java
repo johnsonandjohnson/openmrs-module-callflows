@@ -26,7 +26,7 @@ public class CallDaoImpl extends HibernateOpenmrsDataDAO<Call> implements CallDa
     @Autowired
     private DbSessionFactory dbSessionFactory;
 
-    public CallDaoImpl(){
+    public CallDaoImpl() {
         super(Call.class);
     }
 
@@ -73,7 +73,7 @@ public class CallDaoImpl extends HibernateOpenmrsDataDAO<Call> implements CallDa
     /**
      * Updates the call using the {@link org.openmrs.api.db.hibernate.DbSession#update(Object)} method.
      * The following propagation is used {@link org.springframework.transaction.annotation.Propagation#REQUIRES_NEW}.
-     *
+     * <p>
      * The new transaction is used because of we want to update always the latest value in case of
      * processing the call flow by many threads. Additionally {@link DbSession#flush()} is called after update.
      *

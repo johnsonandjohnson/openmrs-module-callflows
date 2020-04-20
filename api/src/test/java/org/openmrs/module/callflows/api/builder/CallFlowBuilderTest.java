@@ -1,14 +1,13 @@
 package org.openmrs.module.callflows.api.builder;
 
-import org.openmrs.module.callflows.BaseTest;
-import org.openmrs.module.callflows.api.contract.CallFlowRequest;
-import org.openmrs.module.callflows.api.domain.CallFlow;
-import org.openmrs.module.callflows.api.helper.CallFlowContractHelper;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.openmrs.module.callflows.BaseTest;
+import org.openmrs.module.callflows.api.contract.CallFlowRequest;
+import org.openmrs.module.callflows.api.domain.CallFlow;
+import org.openmrs.module.callflows.api.helper.CallFlowContractHelper;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;

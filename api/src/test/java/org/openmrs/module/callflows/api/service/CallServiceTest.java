@@ -68,7 +68,7 @@ import static org.mockito.Mockito.verifyZeroInteractions;
  * @author bramak09
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ CallServiceImpl.class, DateUtil.class, UUID.class, DefaultHttpClient.class })
+@PrepareForTest({CallServiceImpl.class, DateUtil.class, UUID.class, DefaultHttpClient.class})
 public class CallServiceTest extends BaseTest {
 
     @Mock
@@ -270,7 +270,7 @@ public class CallServiceTest extends BaseTest {
 
         // Then
         verify(callDao, times(1)).create(inboundCall);
-        
+
         // And
         CallAssert.assertBasicFields(newCall);
         assertThat(newCall.getCallId(), equalTo(inboundCall.getCallId()));
@@ -352,7 +352,7 @@ public class CallServiceTest extends BaseTest {
 
         // And we are ** not ** supposed to update the following properties
         CallAssert.assertNoChangeToNonChangeableFields(returnedCall,
-                                                       outboundCall.getCallId());
+                outboundCall.getCallId());
 
         // And we are supposed to update the following
         CallAssert.assertChangeToChangeableFields(returnedCall);

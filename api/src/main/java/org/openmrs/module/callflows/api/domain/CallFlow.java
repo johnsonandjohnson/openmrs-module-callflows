@@ -1,6 +1,7 @@
 package org.openmrs.module.callflows.api.domain;
 
 import org.openmrs.module.callflows.api.domain.types.CallFlowStatus;
+import org.openmrs.module.callflows.api.validate.annotation.ValidCallFlow;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,7 +12,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import java.util.Objects;
-import org.openmrs.module.callflows.api.validate.annotation.ValidCallFlow;
 
 /**
  * The call flow domain

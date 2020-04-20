@@ -13,6 +13,16 @@ import io.jsonwebtoken.InvalidClaimException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.time.DateUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.openmrs.module.callflows.api.service.SettingsManagerService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -28,15 +38,6 @@ import java.util.Properties;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.annotation.PostConstruct;
-import javax.xml.bind.DatatypeConverter;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.time.DateUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.openmrs.module.callflows.api.service.SettingsManagerService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 @Component("authUtil")
 public class AuthUtil {
@@ -54,12 +55,12 @@ public class AuthUtil {
 
     private static final Log LOGGER = LogFactory.getLog(CallUtil.class);
     private static final Pattern PEM_PATTERN = Pattern.compile("-----BEGIN PRIVATE KEY-----" +
-            // File header
-            "(.*\\n)" +                     // Key data
-            "-----END PRIVATE KEY-----" +   // File footer
-            "\\n?",
+                    // File header
+                    "(.*\\n)" +                     // Key data
+                    "-----END PRIVATE KEY-----" +   // File footer
+                    "\\n?",
             // Optional trailing line break
-        Pattern.MULTILINE | Pattern.DOTALL);
+            Pattern.MULTILINE | Pattern.DOTALL);
 
     private PrivateKey key;
     private String applicationId;
@@ -72,7 +73,7 @@ public class AuthUtil {
     public void initialize() {
         try {
             boolean isConfigLoaded = settingsManagerService.configurationExist(PRIVATE_KEY_FILE_NAME)
-                && settingsManagerService.configurationExist(IVR_PROPERTIES_FILE_NAME);
+                    && settingsManagerService.configurationExist(IVR_PROPERTIES_FILE_NAME);
             if (isConfigLoaded) {
                 loadProperties();
                 loadPrivateKey();
@@ -96,7 +97,7 @@ public class AuthUtil {
     }
 
     public void loadPrivateKey()
-        throws IOException, InvalidKeyException, NoSuchAlgorithmException, InvalidKeySpecException {
+            throws IOException, InvalidKeyException, NoSuchAlgorithmException, InvalidKeySpecException {
         InputStream privateKeyStream = settingsManagerService.getRawConfig(PRIVATE_KEY_FILE_NAME);
         final byte[] privateKey = IOUtils.toByteArray(privateKeyStream);
 
@@ -120,13 +121,13 @@ public class AuthUtil {
         LOGGER.info("Generating JWT");
         Date now = new Date();
         return Jwts.builder()
-            .setHeaderParam(TYPE_HEADER, TYPE)
-            .setIssuedAt(now)
-            .setExpiration(DateUtils.addHours(now, expTimeInHrs))
-            .claim(APPLICATION_ID_CLAIM, applicationId)
-            .claim(JTI_CLAIM, constructJTI())
-            .signWith(SignatureAlgorithm.RS256, key)
-            .compact();
+                .setHeaderParam(TYPE_HEADER, TYPE)
+                .setIssuedAt(now)
+                .setExpiration(DateUtils.addHours(now, expTimeInHrs))
+                .claim(APPLICATION_ID_CLAIM, applicationId)
+                .claim(JTI_CLAIM, constructJTI())
+                .signWith(SignatureAlgorithm.RS256, key)
+                .compact();
     }
 
     public boolean isTokenValid(String jwt) {
@@ -135,9 +136,9 @@ public class AuthUtil {
         if (jwt != null) {
             try {
                 Jws<Claims> claimsJws = Jwts.parser()
-                    .setSigningKey(key)
-                    .require(APPLICATION_ID_CLAIM, applicationId)
-                    .parseClaimsJws(jwt);
+                        .setSigningKey(key)
+                        .require(APPLICATION_ID_CLAIM, applicationId)
+                        .parseClaimsJws(jwt);
                 if (claimsJws.getBody().getExpiration().before(new Date())) {
                     LOGGER.debug("Token has expired");
                 } else {
@@ -145,7 +146,7 @@ public class AuthUtil {
                 }
             } catch (InvalidClaimException ice) {
                 LOGGER.error(String.format("Token is invalid for the following parameter (claim): %s",
-                    ice.getClaimName()));
+                        ice.getClaimName()));
             } catch (ExpiredJwtException ex) {
                 LOGGER.debug("Token has expired.");
             }

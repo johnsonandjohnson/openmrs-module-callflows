@@ -69,12 +69,12 @@ public final class ConfigHelper {
         headersMap.put("Content-Type", "application/x-www-form-urlencoded");
         imiMobile.setOutgoingCallPostHeadersMap(headersMap);
         imiMobile.setOutgoingCallPostParams("address=[phone]" +
-            "&mode=Callflow" +
-            "&schedule_datetime=" +
-            "&sendername=4039996210" +
-            "&patternId=&callflow_id=3894" +
-            "&menu=/openhouse/app/dvp/callflow/callflow_3894/menu_text/funct_cfldemo.txt" +
-            "&externalHeaders=x-imi-ivrs-jumpTo:[internal.jumpTo];x-imi-ivrs-callId:[internal.callId]");
+                "&mode=Callflow" +
+                "&schedule_datetime=" +
+                "&sendername=4039996210" +
+                "&patternId=&callflow_id=3894" +
+                "&menu=/openhouse/app/dvp/callflow/callflow_3894/menu_text/funct_cfldemo.txt" +
+                "&externalHeaders=x-imi-ivrs-jumpTo:[internal.jumpTo];x-imi-ivrs-callId:[internal.callId]");
         imiMobile.setOutboundCallLimit(Constants.CONFIG_IMI_OUTBOUND_CALL_LIMIT);
         imiMobile.setOutboundCallRetryAttempts(Constants.CONFIG_IMI_OUTBOUND_CALL_RETRY_ATTEMPTS);
         imiMobile.setOutboundCallRetrySeconds(Constants.CONFIG_IMI_OUTBOUND_CALL_RETRY_SECONDS);
@@ -130,7 +130,7 @@ public final class ConfigHelper {
         imiMobile.setCallAllowed(Constants.CONFIG_IMI_CAN_PLACE_OUTBOUND_CALL);
         imiMobile.setServicesMap(GenericHelper.buildServicesMap());
         imiMobile.setTestUsersMap(
-            GenericHelper.buildTestUsersMap(Constants.CONFIG_IMI_USER, Constants.CONFIG_IMI_USER_URL));
+                GenericHelper.buildTestUsersMap(Constants.CONFIG_IMI_USER, Constants.CONFIG_IMI_USER_URL));
         contracts.add(voxeo);
         contracts.add(yo);
         contracts.add(imiMobile);

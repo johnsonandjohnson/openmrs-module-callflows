@@ -4,6 +4,7 @@ import com.google.gson.GsonBuilder;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
+
 import java.io.IOException;
 
 /**

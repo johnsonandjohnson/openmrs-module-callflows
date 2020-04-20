@@ -1,16 +1,5 @@
 package org.openmrs.module.callflows.api.service;
 
-import java.util.Collections;
-import org.openmrs.module.callflows.BaseTest;
-import org.openmrs.module.callflows.Constants;
-import org.openmrs.module.callflows.api.domain.CallFlow;
-import org.openmrs.module.callflows.api.domain.flow.Flow;
-import org.openmrs.module.callflows.api.domain.types.CallFlowStatus;
-import org.openmrs.module.callflows.api.exception.CallFlowAlreadyExistsException;
-import org.openmrs.module.callflows.api.helper.CallFlowHelper;
-import org.openmrs.module.callflows.api.dao.CallFlowDao;
-import org.openmrs.module.callflows.api.service.impl.CallFlowServiceImpl;
-
 import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,9 +8,20 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import java.util.ArrayList;
-import java.util.List;
+import org.openmrs.module.callflows.BaseTest;
+import org.openmrs.module.callflows.Constants;
+import org.openmrs.module.callflows.api.dao.CallFlowDao;
+import org.openmrs.module.callflows.api.domain.CallFlow;
+import org.openmrs.module.callflows.api.domain.flow.Flow;
+import org.openmrs.module.callflows.api.domain.types.CallFlowStatus;
+import org.openmrs.module.callflows.api.exception.CallFlowAlreadyExistsException;
+import org.openmrs.module.callflows.api.helper.CallFlowHelper;
+import org.openmrs.module.callflows.api.service.impl.CallFlowServiceImpl;
 import org.openmrs.module.callflows.api.util.ValidationComponent;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import static junit.framework.TestCase.assertNotNull;
 import static org.hamcrest.CoreMatchers.equalTo;

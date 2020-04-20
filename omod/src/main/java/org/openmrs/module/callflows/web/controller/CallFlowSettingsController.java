@@ -1,7 +1,5 @@
 package org.openmrs.module.callflows.web.controller;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.openmrs.module.callflows.api.builder.ConfigBuilder;
 import org.openmrs.module.callflows.api.builder.ConfigContractBuilder;
 import org.openmrs.module.callflows.api.builder.RendererBuilder;
@@ -22,6 +20,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Controller to manage configurations settings, adapted and enhanced from MoTeCH's IVR module

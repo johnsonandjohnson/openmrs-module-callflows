@@ -2,8 +2,8 @@ package org.openmrs.module.callflows.api.builder;
 
 import org.openmrs.module.callflows.api.contract.ConfigContract;
 import org.openmrs.module.callflows.api.domain.Config;
-
 import org.springframework.stereotype.Component;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 

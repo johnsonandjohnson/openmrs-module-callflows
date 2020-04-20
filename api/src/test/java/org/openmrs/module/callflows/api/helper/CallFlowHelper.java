@@ -17,26 +17,26 @@ public final class CallFlowHelper {
 
     public static CallFlow createMainFlow() {
         CallFlow callFlow = new CallFlow(Constants.CALLFLOW_MAIN,
-                                         Constants.CALLFLOW_MAIN_DESCRIPTION,
-                                         CallFlowStatus.DRAFT,
-                                         Constants.CALLFLOW_MAIN_RAW);
+                Constants.CALLFLOW_MAIN_DESCRIPTION,
+                CallFlowStatus.DRAFT,
+                Constants.CALLFLOW_MAIN_RAW);
         return callFlow;
     }
 
     public static CallFlow createBadFlow() {
         CallFlow callFlow = new CallFlow(Constants.CALLFLOW_BAD,
-                                         Constants.CALLFLOW_BAD_DESCRIPTION,
-                                         CallFlowStatus.DRAFT,
-                                         Constants.CALLFLOW_BAD_RAW);
+                Constants.CALLFLOW_BAD_DESCRIPTION,
+                CallFlowStatus.DRAFT,
+                Constants.CALLFLOW_BAD_RAW);
         return callFlow;
 
     }
 
     public static CallFlow createTestFlow() {
         CallFlow callFlow = new CallFlow("TestFlow",
-                                         "This is the Test Flow",
-                                         CallFlowStatus.DRAFT,
-                                         "{}");
+                "This is the Test Flow",
+                CallFlowStatus.DRAFT,
+                "{}");
         return callFlow;
     }
 }

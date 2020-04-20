@@ -1,13 +1,5 @@
 package org.openmrs.module.callflows.api.validate.validator;
 
-import static org.junit.Assert.assertFalse;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
-
-import java.util.Arrays;
-import javax.validation.ConstraintValidatorContext;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,6 +10,15 @@ import org.openmrs.module.callflows.BaseTest;
 import org.openmrs.module.callflows.api.contract.ConfigContract;
 import org.openmrs.module.callflows.api.contract.ConfigContracts;
 import org.openmrs.module.callflows.testbuilder.ConfigContractBuilder;
+
+import javax.validation.ConstraintValidatorContext;
+import java.util.Arrays;
+
+import static org.junit.Assert.assertFalse;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ConfigContractsUniqueNameValidatorTest extends BaseTest {

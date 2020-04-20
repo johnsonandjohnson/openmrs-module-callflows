@@ -1,5 +1,11 @@
 package org.openmrs.module.callflows.api.service;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.openmrs.module.callflows.BaseTest;
 import org.openmrs.module.callflows.Constants;
 import org.openmrs.module.callflows.api.domain.Config;
@@ -7,12 +13,6 @@ import org.openmrs.module.callflows.api.domain.Renderer;
 import org.openmrs.module.callflows.api.domain.Settings;
 import org.openmrs.module.callflows.api.helper.GenericHelper;
 import org.openmrs.module.callflows.api.service.impl.ConfigServiceImpl;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.core.io.ByteArrayResource;
 
 import java.io.ByteArrayInputStream;

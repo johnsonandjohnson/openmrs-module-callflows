@@ -1,8 +1,5 @@
 package org.openmrs.module.callflows.web.controller;
 
-import static org.openmrs.module.callflows.ValidationMessages.SENT_DATA_IS_NOT_VALID;
-import static org.openmrs.module.callflows.ValidationMessages.VALIDATION_ERROR_OCCURS;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.callflows.api.contract.ErrorResponse;
@@ -13,6 +10,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+
+import static org.openmrs.module.callflows.ValidationMessages.SENT_DATA_IS_NOT_VALID;
+import static org.openmrs.module.callflows.ValidationMessages.VALIDATION_ERROR_OCCURS;
 
 /**
  * Base Rest Controller

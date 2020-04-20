@@ -2,7 +2,7 @@ package org.openmrs.module.callflows.api.domain;
 
 /**
  * Renderer configuration for a output format like VoiceXML, kookoo, etc
- *
+ * <p>
  * A renderer has a template that generates the relevant format (voice-xml, kookoo, proprietary) based on the flow data structure
  * The renderers are used on the client-side to generate the output format files
  * The use of client-side renderers are in order to support complex use-cases where manual editing of the output format after render

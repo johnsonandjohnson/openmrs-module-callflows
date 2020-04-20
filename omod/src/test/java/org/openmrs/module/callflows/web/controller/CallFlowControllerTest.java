@@ -1,6 +1,5 @@
 package org.openmrs.module.callflows.web.controller;
 
-import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,6 +25,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
@@ -110,9 +110,9 @@ public class CallFlowControllerTest extends BaseTest {
 
         // When and Then
         mockMvc.perform(post("/callflows/flows").contentType(MediaType.APPLICATION_JSON).content(jsonBytes(mainFlowRequest)))
-               .andExpect(status().is(HttpStatus.OK.value()))
-               .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
-               .andExpect(content().string(json(mainFlowResponse)));
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
+                .andExpect(content().string(json(mainFlowResponse)));
     }
 
     @Test
@@ -124,8 +124,8 @@ public class CallFlowControllerTest extends BaseTest {
 
         // When and Then
         mockMvc.perform(post("/callflows/flows").contentType(MediaType.APPLICATION_JSON).content(jsonBytes(mainFlowRequest)))
-               .andExpect(status().is(HttpStatus.CONFLICT.value()))
-               .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8));
+                .andExpect(status().is(HttpStatus.CONFLICT.value()))
+                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8));
     }
 
     @Test
@@ -136,8 +136,8 @@ public class CallFlowControllerTest extends BaseTest {
 
         // When and Then
         mockMvc.perform(post("/callflows/flows").contentType(MediaType.APPLICATION_JSON).content(jsonBytes(mainFlowRequest)))
-               .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-               .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8));
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8));
     }
 
     // Update
@@ -150,9 +150,9 @@ public class CallFlowControllerTest extends BaseTest {
 
         // When and Then
         mockMvc.perform(put("/callflows/flows/" + existingMainFlow.getId()).contentType(MediaType.APPLICATION_JSON).content(jsonBytes(mainFlowRequest)))
-               .andExpect(status().is(HttpStatus.OK.value()))
-               .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
-               .andExpect(content().string(json(mainFlowResponse)));
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
+                .andExpect(content().string(json(mainFlowResponse)));
     }
 
     @Test
@@ -163,8 +163,8 @@ public class CallFlowControllerTest extends BaseTest {
 
         // When and Then
         mockMvc.perform(put("/callflows/flows/" + existingMainFlow.getId()).contentType(MediaType.APPLICATION_JSON).content(jsonBytes(mainFlowRequest)))
-               .andExpect(status().is(HttpStatus.CONFLICT.value()))
-               .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8));
+                .andExpect(status().is(HttpStatus.CONFLICT.value()))
+                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8));
     }
 
     @Test
@@ -175,8 +175,8 @@ public class CallFlowControllerTest extends BaseTest {
 
         // When and Then
         mockMvc.perform(put("/callflows/flows/1").contentType(MediaType.APPLICATION_JSON).content(jsonBytes(mainFlowRequest)))
-               .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-               .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8));
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8));
     }
 
     @Test
@@ -187,13 +187,13 @@ public class CallFlowControllerTest extends BaseTest {
         given(callFlowResponseBuilder.createFrom(flow2)).willReturn(CallFlowContractHelper.createFlow2Response());
 
         List<CallFlowResponse> responses = searchedFlows.stream()
-            .map(f ->
-                new CallFlowResponse(f.getId(),
-                    f.getName(),
-                    f.getDescription(),
-                    f.getStatus().toString(),
-                    f.getRaw()))
-            .collect(Collectors.toList());
+                .map(f ->
+                        new CallFlowResponse(f.getId(),
+                                f.getName(),
+                                f.getDescription(),
+                                f.getStatus().toString(),
+                                f.getRaw()))
+                .collect(Collectors.toList());
 
         mockMvc.perform(get("/callflows/flows")
                 .param("lookup", "By Name")
@@ -212,9 +212,9 @@ public class CallFlowControllerTest extends BaseTest {
 
         // When we search for a invalid term , Then
         mockMvc.perform(get("/callflows/flows?lookup=By Name&term=" + Constants.CALLFLOW_INVALID_PREFIX))
-               .andExpect(status().is(HttpStatus.OK.value()))
-               .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
-               .andExpect(content().string(json(new SearchResponse(new ArrayList<CallFlow>()))));
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
+                .andExpect(content().string(json(new SearchResponse(new ArrayList<CallFlow>()))));
 
     }
 
@@ -224,7 +224,7 @@ public class CallFlowControllerTest extends BaseTest {
 
         // When we delete by a valid ID , Then
         mockMvc.perform(delete("/callflows/flows/1"))
-               .andExpect(status().is(HttpStatus.OK.value()));
+                .andExpect(status().is(HttpStatus.OK.value()));
 
     }
 
@@ -235,7 +235,7 @@ public class CallFlowControllerTest extends BaseTest {
 
         // When we delete by a invalid ID , Then
         mockMvc.perform(delete("/callflows/flows/-1"))
-               .andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
     }
 
 }

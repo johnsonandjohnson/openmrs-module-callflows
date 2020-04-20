@@ -2,7 +2,6 @@ package org.openmrs.module.callflows.api.builder;
 
 import org.openmrs.module.callflows.api.contract.CallFlowResponse;
 import org.openmrs.module.callflows.api.domain.CallFlow;
-
 import org.springframework.stereotype.Component;
 
 /**
@@ -21,9 +20,9 @@ public class CallFlowResponseBuilder {
      */
     public CallFlowResponse createFrom(CallFlow callFlow) {
         return new CallFlowResponse(callFlow.getId(),
-                                    callFlow.getName(),
-                                    callFlow.getDescription(),
-                                    callFlow.getStatus().name(),
-                                    callFlow.getRaw());
+                callFlow.getName(),
+                callFlow.getDescription(),
+                callFlow.getStatus().name(),
+                callFlow.getRaw());
     }
 }

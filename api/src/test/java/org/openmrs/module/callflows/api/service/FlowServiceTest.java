@@ -1,5 +1,12 @@
 package org.openmrs.module.callflows.api.service;
 
+import org.apache.velocity.VelocityContext;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.openmrs.module.callflows.BaseTest;
 import org.openmrs.module.callflows.Constants;
 import org.openmrs.module.callflows.api.domain.CallFlow;
@@ -13,13 +20,6 @@ import org.openmrs.module.callflows.api.service.impl.FlowServiceImpl;
 import org.openmrs.module.callflows.api.util.FlowUtil;
 import org.openmrs.module.callflows.api.util.TestUtil;
 
-import org.apache.velocity.VelocityContext;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 import java.io.IOException;
 
 import static junit.framework.TestCase.assertNotNull;
@@ -88,21 +88,21 @@ public class FlowServiceTest extends BaseTest {
         given(callFlowService.findByName(Constants.CALLFLOW_MAIN)).willReturn(mainFlow);
 
         // And the following parse behavior
-        given(flowUtil.parse("|MainFlow.|", null)).willReturn(new String[]{ "MainFlow", null });
-        given(flowUtil.parse("|MainFlow.entry|", null)).willReturn(new String[]{ "MainFlow", "entry" });
-        given(flowUtil.parse("|entry|", expectedFlow.getName())).willReturn(new String[]{ "MainFlow", "entry" });
-        given(flowUtil.parse("|MainFlow.non-existent|", null)).willReturn(new String[]{ "MainFlow", "non-existent" });
-        given(flowUtil.parse("|MainFlow2.|", null)).willReturn(new String[]{ "MainFlow2", null });
+        given(flowUtil.parse("|MainFlow.|", null)).willReturn(new String[]{"MainFlow", null});
+        given(flowUtil.parse("|MainFlow.entry|", null)).willReturn(new String[]{"MainFlow", "entry"});
+        given(flowUtil.parse("|entry|", expectedFlow.getName())).willReturn(new String[]{"MainFlow", "entry"});
+        given(flowUtil.parse("|MainFlow.non-existent|", null)).willReturn(new String[]{"MainFlow", "non-existent"});
+        given(flowUtil.parse("|MainFlow2.|", null)).willReturn(new String[]{"MainFlow2", null});
         given(flowUtil.parse("finished", expectedFlow.getName())).willThrow(new IllegalArgumentException("Bad format"));
 
-        given(flowUtil.parse("|active|", expectedFlow.getName())).willReturn(new String[]{ "MainFlow", "active" });
-        given(flowUtil.parse("|active-handler|", expectedFlow.getName())).willReturn(new String[]{ "MainFlow",
-                "active-handler" });
-        given(flowUtil.parse("|inactive|", expectedFlow.getName())).willReturn(new String[]{ "MainFlow", "inactive" });
-        given(flowUtil.parse("|inactive-handler|", expectedFlow.getName())).willReturn(new String[]{ "MainFlow",
-                "inactive-handler" });
-        given(flowUtil.parse("|entry-handler|", expectedFlow.getName())).willReturn(new String[]{ "MainFlow",
-                "entry-handler" });
+        given(flowUtil.parse("|active|", expectedFlow.getName())).willReturn(new String[]{"MainFlow", "active"});
+        given(flowUtil.parse("|active-handler|", expectedFlow.getName())).willReturn(new String[]{"MainFlow",
+                "active-handler"});
+        given(flowUtil.parse("|inactive|", expectedFlow.getName())).willReturn(new String[]{"MainFlow", "inactive"});
+        given(flowUtil.parse("|inactive-handler|", expectedFlow.getName())).willReturn(new String[]{"MainFlow",
+                "inactive-handler"});
+        given(flowUtil.parse("|entry-handler|", expectedFlow.getName())).willReturn(new String[]{"MainFlow",
+                "entry-handler"});
 
         // And one way to find a node
         given(flowUtil.getNodeByStep(expectedFlow, "entry")).willReturn(entryNode);

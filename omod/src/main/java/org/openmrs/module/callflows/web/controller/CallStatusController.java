@@ -1,5 +1,6 @@
 package org.openmrs.module.callflows.web.controller;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.callflows.api.domain.Call;
@@ -7,8 +8,6 @@ import org.openmrs.module.callflows.api.domain.Constants;
 import org.openmrs.module.callflows.api.domain.types.CallStatus;
 import org.openmrs.module.callflows.api.service.CallService;
 import org.openmrs.module.callflows.api.util.CallUtil;
-
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+
 import java.util.Map;
 
 /**
@@ -75,8 +75,8 @@ public class CallStatusController extends RestController {
         if (!StringUtils.isBlank(params.get(EXTERNAL_ID_PARAM_NAME))) {
             externalId = params.get(params.get(EXTERNAL_ID_PARAM_NAME));
             LOGGER.debug(String.format("Reading external id value using: %s and value is : %s",
-                params.get(EXTERNAL_ID_PARAM_NAME),
-                externalId));
+                    params.get(EXTERNAL_ID_PARAM_NAME),
+                    externalId));
         } else {
             externalId = params.get(Constants.PARAM_EXTERNAL_ID);
         }
@@ -84,7 +84,7 @@ public class CallStatusController extends RestController {
         call.setStatusText(params.get(PARAM_REASON));
         // The Provider specific id and type, if passed then updated for this call record
         if (validateExternalIdToUpdateCall(call.getExternalId(), externalId,
-            params.get(Constants.PARAM_EXTERNAL_TYPE))) {
+                params.get(Constants.PARAM_EXTERNAL_TYPE))) {
             call.setExternalId(externalId);
             call.setExternalType(params.get(Constants.PARAM_EXTERNAL_TYPE));
         }
