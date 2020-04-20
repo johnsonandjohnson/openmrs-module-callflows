@@ -567,14 +567,14 @@ public class CallUtilTest extends BaseTest {
         outboundCall.setStatus(CallStatus.BUSY);
         outboundCall.setStatusText(Constants.STATUS_TEXT);
         outboundCall.setContext(callParams);
-        ArgumentCaptor<CallFlowEvent> CallFlowEventArgumentCaptor = ArgumentCaptor.forClass(CallFlowEvent.class);
+        ArgumentCaptor<CallFlowEvent> callFlowEventArgumentCaptor = ArgumentCaptor.forClass(CallFlowEvent.class);
 
         // When
         callUtil.sendStatusEvent(outboundCall);
 
         // Then
-        verify(callFlowEventService, times(1)).sendEventMessage(CallFlowEventArgumentCaptor.capture());
-        CallFlowEvent capturedEvent = CallFlowEventArgumentCaptor.getValue();
+        verify(callFlowEventService, times(1)).sendEventMessage(callFlowEventArgumentCaptor.capture());
+        CallFlowEvent capturedEvent = callFlowEventArgumentCaptor.getValue();
         assertThat((String) capturedEvent.getParameters().get(Constants.PARAM_CALL_ID),
                 equalTo(outboundCall.getCallId()));
         assertCallStatusEvent(capturedEvent);

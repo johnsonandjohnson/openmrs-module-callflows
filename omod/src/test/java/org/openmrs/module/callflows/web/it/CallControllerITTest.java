@@ -80,7 +80,7 @@ public class CallControllerITTest extends BaseModuleWebContextSensitiveTest {
     private DbSessionFactory dbSessionFactory;
 
     @Autowired
-    protected SessionFactory sessionFactory;
+    private SessionFactory sessionFactory;
 
     private CallDao callDao;
 
@@ -401,11 +401,12 @@ public class CallControllerITTest extends BaseModuleWebContextSensitiveTest {
 
     private static <T> T unwrapProxy(T bean) {
         try {
+            T result = bean;
             if (AopUtils.isAopProxy(bean) && bean instanceof Advised) {
                 Advised advised = (Advised) bean;
-                bean = (T) advised.getTargetSource().getTarget();
+                result = (T) advised.getTargetSource().getTarget();
             }
-            return bean;
+            return result;
         } catch (Exception e) {
             throw new RuntimeException("Could not unwrap proxy!", e);
         }

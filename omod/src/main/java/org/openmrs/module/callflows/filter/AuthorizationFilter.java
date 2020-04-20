@@ -44,10 +44,7 @@ public class AuthorizationFilter implements Filter {
     public void init(FilterConfig arg0) throws ServletException {
         LOGGER.debug("Initializing CallFlow Authorization filter");
         this.config = arg0;
-        List<String> ignoredUrls =
-                Arrays.asList(arg0.getInitParameter("ignored-urls").split("[\\t\\n]+")
-                );
-        this.ignoredUrls = filterOutBlankUrls(ignoredUrls);
+        this.ignoredUrls = filterOutBlankUrls(arg0);
     }
 
     /**
@@ -98,12 +95,13 @@ public class AuthorizationFilter implements Filter {
     private void performBasicAuth(String authorization) {
         // this is "Basic ${base64encode(username + ":" + password)}"
         try {
-            authorization = authorization.replace(BASIC_KEYWORD, "");
-            String decoded = new String(Base64.decodeBase64(authorization), Charset.forName("UTF-8"));
+            String decoded = new String(Base64.decodeBase64(authorization.replace(BASIC_KEYWORD, "")),
+                    Charset.forName("UTF-8"));
             String[] userAndPass = decoded.split(":");
             Context.authenticate(userAndPass[0], userAndPass[1]);
-            if (LOGGER.isDebugEnabled())
+            if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("authenticated " + userAndPass[0]);
+            }
         } catch (ContextAuthenticationException ex) {
             Context.logout();
         } catch (Exception ex) {
@@ -112,9 +110,10 @@ public class AuthorizationFilter implements Filter {
         }
     }
 
-    private List<String> filterOutBlankUrls(List<String> ignoredUrls) {
+    private List<String> filterOutBlankUrls(FilterConfig filterConfig) {
         List<String> list = new ArrayList<>();
-        for (String ignoredUrl : ignoredUrls) {
+        for (String ignoredUrl : Arrays.asList(filterConfig
+                .getInitParameter("ignored-urls").split("[\\t\\n]+"))) {
             if (StringUtils.isNotBlank(ignoredUrl)) {
                 list.add(ignoredUrl);
             }

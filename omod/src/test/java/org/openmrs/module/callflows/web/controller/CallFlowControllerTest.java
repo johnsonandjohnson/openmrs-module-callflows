@@ -25,7 +25,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
@@ -45,7 +44,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(PowerMockRunner.class)
 public class CallFlowControllerTest extends BaseTest {
-
 
     private MockMvc mockMvc;
 
@@ -186,14 +184,15 @@ public class CallFlowControllerTest extends BaseTest {
         given(callFlowResponseBuilder.createFrom(flow1)).willReturn(CallFlowContractHelper.createFlow1Response());
         given(callFlowResponseBuilder.createFrom(flow2)).willReturn(CallFlowContractHelper.createFlow2Response());
 
-        List<CallFlowResponse> responses = searchedFlows.stream()
-                .map(f ->
-                        new CallFlowResponse(f.getId(),
-                                f.getName(),
-                                f.getDescription(),
-                                f.getStatus().toString(),
-                                f.getRaw()))
-                .collect(Collectors.toList());
+        List<CallFlowResponse> responses = new ArrayList<>();
+        for (CallFlow flow : searchedFlows) {
+            CallFlowResponse callFlowResponse = new CallFlowResponse(flow.getId(),
+                    flow.getName(),
+                    flow.getDescription(),
+                    flow.getStatus().toString(),
+                    flow.getRaw());
+            responses.add(callFlowResponse);
+        }
 
         mockMvc.perform(get("/callflows/flows")
                 .param("lookup", "By Name")
@@ -237,5 +236,4 @@ public class CallFlowControllerTest extends BaseTest {
         mockMvc.perform(delete("/callflows/flows/-1"))
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
     }
-
 }

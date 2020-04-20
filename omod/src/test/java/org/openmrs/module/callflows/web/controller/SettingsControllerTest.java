@@ -194,7 +194,6 @@ public class SettingsControllerTest extends BaseTest {
     @Test
     public void shouldReturnValidationErrorIfConfigsHaveNotUniqueNames() throws Exception {
         // Given
-        List<ConfigContract> configContracts = buildNotUniqueConfigContacts();
         String path = "configContracts.name";
         String message = "Names of configs are not unique: voxeo";
         Map<String, String> violations = new HashMap<>();
@@ -206,7 +205,7 @@ public class SettingsControllerTest extends BaseTest {
         // When and Then
         mockMvc.perform(post("/callflows/configs")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonBytes(configContracts)))
+                .content(jsonBytes(buildNotUniqueConfigContacts())))
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$.constraintViolations['" + path + "']")
@@ -271,8 +270,8 @@ public class SettingsControllerTest extends BaseTest {
     }
 
     private List<ConfigContract> buildNotUniqueConfigContacts() {
-        List<ConfigContract> configContracts = ConfigHelper.createConfigContracts();
-        configContracts.add(configContracts.get(0));
-        return configContracts;
+        List<ConfigContract> result = ConfigHelper.createConfigContracts();
+        result.add(result.get(0));
+        return result;
     }
 }

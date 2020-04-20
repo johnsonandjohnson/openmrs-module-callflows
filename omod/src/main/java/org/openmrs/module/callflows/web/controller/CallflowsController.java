@@ -32,13 +32,13 @@ import java.util.List;
 public class CallflowsController extends RestController {
 
     /** Logger for this class and subclasses */
-    protected final Log log = LogFactory.getLog(getClass());
+    protected static final Log LOG = LogFactory.getLog(CallflowsController.class);
 
     @Autowired
-    UserService userService;
+    private UserService userService;
 
     /** Success form view name */
-    private final String VIEW = "/module/callflows/callflows";
+    private static final String VIEW = "/module/callflows/callflows";
 
     /**
      * Initially called after the getUsers method to get the landing form name
