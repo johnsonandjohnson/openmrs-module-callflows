@@ -258,7 +258,7 @@ export const getFlow = (flowName: string) => async (dispatch) => {
   });
 };
 
-export const putFlow = (flow: IFlow, nodes: Array<NodeUI>) => async (dispatch) => {
+export const putFlow = (flow: IFlow, nodes: Array<NodeUI>, callback?: () => void ) => async (dispatch) => {
   const requestUrl = `${callflowsPath}/flows/${flow.id}`;
   const data = {
     ...flow,
@@ -272,7 +272,10 @@ export const putFlow = (flow: IFlow, nodes: Array<NodeUI>) => async (dispatch) =
     type: ACTION_TYPES.PUT_FLOW,
     payload: axiosInstance.put(requestUrl, data)
   };
-  handleRequest(dispatch, body, Msg.DESIGNER_FLOW_UPDATE_SUCCESS, Msg.DESIGNER_FLOW_UPDATE_FAILURE);
+  await handleRequest(dispatch, body, Msg.DESIGNER_FLOW_UPDATE_SUCCESS, Msg.DESIGNER_FLOW_UPDATE_FAILURE);
+  if (callback) {
+    callback();
+  }
 };
 
 export const addEmptyInteractionNode = () => ({

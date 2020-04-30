@@ -57,6 +57,7 @@ export interface IDesignerFlowState {
 };
 
 export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesignerFlowState> {
+  private readonly componentPath = '/designer/edit/';
 
   constructor(props) {
     super(props);
@@ -93,7 +94,7 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
       }
     }
     if (this.state.isNew && !this.props.flow.id && !!nextProps.flow.id) {
-      this.props.history.push('/designer/edit/' + nextProps.flow.name);
+      this.props.history.push(this.componentPath + nextProps.flow.name);
     }
   }
 
@@ -107,7 +108,9 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
 
   handleSave = () => {
     if (!!this.props.flow.id) {
-      this.props.putFlow(this.props.flow, this.props.nodes);
+      this.props.putFlow(this.props.flow, this.props.nodes, () => {
+        this.props.history.push(this.componentPath + this.props.flow.name);
+      });
     } else {
       this.props.postFlow(this.props.flow, this.props.nodes);
     }
