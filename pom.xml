@@ -12,8 +12,13 @@
     <artifactId>callflows</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>Callflows</name>
-    <description>Callflows module</description>
+    <name>Callflows module</name>
+    <description>
+        The Callflows module allows to integrate with the API of IVR providers through the HTTP(s) protocol.
+        Voice interactions with a caller and the Callflow module works around the web's HTTP request response
+        model with a IVR provider's server as a intermediary node. Application should respond
+        to HTTP requests and send back HTTP responses.
+    </description>
 
     <scm>
         <connection>scm:git:git@bitbucket.org:soldevelo/omrs-callflows.git</connection>
