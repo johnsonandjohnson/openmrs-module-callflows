@@ -108,6 +108,8 @@ public class CallUtil {
 
     private static final String INTERNAL = "internal";
 
+    private static final int BYTE_SIZE = 1024;
+
     private ObjectMapper objectMapper = new ObjectMapper();
 
     private static final Collection<CallStatus> ACTIVE_OUTBOUND_CALL_STATUSES = Arrays
@@ -607,7 +609,7 @@ public class CallUtil {
                 try (FileInputStream is = new FileInputStream(fileNames.get(currentFileName))) {
                     ZipEntry zipEntry = new ZipEntry(currentFileName + CSV);
                     zipOutputStream.putNextEntry(zipEntry);
-                    byte[] b = new byte[1024];
+                    byte[] b = new byte[BYTE_SIZE];
                     while ((length = is.read(b)) != -1) {
                         zipOutputStream.write(b, 0, length);
                     }

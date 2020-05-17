@@ -54,6 +54,10 @@
         <url-pattern>/ws/callflows/*</url-pattern>
     </filter-mapping>
 
+    <privilege>
+        <name>Callflows Privilege</name>
+        <description>Allows user to access Callflows module</description>
+    </privilege>
 
     <!-- AOP
     <advice>

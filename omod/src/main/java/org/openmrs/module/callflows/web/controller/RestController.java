@@ -2,6 +2,7 @@ package org.openmrs.module.callflows.web.controller;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.api.APIAuthenticationException;
 import org.openmrs.module.callflows.api.contract.ErrorResponse;
 import org.openmrs.module.callflows.api.contract.ValidationErrorResponse;
 import org.openmrs.module.callflows.api.exception.CallFlowAlreadyExistsException;
@@ -56,6 +57,20 @@ public abstract class RestController {
     public ErrorResponse handleException(ValidationException e) {
         LOGGER.debug(SENT_DATA_IS_NOT_VALID, e);
         return new ValidationErrorResponse(ERR_BAD_PARAM, VALIDATION_ERROR_OCCURS, e.getConstraintViolations());
+    }
+
+    /**
+     * Exception handler for lack of the adequate permissions - Http status code of 403
+     *
+     * @param e the exception throw
+     * @return a error response
+     */
+    @ExceptionHandler(APIAuthenticationException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ResponseBody
+    public ErrorResponse handleException(APIAuthenticationException e) {
+        LOGGER.error(e.getMessage(), e);
+        return new ErrorResponse(ERR_SYSTEM, e.getMessage());
     }
 
     /**

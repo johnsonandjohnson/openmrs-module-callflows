@@ -19,7 +19,7 @@ import java.util.Objects;
         // we have a user node
         @JsonSubTypes.Type(value = UserNode.class, name = "user"),
         // and a system node
-        @JsonSubTypes.Type(value = SystemNode.class, name = "system")})
+        @JsonSubTypes.Type(value = SystemNode.class, name = "system") })
 public class Node {
 
     /**

@@ -1,7 +1,10 @@
 package org.openmrs.module.callflows.api.service;
 
+import org.openmrs.annotation.Authorized;
+import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.callflows.api.domain.CallFlow;
 import org.openmrs.module.callflows.api.exception.CallFlowAlreadyExistsException;
+import org.openmrs.module.callflows.api.util.PrivilegeConstants;
 
 import java.util.List;
 
@@ -11,7 +14,7 @@ import java.util.List;
  * @author bramak09
  * @see org.openmrs.module.callflows.api.domain.CallFlow
  */
-public interface CallFlowService {
+public interface CallFlowService extends OpenmrsService {
 
     /**
      * Create a call flow in the system.
@@ -23,6 +26,7 @@ public interface CallFlowService {
      * @throws CallFlowAlreadyExistsException if a duplicate call flow with the same name already exists
      * @throws IllegalArgumentException       if the call flow name does not contain only alphanumeric characters
      */
+    @Authorized(PrivilegeConstants.CALLFLOWS_PRIVILEGE)
     CallFlow create(CallFlow callflow) throws CallFlowAlreadyExistsException;
 
     /**
@@ -35,6 +39,7 @@ public interface CallFlowService {
      * @throws CallFlowAlreadyExistsException if a duplicate callflow with the same name already exists
      * @throws IllegalArgumentException       if the call flow is not retrievable or does not contain only alphanumeric characters
      */
+    @Authorized(PrivilegeConstants.CALLFLOWS_PRIVILEGE)
     CallFlow update(CallFlow callflow) throws CallFlowAlreadyExistsException;
 
     /**
@@ -43,6 +48,7 @@ public interface CallFlowService {
      * @param prefix a search term that is used to search for callflows
      * @return a list of found callflows
      */
+    @Authorized(PrivilegeConstants.CALLFLOWS_PRIVILEGE)
     List<CallFlow> findAllByNamePrefix(String prefix);
 
     /**
@@ -60,5 +66,6 @@ public interface CallFlowService {
      * @param id of the callflow to delete
      * @throws IllegalArgumentException if no callflow with the given id exists
      */
+    @Authorized(PrivilegeConstants.CALLFLOWS_PRIVILEGE)
     void delete(Integer id);
 }

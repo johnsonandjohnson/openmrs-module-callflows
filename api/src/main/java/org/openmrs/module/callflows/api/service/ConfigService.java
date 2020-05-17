@@ -1,8 +1,10 @@
 package org.openmrs.module.callflows.api.service;
 
+import org.openmrs.annotation.Authorized;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.callflows.api.domain.Config;
 import org.openmrs.module.callflows.api.domain.Renderer;
+import org.openmrs.module.callflows.api.util.PrivilegeConstants;
 
 import java.util.List;
 
@@ -29,6 +31,7 @@ public interface ConfigService extends OpenmrsService {
      *
      * @return a list of configurations
      */
+    @Authorized(PrivilegeConstants.CALLFLOWS_PRIVILEGE)
     List<Config> allConfigs();
 
     /**
@@ -44,6 +47,7 @@ public interface ConfigService extends OpenmrsService {
      *
      * @param configs a list of configurations
      */
+    @Authorized(PrivilegeConstants.CALLFLOWS_PRIVILEGE)
     void updateConfigs(List<Config> configs);
 
     /**
@@ -68,6 +72,7 @@ public interface ConfigService extends OpenmrsService {
      *
      * @return a list of renderers
      */
+    @Authorized(PrivilegeConstants.CALLFLOWS_PRIVILEGE)
     List<Renderer> allRenderers();
 
     /**
@@ -75,5 +80,6 @@ public interface ConfigService extends OpenmrsService {
      *
      * @param renderers a list of renderers
      */
+    @Authorized(PrivilegeConstants.CALLFLOWS_PRIVILEGE)
     void updateRenderers(List<Renderer> renderers);
 }

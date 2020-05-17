@@ -33,7 +33,7 @@ import java.util.Objects;
  * @author bramak09
  */
 @Entity(name = "callFlow.Call")
-@Table(name = "cfl_calls", uniqueConstraints = @UniqueConstraint(name = "UNIQUE_CALLFLOWS_CALL_IDX", columnNames = {"callId"}))
+@Table(name = "cfl_calls", uniqueConstraints = @UniqueConstraint(name = "UNIQUE_CALLFLOWS_CALL_IDX", columnNames = { "callId" }))
 public class Call extends AbstractBaseOpenmrsData {
 
     private static final String TEXT = "text";

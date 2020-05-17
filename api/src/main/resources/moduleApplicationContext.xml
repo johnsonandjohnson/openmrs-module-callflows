@@ -26,4 +26,52 @@
     <context:component-scan base-package="org.openmrs.module.callflows"/>
     <bean id="springValidationFactory" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"
           primary="true"/>
+
+    <bean id="callflows.callFlowService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager" />
+        </property>
+        <property name="target">
+            <bean class="org.openmrs.module.callflows.api.service.impl.CallFlowServiceImpl" />
+        </property>
+        <property name="preInterceptors">
+            <ref bean="serviceInterceptors" />
+        </property>
+        <property name="transactionAttributeSource">
+            <ref bean="transactionAttributeSource" />
+        </property>
+    </bean>
+
+    <bean parent="serviceContext">
+        <property name="moduleService">
+            <list>
+                <value>org.openmrs.module.callflows.api.service.CallFlowService</value>
+                <ref bean="callflows.callFlowService"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="callflows.configService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager" />
+        </property>
+        <property name="target">
+            <bean class="org.openmrs.module.callflows.api.service.impl.ConfigServiceImpl" />
+        </property>
+        <property name="preInterceptors">
+            <ref bean="serviceInterceptors" />
+        </property>
+        <property name="transactionAttributeSource">
+            <ref bean="transactionAttributeSource" />
+        </property>
+    </bean>
+
+    <bean parent="serviceContext">
+        <property name="moduleService">
+            <list>
+                <value>org.openmrs.module.callflows.api.service.ConfigService</value>
+                <ref bean="callflows.configService"/>
+            </list>
+        </property>
+    </bean>
 </beans>

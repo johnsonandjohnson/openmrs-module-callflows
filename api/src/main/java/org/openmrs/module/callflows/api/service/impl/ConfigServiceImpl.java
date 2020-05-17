@@ -16,7 +16,6 @@ import org.openmrs.module.callflows.api.service.SettingsManagerService;
 import org.openmrs.module.callflows.api.util.CallFlowConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
@@ -31,7 +30,6 @@ import java.util.Map;
  *
  * @author bramak09
  */
-@Service("cf.settingsService")
 public class ConfigServiceImpl extends BaseOpenmrsService implements ConfigService {
 
     private static final Log LOGGER = LogFactory.getLog(ConfigServiceImpl.class);

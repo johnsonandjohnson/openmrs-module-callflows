@@ -1,11 +1,13 @@
 package org.openmrs.module.callflows.web.it;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpStatus;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.hibernate.SessionFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.openmrs.api.APIAuthenticationException;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.db.hibernate.DbSessionFactory;
 import org.openmrs.module.DaemonToken;
@@ -25,7 +27,6 @@ import org.openmrs.module.callflows.api.domain.flow.TextElement;
 import org.openmrs.module.callflows.api.domain.flow.UserNode;
 import org.openmrs.module.callflows.api.domain.types.CallDirection;
 import org.openmrs.module.callflows.api.evaluation.EvaluationCommand;
-import org.openmrs.module.callflows.api.exception.CallFlowAlreadyExistsException;
 import org.openmrs.module.callflows.api.helper.CallFlowHelper;
 import org.openmrs.module.callflows.api.helper.ConfigHelper;
 import org.openmrs.module.callflows.api.helper.RendererHelper;
@@ -47,12 +48,12 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -122,8 +123,7 @@ public class CallControllerITTest extends BaseModuleWebContextSensitiveTest {
     private WebApplicationContext webApplicationContext;
 
     @Before
-    public void setUp() throws IOException, CallFlowAlreadyExistsException, NoSuchMethodException, InvocationTargetException,
-            IllegalAccessException {
+    public void setUp() throws Exception {
         // Used to avoid the issues with the H2 when multiple transactions are used
         CallDaoImpl callDaoImpl = new CallDaoImpl();
         ReflectionTestUtils.setField(callDaoImpl, "dbSessionFactory", dbSessionFactory);
@@ -168,7 +168,8 @@ public class CallControllerITTest extends BaseModuleWebContextSensitiveTest {
     }
 
     @After
-    public void tearDown() {
+    public void tearDown() throws Exception {
+        authenticate();
         configService.updateConfigs(new ArrayList());
         callDao.deleteAll();
         callFlowDao.deleteAll();
@@ -227,6 +228,7 @@ public class CallControllerITTest extends BaseModuleWebContextSensitiveTest {
 
     @Test
     public void shouldReturnInternalServerErrorIfScriptErrorInHandleIncoming() throws Exception {
+        authenticate();
         // Given a velocity directive that's missing a #end
         vxmlTemplate.setContent("#if ($missing) no end hee hee hee");
         mainFlow.setRaw(json(flow));
@@ -239,6 +241,7 @@ public class CallControllerITTest extends BaseModuleWebContextSensitiveTest {
 
     @Test
     public void shouldReturnInternalServerErrorIfScriptErrorInHandleIncomingWithJsonExtension() throws Exception {
+        authenticate();
         // Given a velocity directive that's missing a #end in the text element used for json
         ((TextElement) userNode.getBlocks().get(0).getElements().get(0)).setTxt("#if ($x) we won't close!");
         mainFlow.setRaw(json(flow));
@@ -326,7 +329,7 @@ public class CallControllerITTest extends BaseModuleWebContextSensitiveTest {
 
     @Test
     public void shouldHandleCallContinuationWhenJumpToIsSpecified() throws Exception {
-
+        authenticate();
         CallFlow testFlow = CallFlowHelper.createTestFlow();
         testFlow.setRaw(TestUtil.loadFile("test_flow.json"));
         callFlowService.create(testFlow);
@@ -373,14 +376,62 @@ public class CallControllerITTest extends BaseModuleWebContextSensitiveTest {
                 .andExpect(content().contentType(Constants.APPLICATION_JSON_UTF8));
     }
 
-    private void givenACyclicLoopExists() throws IOException, CallFlowAlreadyExistsException {
+
+    @Test(expected = APIAuthenticationException.class)
+    public void shouldForbidUnauthorizedUserToCreate() throws Exception {
+        unauthorizedExecution(new Callable() {
+            @Override
+            public Object call() throws Exception {
+                return callFlowService.create(mainFlow);
+            }
+        });
+    }
+
+    @Test(expected = APIAuthenticationException.class)
+    public void shouldForbidUnauthorizedUserToUpdate() throws Exception {
+        unauthorizedExecution(new Callable() {
+            @Override
+            public Object call() throws Exception {
+                return callFlowService.update(mainFlow);
+            }
+        });
+    }
+
+    @Test(expected = APIAuthenticationException.class)
+    public void shouldForbidUnauthorizedUserToFindAll() throws Exception {
+        unauthorizedExecution(new Callable() {
+            @Override
+            public Object call() {
+                return callFlowService.findAllByNamePrefix(StringUtils.EMPTY);
+            }
+        });
+    }
+
+    @Test(expected = APIAuthenticationException.class)
+    public void shouldForbidUnauthorizedUserToDelete() throws Exception {
+        unauthorizedExecution(new Callable() {
+            @Override
+            public Object call() {
+                callFlowService.delete(0);
+                return null;
+            }
+        });
+    }
+
+    private void unauthorizedExecution(Callable func) throws Exception {
+        func.call();
+    }
+
+    private void givenACyclicLoopExists() throws Exception {
+        authenticate();
         flow.getNodes().get(1).getTemplates().get(Constants.VELOCITY).setContent("|active-handler|");
         flow.getNodes().get(3).getTemplates().get(Constants.VELOCITY).setContent("|entry-handler|");
         mainFlow.setRaw(json(flow));
         callFlowService.update(mainFlow);
     }
 
-    private void givenABadJumpFromASystemNodeThatLeadsToNowhere() throws IOException, CallFlowAlreadyExistsException {
+    private void givenABadJumpFromASystemNodeThatLeadsToNowhere() throws Exception {
+        authenticate();
         flow.getNodes().get(1).getTemplates().get(Constants.VELOCITY).setContent("|active-handler|");
         flow.getNodes().get(3).getTemplates().get(Constants.VELOCITY).setContent("|inactive-handler|");
         flow.getNodes().get(5).getTemplates().get(Constants.VELOCITY).setContent("no where in particular");
@@ -388,7 +439,8 @@ public class CallControllerITTest extends BaseModuleWebContextSensitiveTest {
         callFlowService.update(mainFlow);
     }
 
-    private void givenABadServiceExists() {
+    private void givenABadServiceExists() throws Exception {
+        authenticate();
         Map<String, String> badServices = new HashMap<>();
         badServices.put("badSrvc", NOT_EXISTING_SERVICE_BEAN_NAME);
         configs.get(0).setServicesMap(badServices);

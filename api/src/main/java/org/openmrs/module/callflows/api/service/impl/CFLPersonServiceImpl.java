@@ -67,8 +67,8 @@ public class CFLPersonServiceImpl extends HibernateOpenmrsDataDAO<PersonAttribut
     public void savePersonAttribute(Integer personId, String attributeTypeName, String attributeValue) {
         Person person = personDAO.getPerson(personId);
 
-        List<PersonAttributeType> personAttributeTypes = personDAO.getPersonAttributeTypes
-                (attributeTypeName, null, null, null);
+        List<PersonAttributeType> personAttributeTypes = personDAO.getPersonAttributeTypes(
+            attributeTypeName, null, null, null);
 
         if (CollectionUtils.isNotEmpty(personAttributeTypes)) {
             PersonAttribute personAttribute = new PersonAttribute();

@@ -11,7 +11,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Target(ElementType.TYPE)
-@Constraint(validatedBy = {ConfigContractsUniqueNameValidator.class})
+@Constraint(validatedBy = { ConfigContractsUniqueNameValidator.class })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface UniqueName {
 

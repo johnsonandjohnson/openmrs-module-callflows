@@ -11,7 +11,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Target(ElementType.TYPE)
-@Constraint(validatedBy = {CallFlowValidator.class})
+@Constraint(validatedBy = { CallFlowValidator.class })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidCallFlow {
 
