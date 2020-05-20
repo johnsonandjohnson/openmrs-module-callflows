@@ -60,5 +60,6 @@ public class ConfigContractsUniqueNameValidator implements ConstraintValidator<U
 
     @Override
     public void initialize(UniqueName parameters) {
+        // shouldn't any specific action be performed
     }
 }

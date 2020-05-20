@@ -7,6 +7,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.db.UserDAO;
@@ -313,28 +314,30 @@ public class CallServiceImpl implements CallService {
 
     private void makeOutboundRequest(HttpUriRequest request, Call call, Map<String, Object> params) throws IOException {
 
-        HttpResponse response = new DefaultHttpClient().execute(request);
+        try(CloseableHttpClient httpClient = new DefaultHttpClient()) {
+            HttpResponse response = httpClient.execute(request);
 
-        LOGGER.debug(String.format("Response for call %s -> %s  headers : %s  ", call.getCallId(),
-                response.getStatusLine().toString(), response.getAllHeaders()));
+            LOGGER.debug(String.format("Response for call %s -> %s  headers : %s  ", call.getCallId(),
+                    response.getStatusLine().toString(), response.getAllHeaders()));
 
 
-        // check status code for any possible issues
-        if (!ACCEPTABLE_IVR_RESPONSE_STATUSES.contains(response.getStatusLine().getStatusCode())) {
-            handleError(call, "Unacceptable status line: " + response.getStatusLine().toString(), params);
-        } else {
-            // check content for possible issues, cause some IVR providers might return 200 and return a error body
-            try (InputStream is = response.getEntity().getContent()) {
-                String content = IOUtils.toString(is);
+            // check status code for any possible issues
+            if (!ACCEPTABLE_IVR_RESPONSE_STATUSES.contains(response.getStatusLine().getStatusCode())) {
+                handleError(call, "Unacceptable status line: " + response.getStatusLine().toString(), params);
+            } else {
+                // check content for possible issues, cause some IVR providers might return 200 and return a error body
+                try (InputStream is = response.getEntity().getContent()) {
+                    String content = IOUtils.toString(is);
 
-                LOGGER.debug(String.format("response : %s ", content));
+                    LOGGER.debug(String.format("response : %s ", content));
 
-                if (content.indexOf(FAILURE) != -1) {
-                    handleError(call, "Unacceptable body: " + content, params);
+                    if (content.indexOf(FAILURE) != -1) {
+                        handleError(call, "Unacceptable body: " + content, params);
+                    }
+                } catch (IOException ioe) {
+                    LOGGER.error(String.format("Error retrieving content response for call %s ", call.getCallId()), ioe);
+                    handleError(call, "Unreadable content: " + response.getStatusLine().toString(), params);
                 }
-            } catch (IOException ioe) {
-                LOGGER.error(String.format("Error retrieving content response for call %s ", call.getCallId()), ioe);
-                handleError(call, "Unreadable content: " + response.getStatusLine().toString(), params);
             }
         }
     }

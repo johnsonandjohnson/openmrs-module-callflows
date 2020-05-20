@@ -67,8 +67,7 @@ public class AuthorizationFilter implements Filter {
         if (request instanceof HttpServletRequest) {
             HttpServletRequest httpRequest = (HttpServletRequest) request;
             String pathWithoutContext = httpRequest.getRequestURI().split(httpRequest.getContextPath())[1];
-            if (httpRequest.getRequestedSessionId() != null
-                    && !httpRequest.isRequestedSessionIdValid()
+            if (!httpRequest.isRequestedSessionIdValid()
                     && !isUrlIgnored(pathWithoutContext)) {
                 HttpServletResponse httpResponse = (HttpServletResponse) response;
                 httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "Session timed out");

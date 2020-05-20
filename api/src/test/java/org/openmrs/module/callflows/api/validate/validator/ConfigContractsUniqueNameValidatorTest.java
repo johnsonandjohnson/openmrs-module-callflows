@@ -77,7 +77,7 @@ public class ConfigContractsUniqueNameValidatorTest extends BaseTest {
         verify(nodeBuilder).addConstraintViolation();
     }
 
-    @Test
+    @Test(expected = Test.None.class /* no exception expected */)
     public void shouldBeInitializedWithoutAnyExceptionThrown() {
         validator.initialize(null);
     }

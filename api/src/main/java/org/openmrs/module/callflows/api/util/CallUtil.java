@@ -50,7 +50,7 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -65,9 +65,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
-import static org.apache.commons.lang.CharEncoding.UTF_8;
-
 
 /**
  * Collection of utility methods in managing and handling calls
@@ -87,12 +84,13 @@ public class CallUtil {
 
     private static final String ERROR_RESPONSE = "error:%s:%s";
 
-    private static final Charset UTF8_CHARSET = Charset.forName("UTF-8");
+    private static final String UTF_8 = "UTF-8";
 
-    private static final MediaType DEFAULT_MEDIA_TYPE = new MediaType("text", "plain", Charset.forName("UTF-8"));
+    private static final MediaType DEFAULT_MEDIA_TYPE =
+            new MediaType("text", "plain", StandardCharsets.UTF_8);
 
     private static final MediaType JSON_MEDIA_TYPE = new MediaType("application", "json",
-            Charset.forName("UTF-8"));
+            StandardCharsets.UTF_8);
 
     private static final String REPLACEMENT_PATTERN = "[%s]";
 
@@ -119,7 +117,7 @@ public class CallUtil {
     private static final String CSV = ".csv";
     private static final String FILE_NAME_INITIALS = "cfl_calls_";
 
-    private final String[] headers = {"id", "actorId", "phone", "actorType", "callId", "direction", "creationDate",
+    private final String[] headers = {"id", ACTOR_ID, "phone", ACTOR_TYPE, "callId", "direction", "creationDate",
             "callReference", "status", "statusText", "startTime", "endTime"};
 
     private static final String DATE_TIME_PATTERN_1 = "MM/dd/yyyy HH:mm:ss";
@@ -334,7 +332,7 @@ public class CallUtil {
         } else {
             if (renderer != null) {
                 String[] mimeParts = renderer.getMimeType().split("/");
-                responseHeaders.setContentType(new MediaType(mimeParts[0], mimeParts[1], UTF8_CHARSET));
+                responseHeaders.setContentType(new MediaType(mimeParts[0], mimeParts[1], StandardCharsets.UTF_8));
             } else {
                 // default type
                 responseHeaders.setContentType(MediaType.TEXT_PLAIN);
@@ -441,13 +439,7 @@ public class CallUtil {
         String uri;
         Map<String, String> testUsersMap = config.getTestUsersMap();
 
-        if (testUsersMap != null && testUsersMap.containsKey(phone)) {
-            LOGGER.debug(String.format("TestURL for user, phone = %s, url = %s", phone, testUsersMap.get(phone)));
-            uri = mergeUriAndRemoveParams(config.getTestUsersMap().get(phone), completeParams);
-        } else {
-            uri = mergeUriAndRemoveParams(config.getOutgoingCallUriTemplate(), completeParams);
-        }
-        LOGGER.debug(String.format("user = %s, uri = %s", phone, uri));
+        uri = buildURI(phone, config, completeParams, testUsersMap);
 
         HttpUriRequest request;
         URIBuilder builder;
@@ -566,7 +558,7 @@ public class CallUtil {
     public void generateReports(String currentFilePath, List<Call> calls) throws IOException {
 
         try (Writer writer = new BufferedWriter(
-                new OutputStreamWriter(new FileOutputStream(currentFilePath), Charset.forName(UTF_8)))) {
+                new OutputStreamWriter(new FileOutputStream(currentFilePath), StandardCharsets.UTF_8))) {
             try (CsvMapWriter csvMapWriter = new CsvMapWriter(writer, CsvPreference.STANDARD_PREFERENCE)) {
                 csvMapWriter.writeHeader(headers);
                 final LinkedHashMap<String, Object> callMap = new LinkedHashMap<>(headers.length);
@@ -586,7 +578,6 @@ public class CallUtil {
             }
         }
     }
-
 
     public void deleteTempFile(String tempDir, Map<String, String> fileNames) throws IOException {
 
@@ -702,5 +693,17 @@ public class CallUtil {
 
     private boolean isTokenNotValid(Config config) {
         return (null == config.getAuthToken() || !authUtil.isTokenValid(config.getAuthToken()));
+    }
+
+    private String buildURI(String phone, Config config, Map<String, Object> completeParams, Map<String, String> testUsersMap) {
+        String uri;
+        if (testUsersMap != null && testUsersMap.containsKey(phone)) {
+            LOGGER.debug(String.format("TestURL for user, phone = %s, url = %s", phone, testUsersMap.get(phone)));
+            uri = mergeUriAndRemoveParams(config.getTestUsersMap().get(phone), completeParams);
+        } else {
+            uri = mergeUriAndRemoveParams(config.getOutgoingCallUriTemplate(), completeParams);
+        }
+        LOGGER.debug(String.format("user = %s, uri = %s", phone, uri));
+        return uri;
     }
 }

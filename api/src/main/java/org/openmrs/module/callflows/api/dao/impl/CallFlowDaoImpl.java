@@ -17,7 +17,7 @@ import java.util.List;
 public class CallFlowDaoImpl extends HibernateOpenmrsDataDAO<CallFlow> implements CallFlowDao {
 
     @Autowired
-    private DbSessionFactory sessionFactory;
+    private DbSessionFactory dbSessionFactory;
 
     public CallFlowDaoImpl() {
         super(CallFlow.class);
@@ -60,6 +60,6 @@ public class CallFlowDaoImpl extends HibernateOpenmrsDataDAO<CallFlow> implement
     }
 
     private DbSession getSession() {
-        return sessionFactory.getCurrentSession();
+        return dbSessionFactory.getCurrentSession();
     }
 }

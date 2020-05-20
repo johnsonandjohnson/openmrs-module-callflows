@@ -6,11 +6,7 @@ import org.apache.velocity.VelocityContext;
 import org.openmrs.module.callflows.api.domain.flow.Flow;
 import org.openmrs.module.callflows.api.domain.flow.Node;
 
-import java.io.Serializable;
-
-public class EvaluationContext implements Serializable {
-
-    private static final long serialVersionUID = 5618142470461036978L;
+public class EvaluationContext {
 
     private Flow flow;
 

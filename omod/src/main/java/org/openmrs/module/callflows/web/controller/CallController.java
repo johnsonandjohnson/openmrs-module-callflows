@@ -6,6 +6,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
+import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.log.Log4JLogChute;
 import org.openmrs.Person;
 import org.openmrs.PersonAttribute;
@@ -151,7 +152,7 @@ public class CallController extends RestController {
             // This might cause permission issues in some cases like a automated tool trying to restart the server
             // So we reset this to use the existing logger rather than writing into velocity.log
             Properties props = new Properties();
-            props.setProperty(Velocity.RUNTIME_LOG_LOGSYSTEM_CLASS, Log4JLogChute.class.getName());
+            props.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS, Log4JLogChute.class.getName());
             props.setProperty(Log4JLogChute.RUNTIME_LOG_LOG4J_LOGGER, ROOT_LOGGER);
             Velocity.init(props);
         } catch (Exception e) {
@@ -413,7 +414,8 @@ public class CallController extends RestController {
         return call != null ? new OutboundCallResponse(call) : null;
     }
 
-    @RequestMapping(value = "/person/{personUuid}/out/{configName}/flows/{name}.{extension}")
+    @RequestMapping(value = "/person/{personUuid}/out/{configName}/flows/{name}.{extension}",
+            method = RequestMethod.GET)
     @ResponseStatus(value = HttpStatus.OK)
     public void handleOutgoingByPersonUuid(@PathVariable(value = "configName") String configName,
                                            @PathVariable(value = "name") String name,

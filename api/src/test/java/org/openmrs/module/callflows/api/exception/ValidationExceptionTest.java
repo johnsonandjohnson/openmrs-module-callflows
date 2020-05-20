@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.openmrs.module.callflows.BaseTest;
+
 import static org.junit.Assert.assertEquals;
 
 import java.util.Collections;
@@ -23,7 +24,7 @@ public class ValidationExceptionTest extends BaseTest {
         constraintViolations = Collections.singletonMap(FIELD_NAME, ERROR_CAUSE);
     }
 
-    @Test
+    @Test(expected = Test.None.class /* no exception expected */)
     public void shouldCreateWithoutAnyExceptionThrown() {
         new ValidationException(constraintViolations);
     }

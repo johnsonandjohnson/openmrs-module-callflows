@@ -57,7 +57,7 @@ public class CallFlowValidator implements ConstraintValidator<ValidCallFlow, Cal
 
     @Override
     public void initialize(ValidCallFlow parameters) {
-
+        // shouldn't any specific action be performed
     }
 
     private boolean isNameValid(CallFlow callflow, ConstraintValidatorContext ctx) {

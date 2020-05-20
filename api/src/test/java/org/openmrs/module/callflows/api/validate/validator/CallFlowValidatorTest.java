@@ -20,6 +20,7 @@ import org.openmrs.module.callflows.api.service.FlowService;
 import javax.validation.ConstraintValidatorContext;
 import java.io.IOException;
 
+import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
@@ -63,7 +64,7 @@ public class CallFlowValidatorTest extends BaseTest {
         when(flowService.loadByJson(mainFlow.getRaw()))
                 .thenReturn(objectMapper.readValue(mainFlow.getRaw(), Flow.class));
 
-        Assert.assertTrue(validator.isValid(mainFlow, context));
+        assertTrue(validator.isValid(mainFlow, context));
     }
 
     @Test
@@ -88,7 +89,7 @@ public class CallFlowValidatorTest extends BaseTest {
         when(flowService.loadByJson(mainFlow.getRaw()))
                 .thenReturn(objectMapper.readValue(mainFlow.getRaw(), Flow.class));
 
-        Assert.assertTrue(validator.isValid(mainFlow, context));
+        assertTrue(validator.isValid(mainFlow, context));
     }
 
     @Test
@@ -172,10 +173,10 @@ public class CallFlowValidatorTest extends BaseTest {
         when(flowService.loadByJson(mainFlow.getRaw()))
                 .thenReturn(flow);
 
-        Assert.assertTrue(validator.isValid(mainFlow, context));
+        assertTrue(validator.isValid(mainFlow, context));
     }
 
-    @Test
+    @Test(expected = Test.None.class /* no exception expected */)
     public void shouldBeInitializedWithoutAnyExceptionThrown() {
         validator.initialize(null);
     }
