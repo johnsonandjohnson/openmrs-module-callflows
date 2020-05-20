@@ -14,7 +14,7 @@ import _ from 'lodash';
 
 
 interface IAddButton {
-  handleAdd: Function,
+  handleAdd: any,
   buttonClass?: string,
   txt?: string
 }

@@ -1,0 +1,1 @@
+export const CALLFLOWS_PRIVILEGE = 'Callflows Privilege';

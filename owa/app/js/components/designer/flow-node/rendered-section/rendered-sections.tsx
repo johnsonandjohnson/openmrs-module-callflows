@@ -62,13 +62,13 @@ export class RenderedSections extends React.Component<IProps> {
             <div className="body-wrapper">
                 <Tabs id={nodeIndex + '-tabs'}>
                     {Object.keys(templates).map((templateKey: string) =>
-                        <Tab
+                      // @ts-ignore additional parameter mismatch
+                      <Tab mountOnEnter={true}
                             key={nodeIndex + '-' + templateKey}
                             eventKey={nodeIndex + '-' + templateKey}
-                            title={this.createTitle(templateKey)}
-                            mountOnEnter={true}>
+                            title={this.createTitle(templateKey)}>
                                 {this.renderBody(templateKey)}
-                        </Tab>
+                      </Tab>
                     )}
                 </Tabs>
             </div>);

@@ -23,7 +23,7 @@ export class FormSectionCheckbox extends React.Component<IProps> {
     <Col md={this.props.md}>
       <FormGroup controlId={`element_name_${this.props.name}-${this.props.elementIndex}`}>
         <Checkbox name={this.props.name} checked={this.props.value}
-          onChange={e => this.props.handleChange(e.target.checked, this.props.name)}>
+          onChange={(e: any) => this.props.handleChange(e.target.checked, this.props.name)}>
           {Msg[`FLOW_${this.props.name.toUpperCase()}_LABEL`]}
         </Checkbox>
       </FormGroup>

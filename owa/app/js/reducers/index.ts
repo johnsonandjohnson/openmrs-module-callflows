@@ -13,11 +13,14 @@ import { reducers as openmrs } from '@openmrs/react-components';
 import designerReducer, { DesignerState } from './designer.reducer';
 import providersReducer, { ProvidersState } from './providers.reducer';
 import renderersReducer, { RenderersState } from './renderersReducer';
+import privateRouteReducer, { PrivateRouteState }
+  from '@bit/soldevelo-omrs.cfl-components.private-route/private-route.reducer';
 
 export interface IRootState {
   readonly designerReducer: DesignerState;
   readonly providersReducer: ProvidersState;
-  readonly renderersReducer: RenderersState; 
+  readonly renderersReducer: RenderersState;
+  readonly privateRouteReducer: PrivateRouteState;
   readonly openmrs: any;
 }
 
@@ -25,5 +28,6 @@ export default combineReducers({
   openmrs,
   designerReducer,
   providersReducer,
-  renderersReducer
+  renderersReducer,
+  privateRouteReducer
 });

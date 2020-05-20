@@ -10,7 +10,7 @@ interface IProps {
   md?: number;
   label?: string;
   help?: string;
-  componentClass?: string;
+  componentClass?: React.ReactType;
   value?: string;
   handleChange: (value, fieldName: string) => void;
 }
@@ -31,7 +31,7 @@ export class FormSectionField extends React.Component<IProps> {
           type={this.props.type}
           name={this.props.name}
           value={this.props.value}
-          onChange={e => this.props.handleChange(e.target.value, this.props.name)}
+          onChange={(e: any) => this.props.handleChange(e.target.value, this.props.name)}
         >
           {this.props.children}
         </FormControl>

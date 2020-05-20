@@ -7,15 +7,13 @@
  * graphic logo is a trademark of OpenMRS Inc.
  */
 // generated on 2019-10-02 using @openmrs/generator-openmrs-owa 0.7.1
-"use strict";
+'use strict';
 const webpack = require("webpack");
 const path = require("path");
 const fs = require("fs");
 const target = require("yargs").argv.target;
 const targetPort = require("yargs").argv.targetPort;
 
-const UglifyPlugin = require("uglifyjs-webpack-plugin");
-const CommonsChunkPlugin = webpack.optimize.CommonsChunkPlugin;
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const BrowserSyncPlugin = require("browser-sync-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
@@ -36,38 +34,35 @@ let outputPath;
 
 let devtool;
 
-var getConfig = function() {
+var getConfig = function () {
   var config;
 
   try {
     // look for config file
-    config = require("./config.json");
+    config = require('./config.json');
   } catch (err) {
     // create file with defaults if not found
     config = {
-      LOCAL_OWA_FOLDER: "/home/user/.cfl-dev/owa/",
-      APP_ENTRY_POINT: "http://localhost:8080/openmrs/owa/callflows/index.html"
+      'LOCAL_OWA_FOLDER': '/home/user/.cfl-dev/owa/',
+      'APP_ENTRY_POINT': 'http://localhost:8080/openmrs/owa/callflows/index.html'
     };
 
-    fs.writeFile("config.json", JSON.stringify(config));
+    fs.writeFile('config.json', JSON.stringify(config));
+
   } finally {
     return config;
-  }
-};
+  };
+}
 var config = getConfig();
 
-var resolveBrowserSyncTarget = function() {
-  if (targetPort != null && targetPort != "null") {
-    return (
-      config.APP_ENTRY_POINT.substr(0, "http://localhost:".length) +
-      targetPort +
-      config.APP_ENTRY_POINT.substr(
-        "http://localhost:".length + targetPort.toString().length,
-        config.APP_ENTRY_POINT.length
-      )
-    );
-  } else {
-    return config.APP_ENTRY_POINT;
+var resolveBrowserSyncTarget = function () {
+  if (targetPort != null && targetPort != 'null') {
+    return config.APP_ENTRY_POINT.substr(0, 'http://localhost:'.length)
+      + targetPort
+      + config.APP_ENTRY_POINT.substr('http://localhost:'.length + targetPort.toString().length, config.APP_ENTRY_POINT.length);
+  }
+  else {
+    return config.APP_ENTRY_POINT
   }
 };
 var browserSyncTarget = resolveBrowserSyncTarget();
@@ -76,7 +71,10 @@ const rules = [
   {
     test: /\.(t|j)sx?$/,
     loader: "awesome-typescript-loader",
-    exclude: /node_modules/,
+    include: [
+      path.resolve(__dirname, "app/js"),
+      path.resolve(__dirname, "node_modules/@bit/soldevelo-omrs.cfl-components")
+    ],
     query: {
       presets: ["env", "react"],
       cacheDirectory: true,
@@ -88,25 +86,12 @@ const rules = [
     loader: "url-loader"
   },
   {
-    test: /\.s?css$/,
-    include: [/node_modules/],
-    use: ["style-loader", "css-loader"]
-  },
-  {
     test: /\.html$/,
     loader: "html-loader"
   },
   {
     test: /\.s?css$/,
-    exclude: [/node_modules/],
-    use: [
-      "style-loader?sourceMap",
-      {
-        loader: "css-loader"
-      },
-      "postcss-loader",
-      "sass-loader?sourcemap&sourceMapContents&outputStyle=expanded"
-    ]
+    use: ['style-loader', 'css-loader','sass-loader']
   },
   { enforce: "pre", test: /\.js$/, loader: "source-map-loader" }
 ];
@@ -118,24 +103,23 @@ if (env === "production") {
       "process.env.NODE_ENV": JSON.stringify("production")
     })
   );
-  plugins.push(new UglifyPlugin());
   outputFile = `${outputFile}.min.[chunkhash].js`;
   vendorOutputFile = "vendor.bundle.[chunkhash].js";
   outputPath = `${__dirname}/dist/`;
   plugins.push(
-    new WebpackOnBuildPlugin(function(stats) {
+    new WebpackOnBuildPlugin(function (stats) {
       //create zip file
       var archiver = require("archiver");
       var output = fs.createWriteStream(THIS_APP_ID + ".zip");
       var archive = archiver("zip");
 
-      output.on("close", function() {
+      output.on("close", function () {
         console.log(
           "distributable has been zipped! size: " + archive.pointer()
         );
       });
 
-      archive.on("error", function(err) {
+      archive.on("error", function (err) {
         throw err;
       });
 
@@ -167,13 +151,6 @@ plugins.push(
     proxy: {
       target: browserSyncTarget
     }
-  })
-);
-
-plugins.push(
-  new CommonsChunkPlugin({
-    name: "vendor",
-    filename: vendorOutputFile
   })
 );
 
@@ -221,6 +198,7 @@ plugins.push(
 
 var webpackConfig = {
   entry: {
+    regenerator_runtime: 'regenerator-runtime/runtime',
     app: `${__dirname}/app/js/callflows`,
     css: `${__dirname}/app/css/callflows.scss`,
     vendor: [
@@ -229,9 +207,9 @@ var webpackConfig = {
       "redux-promise-middleware",
       "react-redux",
       "redux-saga",
-      "redux-logger",
       "redux-thunk",
-      "react-toastify"
+      "react-toastify",
+      "regenerator-runtime"
     ]
   },
   devtool: devtool,
@@ -250,7 +228,20 @@ var webpackConfig = {
   },
   plugins,
   externals: nodeModules,
-  devtool: "source-map"
+  devtool: "source-map",
+  optimization: {
+    splitChunks: {
+      minSize: 10000,
+      maxSize: 250000,
+      cacheGroups: {
+        commons: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendor',
+          chunks: 'all'
+        }
+      }
+    }
+  }
 };
 
 module.exports = webpackConfig;
