@@ -39,7 +39,7 @@ public enum CallStatus {
     ANSWERED,
 
     /**
-     * The call was canceled by the caller
+     * The destination has not answered the call
      */
     UNANSWERED,
 
@@ -54,7 +54,7 @@ public enum CallStatus {
     BUSY,
 
     /**
-     * A call was initiated at the IVR provider
+     * The call was canceled by the caller
      */
     CANCELLED,
 
