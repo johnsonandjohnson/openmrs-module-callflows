@@ -12,7 +12,7 @@
 export const ToastStatusContent = ({ message, type }) => {
   var customClass = "toast-item-image toast-item-image-" + type;
   return (
-    <div className="toast-item-wrapper">
+    <div className="callflow-toast-item-wrapper">
       <div className={customClass}></div>
       <p>{message}</p>
     </div>
