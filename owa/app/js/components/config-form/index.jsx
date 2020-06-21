@@ -103,22 +103,28 @@ const ConfigForm = (props) => {
           onChange={handleChange}
           checked={'GET' === props.config.outgoingCallMethod}>{Msg.CONFIG_FORM_METHOD_RADIO_GET}</Radio>
       </FormGroup>
-      <FormGroup controlId={`outgoingCallPostHeadersMap_${props.localId}`}>
-        <ControlLabel>{Msg.CONFIG_FORM_HEADERS_HEADER}</ControlLabel>
-        <HelpBlock>{Msg.CONFIG_FORM_HEADERS_NOTE}</HelpBlock>
-        <MapFields
-          entries={props.config.outgoingCallPostHeadersMap}
-          fieldName="outgoingCallPostHeadersMap"
-          updateValues={handleArrayChange} />
-      </FormGroup>
-      <FormGroup controlId={`outgoingCallPostParams_${props.localId}`}>
-        <ControlLabel>{Msg.CONFIG_FORM_TYPE_HEADER}</ControlLabel>
-        <HelpBlock>{Msg.CONFIG_FORM_TYPE_NOTE}</HelpBlock>
-        <MapFields
-          entries={props.config.outgoingCallPostParams}
-          fieldName="outgoingCallPostParams"
-          updateValues={handleArrayChange} />
-      </FormGroup>
+
+      {'POST' === props.config.outgoingCallMethod &&
+        <div>
+          <FormGroup controlId={`outgoingCallPostHeadersMap_${props.localId}`}>
+            <ControlLabel>{Msg.CONFIG_FORM_HEADERS_HEADER}</ControlLabel>
+            <HelpBlock>{Msg.CONFIG_FORM_HEADERS_NOTE}</HelpBlock>
+            <MapFields
+              entries={props.config.outgoingCallPostHeadersMap}
+              fieldName="outgoingCallPostHeadersMap"
+              updateValues={handleArrayChange} />
+          </FormGroup>
+          <FormGroup controlId={`outgoingCallPostParams_${props.localId}`}>
+            <ControlLabel>{Msg.CONFIG_FORM_TYPE_HEADER}</ControlLabel>
+            <HelpBlock>{Msg.CONFIG_FORM_TYPE_NOTE}</HelpBlock>
+            <MapFields
+              entries={props.config.outgoingCallPostParams}
+              fieldName="outgoingCallPostParams"
+              updateValues={handleArrayChange} />
+          </FormGroup>
+        </div>
+      }
+
       <FormGroup controlId={`queue_${props.localId}`}>
         <ControlLabel>{Msg.CONFIG_FORM_QUEUE_HEADER}</ControlLabel>
         <Row>
