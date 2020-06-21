@@ -339,14 +339,14 @@ export const processNodeResponse = (data: IFlowTestResponse, dispatch: Function)
   }
   const responseContent: [IFlowTestResponseBody] = JSON.parse(response.body);
   const newMessages = responseContent.map(m => new SystemMessage(response.node, m.txt));
-  let continueFieldProps = extractContinueFieldProps(responseContent, response.callId);
+  let continueFieldProps = getFirstContinueFieldProps(responseContent, response.callId);
   dispatch({
     type: ACTION_TYPES.NODE_PROCESSED,
     payload: newMessages,
     meta: continueFieldProps
   });
 
-  if (response.continueNode) {
+  if (response.continueNode && !continueFieldProps) {
     moveToNextNode(response.callId, dispatch);
   }
 };
@@ -365,17 +365,19 @@ export const moveToNextNode = async (callId: string, dispatch: Function, params:
   }
 };
 
-const extractContinueFieldProps = (responseContent: IFlowTestResponseBody[], callId: string) => {
-  if (responseContent.length > 0) {
-    const lastMessage = responseContent[responseContent.length - 1];
-    if (lastMessage.field) {
-      return {
-        name: lastMessage.field,
-        type: lastMessage.type,
+const getFirstContinueFieldProps = (responseContent: IFlowTestResponseBody[], callId: string) => {
+  let fieldProps = {};
+  _.forEach(responseContent, function (element) {
+    if (element.field) {
+      fieldProps = {
+        name: element.field,
+        type: element.type,
         callId
       };
+      return false;
     }
-  } else return null;
+  });
+  return (fieldProps['name']) ? fieldProps : null;
 };
 
 export const updateFlow = (payload: any) => ({
