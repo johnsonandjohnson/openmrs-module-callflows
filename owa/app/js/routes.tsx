@@ -17,9 +17,11 @@ import Renderers from './components/Renderers';
 import BreadCrumb from './components/BreadCrumb';
 import Designer from './components/designer/index';
 import { CALLFLOWS_PRIVILEGE } from "./config/privileges";
+import Customize from '@bit/soldevelo-omrs.cfl-components.customize'
 
 export default (store) => (
   <div>
+    <Customize />
     <Header />
     <BreadCrumb />
     <Switch>

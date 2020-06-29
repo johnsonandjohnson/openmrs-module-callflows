@@ -7,6 +7,7 @@
     "url": "https://bitbucket.org/soldevelo/omrs-callflows"
   },
   "dependencies": {
+    "@bit/soldevelo-omrs.cfl-components.customize": "^1.0.5",
     "@bit/soldevelo-omrs.cfl-components.error-description": "^1.0.0",
     "@bit/soldevelo-omrs.cfl-components.private-route": "^1.0.13",
     "@fortawesome/fontawesome-svg-core": "1.2.21",
