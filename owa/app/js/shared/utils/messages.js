@@ -11,6 +11,10 @@
 
 export const FIELD_REQUIRED = 'This field is required';
 
+// Breadcrumbs
+export const PROVIDERS_BREADCRUMB = 'Providers';
+export const RENDERERS_BREADCRUMB = 'Renderers';
+export const SYSTEM_ADMINISTRATION_BREADCRUMB = 'System Administration';
 export const MODULE_NAME = 'Call flows';
 
 // Generic messages

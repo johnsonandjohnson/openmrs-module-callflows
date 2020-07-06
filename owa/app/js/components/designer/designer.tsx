@@ -19,7 +19,7 @@ import { IRootState } from '../../reducers';
 import DesignerTable from './designer-table';
 import LinkAddButton from '../link-add-button';
 import * as Msg from '../../shared/utils/messages';
-import { DESIGNER_NEW_FLOW_ROUTE as createLink} from '../BreadCrumb/index';
+import { DESIGNER_NEW_FLOW_ROUTE as createLink} from '../bread-crumb/index';
 
 export interface IDesignerProps extends StateProps, DispatchProps {
 };

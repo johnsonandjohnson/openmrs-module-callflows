@@ -14,7 +14,7 @@ import PrivateRoute from '@bit/soldevelo-omrs.cfl-components.private-route/priva
 import App from './components/app';
 import Providers from './components/Providers';
 import Renderers from './components/Renderers';
-import BreadCrumb from './components/BreadCrumb';
+import BreadCrumb from './components/bread-crumb';
 import Designer from './components/designer/index';
 import { CALLFLOWS_PRIVILEGE } from "./config/privileges";
 import Customize from '@bit/soldevelo-omrs.cfl-components.customize'

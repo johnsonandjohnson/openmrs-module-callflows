@@ -8,12 +8,13 @@
  * graphic logo is a trademark of OpenMRS Inc.
  */
 
-import React from 'react';
+import React, { ReactFragment } from 'react';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
-import { Link, withRouter } from 'react-router-dom';
+import { UnregisterCallback } from 'history';
+import { Link, withRouter, RouteComponentProps } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import UrlPattern from 'url-pattern';
+import { IRootState } from '../../reducers';
 
 import './bread-crumb.scss';
 import * as Msg from '../../shared/utils/messages';
@@ -26,8 +27,18 @@ const PROVIDER_PATTERN = new UrlPattern('/providers*');
 const RENDERERS_PATTERN = new UrlPattern('/renderers*');
 const MODULE_ROUTE = '/';
 const OMRS_ROUTE = '../../';
+const SYSTEM_ADMINISTRATION_ROUTE = `${OMRS_ROUTE}coreapps/systemadministration/systemAdministration.page`;
 
-class BreadCrumb extends React.Component {
+interface IBreadCrumbProps extends DispatchProps, StateProps, RouteComponentProps {
+};
+
+interface IBreadCrumbState {
+  current: string
+};
+
+class BreadCrumb extends React.PureComponent<IBreadCrumbProps, IBreadCrumbState> {
+  unlisten: UnregisterCallback;
+  
   constructor(props) {
     super(props);
 
@@ -51,36 +62,42 @@ class BreadCrumb extends React.Component {
 
   renderDelimiter = () => {
     return (
-      <span className="breadcrumb-link-item">
-        <FontAwesomeIcon size="xs" icon={['fas', 'chevron-right']} />
+      <span className="breadcrumb-link-item breadcrumb-delimiter">
+        <FontAwesomeIcon size="sm" icon={['fas', 'chevron-right']} />
       </span>);
   }
 
   renderHomeCrumb = () => {
     return (
-      <a href={OMRS_ROUTE} className="breadcrumb-link-item">
+      <a href={OMRS_ROUTE} className="breadcrumb-link-item home-crumb">
         <FontAwesomeIcon icon={['fas', 'home']} />
       </a>);
   }
 
-  renderCrumb = (link, txt) => {
-    return <Link to={link} className="breadcrumb-link-item">{txt}</Link>;
+  renderCrumb = (link: string, txt: string, isAbsolute?: boolean) => {
+    if (isAbsolute) {
+      return (
+        <a href={link} className="breadcrumb-link-item" >{txt}</a>
+      );
+    } else {
+      return <Link to={link} className="breadcrumb-link-item">{txt}</Link>;
+    }
   }
 
-  renderLastCrumb = (txt) => {
+  renderLastCrumb = (txt: string) => {
     return <span className="breadcrumb-last-item">{txt}</span>;
   }
 
-  renderCrumbs = elements => {
+  renderCrumbs = (elements: Array<ReactFragment>) => {
     const delimiter = this.renderDelimiter();
-    const lastElementId = elements.length - 1;
+
     return (
       <React.Fragment>
         {this.renderHomeCrumb()}
         {elements.map((e, i) =>
           <React.Fragment key={`crumb-${i}`}>
+            {delimiter}
             {e}
-            {i !== lastElementId && delimiter}
           </React.Fragment>)}
       </React.Fragment>
     );
@@ -100,6 +117,7 @@ class BreadCrumb extends React.Component {
   buildDesignerBreadCrumb = (path) => {
     const designerName = Msg.DESIGNER_NEW_FLOW_BREADCRUMB;
     const designerCrumbs = [
+      this.renderCrumb(SYSTEM_ADMINISTRATION_ROUTE, Msg.SYSTEM_ADMINISTRATION_BREADCRUMB, true),
       this.renderCrumb(MODULE_ROUTE, Msg.MODULE_NAME)
     ];
 
@@ -112,47 +130,43 @@ class BreadCrumb extends React.Component {
     } else {
       designerCrumbs.push(this.renderLastCrumb(designerName));
     }
-    return (
-      <div className="breadcrumb">
-        {this.renderCrumbs(designerCrumbs)}
-      </div>
-    );
+    return designerCrumbs;
+  }
+
+  getCrumbs = (path: string): Array<ReactFragment> => {
+    const providerCrumbs = [
+      this.renderCrumb(SYSTEM_ADMINISTRATION_ROUTE, Msg.SYSTEM_ADMINISTRATION_BREADCRUMB, true),
+      this.renderCrumb(MODULE_ROUTE, Msg.MODULE_NAME),
+      this.renderLastCrumb(Msg.PROVIDERS_BREADCRUMB)
+    ];
+
+    const rendererCrumbs = [
+      this.renderCrumb(SYSTEM_ADMINISTRATION_ROUTE, Msg.SYSTEM_ADMINISTRATION_BREADCRUMB, true),
+      this.renderCrumb(MODULE_ROUTE, Msg.MODULE_NAME),
+      this.renderLastCrumb(Msg.RENDERERS_BREADCRUMB)
+    ];
+
+    if (!!DESIGNER_PATTERN.match(path.toLowerCase())) {
+      return this.buildDesignerBreadCrumb(path);
+    } else if (!!PROVIDER_PATTERN.match(path.toLowerCase())) {
+      return providerCrumbs;
+    } else if (!!RENDERERS_PATTERN.match(path.toLowerCase())) {
+      return rendererCrumbs;
+    } else {
+      return [
+        this.renderCrumb(SYSTEM_ADMINISTRATION_ROUTE, Msg.SYSTEM_ADMINISTRATION_BREADCRUMB, true),
+        this.renderLastCrumb(Msg.MODULE_NAME)
+      ];
+    }
   }
 
   buildBreadCrumb = () => {
     const { current } = this.state;
-
-    const providerCrumbs = [
-      this.renderCrumb(MODULE_ROUTE, Msg.MODULE_NAME),
-      this.renderLastCrumb('Providers')
-    ];
-
-    const rendererCrumbs = [
-      this.renderCrumb(MODULE_ROUTE, Msg.MODULE_NAME),
-      this.renderLastCrumb('Renderers')
-    ];
-
-    if (!!DESIGNER_PATTERN.match(current.toLowerCase())) {
-      return this.buildDesignerBreadCrumb(current);
-    } else if (!!PROVIDER_PATTERN.match(current.toLowerCase())) {
-      return (
-        <div className="breadcrumb">
-          {this.renderCrumbs(providerCrumbs)}
-        </div>
-      );
-    } else if (!!RENDERERS_PATTERN.match(current.toLowerCase())) {
-      return (
-        <div className="breadcrumb">
-          {this.renderCrumbs(rendererCrumbs)}
-        </div>
-      );
-    } else {
-      return (
-        <div className="breadcrumb">
-          {this.renderCrumbs([this.renderLastCrumb(Msg.MODULE_NAME)])}
-        </div>
-      );
-    }
+    return (
+      <div id="breadcrumbs" className="breadcrumb">
+        {this.renderCrumbs(this.getCrumbs(current))}
+      </div>
+    );
   }
 
   render = () => {
@@ -160,8 +174,17 @@ class BreadCrumb extends React.Component {
   }
 }
 
-BreadCrumb.propTypes = {
-  history: PropTypes.shape({}).isRequired
-};
+const mapStateToProps = ({ }: IRootState) => ({
+});
 
-export default withRouter(connect()(BreadCrumb));
+const mapDispatchToProps = ({
+});
+
+type StateProps = ReturnType<typeof mapStateToProps>;
+type DispatchProps = typeof mapDispatchToProps;
+
+export default withRouter(connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(BreadCrumb));
+
