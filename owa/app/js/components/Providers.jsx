@@ -149,7 +149,7 @@ export class Providers extends React.Component {
               <AddButton
                 handleAdd={this.props.addNewForm}
                 txt={buttonLabel}
-                buttonClass="confirm" />
+                buttonClass="confirm add-btn" />
             </div>
           </div>
           {this.props.configForms.map(item => {

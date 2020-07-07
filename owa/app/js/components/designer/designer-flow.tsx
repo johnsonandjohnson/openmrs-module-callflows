@@ -266,9 +266,9 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
                 className={formClass}
               />
             </FormGroup>
-            <Button className="btn btn-success btn-md" disabled={!ready} onClick={() => this.addInteraction()}>Add interaction</Button>
-            <Button className="btn btn-secondary btn-md" disabled={!ready} onClick={() => this.expandAll()}>Expand</Button>
-            <Button className="btn btn-secondary btn-md" disabled={!ready} onClick={() => this.collapseAll()}>Collapse</Button>
+            <Button className="btn btn-success btn-md add-btn" disabled={!ready} onClick={() => this.addInteraction()}>Add interaction</Button>
+            <Button className="btn btn-secondary btn-md sec-btn" disabled={!ready} onClick={() => this.expandAll()}>Expand</Button>
+            <Button className="btn btn-secondary btn-md sec-btn" disabled={!ready} onClick={() => this.collapseAll()}>Collapse</Button>
           </Form>
         </div>
         <div className="panel-body">
@@ -276,7 +276,7 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
         </div>
         <div className="body-wrapper">
           <div className="panel-body">
-            <Button className="btn btn-success btn-md" disabled={!ready} onClick={this.handleSave}>Save</Button>
+            <Button className="btn btn-success btn-md confirm" disabled={!ready} onClick={this.handleSave}>Save</Button>
           </div>
           <hr />
           <div className="panel-body">

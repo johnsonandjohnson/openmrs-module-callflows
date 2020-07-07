@@ -106,7 +106,7 @@ export class Renderers extends React.Component {
               <AddButton 
                 handleAdd={this.props.addNewForm} 
                 txt={buttonLabel} 
-                buttonClass='confirm' />
+                buttonClass='confirm add-btn' />
             </div>
           </div>
           {this.props.rendererForms.map(item => {

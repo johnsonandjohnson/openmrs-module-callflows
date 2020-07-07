@@ -217,7 +217,7 @@ export class DesignerCallTest extends React.PureComponent<IDesignerCallTestProps
           {this.renderError('phoneNumber')}
         </FormGroup>
         <Button
-          className="btn btn-primary btn-md"
+          className="btn btn-primary btn-md test-btn"
           onClick={this.handleInitCallButton}>
           Initiate Test Call
         </Button>

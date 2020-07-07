@@ -19,6 +19,7 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 
 import RendererUI from './RendererUI';
+import * as Msg from '../../shared/utils/messages';
   
 const RendererForm = (props) => {
 
@@ -57,7 +58,7 @@ const RendererForm = (props) => {
             onChange={handleChange} />
           </FormGroup>
 
-          <Button className="btn confirm btn-xs" onClick={props.submit}>SAVE</Button>
+          <Button className="btn confirm btn-xs" onClick={props.submit}>{Msg.CONFIG_FORM_SAVE_BUTTON}</Button>
         </Form>
       </div>
     );

@@ -69,7 +69,7 @@ export const CONFIG_FORM_USERS_NOTE = 'Add test users for testing with simulatio
   'The provided Outbound URLs will over-ride the above Outgoing call URI template for those users\' phone numbers';
 export const CONFIG_FORM_USERS_KEY_LABEL = 'Phone number';
 export const CONFIG_FORM_USERS_VALUE_LABEL = 'Outbound URL';
-export const CONFIG_FORM_SAVE_BUTTON = 'SAVE';
+export const CONFIG_FORM_SAVE_BUTTON = 'Save';
 export const CONFIG_FORM_SERVICE_MAP_HEADER = 'Injected services map';
 export const CONFIG_FORM_SERVICE_MAP_NOTE = 'Map of services that can be injected in IVR templates. ' +
   'Key is the name used in Velocity, Value is the class of OSGi service';

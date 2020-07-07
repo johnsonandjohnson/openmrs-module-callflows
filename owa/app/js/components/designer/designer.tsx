@@ -54,7 +54,7 @@ export class Designer extends React.PureComponent<IDesignerProps, IDesignerState
           <div className="col-md-2 col-md-offset-10 col-xs-2 col-xs-offset-10">
             <LinkAddButton
               link={createLink}
-              buttonClass="confirm"
+              buttonClass="confirm add-btn"
               txt={Msg.DESIGNER_FLOW_TEST_CREATE_BTN} />
           </div>
         </div>
