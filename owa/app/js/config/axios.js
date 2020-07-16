@@ -1,12 +1,27 @@
 import axios from 'axios';
+import { loginActions } from '@openmrs/react-components';
 
-const apiBaseUrl = '/openmrs/';
+const getApiBaseUrl = () => {
+  const path = window.location.pathname;
+  return path.substring(0, path.indexOf('/owa/')) + '/';
+}
 
 const axiosInstance = axios.create({
-  baseURL: apiBaseUrl,
+  baseURL: getApiBaseUrl(),
   headers: {
     accept: 'application/json',
   },
+});
+
+axiosInstance.interceptors.response.use(function (response) {
+  return response;
+}, function (error) {
+  if (401 === error.response.status) {
+    loginActions.logout();
+    window.location.href = getApiBaseUrl() + '/login.htm?redirectUrl=' + window.location.href
+  } else {
+      return Promise.reject(error);
+  }
 });
 
 export default axiosInstance;
