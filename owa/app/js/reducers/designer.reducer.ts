@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import axiosInstance from '../config/axios';
+import axiosInstance from '@bit/soldevelo-omrs.cfl-components.shared/axios'
 import { SUCCESS, REQUEST, FAILURE } from './action-type.util';
 import ConfigFormData from '../components/config-form/config-form-data';
 import { IFlow, defaultValue as defaultFlowValue } from '../shared/model/flow.model';

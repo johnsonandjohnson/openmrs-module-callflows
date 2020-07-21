@@ -1,4 +1,4 @@
-import axiosInstance from '../config/axios';
+import axiosInstance from '@bit/soldevelo-omrs.cfl-components.shared/axios'
 import { SUCCESS, REQUEST, FAILURE } from './action-type.util';
 import _ from 'lodash';
 
