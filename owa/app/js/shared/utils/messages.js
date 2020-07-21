@@ -72,7 +72,7 @@ export const CONFIG_FORM_USERS_VALUE_LABEL = 'Outbound URL';
 export const CONFIG_FORM_SAVE_BUTTON = 'Save';
 export const CONFIG_FORM_SERVICE_MAP_HEADER = 'Injected services map';
 export const CONFIG_FORM_SERVICE_MAP_NOTE = 'Map of services that can be injected in IVR templates. ' +
-  'Key is the name used in Velocity, Value is the class of OSGi service';
+  'Key is the name used in Velocity, Value is the id of Spring Bean';
 export const CONFIG_FORM_NAME_IS_NOT_UNIQUE = 'Each config must have their unique name';
 
 // Flow form
