@@ -11,8 +11,6 @@ import UserMessage from '../shared/model/user-message.model';
 import { IFlowTestResponse } from '../shared/model/flow-test-response.model';
 import { IFlowTestResponseBody } from '../shared/model/flow-test-response-body.model';
 import { IContinueFieldProps } from '../shared/model/continue-field-props.model';
-import { convertToType } from '../shared/utils/conversion-util';
-import { AxiosPromise, AxiosResponse } from 'axios';
 import { NodeUI, toModel, getNewUserNode, getNewSystemNode, toUI } from '../shared/model/node-ui';
 
 export const ACTION_TYPES = {
@@ -26,7 +24,7 @@ export const ACTION_TYPES = {
   PUT_FLOW: 'designerReducer/PUT_FLOW',
   POST_FLOW: 'designerReducer/POST_FLOW',
   SEND_MESSAGE: 'designerReducer/SEND_MESSAGE',
-  RESET_MESSAGES: 'designerReducer/RESET_MESSAGES',
+  RESET_TEST_RUNNER: 'designerReducer/RESET_TEST_RUNNER',
   NODE_PROCESSED: 'designerReducer/NODE_PROCESSED',
   DELETE_INTERACTION_NODE: 'designerReducer/DELETE_INTERACTION_NODE',
   ADD_EMPTY_USER_AND_SYSTEM_NODES: 'designerReducer/ADD_EMPTY_USER_AND_SYSTEM_NODES',
@@ -45,7 +43,13 @@ const initialState = {
   flowLoaded: false,
   nodes: [] as Array<NodeUI>,
   messages: [] as ReadonlyArray<UserMessage | SystemMessage>,
-  continueFieldProps: null as unknown as IContinueFieldProps
+  continueFieldProps: {
+    callId: null,
+    currentNodeFields: [] as Array<IFlowTestResponseBody>,
+    params: {},
+    nodeName: null,
+    continueNode: false
+  } as IContinueFieldProps
 };
 
 export type DesignerState = Readonly<typeof initialState>;
@@ -159,7 +163,13 @@ export default (state: DesignerState = initialState, action): DesignerState => {
       return {
         ...state,
         messages: [...state.messages, ...action.payload],
-        continueFieldProps: action.meta
+        continueFieldProps: {...state.continueFieldProps, 
+          currentNodeFields: action.meta.currentNodeFields,
+          callId: action.meta.callId,
+          params: {...state.continueFieldProps.params, ...action.meta.params},
+          nodeName: action.meta.nodeName,
+          continueNode: action.meta.continueNode
+        }
       };
     }
     case ACTION_TYPES.ADD_EMPTY_USER_AND_SYSTEM_NODES: {
@@ -180,10 +190,17 @@ export default (state: DesignerState = initialState, action): DesignerState => {
         messages: [...state.messages, action.payload]
       }
     }
-    case ACTION_TYPES.RESET_MESSAGES: {
+    case ACTION_TYPES.RESET_TEST_RUNNER: {
       return {
         ...state,
-        messages: []
+        messages: [],
+        continueFieldProps: {
+          callId: null,
+          currentNodeFields: [] as Array<IFlowTestResponseBody>,
+          params: {},
+          nodeName: null,
+          continueNode: false
+        } as IContinueFieldProps
       };
     }
     case ACTION_TYPES.RESET: {
@@ -212,14 +229,11 @@ export default (state: DesignerState = initialState, action): DesignerState => {
   }
 };
 
+const callflowsPath = 'ws/callflows';
+
 export const reset = () => ({
   type: ACTION_TYPES.RESET
 });
-
-export const resetMessages = () => ({
-  type: ACTION_TYPES.RESET_MESSAGES
-});
-const callflowsPath = 'ws/callflows';
 
 export const postConfigs = (configForms) => async (dispatch) => {
   const requestUrl = callflowsPath + '/configs';
@@ -258,7 +272,7 @@ export const getFlow = (flowName: string) => async (dispatch) => {
   });
 };
 
-export const putFlow = (flow: IFlow, nodes: Array<NodeUI>, callback?: () => void ) => async (dispatch) => {
+export const putFlow = (flow: IFlow, nodes: Array<NodeUI>, callback?: () => void) => async (dispatch) => {
   const requestUrl = `${callflowsPath}/flows/${flow.id}`;
   const data = {
     ...flow,
@@ -305,80 +319,6 @@ export const makeTestCall = (config: string, flow: string, phone: string, extens
   };
   handleTestCallRequest(dispatch, body);
 }
-
-export const sendMessage = (message: UserMessage) => async (dispatch, getState) => {
-  const state: DesignerState = getState().designerReducer;
-  const { continueFieldProps } = state;
-  const { callId } = continueFieldProps;
-  const params = {};
-  params[continueFieldProps.name] = message.text;
-  await dispatch({
-    type: ACTION_TYPES.NODE_PROCESSED,
-    payload: [message],
-    meta: continueFieldProps
-  });
-  moveToNextNode(callId, dispatch, params);
-};
-
-export const initiateTestFlow = (configName: string, flowName: string) => async (dispatch) => {
-  // on the backend any configuration is required
-  const requestUrl = `${callflowsPath}/in/${configName}/flows/${flowName}.json`;
-  const { data } = await axiosInstance.get(requestUrl);
-  processNodeResponse(data, dispatch);
-};
-
-export const processNodeResponse = (data: IFlowTestResponse, dispatch: Function) => {
-  const response = data;
-  if (!isJsonContent(response.body)) {
-    dispatch({
-      type: ACTION_TYPES.NODE_PROCESSED,
-      payload: [new SystemMessage(response.node, response.body)],
-      meta: null
-    });
-    return;
-  }
-  const responseContent: [IFlowTestResponseBody] = JSON.parse(response.body);
-  const newMessages = responseContent.map(m => new SystemMessage(response.node, m.txt));
-  let continueFieldProps = getFirstContinueFieldProps(responseContent, response.callId);
-  dispatch({
-    type: ACTION_TYPES.NODE_PROCESSED,
-    payload: newMessages,
-    meta: continueFieldProps
-  });
-
-  if (response.continueNode && !continueFieldProps) {
-    moveToNextNode(response.callId, dispatch);
-  }
-};
-
-export const moveToNextNode = async (callId: string, dispatch: Function, params: any = {}) => {
-  const requestUrl = `${callflowsPath}/calls/${callId}.json`;
-  try {
-    let response = await axiosInstance.get(requestUrl, {
-      params: {
-        ...params
-      }
-    });
-    processNodeResponse(response.data, dispatch);
-  } catch (e) {
-    handleNodeError(e, dispatch);
-  }
-};
-
-const getFirstContinueFieldProps = (responseContent: IFlowTestResponseBody[], callId: string) => {
-  let fieldProps = {};
-  _.forEach(responseContent, function (element) {
-    if (element.field) {
-      fieldProps = {
-        name: element.field,
-        type: element.type,
-        callId
-      };
-      return false;
-    }
-  });
-  return (fieldProps['name']) ? fieldProps : null;
-};
 
 export const updateFlow = (payload: any) => ({
   type: ACTION_TYPES.UPDATE_FLOW,
@@ -451,6 +391,10 @@ const extractNodes = (flow: IFlow) => {
   return _.map(modals, toUI);
 }
 
+export const resetTestRunner = () => ({
+  type: ACTION_TYPES.RESET_TEST_RUNNER
+});
+
 const handleNodeError = (e, dispatch) => {
   let errorMessage = 'Error';
   try {
@@ -467,11 +411,17 @@ const handleNodeError = (e, dispatch) => {
   } catch (exception) {
     errorMessage = exception;
   }
-
+  const newNodeProps: IContinueFieldProps = {
+    callId: null,
+    currentNodeFields: [],
+    params: {},
+    nodeName: null,
+    continueNode: false
+  };
   dispatch({
     type: ACTION_TYPES.NODE_PROCESSED,
     payload: [new SystemMessage('error', errorMessage, new Date(), 'red')],
-    meta: null
+    meta: newNodeProps
   });
 };
 
@@ -481,5 +431,91 @@ const isJsonContent = (text: string) => {
     return !!parsed;
   } catch (e) {
     return false;
+  }
+};
+
+export const sendMessage = (message: UserMessage) => async (dispatch, getState) => {
+  const state: DesignerState = getState().designerReducer;
+  const { currentNodeFields, callId, params, nodeName, continueNode } = state.continueFieldProps;
+  const newNodeProps: IContinueFieldProps = {
+    callId: callId,
+    currentNodeFields: currentNodeFields,
+    params: params,
+    nodeName: nodeName,
+    continueNode: continueNode
+  };
+  if (currentNodeFields.length) {
+    const currentField = currentNodeFields[0];
+    if (currentField.field) {
+      params[currentField.field] = message.text;
+    }
+    currentNodeFields.shift();
+    await dispatch({
+      type: ACTION_TYPES.NODE_PROCESSED,
+      payload: [message],
+      meta: newNodeProps
+    });
+  }
+  
+  processNode(newNodeProps, dispatch);
+};
+
+export const initiateTestFlow = (configName: string, flowName: string) => async (dispatch) => {
+  // on the backend any configuration is required
+  const requestUrl = `${callflowsPath}/in/${configName}/flows/${flowName}.json`;
+  const { data } = await axiosInstance.get(requestUrl);
+  processNodeResponse(data, dispatch);
+};
+
+export const processNodeResponse = (data: IFlowTestResponse, dispatch: Function) => {
+  const response = data;
+  if (!isJsonContent(response.body)) {
+    return;
+  }
+  const nodeProps: IContinueFieldProps = {
+    callId: response.callId,
+    currentNodeFields: JSON.parse(response.body),
+    params: {},
+    nodeName: response.node,
+    continueNode: response.continueNode
+  };
+  processNode(nodeProps, dispatch);
+};
+
+export const processNode = (nodeProps: IContinueFieldProps, dispatch: Function) => {
+  const newMessages = [] as Array<SystemMessage>;
+  let noFieldFoundYet = true;
+  while (nodeProps.currentNodeFields.length && noFieldFoundYet) {
+    if (nodeProps.currentNodeFields && nodeProps.currentNodeFields[0].txt) {
+      newMessages.push(new SystemMessage(nodeProps.nodeName ? nodeProps.nodeName : '', nodeProps.currentNodeFields[0].txt))
+    }
+    if (nodeProps.currentNodeFields[0].field) {
+      noFieldFoundYet = false;
+    } else {
+      nodeProps.currentNodeFields.shift();
+    }
+  }
+  dispatch({
+    type: ACTION_TYPES.NODE_PROCESSED,
+    payload: newMessages,
+    meta: nodeProps
+  });
+
+  if (nodeProps.continueNode && !nodeProps.currentNodeFields.length && nodeProps.callId) {
+    moveToNextNode(nodeProps.callId, dispatch, nodeProps.params);
+  }
+};
+
+export const moveToNextNode = async (callId: string, dispatch: Function, params: any = {}) => {
+  const requestUrl = `${callflowsPath}/calls/${callId}.json`;
+  try {
+    let response = await axiosInstance.get(requestUrl, {
+      params: {
+        ...params
+      }
+    });
+    processNodeResponse(response.data, dispatch);
+  } catch (e) {
+    handleNodeError(e, dispatch);
   }
 };

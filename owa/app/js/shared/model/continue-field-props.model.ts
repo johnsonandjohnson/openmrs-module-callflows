@@ -1,5 +1,9 @@
+import { IFlowTestResponseBody } from '../model/flow-test-response-body.model';
+
 export interface IContinueFieldProps{
-  name: string,
-  type: string,
-  callId: string,
+  callId: string | null,
+  currentNodeFields: Array<IFlowTestResponseBody>,
+  params: any,
+  nodeName?: string | null,
+  continueNode?: boolean
 }

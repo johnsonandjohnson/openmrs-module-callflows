@@ -13,7 +13,7 @@ import { RouteComponentProps } from 'react-router-dom';
 import {
   getConfigs,
   getFlow,
-  resetMessages,
+  resetTestRunner,
   sendMessage,
   initiateTestFlow
 } from '../../../reducers/designer.reducer';
@@ -47,7 +47,7 @@ export class DesignerFlowTest extends React.PureComponent<IDesignerFlowTestProps
   }
 
   componentDidMount = () => {
-    this.props.resetMessages();
+    this.props.resetTestRunner();
     if (!!this.props.flowName) {
       this.props.getFlow(this.props.flowName);
     }
@@ -75,7 +75,7 @@ export class DesignerFlowTest extends React.PureComponent<IDesignerFlowTestProps
   }
 
   renderInputFields = () => {
-    let isInputExpected = !!this.props.continueFieldProps;
+    let isInputExpected = this.props.continueFieldProps.currentNodeFields.length;
     if (isInputExpected) {
       return (
         <Input
@@ -120,7 +120,7 @@ const mapDispatchToProps = ({
   getFlow,
   sendMessage,
   initiateTestFlow,
-  resetMessages
+  resetTestRunner
 });
 
 type StateProps = ReturnType<typeof mapStateToProps>;
