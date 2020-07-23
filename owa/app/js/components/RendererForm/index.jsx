@@ -19,7 +19,8 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 
 import RendererUI from './RendererUI';
-import * as Msg from '../../shared/utils/messages';
+import * as Default from '../../shared/utils/messages';
+import { getIntl } from "@openmrs/react-components/lib/components/localization/withLocalization";
   
 const RendererForm = (props) => {
 
@@ -58,7 +59,9 @@ const RendererForm = (props) => {
             onChange={handleChange} />
           </FormGroup>
 
-          <Button className="btn confirm btn-xs" onClick={props.submit}>{Msg.CONFIG_FORM_SAVE_BUTTON}</Button>
+          <Button className="btn confirm btn-xs" onClick={props.submit}>
+            {getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_SAVE_BUTTON', defaultMessage: Default.CONFIG_FORM_SAVE_BUTTON })}
+          </Button>
         </Form>
       </div>
     );

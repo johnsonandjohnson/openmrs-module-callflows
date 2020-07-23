@@ -4,7 +4,8 @@ import { Controlled as CodeMirror } from 'react-codemirror2';
 import { connect } from 'react-redux';
 import { Row, Col, FormGroup, FormControl, ControlLabel, HelpBlock } from 'react-bootstrap';
 import { Tabs } from '@openmrs/react-components';
-import * as Msg from '../../../shared/utils/messages';
+import * as Default from '../../../shared/utils/messages';
+import { getIntl } from "@openmrs/react-components/lib/components/localization/withLocalization";
 import FormSectionField from './form-section-field';
 import FormSectionCheckbox from './form-section-checkbox';
 import TabWrapper from '../../tab-wrapper';
@@ -84,13 +85,14 @@ export class FormSection extends React.Component<IProps, IState> {
           </FormSectionField>
         </Row>
         <Row>
-          <FormSectionField {...{ elementIndex, handleChange }} name="reprompt" value={element.reprompt} help={Msg.FLOW_REPROMPT_HELP} />
+          <FormSectionField {...{ elementIndex, handleChange }} name="reprompt" value={element.reprompt}
+            help={getIntl().formatMessage({ id: 'CALLFLOW_FLOW_REPROMPT_HELP', defaultMessage: Default.FLOW_REPROMPT_HELP })} />
           {element.fieldType == FieldType.DIGITS &&
             <FormSectionField {...{ elementIndex, handleChange }}
               name="fieldMeta"
               value={element.fieldMeta}
-              label={Msg.FLOW_RANGE_LABEL}
-              help={Msg.FLOW_RANGE_HELP} />
+              label={getIntl().formatMessage({ id: 'CALLFLOW_FLOW_RANGE_LABEL', defaultMessage: Default.FLOW_RANGE_LABEL })}
+              help={getIntl().formatMessage({ id: 'CALLFLOW_FLOW_RANGE_HELP', defaultMessage: Default.FLOW_RANGE_HELP })} />
           }
         </Row>
         <Row>
@@ -115,7 +117,7 @@ export class FormSection extends React.Component<IProps, IState> {
           <Col md={6}>
             <Row className="right-code-wrapper">
               <Tabs>
-                <TabWrapper key="noInput" label={Msg.FLOW_NO_INPUT_LABEL}>
+                <TabWrapper key="noInput" label={getIntl().formatMessage({ id: 'CALLFLOW_FLOW_NO_INPUT_LABEL', defaultMessage: Default.FLOW_NO_INPUT_LABEL })}>
                   <CodeMirror
                     value={this.state.noInputValue ? this.state.noInputValue : ''}
                     options={this.options}
@@ -123,7 +125,7 @@ export class FormSection extends React.Component<IProps, IState> {
                     onChange={(editor, data, value) => this.handleCodeChange(editor, data, value, 'noInput')}
                   />
                 </TabWrapper>
-                <TabWrapper key="noMatch" label={Msg.FLOW_NO_MATCH_LABEL}>
+                <TabWrapper key="noMatch" label={getIntl().formatMessage({ id: 'CALLFLOW_FLOW_NO_MATCH_LABEL', defaultMessage: Default.FLOW_NO_MATCH_LABEL })}>
                   <CodeMirror
                     value={this.state.noMatchValue ? this.state.noMatchValue : ''}
                     options={this.options}
@@ -131,7 +133,7 @@ export class FormSection extends React.Component<IProps, IState> {
                     onChange={(editor, data, value) => this.handleCodeChange(editor, data, value, 'noMatch')}
                   />
                 </TabWrapper>
-                <TabWrapper key="exit" label={Msg.FLOW_EXIT_LABEL}>
+                <TabWrapper key="exit" label={getIntl().formatMessage({ id: 'CALLFLOW_FLOW_EXIT_LABEL', defaultMessage: Default.FLOW_EXIT_LABEL })}>
                   <CodeMirror
                     value={this.state.exitValue ? this.state.exitValue : ''}
                     options={this.options}

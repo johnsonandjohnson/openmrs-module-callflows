@@ -39,14 +39,13 @@ import UserNode from './flow-node/user-node';
 import { NodeType } from '../../shared/model/node-type.model';
 import DesignerFlowTest from './test-flow/designer-flow-test';
 import { IFlow } from '../../shared/model/flow.model';
-import * as Msg from '../../shared/utils/messages';
+import * as Default from '../../shared/utils/messages';
+import { getIntl } from "@openmrs/react-components/lib/components/localization/withLocalization";
 import Tooltip from '../tooltip';
 import { getRenderers } from '../../reducers/renderersReducer';
 import { TabWrapper } from '../tab-wrapper';
 import './designer.scss';
 import { NodeUI } from '../../shared/model/node-ui';
-import { IUserNode } from '../../shared/model/user-node.model';
-import { ISystemNode } from '../../shared/model/system-node.model';
 
 export interface IDesignerFlowProps extends StateProps, DispatchProps, RouteComponentProps<{ flowName: string }> {
 };
@@ -234,7 +233,7 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
                 <Col sm={1}>
                   <i className="medium icon-remove delete-action interaction-trash-button"
                     onClick={(event) => this.handleRemoveInteraction(event, index)}
-                    title={Msg.DELETE_INTERACTION_NODE} />
+                    title={getIntl().formatMessage({ id: 'CALLFLOW_DELETE_INTERACTION_NODE', defaultMessage: Default.DELETE_INTERACTION_NODE })} />
                 </Col>
                 : '')}
             </Row>
@@ -246,7 +245,7 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
           <div>Unable to parse flow steps</div>
         );
       }
-    } else return Msg.GENERIC_LOADING;
+    } else return getIntl().formatMessage({ id: 'CALLFLOW_GENERIC_LOADING', defaultMessage: Default.GENERIC_LOADING });
   }
 
   render() {
@@ -281,12 +280,12 @@ export class DesignerFlow extends React.PureComponent<IDesignerFlowProps, IDesig
           <hr />
           <div className="panel-body">
             <h2>Test Flow</h2>
-            <Tooltip message={Msg.DESIGNER_FLOW_TEST_SECTION_DESCRIPTION} />
+            <Tooltip message={getIntl().formatMessage({ id: 'CALLFLOW_DESIGNER_FLOW_TEST_SECTION_DESCRIPTION', defaultMessage: Default.DESIGNER_FLOW_TEST_SECTION_DESCRIPTION })} />
             <Tabs>
-              <TabWrapper key="callTest" label={Msg.DESIGNER_TEST_CALL_LABEL} >
+              <TabWrapper key="callTest" label={getIntl().formatMessage({ id: 'CALLFLOW_DESIGNER_TEST_CALL_LABEL', defaultMessage: Default.DESIGNER_TEST_CALL_LABEL })} >
                 <DesignerCallTest />
               </TabWrapper>
-              <TabWrapper key="flowTest" label={Msg.DESIGNER_TEST_FLOW_LABEL} >
+              <TabWrapper key="flowTest" label={getIntl().formatMessage({ id: 'CALLFLOW_DESIGNER_TEST_FLOW_LABEL', defaultMessage: Default.DESIGNER_TEST_FLOW_LABEL })} >
                 <DesignerFlowTest />
               </TabWrapper>
             </Tabs>

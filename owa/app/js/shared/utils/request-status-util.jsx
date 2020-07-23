@@ -7,7 +7,8 @@
  * graphic logo is a trademark of OpenMRS Inc.
  */
 
-import * as Msg from './messages';
+import * as Default from './messages';
+import { getIntl } from "@openmrs/react-components/lib/components/localization/withLocalization";
 import { toast } from 'react-toastify';
 
 import '../../../css/toast.scss';
@@ -19,7 +20,7 @@ export const handleRequest = async (dispatch, body, successMessage, errorMessage
   const TOAST_CLASS = 'toast-item';
 
   var toastId = toast(
-    <ToastStatusContent message={Msg.GENERIC_PROCESSING} type="notice"/>, 
+    <ToastStatusContent message={getIntl().formatMessage({ id: 'CALLFLOW_GENERIC_PROCESSING', defaultMessage: Default.GENERIC_PROCESSING })} type="notice"/>, 
     {
       autoClose: false,
       closeButton: false,
@@ -48,7 +49,7 @@ export const handleRequest = async (dispatch, body, successMessage, errorMessage
       });
     } catch(e) {
       toast.update(toastId, {
-        render: <ToastStatusContent message={Msg.GENERIC_FAILURE} type={toast.TYPE.ERROR}/>,
+        render: <ToastStatusContent message={getIntl().formatMessage({ id: 'CALLFLOW_GENERIC_FAILURE', defaultMessage: Default.GENERIC_FAILURE })} type={toast.TYPE.ERROR}/>,
         autoClose: CLOSE_DELAY,
         closeButton: <CloseButton />,
         className: TOAST_CLASS,

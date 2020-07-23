@@ -26,7 +26,8 @@ import {
 } from 'react-bootstrap';
 import TextLabel from '../../text-label';
 import Tooltip from '../../tooltip';
-import * as Msg from '../../../shared/utils/messages';
+import * as Default from '../../../shared/utils/messages';
+import { getIntl } from "@openmrs/react-components/lib/components/localization/withLocalization";
 import { validateForm, validateField } from '../../../shared/utils/validation-util'
 import { IFlowCallError, validationSchema } from '../../../shared/model/flow-test.model';
 import ErrorDesc from '@bit/soldevelo-omrs.cfl-components.error-description';
@@ -176,13 +177,13 @@ export class DesignerCallTest extends React.PureComponent<IDesignerCallTestProps
           deny={this.handleClose}
           confirm={this.handleConfirm}
           show={this.props.showModal}
-          title={Msg.INIT_CALL_MODAL_TITLE}
-          txt={Msg.INIT_CALL_MODAL_TEXT} />
+          title={getIntl().formatMessage({ id: 'CALLFLOW_INIT_CALL_MODAL_TITLE', defaultMessage: Default.INIT_CALL_MODAL_TITLE })}
+          txt={getIntl().formatMessage({ id: 'CALLFLOW_INIT_CALL_MODAL_TEXT', defaultMessage: Default.INIT_CALL_MODAL_TEXT })} />
         <FormGroup controlId="general-description">
-          <Tooltip message={Msg.DESIGNER_TEST_CALL_GENERAL_DESCRIPTION} />
+          <Tooltip message={getIntl().formatMessage({ id: 'CALLFLOW_DESIGNER_TEST_CALL_GENERAL_DESCRIPTION', defaultMessage: Default.DESIGNER_TEST_CALL_GENERAL_DESCRIPTION })} />
         </FormGroup>
         <FormGroup controlId="configuration">
-          <TextLabel text={Msg.DESIGNER_TEST_CALL_CONFIGURATION_LABEL} isMandatory={false} isWithColon={true} />
+          <TextLabel text={getIntl().formatMessage({ id: 'CALLFLOW_DESIGNER_TEST_CALL_CONFIGURATION_LABEL', defaultMessage: Default.DESIGNER_TEST_CALL_CONFIGURATION_LABEL })} isMandatory={false} isWithColon={true} />
           <FormControl componentClass="select" name="configuration"
             value={this.state.configuration}
             onChange={this.handleConfigurationChange}
@@ -195,7 +196,7 @@ export class DesignerCallTest extends React.PureComponent<IDesignerCallTestProps
           {this.renderError('configuration')}
         </FormGroup>
         <FormGroup controlId="extension">
-          <TextLabel text={Msg.DESIGNER_TEST_CALL_EXTENSION_LABEL} isMandatory={false} isWithColon={true} />
+          <TextLabel text={getIntl().formatMessage({ id: 'CALLFLOW_DESIGNER_TEST_CALL_EXTENSION_LABEL', defaultMessage: Default.DESIGNER_TEST_CALL_EXTENSION_LABEL })} isMandatory={false} isWithColon={true} />
           <FormControl componentClass="select" name="extension"
             value={this.state.extension}
             onChange={this.handleExtensionChange}
@@ -208,7 +209,7 @@ export class DesignerCallTest extends React.PureComponent<IDesignerCallTestProps
           {this.renderError('extension')}
         </FormGroup>
         <FormGroup controlId="phoneNumber">
-          <TextLabel text={Msg.DESIGNER_TEST_CALL_PHONE_NUMBER_LABEL} isMandatory={false} isWithColon={true} />
+          <TextLabel text={getIntl().formatMessage({ id: 'CALLFLOW_DESIGNER_TEST_CALL_PHONE_NUMBER_LABEL', defaultMessage: Default.DESIGNER_TEST_CALL_PHONE_NUMBER_LABEL })} isMandatory={false} isWithColon={true} />
           <FormControl type="text"
             name="phoneNumber"
             value={this.state.phoneNumber}

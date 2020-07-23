@@ -17,7 +17,8 @@ import UrlPattern from 'url-pattern';
 import { IRootState } from '../../reducers';
 
 import './bread-crumb.scss';
-import * as Msg from '../../shared/utils/messages';
+import * as Default from '../../shared/utils/messages';
+import { getIntl } from "@openmrs/react-components/lib/components/localization/withLocalization";
 
 export const DESIGNER_NEW_FLOW_ROUTE = '#/designer/new';
 const DESIGNER_NEW_FLOW_PATTERN = new UrlPattern('/designer/new');
@@ -115,15 +116,15 @@ class BreadCrumb extends React.PureComponent<IBreadCrumbProps, IBreadCrumbState>
   }
 
   buildDesignerBreadCrumb = (path) => {
-    const designerName = Msg.DESIGNER_NEW_FLOW_BREADCRUMB;
+    const designerName = getIntl().formatMessage({ id: 'CALLFLOW_DESIGNER_NEW_FLOW_BREADCRUMB', defaultMessage: Default.DESIGNER_NEW_FLOW_BREADCRUMB });
     const designerCrumbs = [
-      this.renderCrumb(SYSTEM_ADMINISTRATION_ROUTE, Msg.SYSTEM_ADMINISTRATION_BREADCRUMB, true),
-      this.renderCrumb(MODULE_ROUTE, Msg.MODULE_NAME)
+      this.renderCrumb(SYSTEM_ADMINISTRATION_ROUTE, getIntl().formatMessage({ id: 'CALLFLOW_SYSTEM_ADMINISTRATION_BREADCRUMB', defaultMessage: Default.SYSTEM_ADMINISTRATION_BREADCRUMB }), true),
+      this.renderCrumb(MODULE_ROUTE, getIntl().formatMessage({ id: 'CALLFLOW_MODULE_NAME', defaultMessage: Default.MODULE_NAME }))
     ];
 
     if (DESIGNER_NEW_FLOW_PATTERN.match(path)) {
       designerCrumbs.push(this.renderCrumb(DESIGNER_ROUTE, designerName));
-      designerCrumbs.push(this.renderLastCrumb(Msg.DESIGNER_NEW_FLOW_BREADCRUMB_NEW));
+      designerCrumbs.push(this.renderLastCrumb(getIntl().formatMessage({ id: 'CALLFLOW_DESIGNER_NEW_FLOW_BREADCRUMB_NEW', defaultMessage: Default.DESIGNER_NEW_FLOW_BREADCRUMB_NEW })));
     } else if (DESIGNER_PATTERN.match(path)._) {
       designerCrumbs.push(this.renderCrumb(DESIGNER_ROUTE, designerName));
       designerCrumbs.push(this.buildPathDynamically(DESIGNER_PATTERN, path));
@@ -135,15 +136,17 @@ class BreadCrumb extends React.PureComponent<IBreadCrumbProps, IBreadCrumbState>
 
   getCrumbs = (path: string): Array<ReactFragment> => {
     const providerCrumbs = [
-      this.renderCrumb(SYSTEM_ADMINISTRATION_ROUTE, Msg.SYSTEM_ADMINISTRATION_BREADCRUMB, true),
-      this.renderCrumb(MODULE_ROUTE, Msg.MODULE_NAME),
-      this.renderLastCrumb(Msg.PROVIDERS_BREADCRUMB)
+      this.renderCrumb(SYSTEM_ADMINISTRATION_ROUTE, 
+        getIntl().formatMessage({ id: 'CALLFLOW_SYSTEM_ADMINISTRATION_BREADCRUMB', defaultMessage: Default.SYSTEM_ADMINISTRATION_BREADCRUMB }), true),
+      this.renderCrumb(MODULE_ROUTE, getIntl().formatMessage({ id: 'CALLFLOW_MODULE_NAME', defaultMessage: Default.MODULE_NAME })),
+      this.renderLastCrumb(getIntl().formatMessage({ id: 'CALLFLOW_PROVIDERS_BREADCRUMB', defaultMessage: Default.PROVIDERS_BREADCRUMB }))
     ];
 
     const rendererCrumbs = [
-      this.renderCrumb(SYSTEM_ADMINISTRATION_ROUTE, Msg.SYSTEM_ADMINISTRATION_BREADCRUMB, true),
-      this.renderCrumb(MODULE_ROUTE, Msg.MODULE_NAME),
-      this.renderLastCrumb(Msg.RENDERERS_BREADCRUMB)
+      this.renderCrumb(SYSTEM_ADMINISTRATION_ROUTE, 
+        getIntl().formatMessage({ id: 'CALLFLOW_SYSTEM_ADMINISTRATION_BREADCRUMB', defaultMessage: Default.SYSTEM_ADMINISTRATION_BREADCRUMB }), true),
+      this.renderCrumb(MODULE_ROUTE, getIntl().formatMessage({ id: 'CALLFLOW_MODULE_NAME', defaultMessage: Default.MODULE_NAME })),
+      this.renderLastCrumb(getIntl().formatMessage({ id: 'CALLFLOW_RENDERERS_BREADCRUMB', defaultMessage: Default.RENDERERS_BREADCRUMB }))
     ];
 
     if (!!DESIGNER_PATTERN.match(path.toLowerCase())) {
@@ -154,8 +157,8 @@ class BreadCrumb extends React.PureComponent<IBreadCrumbProps, IBreadCrumbState>
       return rendererCrumbs;
     } else {
       return [
-        this.renderCrumb(SYSTEM_ADMINISTRATION_ROUTE, Msg.SYSTEM_ADMINISTRATION_BREADCRUMB, true),
-        this.renderLastCrumb(Msg.MODULE_NAME)
+        this.renderCrumb(SYSTEM_ADMINISTRATION_ROUTE, getIntl().formatMessage({ id: 'CALLFLOW_SYSTEM_ADMINISTRATION_BREADCRUMB', defaultMessage: Default.SYSTEM_ADMINISTRATION_BREADCRUMB }), true),
+        this.renderLastCrumb(getIntl().formatMessage({ id: 'CALLFLOW_MODULE_NAME', defaultMessage: Default.MODULE_NAME }))
       ];
     }
   }

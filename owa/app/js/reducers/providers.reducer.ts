@@ -3,7 +3,8 @@ import { SUCCESS, REQUEST, FAILURE } from './action-type.util';
 import _ from 'lodash';
 
 import ConfigFormData from '../components/config-form/config-form-data';
-import * as Msg from '../shared/utils/messages';
+import * as Default from '../shared/utils/messages';
+import { getIntl } from "@openmrs/react-components/lib/components/localization/withLocalization";
 import { handleRequest } from '../shared/utils/request-status-util';
 import IConfig from '../shared/model/config.model';
 
@@ -207,7 +208,8 @@ export const postConfigs = (configForms: ConfigFormData[]) => async (dispatch) =
     type: ACTION_TYPES.POST_CONFIG,
     payload: axiosInstance.post(requestUrl, data)
   };
-  handleRequest(dispatch, body, Msg.GENERIC_SUCCESS, Msg.GENERIC_FAILURE);
+  handleRequest(dispatch, body, getIntl().formatMessage({ id: 'CALLFLOW_GENERIC_SUCCESS', defaultMessage: Default.GENERIC_SUCCESS }),
+    getIntl().formatMessage({ id: 'CALLFLOW_GENERIC_FAILURE', defaultMessage: Default.GENERIC_FAILURE }));
 };
 
 export const getConfigs = () => async (dispatch) => {

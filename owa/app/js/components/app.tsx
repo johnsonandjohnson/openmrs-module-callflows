@@ -11,13 +11,14 @@ import { connect } from 'react-redux';
 
 import Tile from './Tile';
 import IconModel from '../shared/model/Icon.model';
-import * as Msg from '../shared/utils/messages';
+import * as Default from '../shared/utils/messages';
+import { getIntl } from "@openmrs/react-components/lib/components/localization/withLocalization";
 
 class App extends React.Component {
   render() {
     return (
       <div className="body-wrapper">
-        <h1>{Msg.MODULE_NAME}</h1>
+        <h1>{getIntl().formatMessage({ id: 'CALLFLOW_MODULE_NAME', defaultMessage: Default.MODULE_NAME })}</h1>
         <div className="panel-body">
           <Tile name='Designer' href='#/designer'
             icons={[new IconModel(['fas', 'magic'], '2x') ]} />

@@ -2,7 +2,8 @@ import React from 'react';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { IUserNodeTemplate } from "../../../../shared/model/user-node-template.model";
-import * as Msg from '../../../../shared/utils/messages.js';
+import * as Default from '../../../../shared/utils/messages.js';
+import { getIntl } from "@openmrs/react-components/lib/components/localization/withLocalization";
 
 interface IProps {
     template: IUserNodeTemplate;
@@ -31,11 +32,11 @@ export class RenderedLabel extends React.Component<IProps> {
             &nbsp;&nbsp;
                     {template.dirty ?
                 (
-                    <span onClick={this.handleDirtyStatusChange} title={Msg.DIRTY_LABEL}>
+                    <span onClick={this.handleDirtyStatusChange} title={getIntl().formatMessage({ id: 'CALLFLOW_DIRTY_LABEL', defaultMessage: Default.DIRTY_LABEL })}>
                         <FontAwesomeIcon size="1x" icon={this.dirtyIcon} />
                     </span>
                 ) : (
-                    <span onClick={this.handleDirtyStatusChange} title={Msg.NON_DIRTY_LABEL}>
+                    <span onClick={this.handleDirtyStatusChange} title={getIntl().formatMessage({ id: 'CALLFLOW_NON_DIRTY_LABEL', defaultMessage: Default.NON_DIRTY_LABEL })}>
                         <FontAwesomeIcon size="1x" icon={this.nonDirtyIcon} />
                     </span>
                 )

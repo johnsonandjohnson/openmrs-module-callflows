@@ -66,7 +66,7 @@ export const CONFIG_FORM_QUEUE_ATTEMPTS = 'Retry Attempts';
 export const CONFIG_FORM_QUEUE_CALL = 'Call after all Retry Attempts?';
 export const CONFIG_FORM_USERS_HEADER = 'Test users (optional)';
 export const CONFIG_FORM_USERS_NOTE = 'Add test users for testing with simulation programs. ' +
-  'The provided Outbound URLs will over-ride the above Outgoing call URI template for those users\' phone numbers';
+  'The provided Outbound URLs will override the above Outgoing call URI template for those users\' phone numbers';
 export const CONFIG_FORM_USERS_KEY_LABEL = 'Phone number';
 export const CONFIG_FORM_USERS_VALUE_LABEL = 'Outbound URL';
 export const CONFIG_FORM_SAVE_BUTTON = 'Save';

@@ -18,6 +18,12 @@ import BreadCrumb from './components/bread-crumb';
 import Designer from './components/designer/index';
 import { CALLFLOWS_PRIVILEGE } from "./config/privileges";
 import Customize from '@bit/soldevelo-omrs.cfl-components.customize'
+import { initializeLocalizationWrapper } from '@bit/soldevelo-omrs.cfl-components.localization-wrapper';
+import messagesEN from "./translations/en.json";
+
+initializeLocalizationWrapper({
+  en: messagesEN,
+});
 
 export default (store) => (
   <div>

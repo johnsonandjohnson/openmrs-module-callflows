@@ -35,20 +35,22 @@ import RemoveButton from './RemoveButton';
 import ConfigForm from './config-form';
 import OpenMRSModal from './OpenMRSModal';
 import * as Yup from "yup";
-import * as Msg from '../shared/utils/messages';
+import * as Default from '../shared/utils/messages';
 import { validateForm } from '../shared/utils/validation-util';
 import { errorToast } from '../shared/utils/toast-display-util';
+import { getIntl } from "@openmrs/react-components/lib/components/localization/withLocalization";
 
 export class Providers extends React.Component {
   validationSchema = Yup.object().shape({
     name: Yup.string()
-      .required(Msg.FIELD_REQUIRED)
-      .test('unique check', Msg.CONFIG_FORM_NAME_IS_NOT_UNIQUE, nameToValidate => {
-        const { configForms } = this.props;
-        return _(configForms)
-          .filter(configForm => configForm.config.name === nameToValidate)
-          .size() === 1;
-      }),
+      .required(getIntl().formatMessage({ id: 'CALLFLOW_FIELD_REQUIRED', defaultMessage: Default.FIELD_REQUIRED }))
+      .test('unique check', getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_NAME_IS_NOT_UNIQUE', defaultMessage: Default.CONFIG_FORM_NAME_IS_NOT_UNIQUE })
+        , nameToValidate => {
+          const { configForms } = this.props;
+          return _(configForms)
+            .filter(configForm => configForm.config.name === nameToValidate)
+            .size() === 1;
+        }),
   });
 
   constructor(props) {
@@ -94,7 +96,7 @@ export class Providers extends React.Component {
       })
       .catch(() => {
         updateAllConfigForms(newConfigForms);
-        errorToast(Msg.GENERIC_INVALID_FORM);
+        errorToast(getIntl().formatMessage({ id: 'CALLFLOW_GENERIC_INVALID_FORM', defaultMessage: Default.GENERIC_INVALID_FORM }));
       })
   }
 
@@ -186,9 +188,9 @@ export class Providers extends React.Component {
             );
           })}
           <Button className="btn confirm btn-xs"
-              disabled={this.props.loading}
-              onClick={this.handleSubmitConfigs}>
-            {Msg.CONFIG_FORM_SAVE_BUTTON}
+            disabled={this.props.loading}
+            onClick={this.handleSubmitConfigs}>
+            {getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_SAVE_BUTTON', defaultMessage: Default.CONFIG_FORM_SAVE_BUTTON })}
           </Button>
         </div>
       </div>

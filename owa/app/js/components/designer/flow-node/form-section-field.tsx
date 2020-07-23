@@ -1,7 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Col, FormGroup, FormControl, ControlLabel, HelpBlock } from 'react-bootstrap';
-import * as Msg from '../../../shared/utils/messages';
+import * as Default from '../../../shared/utils/messages';
+import { getIntl } from "@openmrs/react-components/lib/components/localization/withLocalization";
 
 interface IProps {
   name: string;
@@ -24,7 +25,9 @@ export class FormSectionField extends React.Component<IProps> {
   render = () =>
     <Col md={this.props.md}>
       <FormGroup controlId={`element_name_${this.props.name}-${this.props.elementIndex}`}>
-        <ControlLabel>{`${this.props.label ? this.props.label : Msg[`FLOW_${this.props.name.toUpperCase()}_LABEL`]}:`}</ControlLabel>
+        <ControlLabel>{`${this.props.label ? this.props.label :
+          getIntl().formatMessage({ id: 'CALLFLOW_' + `FLOW_${this.props.name.toUpperCase()}_LABEL`, defaultMessage: Default[`FLOW_${this.props.name.toUpperCase()}_LABEL`] })}:`}
+        </ControlLabel>
         {this.props.help && <HelpBlock>{this.props.help}</HelpBlock>}
         <FormControl
           componentClass={this.props.componentClass}

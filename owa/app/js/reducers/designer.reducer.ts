@@ -4,7 +4,8 @@ import { SUCCESS, REQUEST, FAILURE } from './action-type.util';
 import ConfigFormData from '../components/config-form/config-form-data';
 import { IFlow, defaultValue as defaultFlowValue } from '../shared/model/flow.model';
 import { handleTestCallRequest, handleSuccessMessage } from '../components/designer/test-call/designer-call-test.util';
-import * as Msg from '../shared/utils/messages';
+import * as Default from '../shared/utils/messages';
+import { getIntl } from "@openmrs/react-components/lib/components/localization/withLocalization";
 import { handleRequest } from '../shared/utils/request-status-util';
 import SystemMessage from '../shared/model/system-message.model';
 import UserMessage from '../shared/model/user-message.model';
@@ -286,7 +287,8 @@ export const putFlow = (flow: IFlow, nodes: Array<NodeUI>, callback?: () => void
     type: ACTION_TYPES.PUT_FLOW,
     payload: axiosInstance.put(requestUrl, data)
   };
-  await handleRequest(dispatch, body, Msg.DESIGNER_FLOW_UPDATE_SUCCESS, Msg.DESIGNER_FLOW_UPDATE_FAILURE);
+  await handleRequest(dispatch, body, getIntl().formatMessage({ id: 'CALLFLOW_DESIGNER_FLOW_UPDATE_SUCCESS', defaultMessage: Default.DESIGNER_FLOW_UPDATE_SUCCESS }),
+    getIntl().formatMessage({ id: 'CALLFLOW_DESIGNER_FLOW_UPDATE_FAILURE', defaultMessage: Default.DESIGNER_FLOW_UPDATE_FAILURE }));
   if (callback) {
     callback();
   }
@@ -341,8 +343,8 @@ export const postFlow = (flow: IFlow, nodes: Array<NodeUI>) => async (dispatch) 
   };
   handleRequest(dispatch,
     body,
-    Msg.DESIGNER_FLOW_CREATE_SUCCESS,
-    Msg.DESIGNER_FLOW_CREATE_FAILURE);
+    getIntl().formatMessage({ id: 'CALLFLOW_DESIGNER_FLOW_CREATE_SUCCESS', defaultMessage: Default.DESIGNER_FLOW_CREATE_SUCCESS }),
+    getIntl().formatMessage({ id: 'CALLFLOW_DESIGNER_FLOW_CREATE_FAILURE', defaultMessage: Default.DESIGNER_FLOW_CREATE_FAILURE }));
 };
 
 export const openModal = () => ({

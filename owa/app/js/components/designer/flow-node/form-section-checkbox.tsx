@@ -1,10 +1,8 @@
 import React from 'react';
-import { IElement, ElementType } from '../../../shared/model/element.model';
-import { Controlled as CodeMirror } from 'react-codemirror2';
 import { connect } from 'react-redux';
-import { Row, Col, FormGroup, FormControl, ControlLabel, Checkbox, HelpBlock } from 'react-bootstrap';
-import { Tabs } from '@openmrs/react-components';
-import * as Msg from '../../../shared/utils/messages';
+import { Col, FormGroup, Checkbox } from 'react-bootstrap';
+import * as Default from '../../../shared/utils/messages';
+import { getIntl } from "@openmrs/react-components/lib/components/localization/withLocalization";
 
 interface IProps {
   name: string;
@@ -24,7 +22,7 @@ export class FormSectionCheckbox extends React.Component<IProps> {
       <FormGroup controlId={`element_name_${this.props.name}-${this.props.elementIndex}`}>
         <Checkbox name={this.props.name} checked={this.props.value}
           onChange={(e: any) => this.props.handleChange(e.target.checked, this.props.name)}>
-          {Msg[`FLOW_${this.props.name.toUpperCase()}_LABEL`]}
+          {getIntl().formatMessage({ id: 'CALLFLOW_' + `FLOW_${this.props.name.toUpperCase()}_LABEL`, defaultMessage: Default[`FLOW_${this.props.name.toUpperCase()}_LABEL`] })}
         </Checkbox>
       </FormGroup>
     </Col>

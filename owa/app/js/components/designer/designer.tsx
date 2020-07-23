@@ -18,7 +18,8 @@ import {
 import { IRootState } from '../../reducers';
 import DesignerTable from './designer-table';
 import LinkAddButton from '../link-add-button';
-import * as Msg from '../../shared/utils/messages';
+import * as Default from '../../shared/utils/messages';
+import { getIntl } from "@openmrs/react-components/lib/components/localization/withLocalization";
 import { DESIGNER_NEW_FLOW_ROUTE as createLink} from '../bread-crumb/index';
 
 export interface IDesignerProps extends StateProps, DispatchProps {
@@ -47,7 +48,7 @@ export class Designer extends React.PureComponent<IDesignerProps, IDesignerState
       <div className="body-wrapper">
         <div className="row">
           <div className="col-md-12 col-xs-12">
-            <h2>{Msg.DESIGNER_FLOW_TEST_TITLE}</h2>
+            <h2>{getIntl().formatMessage({ id: 'CALLFLOW_DESIGNER_FLOW_TEST_TITLE', defaultMessage: Default.DESIGNER_FLOW_TEST_TITLE })}</h2>
           </div>
         </div>
         <div className="row">
@@ -55,7 +56,7 @@ export class Designer extends React.PureComponent<IDesignerProps, IDesignerState
             <LinkAddButton
               link={createLink}
               buttonClass="confirm add-btn"
-              txt={Msg.DESIGNER_FLOW_TEST_CREATE_BTN} />
+              txt={getIntl().formatMessage({ id: 'CALLFLOW_DESIGNER_FLOW_TEST_CREATE_BTN', defaultMessage: Default.DESIGNER_FLOW_TEST_CREATE_BTN })} />
           </div>
         </div>
         <div className="panel-body">

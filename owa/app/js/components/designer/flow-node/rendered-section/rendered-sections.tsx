@@ -6,7 +6,8 @@ import { Tabs, Tab } from 'react-bootstrap'
 import { RenderedLabel } from './rendered-label';
 import { IUserNodeTemplate } from '../../../../shared/model/user-node-template.model';
 import _ from 'lodash'
-import * as Msg from '../../../../shared/utils/messages.js'
+import * as Default from '../../../../shared/utils/messages.js'
+import { getIntl } from "@openmrs/react-components/lib/components/localization/withLocalization";
 
 interface IProps {
     templates: Map<string, IUserNodeTemplate>;
@@ -37,7 +38,7 @@ export class RenderedSections extends React.Component<IProps> {
 
     renderBody = (templateKey: string) => {
         const template = this.props.templates[templateKey];
-        return (!template) ? (<p>{Msg.MISSING_TEMPLATE + templateKey}</p>) : (
+        return (!template) ? (<p>{getIntl().formatMessage({ id: 'CALLFLOW_MISSING_TEMPLATE', defaultMessage: Default.MISSING_TEMPLATE }) + templateKey}</p>) : (
             <CodeMirror
                 value={template.content}
                 options={this.options}

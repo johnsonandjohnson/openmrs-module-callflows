@@ -25,7 +25,8 @@ import { MessageList } from 'react-chat-elements';
 import 'react-chat-elements/dist/main.css';
 import { Input } from 'react-chat-elements';
 import UserMessage from '../../../shared/model/user-message.model';
-import * as Msg from '../../../shared/utils/messages';
+import * as Default from '../../../shared/utils/messages';
+import { getIntl } from "@openmrs/react-components/lib/components/localization/withLocalization";
 import Tooltip from '../../tooltip';
 
 export interface IDesignerFlowTestProps extends StateProps, DispatchProps, RouteComponentProps<{ flowName: string }> {
@@ -99,7 +100,7 @@ export class DesignerFlowTest extends React.PureComponent<IDesignerFlowTestProps
   render() {
     return (
       <div>
-        <Tooltip message={Msg.DESIGNER_TEST_FLOW_GENERAL_DESCRIPTION} />
+        <Tooltip message={getIntl().formatMessage({ id: 'CALLFLOW_DESIGNER_TEST_FLOW_GENERAL_DESCRIPTION', defaultMessage: Default.DESIGNER_TEST_FLOW_GENERAL_DESCRIPTION })} />
         <div className="flow-test-container">
           <MessageList
             className="message-list"
