@@ -195,4 +195,49 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="callFlow-2020-08-06-08:00" author="Arkadiusz Lalo">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="cfl_calls" />
+        </preConditions>
+        <comment>
+            Adds the table used to store the history of call resources.
+        </comment>
+        <sql>
+            CREATE TABLE cfl_calls_history LIKE cfl_calls;
+
+            ALTER TABLE cfl_calls_history MODIFY COLUMN cfl_calls_id int(11) NOT NULL,
+            DROP PRIMARY KEY, DROP KEY cfl_calls_id, DROP KEY UNIQUE_CALLFLOWS_CALL_IDX,
+            DROP KEY uuid, ENGINE = MyISAM, ADD action VARCHAR(8) DEFAULT 'insert' FIRST,
+            ADD revision INT(6) NOT NULL AUTO_INCREMENT AFTER action,
+            ADD dt_datetime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER revision,
+            ADD PRIMARY KEY (cfl_calls_id, revision);
+        </sql>
+    </changeSet>
+
+    <changeSet id="callFlow-2020-08-06-08:10" author="Arkadiusz Lalo">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="cfl_calls" />
+        </preConditions>
+        <comment>
+            Adds the inbuilt database triggers which will store information about
+            insert, update, delete of Call resources
+        </comment>
+        <sql>
+            CREATE TRIGGER cfl_calls_history_insert
+            AFTER INSERT ON cfl_calls FOR EACH ROW
+            INSERT INTO cfl_calls_history SELECT 'insert', NULL, NOW(), d.*
+                FROM cfl_calls AS d WHERE d.cfl_calls_id = NEW.cfl_calls_id;
+
+            CREATE TRIGGER cfl_calls_history_update
+            AFTER UPDATE ON cfl_calls FOR EACH ROW
+            INSERT INTO cfl_calls_history SELECT 'update', NULL, NOW(), d.*
+                FROM cfl_calls AS d WHERE d.cfl_calls_id = NEW.cfl_calls_id;
+
+            CREATE TRIGGER cfl_calls_history_delete
+            BEFORE DELETE ON cfl_calls FOR EACH ROW
+            INSERT INTO cfl_calls_history SELECT 'delete', NULL, NOW(), d.*
+                FROM cfl_calls AS d WHERE d.cfl_calls_id = OLD.cfl_calls_id;
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
