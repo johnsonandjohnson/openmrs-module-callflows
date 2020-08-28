@@ -26,7 +26,7 @@ import java.util.Objects;
  * The Call class represents the context of a IVR call
  * This class is intended to provide enough information to fulfill high level overview call reporting
  * For more detailed information of what happens at each step, refer the history table
- * <p/>
+ * <p></p>
  * The backing table of this entity can be directly joined with application tables via the actorId and actorType fields for
  * application specific reporting needs.
  *

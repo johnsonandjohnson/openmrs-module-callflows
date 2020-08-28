@@ -76,11 +76,11 @@ public class FlowUtil {
     /**
      * Parse a string into a string array of two components. The first component is the flow name and the second is the step name
      * input is expected to be in one of the following formats
-     * |MainFlow.| => MainFlow, null
-     * |MainFlow.active| => MainFlow, active
-     * |entry| => currentFlow, entry - currentFlow is a passed argument
-     * |.entry| => currentFlow, entry - currentFlow is a passed argument
-     * <p/>
+     * |MainFlow.| =&gt; MainFlow, null
+     * |MainFlow.active| =&gt; MainFlow, active
+     * |entry| =&gt; currentFlow, entry - currentFlow is a passed argument
+     * |.entry| =&gt; currentFlow, entry - currentFlow is a passed argument
+     * <p></p>
      * Note: This method does not validate whether the parsed flow name and step names are valid. That is handled at FlowService
      *
      * @param input       to parse

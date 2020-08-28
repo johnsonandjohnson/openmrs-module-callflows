@@ -70,12 +70,12 @@ public interface CallService {
     /**
      * Makes an outbound call using the IVR configuration to use, the flow name to kick start the call with
      * and a map of parameters
-     * <p/>
+     * <p></p>
      * In the params map, three keys have special meanings
      * phone - indicating the phone number to call [REQUIRED]
      * actorId - indicating a unique ID that you can connect with your application user [OPTIONAL]
      * actorType - indicating a type of a user, say a doctor or a patient [OPTIONAL]
-     * <p/>
+     * <p></p>
      * The flowName will be stored in the created call's context as a variable named jumpTo
      * Typically the IVR providers will be configured to always hit a specific main flow and while making outbound calls,
      * when you want to invoke a different flow, this parameter will be passed to the IVR provider as internal.jumpTo,
@@ -84,11 +84,11 @@ public interface CallService {
      * in their main flow.
      * Eg: One can use the main flow for any authentication like entering a PIN and then jump to this flow
      * or you could jump even before the authentication, if so desired.
-     * Typically only these two parameters (phone & jumpTo) along with a callId would be passed to the IVR provider's API
+     * Typically only these two parameters (phone and jumpTo) along with a callId would be passed to the IVR provider's API
      * to initiate a call.
      * No other params *need to be* passed, but this is configurable in the relevant IVR's configuration section
      * These params will be passed to the IVR provider under the names internal.phone, internal.jumpId and internal.callId
-     * <p/>
+     * <p></p>
      * All params passed to this method will also be persisted in the call's context,
      * so that they are available for use in the callflow.
      * Eg: If making a outbound call for a visit reminder, use
@@ -96,9 +96,9 @@ public interface CallService {
      * <code>jumpTo</code> as your visit reminder flow,
      * <code>visitId</code> indicating for which visit this reminder is for,
      * that you can then use from within your callflow to retrieve the visit object and do something with it
-     * <p/>
+     * <p></p>
      * Event: Sends a failed call event passing all parameters into the event in case the call could not be made for any reason
-     * <p/>
+     * <p></p>
      * Note: This method was inspired and adapted from the MOTECH IVR module
      *
      * @param configName indicating the IVR configuration to use to connect to the caller

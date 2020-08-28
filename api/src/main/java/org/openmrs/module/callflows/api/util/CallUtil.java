@@ -408,11 +408,11 @@ public class CallUtil {
      * Builds a outbound call request for a given phone number and a created call using a specific configuration
      * The configuration's outbound URL is used to place the call, if a test user's URL is not registered
      * If a test user's URL is registered in the IVR configuration, it over-rides the generic configuration URL
-     * <p/>
+     * <p></p>
      * The outbound URL can also have placeholders in the form of [variable] and
      * those will be replaced from the parameters available before creating the request
      * Additionally the callId and phone can also be used as part of this syntax as [internal.callId] and [internal.phone]
-     * <p/>
+     * <p></p>
      * Note: This method was inspired and adapted from the MOTECH IVR module
      *
      * @param phone  to call

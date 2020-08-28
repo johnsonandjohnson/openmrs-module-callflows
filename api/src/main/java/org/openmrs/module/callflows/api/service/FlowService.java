@@ -22,12 +22,12 @@ public interface FlowService {
      * All formats are delimited by pipes, as in velocity templates they are aesthetically pleasant to visualize
      * and they also communicate that this is a pipe to elsewhere, i.e a pipe to another flow or step
      * Supported formats:
-     * <p/>
-     * |MainFlow.| => flow = MainFlow, step = entry, where entry is the first node in the MainFlow
-     * |MainFlow.active| => flow = MainFlow, step = active, where active is a valid node in the MainFlow flow
-     * |entry| => flow = MainFlow, step = entry, where MainFlow is the currentFlow. currentFlow is mandatory here
-     * |.entry| => flow = MainFlow, step = entry, where MainFlow is the currentFlow. currentFlow is mandatory here
-     * <p/>
+     * <p></p>
+     * |MainFlow.| =&gt; flow = MainFlow, step = entry, where entry is the first node in the MainFlow
+     * |MainFlow.active| =&gt; flow = MainFlow, step = active, where active is a valid node in the MainFlow flow
+     * |entry| =&gt; flow = MainFlow, step = entry, where MainFlow is the currentFlow. currentFlow is mandatory here
+     * |.entry| =&gt; flow = MainFlow, step = entry, where MainFlow is the currentFlow. currentFlow is mandatory here
+     * <p></p>
      * Note: spaces are supported liberally all across the pattern and will be truncated before parse
      *
      * @param input       to parse
