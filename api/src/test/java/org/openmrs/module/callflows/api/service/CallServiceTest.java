@@ -71,6 +71,9 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 @PrepareForTest({CallServiceImpl.class, DateUtil.class, UUID.class, DefaultHttpClient.class})
 public class CallServiceTest extends BaseTest {
 
+    private static final String PHONE_NUMBER = "1234567890";
+    private static final String PHONE_PROP = "phone";
+
     @Mock
     private CallDao callDao;
 
@@ -119,6 +122,9 @@ public class CallServiceTest extends BaseTest {
 
     @Mock
     private CloseableHttpResponse failureResponse;
+
+    @Mock
+    private CloseableHttpResponse failedResponse;
 
     @Mock
     private CloseableHttpResponse badResponse;
@@ -182,6 +188,14 @@ public class CallServiceTest extends BaseTest {
         StatusLine failureStatusLine = mock(StatusLine.class);
         given(failureResponse.getStatusLine()).willReturn(failureStatusLine);
         given(failureStatusLine.getStatusCode()).willReturn(200);
+
+        HttpEntity failedEntity = mock(HttpEntity.class);
+        given(failedEntity.getContent()).willReturn(IOUtils.toInputStream("FAILED TO ROUTE CALL"));
+        given(failedResponse.getEntity()).willReturn(failedEntity);
+
+        StatusLine failedStatusLine = mock(StatusLine.class);
+        given(failedResponse.getStatusLine()).willReturn(failedStatusLine);
+        given(failedStatusLine.getStatusCode()).willReturn(200);
 
         HttpEntity badEntity = mock(HttpEntity.class);
         given(badEntity.getContent()).willReturn(null);
@@ -559,6 +573,24 @@ public class CallServiceTest extends BaseTest {
         assertCallCreated();
         verify(callDao, times(1)).update(outboundCall);
         verify(callUtil, times(1)).buildOutboundRequest("1234567890", outboundCall, voxeo, params);
+        // Since phone and config are fine, we have a valid call object which we'll use for error reporting
+        assertEventSent(outboundCall);
+    }
+
+    @Test
+    public void shouldSendCallFailedIfHttpResponseFromProviderHasFailed() throws IOException, URISyntaxException {
+        // Given
+        given(client.execute(any(HttpGet.class))).willReturn(failedResponse);
+        params.put(PHONE_PROP, PHONE_NUMBER);
+
+        // When
+        Call call = callService.makeCall(Constants.CONFIG_VOXEO, Constants.CALLFLOW_MAIN, params);
+
+        // Then
+        assertAllLoaded();
+        assertCallCreated();
+        verify(callDao, times(1)).update(outboundCall);
+        verify(callUtil, times(1)).buildOutboundRequest(PHONE_NUMBER, outboundCall, voxeo, params);
         // Since phone and config are fine, we have a valid call object which we'll use for error reporting
         assertEventSent(outboundCall);
     }

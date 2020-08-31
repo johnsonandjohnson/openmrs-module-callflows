@@ -52,6 +52,8 @@ public class CallServiceImpl implements CallService {
 
     private static final String FAILURE = "failure";
 
+    private static final String FAILED = "failed";
+
     private static final Set<Integer> ACCEPTABLE_IVR_RESPONSE_STATUSES = Sets
             .newHashSet(HttpURLConnection.HTTP_OK, HttpURLConnection.HTTP_ACCEPTED, HttpURLConnection.HTTP_CREATED);
 
@@ -331,7 +333,7 @@ public class CallServiceImpl implements CallService {
 
                     LOGGER.debug(String.format("response : %s ", content));
 
-                    if (content.indexOf(FAILURE) != -1) {
+                    if (isFailedContent(content)) {
                         handleError(call, "Unacceptable body: " + content, params);
                     }
                 } catch (IOException ioe) {
@@ -340,6 +342,10 @@ public class CallServiceImpl implements CallService {
                 }
             }
         }
+    }
+
+    private boolean isFailedContent(String content) {
+        return content != null && (content.toLowerCase().contains(FAILURE) || content.toLowerCase().contains(FAILED));
     }
 
     private CallStatus determineStatus(CallDirection direction) {
