@@ -1,6 +1,5 @@
 package org.openmrs.module.callflows.api.service.it;
 
-import org.hibernate.SessionFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,9 +50,6 @@ public class CallServiceITTest extends BaseModuleContextSensitiveTest {
     @Autowired
     private DbSessionFactory dbSessionFactory;
 
-    @Autowired
-    private SessionFactory sessionFactory;
-
     private CallDao callDao;
 
     @Autowired
@@ -81,9 +77,8 @@ public class CallServiceITTest extends BaseModuleContextSensitiveTest {
         // Used to avoid the issues with the H2 when multiple transactions are used
         CallDaoImpl callDaoImpl = new CallDaoImpl();
         ReflectionTestUtils.setField(callDaoImpl, "dbSessionFactory", dbSessionFactory);
-        ReflectionTestUtils.setField(callDaoImpl, "sessionFactory", sessionFactory);
         callDao = callDaoImpl;
-        ReflectionTestUtils.setField(unwrapProxy(callService), null, callDao, CallDao.class);
+        ReflectionTestUtils.setField(unwrapProxy(unwrapProxy(callService)), null, callDao, CallDao.class);
         // create a call flow
         mainFlow = CallFlowHelper.createMainFlow();
         mainFlow.setRaw(TestUtil.loadFile("main_flow.json"));

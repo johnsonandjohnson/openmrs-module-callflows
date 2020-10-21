@@ -1,6 +1,5 @@
 package org.openmrs.module.callflows.api.dao;
 
-import org.openmrs.api.db.OpenmrsDataDAO;
 import org.openmrs.module.callflows.api.domain.Call;
 import org.openmrs.module.callflows.api.domain.types.CallDirection;
 import org.openmrs.module.callflows.api.domain.types.CallStatus;
@@ -13,7 +12,7 @@ import java.util.Set;
  *
  * @author bramak09
  */
-public interface CallDao extends OpenmrsDataDAO<Call> {
+public interface CallDao {
 
     /**
      * Find a Call record using the call id

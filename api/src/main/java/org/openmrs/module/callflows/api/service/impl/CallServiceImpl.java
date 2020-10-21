@@ -25,8 +25,6 @@ import org.openmrs.module.callflows.api.service.ConfigService;
 import org.openmrs.module.callflows.api.service.FlowService;
 import org.openmrs.module.callflows.api.util.CallUtil;
 import org.openmrs.module.callflows.api.util.DateUtil;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,7 +43,6 @@ import java.util.UUID;
  *
  * @author bramak09
  */
-@Service("callService")
 public class CallServiceImpl implements CallService {
 
     private static final Log LOGGER = LogFactory.getLog(CallServiceImpl.class);
@@ -59,23 +56,13 @@ public class CallServiceImpl implements CallService {
 
     private static final String ADMIN_USER = "admin";
 
-    @Autowired
     private CallDao callDao;
-
-    @Autowired
     private CallFlowService callFlowService;
-
-    @Autowired
     private FlowService flowService;
-
-    @Autowired
     private ConfigService configService;
-
-    @Autowired
     private CallUtil callUtil;
 
-    @Autowired
-    private UserDAO userDAO;
+    private static final String USER_DAO_BEAN_NAME = "userDAO";
 
     @Override
     @Transactional
@@ -125,7 +112,8 @@ public class CallServiceImpl implements CallService {
         call.setStatus(determineStatus(direction));
 
         if (Context.isSessionOpen() && !Context.isAuthenticated()) {
-            call.setCreator(userDAO.getUserByUsername(ADMIN_USER));
+            call.setCreator(Context.getRegisteredComponent(USER_DAO_BEAN_NAME, UserDAO.class)
+                    .getUserByUsername(ADMIN_USER));
         }
 
         return callDao.create(call);
@@ -354,5 +342,25 @@ public class CallServiceImpl implements CallService {
         } else {
             return CallStatus.INITIATED;
         }
+    }
+
+    public void setCallDao(CallDao callDao) {
+        this.callDao = callDao;
+    }
+
+    public void setCallFlowService(CallFlowService callFlowService) {
+        this.callFlowService = callFlowService;
+    }
+
+    public void setFlowService(FlowService flowService) {
+        this.flowService = flowService;
+    }
+
+    public void setConfigService(ConfigService configService) {
+        this.configService = configService;
+    }
+
+    public void setCallUtil(CallUtil callUtil) {
+        this.callUtil = callUtil;
     }
 }

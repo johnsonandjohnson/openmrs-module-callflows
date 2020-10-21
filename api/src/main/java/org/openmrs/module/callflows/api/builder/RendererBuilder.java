@@ -2,15 +2,13 @@ package org.openmrs.module.callflows.api.builder;
 
 import org.openmrs.module.callflows.api.contract.RendererContract;
 import org.openmrs.module.callflows.api.domain.Renderer;
-import org.springframework.stereotype.Component;
 
 /**
  * Renderer Domain Builder
  *
  * @author bramak09
  */
-@Component
-public class RendererBuilder {
+public final class RendererBuilder {
 
     /**
      * Create a Renderer Domain object from a RendererContract object
@@ -18,7 +16,7 @@ public class RendererBuilder {
      * @param rendererContract the object to convert
      * @return a new Renderer object
      */
-    public Renderer createFrom(RendererContract rendererContract) {
+    public static Renderer createFrom(RendererContract rendererContract) {
         Renderer renderer = new Renderer();
         renderer.setName(rendererContract.getName());
         renderer.setTemplate(rendererContract.getTemplate());
@@ -26,5 +24,7 @@ public class RendererBuilder {
         return renderer;
     }
 
+    private RendererBuilder() {
+    }
 }
 

@@ -4,6 +4,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.callflows.api.domain.CallFlow;
 import org.openmrs.module.callflows.api.domain.FlowPosition;
 import org.openmrs.module.callflows.api.domain.FlowStep;
@@ -13,8 +14,6 @@ import org.openmrs.module.callflows.api.domain.flow.SystemNode;
 import org.openmrs.module.callflows.api.service.CallFlowService;
 import org.openmrs.module.callflows.api.service.FlowService;
 import org.openmrs.module.callflows.api.util.FlowUtil;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,8 +24,7 @@ import java.util.List;
  *
  * @author bramak09
  */
-@Service("flowService")
-public class FlowServiceImpl implements FlowService {
+public class FlowServiceImpl extends BaseOpenmrsService implements FlowService {
 
     private static final Log LOGGER = LogFactory.getLog(FlowServiceImpl.class);
 
@@ -41,10 +39,8 @@ public class FlowServiceImpl implements FlowService {
 
     private static final String VELOCITY = "velocity";
 
-    @Autowired
-    private CallFlowService callFlowService;
 
-    @Autowired
+    private CallFlowService callFlowService;
     private FlowUtil flowUtil;
 
     private ObjectMapper objectMapper = new ObjectMapper();
@@ -153,6 +149,14 @@ public class FlowServiceImpl implements FlowService {
             sb.append(node.getStep()).append(SPACE);
         }
         return sb.toString();
+    }
+
+    public void setCallFlowService(CallFlowService callFlowService) {
+        this.callFlowService = callFlowService;
+    }
+
+    public void setFlowUtil(FlowUtil flowUtil) {
+        this.flowUtil = flowUtil;
     }
 }
 

@@ -16,6 +16,6 @@ public class CallFlowScheduledTask extends AbstractTask {
         String config = properties.get(Constants.PARAM_CONFIG).toString();
         String flowName = properties.get(Constants.PARAM_FLOW_NAME).toString();
         Map<String, Object> params = (Map<String, Object>) properties.get(Constants.PARAM_PARAMS);
-        Context.getRegisteredComponent("callService", CallService.class).makeCall(config, flowName, params);
+        Context.getRegisteredComponent("callflows.callService", CallService.class).makeCall(config, flowName, params);
     }
 }

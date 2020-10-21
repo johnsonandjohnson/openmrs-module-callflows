@@ -115,7 +115,7 @@ public final class Constants {
 
     public static final String CONFIG_SRVC_CALL = "callSrvc";
 
-    public static final String CONFIG_SRVC_CALL_BEAN_NAME = "callService";
+    public static final String CONFIG_SRVC_CALL_BEAN_NAME = "callflows.callService";
 
     public static final String CONFIG_PERSON_SERV = "personService";
 

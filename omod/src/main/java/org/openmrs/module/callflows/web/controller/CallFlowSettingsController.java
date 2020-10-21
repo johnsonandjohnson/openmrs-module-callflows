@@ -34,22 +34,11 @@ import java.util.List;
 public class CallFlowSettingsController extends RestController {
 
     @Autowired
+    @Qualifier("callflows.configService")
     private ConfigService configService;
 
     @Autowired
-    @Qualifier("callFlow.ConfigBuilder")
-    private ConfigBuilder configBuilder;
-
-    @Autowired
-    private RendererBuilder rendererBuilder;
-
-    @Autowired
-    private ConfigContractBuilder configContractBuilder;
-
-    @Autowired
-    private RendererContractBuilder rendererContractBuilder;
-
-    @Autowired
+    @Qualifier("callflows.validationComponent")
     private ValidationComponent validationComponent;
 
     /**
@@ -77,7 +66,7 @@ public class CallFlowSettingsController extends RestController {
 
         List<Config> configs = new ArrayList<>();
         for (ConfigContract configContract : configContracts.getConfigContracts()) {
-            configs.add(configBuilder.createFrom(configContract));
+            configs.add(ConfigBuilder.createFrom(configContract));
         }
         configService.updateConfigs(configs);
         return buildConfigContract(configService.allConfigs());
@@ -106,7 +95,7 @@ public class CallFlowSettingsController extends RestController {
     public List<RendererContract> updateRenderers(@RequestBody RendererContract[] rendererContracts) {
         List<Renderer> renderers = new ArrayList<>();
         for (RendererContract rendererContract : rendererContracts) {
-            renderers.add(rendererBuilder.createFrom(rendererContract));
+            renderers.add(RendererBuilder.createFrom(rendererContract));
         }
         configService.updateRenderers(renderers);
         return buildRendererContract(configService.allRenderers());
@@ -115,7 +104,7 @@ public class CallFlowSettingsController extends RestController {
     private List<ConfigContract> buildConfigContract(List<Config> configs) {
         List<ConfigContract> configContracts = new ArrayList<>();
         for (Config config : configs) {
-            configContracts.add(configContractBuilder.createFrom(config));
+            configContracts.add(ConfigContractBuilder.createFrom(config));
         }
         return configContracts;
     }
@@ -123,7 +112,7 @@ public class CallFlowSettingsController extends RestController {
     private List<RendererContract> buildRendererContract(List<Renderer> renderers) {
         List<RendererContract> rendererContracts = new ArrayList<>();
         for (Renderer renderer : renderers) {
-            rendererContracts.add(rendererContractBuilder.createFrom(renderer));
+            rendererContracts.add(RendererContractBuilder.createFrom(renderer));
         }
         return rendererContracts;
     }

@@ -7,9 +7,6 @@ import org.openmrs.module.callflows.api.domain.flow.Node;
 import org.openmrs.module.callflows.api.evaluation.EvalNodeDaemon;
 import org.openmrs.module.callflows.api.evaluation.EvaluationCommand;
 import org.openmrs.module.callflows.api.evaluation.EvaluationContext;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.List;
@@ -21,15 +18,12 @@ import java.util.regex.Pattern;
  *
  * @author bramak09
  */
-@Component("flowUtil")
 public class FlowUtil {
 
     private static final String DOT = ".";
 
     private static final Pattern STEP_REGEX = Pattern.compile("\\|\\s*([^|]+)\\s*\\|");
 
-    @Autowired
-    @Qualifier("callflows.baseEvaluationCommand")
     private EvaluationCommand evaluationCommand;
 
     /**

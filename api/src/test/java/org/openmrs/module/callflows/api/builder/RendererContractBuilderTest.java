@@ -2,9 +2,6 @@ package org.openmrs.module.callflows.api.builder;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.openmrs.module.callflows.BaseTest;
 import org.openmrs.module.callflows.Constants;
 import org.openmrs.module.callflows.api.contract.RendererContract;
@@ -18,11 +15,7 @@ import static org.junit.Assert.assertThat;
  *
  * @author bramak09
  */
-@RunWith(MockitoJUnitRunner.class)
 public class RendererContractBuilderTest extends BaseTest {
-
-    @InjectMocks
-    private RendererContractBuilder rendererContractBuilder = new RendererContractBuilder();
 
     private Renderer renderer;
 
@@ -38,7 +31,7 @@ public class RendererContractBuilderTest extends BaseTest {
     @Test
     public void shouldBuildRendererContract() {
         // When
-        RendererContract rendererContract = rendererContractBuilder.createFrom(renderer);
+        RendererContract rendererContract = RendererContractBuilder.createFrom(renderer);
 
         // Then
         assertThat(rendererContract.getName(), equalTo(renderer.getName()));

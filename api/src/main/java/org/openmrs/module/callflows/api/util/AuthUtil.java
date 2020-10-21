@@ -18,8 +18,6 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.callflows.api.service.SettingsManagerService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.xml.bind.DatatypeConverter;
@@ -39,7 +37,6 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@Component("authUtil")
 public class AuthUtil {
 
     public static final String PRIVATE_KEY_FILE_NAME = "private.key";
@@ -66,7 +63,6 @@ public class AuthUtil {
     private String applicationId;
     private int expTimeInHrs;
 
-    @Autowired
     private SettingsManagerService settingsManagerService;
 
     @PostConstruct
@@ -174,5 +170,9 @@ public class AuthUtil {
         Properties properties = new Properties();
         properties.load(propertiesStream);
         return properties;
+    }
+
+    public void setSettingsManagerService(SettingsManagerService settingsManagerService) {
+        this.settingsManagerService = settingsManagerService;
     }
 }

@@ -1,9 +1,6 @@
 package org.openmrs.module.callflows.api.builder;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.openmrs.module.callflows.BaseTest;
 import org.openmrs.module.callflows.api.contract.CallFlowRequest;
 import org.openmrs.module.callflows.api.domain.CallFlow;
@@ -17,15 +14,11 @@ import static org.junit.Assert.assertThat;
  *
  * @author bramak09
  */
-@RunWith(MockitoJUnitRunner.class)
 public class CallFlowBuilderTest extends BaseTest {
 
     private CallFlowRequest callFlowRequest;
 
     private CallFlow callFlow;
-
-    @InjectMocks
-    private CallFlowBuilder callFlowBuilder = new CallFlowBuilder();
 
     @Test
     public void shouldBuildCallFlowFromCallFlowRequest() {
@@ -33,7 +26,7 @@ public class CallFlowBuilderTest extends BaseTest {
         callFlowRequest = CallFlowContractHelper.createMainFlowRequest();
 
         // When
-        callFlow = callFlowBuilder.createFrom(callFlowRequest);
+        callFlow = CallFlowBuilder.createFrom(callFlowRequest);
 
         // Then
         assertThat(callFlow.getId(), equalTo(null));

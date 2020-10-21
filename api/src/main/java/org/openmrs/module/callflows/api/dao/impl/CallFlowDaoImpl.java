@@ -5,22 +5,18 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.api.db.hibernate.DbSessionFactory;
-import org.openmrs.api.db.hibernate.HibernateOpenmrsDataDAO;
 import org.openmrs.module.callflows.api.dao.CallFlowDao;
 import org.openmrs.module.callflows.api.domain.CallFlow;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository("callFlow.CallFlowDao")
-public class CallFlowDaoImpl extends HibernateOpenmrsDataDAO<CallFlow> implements CallFlowDao {
+public class CallFlowDaoImpl implements CallFlowDao {
 
-    @Autowired
     private DbSessionFactory dbSessionFactory;
+    private Class mappedClass;
 
     public CallFlowDaoImpl() {
-        super(CallFlow.class);
+        this.mappedClass = CallFlow.class;
     }
 
     @Override
@@ -41,17 +37,20 @@ public class CallFlowDaoImpl extends HibernateOpenmrsDataDAO<CallFlow> implement
 
     @Override
     public CallFlow create(CallFlow callFlow) {
-        return saveOrUpdate(callFlow);
+        getSession().saveOrUpdate(callFlow);
+        return callFlow;
     }
 
     @Override
     public CallFlow update(CallFlow callFlow) {
-        return saveOrUpdate(callFlow);
+        getSession().saveOrUpdate(callFlow);
+        return callFlow;
     }
 
     @Override
     public CallFlow findById(Integer id) {
-        return getById(id);
+        Object result = getSession().get(this.mappedClass, id);
+        return result != null ? (CallFlow) result : null;
     }
 
     @Override
@@ -59,7 +58,16 @@ public class CallFlowDaoImpl extends HibernateOpenmrsDataDAO<CallFlow> implement
         getSession().createQuery("delete from callFlow.CallFlow").executeUpdate();
     }
 
+    @Override
+    public void delete(CallFlow callFlow) {
+        getSession().delete(callFlow);
+    }
+
     private DbSession getSession() {
         return dbSessionFactory.getCurrentSession();
+    }
+
+    public void setDbSessionFactory(DbSessionFactory dbSessionFactory) {
+        this.dbSessionFactory = dbSessionFactory;
     }
 }

@@ -2,15 +2,13 @@ package org.openmrs.module.callflows.api.builder;
 
 import org.openmrs.module.callflows.api.contract.CallFlowResponse;
 import org.openmrs.module.callflows.api.domain.CallFlow;
-import org.springframework.stereotype.Component;
 
 /**
  * Call Flow Response Builder
  *
  * @author bramak09
  */
-@Component
-public class CallFlowResponseBuilder {
+public final class CallFlowResponseBuilder {
 
     /**
      * Creates a new CallFlowResponse from a provided CallFlow
@@ -18,11 +16,14 @@ public class CallFlowResponseBuilder {
      * @param callFlow that is provided
      * @return a CallFlowResponse
      */
-    public CallFlowResponse createFrom(CallFlow callFlow) {
+    public static CallFlowResponse createFrom(CallFlow callFlow) {
         return new CallFlowResponse(callFlow.getId(),
                 callFlow.getName(),
                 callFlow.getDescription(),
                 callFlow.getStatus().name(),
                 callFlow.getRaw());
+    }
+
+    private CallFlowResponseBuilder() {
     }
 }

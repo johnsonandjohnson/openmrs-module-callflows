@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.callflows.api.service.SettingsManagerService;
 import org.openmrs.module.callflows.api.util.AuthUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -29,9 +30,11 @@ public class AuthSettingsController extends RestController {
     private static final Log LOGGER = LogFactory.getLog(AuthSettingsController.class);
 
     @Autowired
+    @Qualifier("callflows.settings.manager")
     private SettingsManagerService settingsManagerService;
 
     @Autowired
+    @Qualifier("callflows.authUtil")
     private AuthUtil authUtil;
 
     /**

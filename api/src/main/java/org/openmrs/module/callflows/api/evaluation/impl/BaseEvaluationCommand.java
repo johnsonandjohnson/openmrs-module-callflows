@@ -4,6 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.DaemonToken;
 import org.openmrs.module.callflows.api.domain.flow.Block;
 import org.openmrs.module.callflows.api.domain.flow.Element;
@@ -16,7 +17,6 @@ import org.openmrs.module.callflows.api.domain.flow.TextElement;
 import org.openmrs.module.callflows.api.domain.flow.UserNode;
 import org.openmrs.module.callflows.api.evaluation.EvaluationCommand;
 import org.openmrs.module.callflows.api.evaluation.EvaluationContext;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -25,8 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-@Component("callflows.baseEvaluationCommand")
-public class BaseEvaluationCommand implements EvaluationCommand {
+public class BaseEvaluationCommand extends BaseOpenmrsService implements EvaluationCommand {
 
     private static final String JSON = "json";
 

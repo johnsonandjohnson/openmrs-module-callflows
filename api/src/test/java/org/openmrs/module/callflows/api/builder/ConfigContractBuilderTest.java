@@ -2,9 +2,6 @@ package org.openmrs.module.callflows.api.builder;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.openmrs.module.callflows.BaseTest;
 import org.openmrs.module.callflows.api.contract.ConfigContract;
 import org.openmrs.module.callflows.api.domain.Config;
@@ -20,18 +17,14 @@ import static org.junit.Assert.assertThat;
  *
  * @author bramak09
  */
-@RunWith(MockitoJUnitRunner.class)
+
 public class ConfigContractBuilderTest extends BaseTest {
 
     private Config voxeo;
 
-    @InjectMocks
-    private ConfigContractBuilder configContractBuilder = new ConfigContractBuilder();
-
     @Before
     public void setUp() {
         voxeo = ConfigHelper.createConfigs().get(0);
-
     }
 
     @Test
@@ -39,7 +32,7 @@ public class ConfigContractBuilderTest extends BaseTest {
         // Given
 
         // When
-        ConfigContract voxeoContract = configContractBuilder.createFrom(voxeo);
+        ConfigContract voxeoContract = ConfigContractBuilder.createFrom(voxeo);
 
         // Then
         assertThat(voxeoContract.getName(), equalTo(voxeo.getName()));

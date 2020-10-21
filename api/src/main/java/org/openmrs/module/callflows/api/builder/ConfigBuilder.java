@@ -2,7 +2,6 @@ package org.openmrs.module.callflows.api.builder;
 
 import org.openmrs.module.callflows.api.contract.ConfigContract;
 import org.openmrs.module.callflows.api.domain.Config;
-import org.springframework.stereotype.Component;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -12,8 +11,7 @@ import java.util.Map;
  *
  * @author bramak09
  */
-@Component("callFlow.ConfigBuilder")
-public class ConfigBuilder {
+public final class ConfigBuilder {
 
     /**
      * Create a Config domain object from a ConfigContract object
@@ -21,7 +19,7 @@ public class ConfigBuilder {
      * @param configContract the object to convert
      * @return a new Config object
      */
-    public Config createFrom(ConfigContract configContract) {
+    public static Config createFrom(ConfigContract configContract) {
         Config config = new Config();
         config.setName(configContract.getName());
         config.setOutgoingCallMethod(configContract.getOutgoingCallMethod());
@@ -47,5 +45,8 @@ public class ConfigBuilder {
         config.setServicesMap(servicesMap);
 
         return config;
+    }
+
+    private ConfigBuilder() {
     }
 }

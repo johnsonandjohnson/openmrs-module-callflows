@@ -6,28 +6,24 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.api.db.hibernate.DbSessionFactory;
-import org.openmrs.api.db.hibernate.HibernateOpenmrsDataDAO;
 import org.openmrs.module.callflows.api.dao.CallDao;
 import org.openmrs.module.callflows.api.domain.Call;
 import org.openmrs.module.callflows.api.domain.types.CallDirection;
 import org.openmrs.module.callflows.api.domain.types.CallStatus;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
 
-@Repository("callFlow.CallDao")
 @Transactional
-public class CallDaoImpl extends HibernateOpenmrsDataDAO<Call> implements CallDao {
+public class CallDaoImpl implements CallDao {
 
-    @Autowired
     private DbSessionFactory dbSessionFactory;
+    private Class mappedClass;
 
     public CallDaoImpl() {
-        super(Call.class);
+        this.mappedClass = Call.class;
     }
 
     /**
@@ -67,7 +63,8 @@ public class CallDaoImpl extends HibernateOpenmrsDataDAO<Call> implements CallDa
 
     @Override
     public Call create(Call call) {
-        return saveOrUpdate(call);
+        getSession().saveOrUpdate(call);
+        return call;
     }
 
     /**
@@ -90,7 +87,8 @@ public class CallDaoImpl extends HibernateOpenmrsDataDAO<Call> implements CallDa
 
     @Override
     public Call findById(Integer id) {
-        return getById(id);
+        Object result = getSession().get(this.mappedClass, id);
+        return result != null ? (Call) result : null;
     }
 
     @Override
@@ -128,5 +126,9 @@ public class CallDaoImpl extends HibernateOpenmrsDataDAO<Call> implements CallDa
         crit.add(or);
 
         return crit;
+    }
+
+    public void setDbSessionFactory(DbSessionFactory dbSessionFactory) {
+        this.dbSessionFactory = dbSessionFactory;
     }
 }

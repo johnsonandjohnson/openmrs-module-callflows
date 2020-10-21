@@ -9,6 +9,7 @@ import org.openmrs.module.callflows.api.domain.CallFlow;
 import org.openmrs.module.callflows.api.exception.CallFlowAlreadyExistsException;
 import org.openmrs.module.callflows.api.service.CallFlowService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,13 +35,8 @@ public class CallFlowController extends RestController {
     private static final String LOOKUP_BY_NAME_PREFIX = "By Name";
 
     @Autowired
+    @Qualifier("callflows.callFlowService")
     private CallFlowService callFlowService;
-
-    @Autowired
-    private CallFlowBuilder callFlowBuilder;
-
-    @Autowired
-    private CallFlowResponseBuilder callFlowResponseBuilder;
 
     /**
      * REST API to create a call flow if no duplicate (by name) exists
@@ -54,8 +50,8 @@ public class CallFlowController extends RestController {
     @ResponseBody
     public CallFlowResponse createFlow(@RequestBody CallFlowRequest callFlowRequest)
             throws CallFlowAlreadyExistsException {
-        CallFlow callFlow = callFlowService.create(callFlowBuilder.createFrom(callFlowRequest));
-        return callFlowResponseBuilder.createFrom(callFlow);
+        CallFlow callFlow = callFlowService.create(CallFlowBuilder.createFrom(callFlowRequest));
+        return CallFlowResponseBuilder.createFrom(callFlow);
     }
 
     /**
@@ -70,9 +66,9 @@ public class CallFlowController extends RestController {
     @ResponseBody
     public CallFlowResponse updateFlow(@PathVariable(value = "id") Long id, @RequestBody CallFlowRequest callFlowRequest)
             throws CallFlowAlreadyExistsException {
-        CallFlow callflow = callFlowBuilder.createFrom(callFlowRequest);
+        CallFlow callflow = CallFlowBuilder.createFrom(callFlowRequest);
         callflow.setId(id != null ? id.intValue() : null);
-        return callFlowResponseBuilder.createFrom(callFlowService.update(callflow));
+        return CallFlowResponseBuilder.createFrom(callFlowService.update(callflow));
     }
 
     /**
@@ -101,7 +97,7 @@ public class CallFlowController extends RestController {
         if (LOOKUP_BY_NAME_PREFIX.equals(lookup)) {
             List<CallFlow> callFlows = callFlowService.findAllByNamePrefix(term);
             for (CallFlow callFlow : callFlows) {
-                callFlowResponses.add(callFlowResponseBuilder.createFrom(callFlow));
+                callFlowResponses.add(CallFlowResponseBuilder.createFrom(callFlow));
             }
         }
         return new SearchResponse(callFlowResponses);

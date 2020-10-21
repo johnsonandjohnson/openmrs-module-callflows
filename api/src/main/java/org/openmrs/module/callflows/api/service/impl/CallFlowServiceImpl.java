@@ -7,7 +7,6 @@ import org.openmrs.module.callflows.api.dao.CallFlowDao;
 import org.openmrs.module.callflows.api.domain.CallFlow;
 import org.openmrs.module.callflows.api.service.CallFlowService;
 import org.openmrs.module.callflows.api.util.ValidationComponent;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -21,21 +20,18 @@ public class CallFlowServiceImpl extends BaseOpenmrsService implements CallFlowS
 
     private static final String ADMIN_USER = "admin";
 
-    @Autowired
     private CallFlowDao callFlowDao;
-
-    @Autowired
-    private UserDAO userDAO;
-
-    @Autowired
     private ValidationComponent validationComponent;
+
+    private static final String USER_DAO_BEAN_NAME = "userDAO";
 
     @Override
     @Transactional
     public CallFlow create(CallFlow callflow) {
         validationComponent.validate(callflow);
         if (Context.isSessionOpen() && !Context.isAuthenticated()) {
-            callflow.setCreator(userDAO.getUserByUsername(ADMIN_USER));
+            callflow.setCreator(Context.getRegisteredComponent(USER_DAO_BEAN_NAME, UserDAO.class)
+                    .getUserByUsername(ADMIN_USER));
         }
         return callFlowDao.create(callflow);
     }
@@ -89,5 +85,13 @@ public class CallFlowServiceImpl extends BaseOpenmrsService implements CallFlowS
         } else {
             callFlowDao.delete(callflow);
         }
+    }
+
+    public void setCallFlowDao(CallFlowDao callFlowDao) {
+        this.callFlowDao = callFlowDao;
+    }
+
+    public void setValidationComponent(ValidationComponent validationComponent) {
+        this.validationComponent = validationComponent;
     }
 }

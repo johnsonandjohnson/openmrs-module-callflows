@@ -11,6 +11,7 @@ import org.mockito.Spy;
 import org.openmrs.Person;
 import org.openmrs.PersonAttribute;
 import org.openmrs.api.PersonService;
+import org.openmrs.api.context.Context;
 import org.openmrs.api.context.ServiceContext;
 import org.openmrs.module.DaemonToken;
 import org.openmrs.module.Module;
@@ -87,7 +88,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author bramak09
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({CallController.class, ServiceContext.class})
+@PrepareForTest({CallController.class, ServiceContext.class, Context.class })
 public class CallControllerTest extends BaseTest {
 
     private static final String LOCALHOST = "localhost";
@@ -173,7 +174,7 @@ public class CallControllerTest extends BaseTest {
 
     private Map<String, String> servicesMap;
 
-    private static final String CALL_SERVICE_BEAN_NAME = "callService";
+    private static final String CALL_SERVICE_BEAN_NAME = "callflows.callService";
 
     @Before
     public void setUp() throws IOException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
@@ -183,6 +184,8 @@ public class CallControllerTest extends BaseTest {
         given(ServiceContext.getInstance().getApplicationContext()).willReturn(mock(ApplicationContext.class));
         mockMvc = MockMvcBuilders.standaloneSetup(callController).build();
         callController.initialize();
+
+        given(Context.getPersonService()).willReturn(personService);
 
         // Load Flows and node strings from JSON Files
         String raw = TestUtil.loadFile("main_flow.json");
@@ -196,7 +199,7 @@ public class CallControllerTest extends BaseTest {
 
         servicesMap = new HashMap<>();
         // We'll use a service that we can use for integration testing also
-        servicesMap.put("callService", CALL_SERVICE_BEAN_NAME);
+        servicesMap.put("callflows.callService", CALL_SERVICE_BEAN_NAME);
         voxeo.setServicesMap(servicesMap);
         given(configService.getConfig(Constants.CONFIG_VOXEO)).willReturn(voxeo);
         given(configService.getConfig(Constants.CONFIG_YO)).willThrow(new IllegalArgumentException(Constants.ERROR_YO));

@@ -1,6 +1,7 @@
 package org.openmrs.module.callflows.api.service;
 
 import org.apache.velocity.VelocityContext;
+import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.callflows.api.domain.FlowPosition;
 import org.openmrs.module.callflows.api.domain.FlowStep;
 import org.openmrs.module.callflows.api.domain.flow.Flow;
@@ -13,7 +14,7 @@ import java.io.IOException;
  *
  * @author bramak09
  */
-public interface FlowService {
+public interface FlowService extends OpenmrsService {
 
 
     /**

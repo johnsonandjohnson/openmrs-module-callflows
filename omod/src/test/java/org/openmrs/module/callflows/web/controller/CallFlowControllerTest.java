@@ -7,8 +7,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.openmrs.module.callflows.BaseTest;
 import org.openmrs.module.callflows.Constants;
-import org.openmrs.module.callflows.api.builder.CallFlowBuilder;
-import org.openmrs.module.callflows.api.builder.CallFlowResponseBuilder;
 import org.openmrs.module.callflows.api.contract.CallFlowRequest;
 import org.openmrs.module.callflows.api.contract.CallFlowResponse;
 import org.openmrs.module.callflows.api.contract.SearchResponse;
@@ -53,12 +51,6 @@ public class CallFlowControllerTest extends BaseTest {
     @Mock
     private CallFlowService callFlowService;
 
-    @Mock
-    private CallFlowResponseBuilder callFlowResponseBuilder;
-
-    @Mock
-    private CallFlowBuilder callFlowBuilder;
-
     private CallFlow mainFlow;
 
     private CallFlow badFlow;
@@ -80,6 +72,7 @@ public class CallFlowControllerTest extends BaseTest {
         mockMvc = MockMvcBuilders.standaloneSetup(callFlowController).build();
         // flows to be created
         mainFlow = CallFlowHelper.createMainFlow();
+        mainFlow.setId(1);
         badFlow = CallFlowHelper.createBadFlow();
         // flows to be updated
         existingMainFlow = CallFlowHelper.createMainFlow();
@@ -102,9 +95,7 @@ public class CallFlowControllerTest extends BaseTest {
     @Test
     public void shouldReturnNewlyCreatedCallflowAsJSON() throws Exception {
         // Given
-        given(callFlowBuilder.createFrom(any(CallFlowRequest.class))).willReturn(mainFlow);
         given(callFlowService.create(mainFlow)).willReturn(mainFlow);
-        given(callFlowResponseBuilder.createFrom(mainFlow)).willReturn(mainFlowResponse);
 
         // When and Then
         mockMvc.perform(post("/callflows/flows").contentType(MediaType.APPLICATION_JSON).content(jsonBytes(mainFlowRequest)))
@@ -116,9 +107,7 @@ public class CallFlowControllerTest extends BaseTest {
     @Test
     public void shouldReturnHttpConflictStatusIfDuplicateCallflowIsBeingCreated() throws Exception {
         // Given
-        given(callFlowBuilder.createFrom(any(CallFlowRequest.class))).willReturn(mainFlow);
         given(callFlowService.create(mainFlow)).willThrow(new CallFlowAlreadyExistsException("Callflow already exists! "));
-        given(callFlowResponseBuilder.createFrom(mainFlow)).willReturn(mainFlowResponse);
 
         // When and Then
         mockMvc.perform(post("/callflows/flows").contentType(MediaType.APPLICATION_JSON).content(jsonBytes(mainFlowRequest)))
@@ -129,8 +118,7 @@ public class CallFlowControllerTest extends BaseTest {
     @Test
     public void shouldReturnHttpBadRequestStatusIfCallflowNameIsNotAlphanumeric() throws Exception {
         // Given
-        given(callFlowBuilder.createFrom(any(CallFlowRequest.class))).willReturn(badFlow);
-        given(callFlowService.create(badFlow)).willThrow(new IllegalArgumentException("bad Callflow ! "));
+        given(callFlowService.create(any())).willThrow(new IllegalArgumentException("bad Callflow ! "));
 
         // When and Then
         mockMvc.perform(post("/callflows/flows").contentType(MediaType.APPLICATION_JSON).content(jsonBytes(mainFlowRequest)))
@@ -142,9 +130,7 @@ public class CallFlowControllerTest extends BaseTest {
     @Test
     public void shouldReturnNewlyUpdatedCallflowAsJSON() throws Exception {
         // Given
-        given(callFlowBuilder.createFrom(any(CallFlowRequest.class))).willReturn(existingMainFlow);
         given(callFlowService.update(existingMainFlow)).willReturn(existingMainFlow);
-        given(callFlowResponseBuilder.createFrom(mainFlow)).willReturn(mainFlowResponse);
 
         // When and Then
         mockMvc.perform(put("/callflows/flows/" + existingMainFlow.getId()).contentType(MediaType.APPLICATION_JSON).content(jsonBytes(mainFlowRequest)))
@@ -156,7 +142,6 @@ public class CallFlowControllerTest extends BaseTest {
     @Test
     public void shouldReturnHttpConflictStatusIfCallflowWithSameNameExistsDuringUpdate() throws Exception {
         // Given
-        given(callFlowBuilder.createFrom(any(CallFlowRequest.class))).willReturn(existingMainFlow);
         given(callFlowService.update(existingMainFlow)).willThrow(new CallFlowAlreadyExistsException("Callflow already exists! "));
 
         // When and Then
@@ -168,8 +153,7 @@ public class CallFlowControllerTest extends BaseTest {
     @Test
     public void shouldReturnHttpBadRequestStatusIfCallflowNameIsNotAlphanumericDuringUpdate() throws Exception {
         // Given
-        given(callFlowBuilder.createFrom(any(CallFlowRequest.class))).willReturn(badFlow);
-        given(callFlowService.update(badFlow)).willThrow(new IllegalArgumentException("bad Callflow ! "));
+        given(callFlowService.update(any())).willThrow(new IllegalArgumentException("bad Callflow ! "));
 
         // When and Then
         mockMvc.perform(put("/callflows/flows/1").contentType(MediaType.APPLICATION_JSON).content(jsonBytes(mainFlowRequest)))
@@ -181,8 +165,6 @@ public class CallFlowControllerTest extends BaseTest {
     public void shouldReturnStatusOKForSuccessfulCallFlowSearches() throws Exception {
         // Given two flows found for a valid search term
         given(callFlowService.findAllByNamePrefix(Constants.CALLFLOW_MAIN_PREFIX)).willReturn(searchedFlows);
-        given(callFlowResponseBuilder.createFrom(flow1)).willReturn(CallFlowContractHelper.createFlow1Response());
-        given(callFlowResponseBuilder.createFrom(flow2)).willReturn(CallFlowContractHelper.createFlow2Response());
 
         List<CallFlowResponse> responses = new ArrayList<>();
         for (CallFlow flow : searchedFlows) {
@@ -206,8 +188,6 @@ public class CallFlowControllerTest extends BaseTest {
     public void shouldReturnStatusOKForUnSuccessfulCallFlowSearches() throws Exception {
         // Given two flows found for a valid search term
         given(callFlowService.findAllByNamePrefix(Constants.CALLFLOW_MAIN_PREFIX)).willReturn(searchedFlows);
-        given(callFlowResponseBuilder.createFrom(flow1)).willReturn(CallFlowContractHelper.createFlow1Response());
-        given(callFlowResponseBuilder.createFrom(flow2)).willReturn(CallFlowContractHelper.createFlow2Response());
 
         // When we search for a invalid term , Then
         mockMvc.perform(get("/callflows/flows?lookup=By Name&term=" + Constants.CALLFLOW_INVALID_PREFIX))

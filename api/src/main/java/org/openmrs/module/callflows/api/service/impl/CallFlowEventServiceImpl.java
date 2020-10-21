@@ -5,12 +5,10 @@ import org.openmrs.event.Event;
 import org.openmrs.event.EventMessage;
 import org.openmrs.module.callflows.api.event.CallFlowEvent;
 import org.openmrs.module.callflows.api.service.CallFlowEventService;
-import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.util.Map;
 
-@Service("callFlow.eventService")
 public class CallFlowEventServiceImpl extends BaseOpenmrsService implements CallFlowEventService {
 
     @Override

@@ -27,13 +27,10 @@ import org.openmrs.module.callflows.api.event.CallFlowEvent;
 import org.openmrs.module.callflows.api.service.CallFlowEventService;
 import org.openmrs.module.callflows.api.service.CallFlowSchedulerService;
 import org.openmrs.module.callflows.api.task.CallFlowScheduledTask;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
 import org.springframework.util.ClassUtils;
 import org.supercsv.io.CsvMapWriter;
 import org.supercsv.prefs.CsvPreference;
@@ -71,7 +68,6 @@ import java.util.zip.ZipOutputStream;
  *
  * @author bramak09
  */
-@Component("callUtil")
 public class CallUtil {
 
     private static final String DOT = ".";
@@ -124,20 +120,10 @@ public class CallUtil {
 
     private static final String DATE_TIME_PATTERN_2 = "yyMMddHHmm";
 
-    @Autowired
     private CallDao callDao;
-
-    @Autowired
-    @Qualifier("callflow.schedulerService")
     private CallFlowSchedulerService schedulerService;
-
-    @Autowired
-    @Qualifier("callFlow.eventService")
     private CallFlowEventService callFlowEventService;
-
-    @Autowired
     private AuthUtil authUtil;
-
 
     /**
      * Merge call properties with a context.
@@ -705,5 +691,21 @@ public class CallUtil {
         }
         LOGGER.debug(String.format("user = %s, uri = %s", phone, uri));
         return uri;
+    }
+
+    public void setCallDao(CallDao callDao) {
+        this.callDao = callDao;
+    }
+
+    public void setSchedulerService(CallFlowSchedulerService schedulerService) {
+        this.schedulerService = schedulerService;
+    }
+
+    public void setCallFlowEventService(CallFlowEventService callFlowEventService) {
+        this.callFlowEventService = callFlowEventService;
+    }
+
+    public void setAuthUtil(AuthUtil authUtil) {
+        this.authUtil = authUtil;
     }
 }

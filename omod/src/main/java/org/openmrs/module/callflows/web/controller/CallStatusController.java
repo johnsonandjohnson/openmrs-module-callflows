@@ -9,6 +9,7 @@ import org.openmrs.module.callflows.api.domain.types.CallStatus;
 import org.openmrs.module.callflows.api.service.CallService;
 import org.openmrs.module.callflows.api.util.CallUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,9 +43,11 @@ public class CallStatusController extends RestController {
     private static final String EXTERNAL_ID_PARAM_NAME = "externalIdParamName";
 
     @Autowired
+    @Qualifier("callflows.callService")
     private CallService callService;
 
     @Autowired
+    @Qualifier("callflows.callUtil")
     private CallUtil callUtil;
 
     /**

@@ -1,6 +1,5 @@
 package org.openmrs.module.callflows.api.dao;
 
-import org.openmrs.api.db.OpenmrsDataDAO;
 import org.openmrs.module.callflows.api.domain.CallFlow;
 
 import java.util.List;
@@ -10,7 +9,7 @@ import java.util.List;
  *
  * @author bramak09
  */
-public interface CallFlowDao extends OpenmrsDataDAO<CallFlow> {
+public interface CallFlowDao {
 
     /**
      * Finds a single call flow by name using an exact match
@@ -36,4 +35,5 @@ public interface CallFlowDao extends OpenmrsDataDAO<CallFlow> {
 
     void deleteAll();
 
+    void delete(CallFlow callFlow);
 }

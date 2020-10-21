@@ -14,7 +14,6 @@ import org.openmrs.module.callflows.api.exception.CallFlowRuntimeException;
 import org.openmrs.module.callflows.api.service.ConfigService;
 import org.openmrs.module.callflows.api.service.SettingsManagerService;
 import org.openmrs.module.callflows.api.util.CallFlowConstants;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 
 import javax.annotation.PostConstruct;
@@ -34,7 +33,6 @@ public class ConfigServiceImpl extends BaseOpenmrsService implements ConfigServi
 
     private static final Log LOGGER = LogFactory.getLog(ConfigServiceImpl.class);
 
-    @Autowired
     private SettingsManagerService settingsManagerService;
 
     private Settings settings = new Settings();
@@ -152,5 +150,9 @@ public class ConfigServiceImpl extends BaseOpenmrsService implements ConfigServi
         } catch (IOException e) {
             throw new CallFlowRuntimeException(e);
         }
+    }
+
+    public void setSettingsManagerService(SettingsManagerService settingsManagerService) {
+        this.settingsManagerService = settingsManagerService;
     }
 }

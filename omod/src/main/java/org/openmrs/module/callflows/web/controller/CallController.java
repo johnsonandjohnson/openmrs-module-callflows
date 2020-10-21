@@ -10,7 +10,7 @@ import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.log.Log4JLogChute;
 import org.openmrs.Person;
 import org.openmrs.PersonAttribute;
-import org.openmrs.api.PersonService;
+import org.openmrs.api.context.Context;
 import org.openmrs.api.context.ServiceContext;
 import org.openmrs.module.callflows.api.contract.OutboundCallResponse;
 import org.openmrs.module.callflows.api.domain.Call;
@@ -31,6 +31,7 @@ import org.openmrs.module.callflows.api.util.CallUtil;
 import org.openmrs.module.callflows.api.util.DateUtil;
 import org.openmrs.module.callflows.api.util.FlowUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -124,25 +125,28 @@ public class CallController extends RestController {
     private static final String TELEPHONE_NUMBER = "Telephone Number";
 
     @Autowired
+    @Qualifier("callflows.configService")
     private ConfigService configService;
 
     @Autowired
+    @Qualifier("callflows.callFlowService")
     private CallFlowService callFlowService;
 
     @Autowired
+    @Qualifier("callflows.callService")
     private CallService callService;
 
     @Autowired
+    @Qualifier("callflows.flowService")
     private FlowService flowService;
 
     @Autowired
+    @Qualifier("callflows.flowUtil")
     private FlowUtil flowUtil;
 
     @Autowired
+    @Qualifier("callflows.callUtil")
     private CallUtil callUtil;
-
-    @Autowired
-    private PersonService personService;
 
     @PostConstruct
     public void initialize() {
@@ -422,7 +426,7 @@ public class CallController extends RestController {
                                            @PathVariable(value = "extension") String extension,
                                            @PathVariable(value = "personUuid") String personUuid,
                                            @RequestParam Map<String, Object> params) {
-        Person person = personService.getPersonByUuid(personUuid);
+        Person person = Context.getPersonService().getPersonByUuid(personUuid);
         String phoneNumber = getTelephoneFromPerson(person);
         if (StringUtils.isNotBlank(phoneNumber)) {
             Map<String, Object> additionalParams = new HashMap<>();
