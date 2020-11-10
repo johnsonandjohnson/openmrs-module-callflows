@@ -305,7 +305,7 @@
         <guavaVersion>23.0</guavaVersion>
         <superCsvVersion>2.2.1</superCsvVersion>
         <apacheHttpClientVersion>4.4.1</apacheHttpClientVersion>
-        <eventVersion>2.6.0</eventVersion>
+        <eventVersion>2.8.0</eventVersion>
         <legacyVersion>1.5.0</legacyVersion>
         <javax.servlet.version>3.0.1</javax.servlet.version>
         <jjwtVersion>0.9.1</jjwtVersion>
