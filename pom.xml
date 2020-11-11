@@ -9,7 +9,7 @@
 
     <groupId>org.openmrs.module</groupId>
     <artifactId>callflows</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Callflows module</name>
     <description>
@@ -23,7 +23,7 @@
         <connection>scm:git:git@bitbucket.org:soldevelo/omrs-callflows.git</connection>
         <developerConnection>scm:git:git@bitbucket.org:soldevelo/omrs-callflows.git</developerConnection>
         <url>https://bitbucket.org/soldevelo/omrs-callflows/</url>
-      <tag>1.0.1</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <modules>
