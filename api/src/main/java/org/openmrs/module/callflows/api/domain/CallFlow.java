@@ -1,5 +1,6 @@
 package org.openmrs.module.callflows.api.domain;
 
+import org.openmrs.BaseOpenmrsMetadata;
 import org.openmrs.module.callflows.api.domain.types.CallFlowStatus;
 import org.openmrs.module.callflows.api.validate.annotation.ValidCallFlow;
 
@@ -19,9 +20,9 @@ import java.util.Objects;
  * @author bramak09
  */
 @Entity(name = "callFlow.CallFlow")
-@Table(name = "cfl_callflows", uniqueConstraints = @UniqueConstraint(name = "UNIQUE_CALLFLOW_IDX", columnNames = {"name"} ))
+@Table(name = "cfl_callflows", uniqueConstraints = @UniqueConstraint(name = "UNIQUE_CALLFLOW_IDX", columnNames = {"name"}))
 @ValidCallFlow
-public class CallFlow extends AbstractBaseOpenmrsData {
+public class CallFlow extends BaseOpenmrsMetadata {
 
     private static final String TEXT = "text";
 
@@ -29,19 +30,6 @@ public class CallFlow extends AbstractBaseOpenmrsData {
     @GeneratedValue
     @Column(name = "cfl_callflows_id")
     private Integer id;
-
-    /**
-     * The callflow name. Typically alpha-numeric.
-     * Can not contain dots strictly, as a dot is used to separate a call flow from a step in a call flow
-     */
-    @Column
-    private String name;
-
-    /**
-     * A description of the call flow
-     */
-    @Column
-    private String description;
 
     /**
      * The call flow status
@@ -56,10 +44,14 @@ public class CallFlow extends AbstractBaseOpenmrsData {
      * The JSON structure itself is inspired from the VoiceXML format as that's the standard for Voice communications
      * However best effort has been made to choose those elements/attributes that can be applicable even in areas
      * where VoiceXML might not be used. The flow structure is therefore a very minified subset of the whole VoiceXML schema
+     * <p>
+     * <b>WARNING</b>: OpenMRS requires a length to be specified at Column mapping. This column's real datatype is LONGTEXT,
+     * which max size is bigger (4,294,967,295 bytes) then what was specified here (2,147,483,647).
+     * </p>
      *
      * @see org.openmrs.module.callflows.api.domain.flow.Flow
      */
-    @Column(columnDefinition = TEXT)
+    @Column(columnDefinition = TEXT, length = Integer.MAX_VALUE)
     private String raw;
 
     public CallFlow() {
@@ -74,8 +66,8 @@ public class CallFlow extends AbstractBaseOpenmrsData {
      * @param raw         A json serialized representation of the callflow
      */
     public CallFlow(String name, String description, CallFlowStatus status, String raw) {
-        this.name = name;
-        this.description = description;
+        setName(name);
+        setDescription(description);
         this.status = status;
         this.raw = raw;
     }
@@ -86,22 +78,6 @@ public class CallFlow extends AbstractBaseOpenmrsData {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public CallFlowStatus getStatus() {
@@ -129,19 +105,19 @@ public class CallFlow extends AbstractBaseOpenmrsData {
             return false;
         }
         final CallFlow other = (CallFlow) o;
-        return Objects.equals(this.name, other.name);
+        return Objects.equals(this.getName(), other.getName());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name);
+        return Objects.hash(getName());
     }
 
     @Override
     public String toString() {
         return "CallFlow{" +
-                "name='" + name + '\'' +
-                ", status=" + status +
+                "name='" + getName() + '\'' +
+                ", status=" + getStatus() +
                 '}';
     }
 

@@ -30,6 +30,18 @@ public interface CallFlowService extends OpenmrsService {
     CallFlow create(CallFlow callflow) throws CallFlowAlreadyExistsException;
 
     /**
+     * Save the current state of {@code callFlow}. Creates a new CallFlow or updates existing.
+     * <p>
+     * This method complies with default OpenMRS entity service method names pattern and is required.
+     * </p>
+     *
+     * @param callFlow the callFlow to save, not null
+     * @return the saved CallFlow, never null
+     */
+    @Authorized(PrivilegeConstants.CALLFLOWS_PRIVILEGE)
+    CallFlow saveCallFlow(CallFlow callFlow);
+
+    /**
      * Updates a call flow in the system.
      * If the name of the call flow is being changed, it cannot be the same as that of an existing call flow
      * and special characters cannot be used in the name of the callflow as they have special significance during call flow execution

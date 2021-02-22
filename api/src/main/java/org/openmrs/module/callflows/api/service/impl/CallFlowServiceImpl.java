@@ -38,6 +38,12 @@ public class CallFlowServiceImpl extends BaseOpenmrsService implements CallFlowS
 
     @Override
     @Transactional
+    public CallFlow saveCallFlow(CallFlow callFlow) {
+        return create(callFlow);
+    }
+
+    @Override
+    @Transactional
     public CallFlow update(CallFlow callflow) {
         validationComponent.validate(callflow);
 

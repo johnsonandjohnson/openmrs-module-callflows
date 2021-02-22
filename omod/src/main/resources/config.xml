@@ -20,9 +20,7 @@
     <require_version>${openmrsPlatformVersion}</require_version>
 
     <require_modules>
-        <require_module version="${eventVersion}">
-            org.openmrs.event
-        </require_module>
+        <require_module version="${eventVersion}">org.openmrs.event</require_module>
     </require_modules>
 
     <!-- Extensions -->
@@ -33,6 +31,7 @@
 
     <aware_of_modules>
         <aware_of_module>org.openmrs.module.legacyui</aware_of_module>
+        <aware_of_module version="${metadatasharingVersion}">org.openmrs.module.metadatasharing</aware_of_module>
     </aware_of_modules>
 
     <filter>

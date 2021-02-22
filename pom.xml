@@ -97,6 +97,12 @@
                 <artifactId>jjwt</artifactId>
                 <version>${jjwtVersion}</version>
             </dependency>
+            <dependency>
+                <groupId>org.openmrs.module</groupId>
+                <artifactId>metadatasharing-api</artifactId>
+                <version>${metadatasharingVersion}</version>
+                <scope>provided</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -316,5 +322,6 @@
         <checkStylePluginSkip>false</checkStylePluginSkip>
         <pmdPluginVersion>3.5</pmdPluginVersion>
         <pmdPluginSkip>false</pmdPluginSkip>
+        <metadatasharingVersion>1.6.0</metadatasharingVersion>
     </properties>
 </project>
