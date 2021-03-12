@@ -44,9 +44,12 @@ import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -204,7 +207,7 @@ public class CallUtilTest extends BaseTest {
     }
 
     @Test
-    public void shouldReplaceParamsInString() {
+    public void shouldReplaceParamsInString() throws UnsupportedEncodingException {
         // Given
         String url = "http://localhost/context-path?phone=[phone]&callId=[internal.callId]&noreplace=ok";
         Map<String, Object> params = new HashMap<>();
@@ -271,7 +274,8 @@ public class CallUtilTest extends BaseTest {
     }
 
     @Test
-    public void shouldGenerateTokenForTheFirstTime() throws URISyntaxException {
+    public void shouldGenerateTokenForTheFirstTime()
+            throws URISyntaxException, IOException, InvalidKeySpecException, NoSuchAlgorithmException {
         // Given
         voxeo.setOutgoingCallUriTemplate("http://to-outer-space?callId=[internal.callId]&myParam=[testParam]");
         voxeo.setOutgoingCallMethod("POST");
@@ -294,7 +298,8 @@ public class CallUtilTest extends BaseTest {
     }
 
     @Test
-    public void shouldGenerateTokenIfTheTokenIsExpired() throws URISyntaxException {
+    public void shouldGenerateTokenIfTheTokenIsExpired()
+            throws URISyntaxException, IOException, InvalidKeySpecException, NoSuchAlgorithmException {
         // Given
         voxeo.setOutgoingCallUriTemplate("http://to-outer-space?callId=[internal.callId]&myParam=[testParam]");
         voxeo.setOutgoingCallMethod("POST");
@@ -319,7 +324,8 @@ public class CallUtilTest extends BaseTest {
     }
 
     @Test
-    public void shouldNotGenerateTokenForSubsequentRequests() throws URISyntaxException {
+    public void shouldNotGenerateTokenForSubsequentRequests()
+            throws URISyntaxException, IOException, InvalidKeySpecException, NoSuchAlgorithmException {
         // Given
         voxeo.setOutgoingCallUriTemplate("http://to-outer-space?callId=[internal.callId]&myParam=[testParam]");
         voxeo.setOutgoingCallMethod("POST");
@@ -343,7 +349,8 @@ public class CallUtilTest extends BaseTest {
     }
 
     @Test
-    public void shouldNotTriggerGenerateTokenIfAuthFlagIsDisabled() throws URISyntaxException {
+    public void shouldNotTriggerGenerateTokenIfAuthFlagIsDisabled()
+            throws URISyntaxException, IOException, InvalidKeySpecException, NoSuchAlgorithmException {
         // Given
         voxeo.setOutgoingCallUriTemplate("http://to-outer-space?callId=[internal.callId]&myParam=[testParam]");
         voxeo.setOutgoingCallMethod("POST");

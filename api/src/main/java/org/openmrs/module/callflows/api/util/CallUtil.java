@@ -47,9 +47,12 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -82,13 +85,15 @@ public class CallUtil {
 
     private static final String UTF_8 = "UTF-8";
 
-    private static final MediaType DEFAULT_MEDIA_TYPE =
-            new MediaType("text", "plain", StandardCharsets.UTF_8);
+    private static final MediaType DEFAULT_MEDIA_TYPE = new MediaType("text", "plain", StandardCharsets.UTF_8);
 
-    private static final MediaType JSON_MEDIA_TYPE = new MediaType("application", "json",
-            StandardCharsets.UTF_8);
+    private static final MediaType JSON_MEDIA_TYPE = new MediaType("application", "json", StandardCharsets.UTF_8);
 
-    private static final String REPLACEMENT_PATTERN = "[%s]";
+    private static final String URI_PARAM_REPLACE_PATTERN = "[%s]";
+
+    private static final String URI_PARAM_REPLACE_KEY_ILLEGAL_CHARACTERS_PATTERN = "[\\[\\]]";
+
+    private static final String URI_PARAM_REPLACE_KEY_ILLEGAL_CHARACTER_REPLACEMENT = "_";
 
     private static final String ACTOR_ID = "actorId";
 
@@ -103,23 +108,23 @@ public class CallUtil {
     private static final String INTERNAL = "internal";
 
     private static final int BYTE_SIZE = 1024;
-
-    private ObjectMapper objectMapper = new ObjectMapper();
-
-    private static final Collection<CallStatus> ACTIVE_OUTBOUND_CALL_STATUSES = Arrays
-            .asList(CallStatus.INITIATED, CallStatus.IN_PROGRESS, CallStatus.OPENMRS_INITIATED);
-
+    private static final Collection<CallStatus> ACTIVE_OUTBOUND_CALL_STATUSES =
+            Arrays.asList(CallStatus.INITIATED, CallStatus.IN_PROGRESS, CallStatus.OPENMRS_INITIATED);
     private static final String MESSAGE_KEY = "messageKey";
     private static final String CSV = ".csv";
     private static final String FILE_NAME_INITIALS = "cfl_calls_";
-
-    private final String[] headers = {"id", ACTOR_ID, "phone", ACTOR_TYPE, "callId", "direction", "creationDate",
-            "callReference", "status", "statusText", "startTime", "endTime"};
-
     private static final String DATE_TIME_PATTERN_1 = "MM/dd/yyyy HH:mm:ss";
-
     private static final String DATE_TIME_PATTERN_2 = "yyMMddHHmm";
-
+    /**
+     * The maximum number of parameters to merge into URI. This is safety measure from DoS attacks.
+     * The value has been selected based on a default max size of HTTP request line in Apache HTTP Server 8190.
+     * The value is the 8190 divided by 4 (smallest param &a=b).
+     */
+    private static final int MAX_URI_MERGE_PARAM_SIZE = 2047;
+    private final String[] headers =
+            {"id", ACTOR_ID, "phone", ACTOR_TYPE, "callId", "direction", "creationDate", "callReference", "status",
+                    "statusText", "startTime", "endTime"};
+    private ObjectMapper objectMapper = new ObjectMapper();
     private CallDao callDao;
     private CallFlowSchedulerService schedulerService;
     private CallFlowEventService callFlowEventService;
@@ -158,8 +163,7 @@ public class CallUtil {
             // we are not going to capture domain objects or other complex objects, just simple objects
             if (val != null) {
                 if (isAllowedToPersist(keyString, val) || ClassUtils.isPrimitiveOrWrapper(val.getClass()) ||
-                        ClassUtils.isPrimitiveArray(val.getClass()) ||
-                        ClassUtils.isPrimitiveWrapperArray(val.getClass())) {
+                        ClassUtils.isPrimitiveArray(val.getClass()) || ClassUtils.isPrimitiveWrapperArray(val.getClass())) {
                     callContext.put((String) key, val);
                 }
             }
@@ -363,8 +367,8 @@ public class CallUtil {
         if (config.getOutboundCallLimit() > 0) {
             // Check how many current active calls are there
             Set<CallStatus> callStatusSet = new HashSet<>(ACTIVE_OUTBOUND_CALL_STATUSES);
-            long currentOutboundCallCount = callDao
-                    .countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet);
+            long currentOutboundCallCount =
+                    callDao.countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet);
             // Do we have enough bandwidth to make this call?
             if (currentOutboundCallCount > config.getOutboundCallLimit()) {
                 // No we don't!
@@ -377,7 +381,8 @@ public class CallUtil {
                     if (!config.getCallAllowed()) {
                         throw new OperationNotSupportedException("Outbound call limit is exceeded");
                     }
-                    // otherwise we allow the call to do even though retries have been exceeded cause the configuration says so!
+                    // otherwise we allow the call to do even though retries have been exceeded cause the configuration
+                    // says so!
                 } else {
                     // retry after some time
                     params.put(Constants.PARAM_RETRY_ATTEMPTS, retryAttempts + 1);
@@ -425,11 +430,10 @@ public class CallUtil {
         String uri;
         Map<String, String> testUsersMap = config.getTestUsersMap();
 
-        uri = buildURI(phone, config, completeParams, testUsersMap);
-
         HttpUriRequest request;
         URIBuilder builder;
         try {
+            uri = buildURI(phone, config, completeParams, testUsersMap);
             builder = new URIBuilder(uri);
 
             if (HttpMethod.GET.name().equals(config.getOutgoingCallMethod())) {
@@ -439,7 +443,7 @@ public class CallUtil {
 
                 for (Map.Entry<String, String> entry : config.getOutgoingCallPostHeadersMap().entrySet()) {
                     // Set headers
-                    post.setHeader(entry.getKey(), entry.getValue() == null ? "" : entry.getValue().toString());
+                    post.setHeader(entry.getKey(), entry.getValue() == null ? "" : entry.getValue());
                 }
                 boolean hasAuthRequired = config.getHasAuthRequired();
                 LOGGER.debug(String.format("Is authentication required: %s", hasAuthRequired));
@@ -461,10 +465,13 @@ public class CallUtil {
 
                 request = post;
             }
-            LOGGER.debug(String.format("Generated headers: %s, request: %s for call %s",
-                    request.getAllHeaders(), request.toString(), call.getCallId()));
-        } catch (URISyntaxException | UnsupportedEncodingException e) {
-            throw new IllegalArgumentException("Unexpected error creating a URI", e);
+            LOGGER.debug(
+                    String.format("Generated headers: %s, request: %s for call %s", Arrays.toString(request.getAllHeaders()),
+                            request.toString(), call.getCallId()));
+        } catch (IOException | NoSuchAlgorithmException privateKeyError) {
+            throw new IllegalStateException("Could not read private key!", privateKeyError);
+        } catch (URISyntaxException | InvalidKeySpecException argumentError) {
+            throw new IllegalArgumentException("Unexpected error creating a URI", argumentError);
         }
 
         LOGGER.debug(String.format("Generated %s for call %s", request.toString(), call.getCallId()));
@@ -473,25 +480,43 @@ public class CallUtil {
     }
 
     /**
-     * Merges a URI string by replacing params in the form [x] with actual values
+     * Merges a URI string by replacing params in the form [x] with actual values.
+     * <p>
+     * The merged values are encoded for URL.
+     * </p>
      *
      * @param uriTemplate to replace
      * @param params      to use during replace
      * @return a replaced string
+     * @throws UnsupportedEncodingException if UTF-8 is not supported
      */
-    public String mergeUriAndRemoveParams(String uriTemplate, Map<String, Object> params) {
+    public String mergeUriAndRemoveParams(String uriTemplate, Map<String, Object> params)
+            throws UnsupportedEncodingException {
         String mergedURI = uriTemplate;
 
-        Iterator<Map.Entry<String, Object>> it = params.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<String, Object> entry = it.next();
-            String placeholder = String.format(REPLACEMENT_PATTERN, entry.getKey());
+        final Iterator<Map.Entry<String, Object>> it = params.entrySet().iterator();
+        for (int paramIdx = 0; paramIdx < MAX_URI_MERGE_PARAM_SIZE && it.hasNext(); ++paramIdx) {
+            final Map.Entry<String, Object> entry = it.next();
+            final String safeKey = sanitizeUriParamKey(entry.getKey());
+            final String placeholder = String.format(URI_PARAM_REPLACE_PATTERN, safeKey);
+
             if (mergedURI.contains(placeholder)) {
-                mergedURI = mergedURI.replace(placeholder, entry.getValue().toString());
+                mergedURI = mergedURI.replace(placeholder, URLEncoder.encode(entry.getValue().toString(), UTF_8));
                 it.remove();
             }
         }
+
+        if (it.hasNext()) {
+            throw new IllegalArgumentException(
+                    "The size of 'params' parameter in CallUtil#mergeUriAndRemoveParams method was too big!");
+        }
+
         return mergedURI;
+    }
+
+    private String sanitizeUriParamKey(final String rawKey) {
+        return rawKey.replaceAll(URI_PARAM_REPLACE_KEY_ILLEGAL_CHARACTERS_PATTERN,
+                URI_PARAM_REPLACE_KEY_ILLEGAL_CHARACTER_REPLACEMENT);
     }
 
     /**
@@ -503,8 +528,9 @@ public class CallUtil {
         Map<String, Object> data = new HashMap<>();
 
         if (null != call) {
-            LOGGER.debug(String.format("Triggering call status changed event for call=%s, status=%s, reason=%s", call.getCallId(),
-                    call.getStatus(), call.getStatusText()));
+            LOGGER.debug(
+                    String.format("Triggering call status changed event for call=%s, status=%s, reason=%s", call.getCallId(),
+                            call.getStatus(), call.getStatusText()));
             data.put(Constants.PARAM_CALL_ID, call.getCallId());
             // We are sending status to clients, to whom we shouldn't expose our domain objects
             data.put(Constants.PARAM_STATUS, call.getStatus().name());
@@ -557,8 +583,9 @@ public class CallUtil {
                             csvMapWriter.write(callMap, headers);
                         }
                     } catch (Exception e) {
-                        LOGGER.error(String.format("Exception occurred for call record having id:%s with exception message: %s",
-                                call.getId(), e.getMessage()));
+                        LOGGER.error(
+                                String.format("Exception occurred for call record having id:%s with exception message: %s",
+                                        call.getId(), e.getMessage()));
                     }
                 }
             }
@@ -575,8 +602,12 @@ public class CallUtil {
 
     public String generateFileName(String tempDir, int fileNumber) {
 
-        return new StringBuilder(tempDir).append(File.separator).append(FILE_NAME_INITIALS).append(fileNumber)
-                .append(CSV).toString();
+        return new StringBuilder(tempDir)
+                .append(File.separator)
+                .append(FILE_NAME_INITIALS)
+                .append(fileNumber)
+                .append(CSV)
+                .toString();
     }
 
     public void createZip(HttpServletResponse response, Map<String, String> fileNames) throws IOException {
@@ -606,8 +637,8 @@ public class CallUtil {
         callMap.put(headers[3], call.getActorType());
         callMap.put(headers[4], call.getCallId());
         callMap.put(headers[5], call.getDirection());
-        callMap.put(headers[6], null != call.getCreationDate() ?
-                DateUtil.dateToString(call.getCreationDate(), DATE_TIME_PATTERN_2) : null);
+        callMap.put(headers[6],
+                null != call.getCreationDate() ? DateUtil.dateToString(call.getCreationDate(), DATE_TIME_PATTERN_2) : null);
 
         if (null != call.getContext() && null != call.getContext().get(MESSAGE_KEY) &&
                 StringUtils.isNotEmpty(call.getContext().get(MESSAGE_KEY).toString())) {
@@ -616,8 +647,8 @@ public class CallUtil {
                 callMap.put(headers[7], DateUtil.dateToString(dateTimeMessageKey, DATE_TIME_PATTERN_2));
             } catch (IllegalArgumentException e) {
                 LOGGER.error(String.format(
-                        "Invalid input format to parse messageKey to dateTime for calls record having id: %s with messageKey value: %s",
-                        call.getId(), call.getContext().get(MESSAGE_KEY)));
+                        "Invalid input format to parse messageKey to dateTime for calls record having id: %s with " +
+                                "messageKey value: %s", call.getId(), call.getContext().get(MESSAGE_KEY)));
                 callMap.put(headers[7], null);
             }
         } else {
@@ -673,15 +704,16 @@ public class CallUtil {
         eventParams.put(Constants.PARAM_HEADERS, config.getOutgoingCallPostHeadersMap());
         eventParams.put(Constants.PARAM_JOB_ID, callId);
         CallFlowEvent event = new CallFlowEvent(CallFlowEventSubjects.CALLFLOWS_INITIATE_CALL, eventParams);
-        schedulerService.scheduleRunOnceJob(event, DateUtil.plusSeconds(DateUtil.now(),
-                config.getOutboundCallRetrySeconds()), new CallFlowScheduledTask());
+        schedulerService.scheduleRunOnceJob(event,
+                DateUtil.plusSeconds(DateUtil.now(), config.getOutboundCallRetrySeconds()), new CallFlowScheduledTask());
     }
 
     private boolean isTokenNotValid(Config config) {
         return (null == config.getAuthToken() || !authUtil.isTokenValid(config.getAuthToken()));
     }
 
-    private String buildURI(String phone, Config config, Map<String, Object> completeParams, Map<String, String> testUsersMap) {
+    private String buildURI(String phone, Config config, Map<String, Object> completeParams,
+                            Map<String, String> testUsersMap) throws UnsupportedEncodingException {
         String uri;
         if (testUsersMap != null && testUsersMap.containsKey(phone)) {
             LOGGER.debug(String.format("TestURL for user, phone = %s, url = %s", phone, testUsersMap.get(phone)));

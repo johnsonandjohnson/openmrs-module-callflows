@@ -103,6 +103,11 @@
                 <version>${metadatasharingVersion}</version>
                 <scope>provided</scope>
             </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk15on</artifactId>
+                <version>${bouncycastleVersion}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -323,5 +328,6 @@
         <pmdPluginVersion>3.5</pmdPluginVersion>
         <pmdPluginSkip>false</pmdPluginSkip>
         <metadatasharingVersion>1.6.0</metadatasharingVersion>
+        <bouncycastleVersion>1.68</bouncycastleVersion>
     </properties>
 </project>
