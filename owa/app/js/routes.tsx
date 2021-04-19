@@ -17,7 +17,7 @@ import Renderers from './components/Renderers';
 import BreadCrumb from './components/bread-crumb';
 import Designer from './components/designer/index';
 import { CALLFLOWS_PRIVILEGE } from "./config/privileges";
-import Customize from '@bit/soldevelo-omrs.cfl-components.customize'
+import Customize from '@bit/soldevelo-cfl.omrs-components.customize'
 import { initializeLocalizationWrapper } from '@bit/soldevelo-omrs.cfl-components.localization-wrapper';
 import messagesEN from "./translations/en.json";
 
