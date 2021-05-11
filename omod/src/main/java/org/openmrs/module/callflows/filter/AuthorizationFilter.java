@@ -114,7 +114,7 @@ public class AuthorizationFilter implements Filter {
         for (String ignoredUrl : Arrays.asList(filterConfig
                 .getInitParameter("ignored-urls").split("[\\t\\n]+"))) {
             if (StringUtils.isNotBlank(ignoredUrl)) {
-                list.add(ignoredUrl);
+                list.add(ignoredUrl.trim());
             }
         }
         return list;
