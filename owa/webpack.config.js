@@ -73,8 +73,7 @@ const rules = [
     loader: "awesome-typescript-loader",
     include: [
       path.resolve(__dirname, "app/js"),
-      path.resolve(__dirname, "node_modules/@bit/soldevelo-omrs.cfl-components"),
-      path.resolve(__dirname, "node_modules/@bit/soldevelo-cfl.omrs-components")
+      path.resolve(__dirname, "node_modules/@bit/soldevelo-omrs.cfl-components")
     ],
     query: {
       presets: ["env", "react"],
