@@ -323,7 +323,7 @@
         <jsonPathAssertVersion>0.8.1</jsonPathAssertVersion>
         <jacocoVersion>0.8.2</jacocoVersion>
         <surefireVersion>2.17</surefireVersion>
-        <checkStylePluginVersion>2.10</checkStylePluginVersion>
+        <checkStylePluginVersion>2.15</checkStylePluginVersion>
         <checkStylePluginSkip>false</checkStylePluginSkip>
         <pmdPluginVersion>3.5</pmdPluginVersion>
         <pmdPluginSkip>false</pmdPluginSkip>

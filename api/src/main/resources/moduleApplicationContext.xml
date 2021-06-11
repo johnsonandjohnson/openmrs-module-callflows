@@ -230,4 +230,5 @@
     <bean id="callflows.callFlowInitiateCallEventListener" class="org.openmrs.module.callflows.api.event.CallFlowInitiateCallEventListener"/>
 
     <bean id="callflows.RendererHandler" class="org.openmrs.module.callflows.handler.metadatasharing.RendererHandler" />
+    <bean id="callflows.ConfigHandler" class="org.openmrs.module.callflows.handler.metadatasharing.ConfigHandler" />
 </beans>
