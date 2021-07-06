@@ -6,6 +6,7 @@ import io.jsonwebtoken.Jwt;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -32,7 +33,6 @@ import java.util.Date;
 import java.util.Properties;
 import java.util.UUID;
 
-import static org.apache.commons.lang3.StringUtils.trim;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
@@ -167,13 +167,23 @@ public class AuthUtilTest {
         final ByteArrayResource actualSavedBytes = argumentCaptor.getValue();
         final String actualFileContent = new String(actualSavedBytes.getByteArray());
 
-        // Trim optional new-line character from the end of the file content
-        Assert.assertEquals(trim(actualFileContent), trim(expectedFileContent));
+        Assert.assertEquals(normalizeKeyFileContent(actualFileContent), normalizeKeyFileContent(expectedFileContent));
     }
 
     private InputStream loadConfigFile(String filename) throws IOException {
         return new ByteArrayInputStream(TestUtil
                 .loadFile(filename)
                 .getBytes());
+    }
+
+    /**
+     * Removes carriage return characters (optional part of new line characters) and removes optional new line character(-s)
+     * at the end of the file.
+     *
+     * @param fileContent the string to normalize, not null
+     * @return normalized result, never null
+     */
+    private String normalizeKeyFileContent(final String fileContent) {
+        return StringUtils.remove(fileContent, '\r').trim();
     }
 }
