@@ -51,7 +51,7 @@ public class CallflowsActivator extends BaseModuleActivator implements DaemonTok
      */
     @Override
     public void stopped() {
-        LOGGER.info("Stopped Sms");
+        LOGGER.info("Stopped Callflows");
         CallFlowEventListenerFactory.unRegisterEventListeners();
     }
 
