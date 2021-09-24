@@ -1,0 +1,119 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+ *
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
+ */
+
+ .breadcrumb {
+  clear: both;
+  font-size: 1em;
+  font-family: 'OpenSans';
+  display: block;
+  border-bottom: 1px solid white;
+}
+
+.breadcrumb ul li {
+  border: none;
+  width: auto;
+}
+
+.breadcrumb.navbar {
+  min-height: 0;
+}
+
+.breadcrumb-item {
+  display: inline-block;
+  margin-left: 0.4em;
+  color: black;
+  background: none;
+}
+
+.breadcrumb-last-item {
+  @extend .breadcrumb-item;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.breadcrumb-link-item {
+  @extend .breadcrumb-item;
+  text-decoration: underline;
+  text-decoration-color: black;
+  z-index: 7;
+}
+
+.breadcrumb-link-item .dropdown-toggle {
+  line-height: 0;
+  padding: 0;
+}
+
+.breadcrumb-link-item.dropdown {
+  top: 0;
+  margin: 0;
+}
+
+.navbar-nav li a {
+  line-height: 0;
+  padding: 0;
+}
+
+.navbar-nav li.breadcrumb-menu-item  a {
+  line-height: 10px;
+  padding: 5px;
+}
+
+.breadcrumb-link-item:link {
+  color: black;
+  text-decoration: underline;
+  text-decoration-color: black;
+}
+
+.breadcrumb-link-item:visited {
+  color: black;
+  text-decoration: underline;
+  text-decoration-color: black;
+}
+
+.breadcrumb-link-item:hover {
+  color: #555;
+  text-decoration: underline;
+  text-decoration-color: black;
+}
+
+.breadcrumb-link-item:active {
+  color: black;
+  text-decoration: underline;
+  text-decoration-color: black;
+}
+
+.breadcrumb-menu-item-icon {
+  float: right;
+}
+
+li.breadcrumb-menu-item  {
+  @extend .breadcrumb-item;
+  display: list-item;
+}
+
+li.breadcrumb-link-item.dropdown.open a,
+li.breadcrumb-link-item.dropdown.open a:hover,
+li.breadcrumb-link-item.dropdown.open a:focus {
+  background: none;
+}
+
+select.breadcrumb-link-item {
+  @extend .breadcrumb-item;
+  text-decoration: underline;
+  text-decoration-color: black;
+  // remove default select apperance
+  border:none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  -ms-appearance: none;
+  background: none;
+  min-width: auto;
+}

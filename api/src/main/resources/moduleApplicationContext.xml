@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Beans to add to the current Application context definition -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+    <bean id="springValidationFactory" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"
+          primary="true"/>
+
+    <bean id="callflows.validationComponent" class="org.openmrs.module.callflows.api.util.ValidationComponent">
+        <property name="factory">
+            <ref local="springValidationFactory"/>
+        </property>
+    </bean>
+
+    <bean id="callflows.callFlowDao" class="org.openmrs.module.callflows.api.dao.impl.CallFlowDaoImpl">
+        <property name="dbSessionFactory">
+            <ref bean="dbSessionFactory"/>
+        </property>
+    </bean>
+
+    <bean id="callflows.callFlowService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager" />
+        </property>
+        <property name="target">
+            <bean class="org.openmrs.module.callflows.api.service.impl.CallFlowServiceImpl">
+                <property name="callFlowDao">
+                    <ref local="callflows.callFlowDao"/>
+                </property>
+                <property name="validationComponent">
+                    <ref local="callflows.validationComponent"/>
+                </property>
+            </bean>
+        </property>
+        <property name="preInterceptors">
+            <ref bean="serviceInterceptors" />
+        </property>
+        <property name="transactionAttributeSource">
+            <ref bean="transactionAttributeSource" />
+        </property>
+    </bean>
+
+    <bean parent="serviceContext">
+        <property name="moduleService">
+            <list merge="true">
+                <value>org.openmrs.module.callflows.api.service.CallFlowService</value>
+                <ref local="callflows.callFlowService"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="callflows.settings.manager" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager" />
+        </property>
+        <property name="target">
+            <bean class="org.openmrs.module.callflows.api.service.impl.SettingsManagerServiceImpl"/>
+        </property>
+        <property name="preInterceptors">
+            <ref bean="serviceInterceptors" />
+        </property>
+        <property name="transactionAttributeSource">
+            <ref bean="transactionAttributeSource" />
+        </property>
+    </bean>
+
+    <bean id="callflows.eventService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager" />
+        </property>
+        <property name="target">
+            <bean class="org.openmrs.module.callflows.api.service.impl.CallFlowEventServiceImpl"/>
+        </property>
+        <property name="preInterceptors">
+            <ref bean="serviceInterceptors" />
+        </property>
+        <property name="transactionAttributeSource">
+            <ref bean="transactionAttributeSource" />
+        </property>
+    </bean>
+
+    <bean id="callflows.schedulerService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager" />
+        </property>
+        <property name="target">
+            <bean class="org.openmrs.module.callflows.api.service.impl.CallFlowSchedulerServiceImpl"/>
+        </property>
+        <property name="preInterceptors">
+            <ref bean="serviceInterceptors" />
+        </property>
+        <property name="transactionAttributeSource">
+            <ref bean="transactionAttributeSource" />
+        </property>
+    </bean>
+
+    <bean id="callflows.configService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager" />
+        </property>
+        <property name="target">
+            <bean class="org.openmrs.module.callflows.api.service.impl.ConfigServiceImpl">
+                <property name="settingsManagerService">
+                    <ref local="callflows.settings.manager"/>
+                </property>
+            </bean>
+        </property>
+        <property name="preInterceptors">
+            <ref bean="serviceInterceptors" />
+        </property>
+        <property name="transactionAttributeSource">
+            <ref bean="transactionAttributeSource" />
+        </property>
+    </bean>
+
+    <bean parent="serviceContext">
+        <property name="moduleService">
+            <list merge="true">
+                <value>org.openmrs.module.callflows.api.service.ConfigService</value>
+                <ref local="callflows.configService"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="callflows.callDao" class="org.openmrs.module.callflows.api.dao.impl.CallDaoImpl">
+        <property name="dbSessionFactory">
+            <ref bean="dbSessionFactory"/>
+        </property>
+    </bean>
+
+    <bean id="callflows.baseEvaluationCommand" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager" />
+        </property>
+        <property name="target">
+            <bean class="org.openmrs.module.callflows.api.evaluation.impl.BaseEvaluationCommand"/>
+        </property>
+        <property name="preInterceptors">
+            <ref bean="serviceInterceptors" />
+        </property>
+        <property name="transactionAttributeSource">
+            <ref bean="transactionAttributeSource" />
+        </property>
+    </bean>
+
+    <bean id="callflows.flowUtil" class="org.openmrs.module.callflows.api.util.FlowUtil">
+        <property name="evaluationCommand">
+            <ref local="callflows.baseEvaluationCommand"/>
+        </property>
+    </bean>
+
+    <bean id="callflows.flowService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager" />
+        </property>
+        <property name="target">
+            <bean class="org.openmrs.module.callflows.api.service.impl.FlowServiceImpl">
+                <property name="callFlowService">
+                    <ref local="callflows.callFlowService"/>
+                </property>
+                <property name="flowUtil">
+                    <ref local="callflows.flowUtil"/>
+                </property>
+            </bean>
+        </property>
+        <property name="preInterceptors">
+            <ref bean="serviceInterceptors" />
+        </property>
+        <property name="transactionAttributeSource">
+            <ref bean="transactionAttributeSource" />
+        </property>
+    </bean>
+
+    <bean id="callflows.authUtil" class="org.openmrs.module.callflows.api.util.AuthUtil">
+        <property name="settingsManagerService">
+            <ref local="callflows.settings.manager"/>
+        </property>
+    </bean>
+
+    <bean id="callflows.callUtil" class="org.openmrs.module.callflows.api.util.CallUtil">
+        <property name="callDao">
+            <ref local="callflows.callDao"/>
+        </property>
+        <property name="schedulerService">
+            <ref local="callflows.schedulerService"/>
+        </property>
+        <property name="callFlowEventService">
+            <ref local="callflows.eventService"/>
+        </property>
+        <property name="authUtil">
+            <ref local="callflows.authUtil"/>
+        </property>
+    </bean>
+
+    <bean id="callflows.callService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager" />
+        </property>
+        <property name="target">
+            <bean class="org.openmrs.module.callflows.api.service.impl.CallServiceImpl">
+                <property name="callDao">
+                    <ref local="callflows.callDao"/>
+                </property>
+                <property name="callFlowService">
+                    <ref local="callflows.callFlowService"/>
+                </property>
+                <property name="flowService">
+                    <ref local="callflows.flowService"/>
+                </property>
+                <property name="configService">
+                    <ref local="callflows.configService"/>
+                </property>
+                <property name="callUtil">
+                    <ref local="callflows.callUtil"/>
+                </property>
+            </bean>
+        </property>
+        <property name="preInterceptors">
+            <ref bean="serviceInterceptors" />
+        </property>
+        <property name="transactionAttributeSource">
+            <ref bean="transactionAttributeSource" />
+        </property>
+    </bean>
+
+    <bean id="callflows.callFlowInitiateCallEventListener" class="org.openmrs.module.callflows.api.event.CallFlowInitiateCallEventListener"/>
+
+    <bean id="callflows.RendererHandler" class="org.openmrs.module.callflows.handler.metadatasharing.RendererHandler" />
+    <bean id="callflows.ConfigHandler" class="org.openmrs.module.callflows.handler.metadatasharing.ConfigHandler" />
+</beans>
