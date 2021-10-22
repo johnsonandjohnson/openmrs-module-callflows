@@ -1,9 +1,9 @@
 package org.openmrs.module.callflows.api.validate.validator;
 
 import org.apache.commons.lang.StringUtils;
-import org.openmrs.module.callflows.ValidationMessages;
+import org.openmrs.module.callflows.ValidationMessageConstants;
 import org.openmrs.module.callflows.api.contract.ConfigContract;
-import org.openmrs.module.callflows.api.contract.ConfigContracts;
+import org.openmrs.module.callflows.api.contract.ConfigContractList;
 import org.openmrs.module.callflows.api.validate.annotation.UniqueName;
 
 import javax.validation.ConstraintValidator;
@@ -14,7 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class ConfigContractsUniqueNameValidator implements ConstraintValidator<UniqueName, ConfigContracts> {
+public class ConfigContractListUniqueNameValidator implements ConstraintValidator<UniqueName, ConfigContractList> {
 
     private static final String PROPERTY_PATH = "configContracts.name";
 
@@ -26,12 +26,13 @@ public class ConfigContractsUniqueNameValidator implements ConstraintValidator<U
      * @return the validation result
      */
     @Override
-    public boolean isValid(ConfigContracts configContracts, ConstraintValidatorContext context) {
+    public boolean isValid(ConfigContractList configContracts, ConstraintValidatorContext context) {
         if (configContracts != null && configContracts.getConfigContracts() != null) {
             List<String> notUniqueNames = findNotUniqueNames(configContracts);
 
             if (!notUniqueNames.isEmpty()) {
-                String message = String.format(ValidationMessages.NOT_UNIQUE_CONFIG_NAME, StringUtils.join(notUniqueNames, ", "));
+                String message = String.format(
+                        ValidationMessageConstants.NOT_UNIQUE_CONFIG_NAME, StringUtils.join(notUniqueNames, ", "));
                 context.disableDefaultConstraintViolation();
                 context.buildConstraintViolationWithTemplate(message)
                         .addNode(PROPERTY_PATH)
@@ -42,7 +43,7 @@ public class ConfigContractsUniqueNameValidator implements ConstraintValidator<U
         return true;
     }
 
-    private List<String> findNotUniqueNames(ConfigContracts configContracts) {
+    private List<String> findNotUniqueNames(ConfigContractList configContracts) {
         List<String> notUniqueNames = new ArrayList<>();
         Set<String> uniqueNames = new HashSet<>();
         for (ConfigContract configContract : configContracts.getConfigContracts()) {

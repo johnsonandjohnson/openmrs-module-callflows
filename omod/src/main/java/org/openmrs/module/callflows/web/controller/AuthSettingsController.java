@@ -43,7 +43,7 @@ public class AuthSettingsController extends RestController {
     @RequestMapping(value = "upload/private-key", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     public void uploadPrivateKey(@RequestParam("file") MultipartFile file) throws IOException {
-        try (final InputStream fileInputStream = file.getInputStream()) {
+        try (InputStream fileInputStream = file.getInputStream()) {
             authUtil.saveNewPrivateKey(fileInputStream);
         }
         LOGGER.info("Private key file has been uploaded");

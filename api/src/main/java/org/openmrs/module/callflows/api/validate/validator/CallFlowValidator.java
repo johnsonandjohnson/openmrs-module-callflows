@@ -15,10 +15,10 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.util.regex.Pattern;
 
-import static org.openmrs.module.callflows.ValidationMessages.CALL_FLOW_NAME_BLANK_OR_NON_ALFA_NUMERIC;
-import static org.openmrs.module.callflows.ValidationMessages.CALL_FLOW_NAME_DUPLICATION;
-import static org.openmrs.module.callflows.ValidationMessages.CALL_FLOW_NODES_NULL;
-import static org.openmrs.module.callflows.ValidationMessages.CALL_FLOW_NODE_NAME_BLANK_OR_NON_ALFA_NUMERIC;
+import static org.openmrs.module.callflows.ValidationMessageConstants.CALL_FLOW_NAME_BLANK_OR_NON_ALFA_NUMERIC;
+import static org.openmrs.module.callflows.ValidationMessageConstants.CALL_FLOW_NAME_DUPLICATION;
+import static org.openmrs.module.callflows.ValidationMessageConstants.CALL_FLOW_NODES_NULL;
+import static org.openmrs.module.callflows.ValidationMessageConstants.CALL_FLOW_NODE_NAME_BLANK_OR_NON_ALFA_NUMERIC;
 
 @Component
 public class CallFlowValidator implements ConstraintValidator<ValidCallFlow, CallFlow> {
@@ -70,12 +70,10 @@ public class CallFlowValidator implements ConstraintValidator<ValidCallFlow, Cal
         boolean nameAlreadyExists = existing != null;
         boolean isTheSameInstance = nameAlreadyExists && existing.getId() == callflow.getId();
         boolean isNew = callflow.getId() == null;
-        if (nameAlreadyExists) {
-            if (isNew || !isTheSameInstance) {
-                addErrorToContext(ctx, NAME_PATH, String.format(CALL_FLOW_NAME_DUPLICATION,
-                        callflow.getName()));
-                isValid = false;
-            }
+        if (nameAlreadyExists && (isNew || !isTheSameInstance)) {
+            addErrorToContext(ctx, NAME_PATH, String.format(CALL_FLOW_NAME_DUPLICATION,
+                    callflow.getName()));
+            isValid = false;
         }
         return isValid;
     }

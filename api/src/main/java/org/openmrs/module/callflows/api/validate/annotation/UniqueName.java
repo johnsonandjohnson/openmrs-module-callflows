@@ -1,7 +1,7 @@
 package org.openmrs.module.callflows.api.validate.annotation;
 
-import org.openmrs.module.callflows.ValidationMessages;
-import org.openmrs.module.callflows.api.validate.validator.ConfigContractsUniqueNameValidator;
+import org.openmrs.module.callflows.ValidationMessageConstants;
+import org.openmrs.module.callflows.api.validate.validator.ConfigContractListUniqueNameValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -11,7 +11,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Target(ElementType.TYPE)
-@Constraint(validatedBy = { ConfigContractsUniqueNameValidator.class })
+@Constraint(validatedBy = { ConfigContractListUniqueNameValidator.class })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface UniqueName {
 
@@ -20,7 +20,7 @@ public @interface UniqueName {
      *
      * @return the message about the error
      */
-    String message() default ValidationMessages.NOT_UNIQUE_NAME;
+    String message() default ValidationMessageConstants.NOT_UNIQUE_NAME;
 
     /**
      * Specify validation groups, to which this constraint belongs

@@ -1,6 +1,6 @@
 package org.openmrs.module.callflows;
 
-public final class ValidationMessages {
+public final class ValidationMessageConstants {
 
     public static final String VALIDATION_ERROR_OCCURS = "Check the form and send it again.";
     public static final String SENT_DATA_IS_NOT_VALID = "Sent not valid data due to: \n";
@@ -16,6 +16,6 @@ public final class ValidationMessages {
     public static final String CALL_FLOW_NODE_NAME_BLANK_OR_NON_ALFA_NUMERIC = "Call flow " +
             "step name is required and must contain only alphanumeric characters";
 
-    private ValidationMessages() {
+    private ValidationMessageConstants() {
     }
 }

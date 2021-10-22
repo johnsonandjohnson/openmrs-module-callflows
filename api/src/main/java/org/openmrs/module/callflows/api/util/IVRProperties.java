@@ -35,7 +35,7 @@ final class IVRProperties {
         try {
             this.expirationTimeInHours = Integer.parseInt(properties.getProperty(EXP_TIME_IN_HRS_PROP_NAME));
         } catch (NumberFormatException nfe) {
-            throw new IllegalArgumentException("The IVR property 'expTimeInHrs' is required and must be a number!");
+            throw new IllegalArgumentException("The IVR property 'expTimeInHrs' is required and must be a number!", nfe);
         }
     }
 

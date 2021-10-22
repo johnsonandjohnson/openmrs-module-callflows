@@ -24,6 +24,7 @@ import java.util.Objects;
 @ValidCallFlow
 public class CallFlow extends BaseOpenmrsMetadata {
 
+    private static final long serialVersionUID = -5236416550800764305L;
     private static final String TEXT = "text";
 
     @Id

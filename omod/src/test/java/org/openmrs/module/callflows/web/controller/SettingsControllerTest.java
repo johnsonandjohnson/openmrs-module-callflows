@@ -10,7 +10,7 @@ import org.mockito.Mockito;
 import org.openmrs.module.callflows.BaseTest;
 import org.openmrs.module.callflows.Constants;
 import org.openmrs.module.callflows.api.contract.ConfigContract;
-import org.openmrs.module.callflows.api.contract.ConfigContracts;
+import org.openmrs.module.callflows.api.contract.ConfigContractList;
 import org.openmrs.module.callflows.api.contract.RendererContract;
 import org.openmrs.module.callflows.api.domain.Config;
 import org.openmrs.module.callflows.api.domain.Renderer;
@@ -163,7 +163,7 @@ public class SettingsControllerTest extends BaseTest {
         violations.put(path, message);
 
         doThrow(new ValidationException(violations))
-                .when(validationComponent).validate(Mockito.any(ConfigContracts.class));
+                .when(validationComponent).validate(Mockito.any(ConfigContractList.class));
 
         // When and Then
         mockMvc.perform(post("/callflows/configs")

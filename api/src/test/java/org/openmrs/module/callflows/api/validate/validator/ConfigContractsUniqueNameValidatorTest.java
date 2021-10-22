@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.openmrs.module.callflows.BaseTest;
 import org.openmrs.module.callflows.api.contract.ConfigContract;
-import org.openmrs.module.callflows.api.contract.ConfigContracts;
+import org.openmrs.module.callflows.api.contract.ConfigContractList;
 import org.openmrs.module.callflows.testbuilder.ConfigContractBuilder;
 
 import javax.validation.ConstraintValidatorContext;
@@ -36,7 +36,7 @@ public class ConfigContractsUniqueNameValidatorTest extends BaseTest {
     @Mock
     private ConstraintValidatorContext.ConstraintViolationBuilder.NodeBuilderDefinedContext nodeBuilder;
 
-    private ConfigContractsUniqueNameValidator validator = new ConfigContractsUniqueNameValidator();
+    private ConfigContractListUniqueNameValidator validator = new ConfigContractListUniqueNameValidator();
 
     @Before
     public void setUp() {
@@ -51,26 +51,26 @@ public class ConfigContractsUniqueNameValidatorTest extends BaseTest {
     @Test
     public void shouldBeValidWhenContractsAreNull() {
         Assert.assertTrue(validator.isValid(null, context));
-        Assert.assertTrue(validator.isValid(new ConfigContracts(), context));
+        Assert.assertTrue(validator.isValid(new ConfigContractList(), context));
     }
 
     @Test
     public void shouldBeValidWhenAllNamesAreUnique() {
-        ConfigContracts contracts = buildValidConfigContracts();
+        ConfigContractList contracts = buildValidConfigContracts();
 
         Assert.assertTrue(validator.isValid(contracts, context));
     }
 
     @Test
     public void shouldNotBeValidWhenNotAllNamesAreUnique() {
-        ConfigContracts contracts = buildNotValidConfigContracts();
+        ConfigContractList contracts = buildNotValidConfigContracts();
 
         assertFalse(validator.isValid(contracts, context));
     }
 
     @Test
     public void shouldBuildCorrectValidationCause() {
-        ConfigContracts contracts = buildNotValidConfigContracts();
+        ConfigContractList contracts = buildNotValidConfigContracts();
 
         assertFalse(validator.isValid(contracts, context));
         verify(validationBuilder).addNode(eq("configContracts.name"));
@@ -82,14 +82,14 @@ public class ConfigContractsUniqueNameValidatorTest extends BaseTest {
         validator.initialize(null);
     }
 
-    private ConfigContracts buildValidConfigContracts() {
-        return new ConfigContracts(Arrays.asList(
+    private ConfigContractList buildValidConfigContracts() {
+        return new ConfigContractList(Arrays.asList(
                 configContractA, configContractB, configContractC
         ));
     }
 
-    private ConfigContracts buildNotValidConfigContracts() {
-        return new ConfigContracts(Arrays.asList(
+    private ConfigContractList buildNotValidConfigContracts() {
+        return new ConfigContractList(Arrays.asList(
                 configContractC, configContractB, configContractC
         ));
     }

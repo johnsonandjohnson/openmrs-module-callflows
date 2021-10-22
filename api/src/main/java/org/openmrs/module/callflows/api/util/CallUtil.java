@@ -71,6 +71,7 @@ import java.util.zip.ZipOutputStream;
  *
  * @author bramak09
  */
+@SuppressWarnings("PMD.CyclomaticComplexity")
 public class CallUtil {
 
     private static final String DOT = ".";
@@ -161,11 +162,9 @@ public class CallUtil {
             keyString = (String) key;
             Object val = context.get(keyString);
             // we are not going to capture domain objects or other complex objects, just simple objects
-            if (val != null) {
-                if (isAllowedToPersist(keyString, val) || ClassUtils.isPrimitiveOrWrapper(val.getClass()) ||
-                        ClassUtils.isPrimitiveArray(val.getClass()) || ClassUtils.isPrimitiveWrapperArray(val.getClass())) {
-                    callContext.put((String) key, val);
-                }
+            if (val != null && (isAllowedToPersist(keyString, val) || ClassUtils.isPrimitiveOrWrapper(val.getClass()) ||
+                    ClassUtils.isPrimitiveArray(val.getClass()) || ClassUtils.isPrimitiveWrapperArray(val.getClass()))) {
+                callContext.put((String) key, val);
             }
         }
 
@@ -536,7 +535,7 @@ public class CallUtil {
             data.put(Constants.PARAM_STATUS, call.getStatus().name());
             data.put(Constants.PARAM_REASON, call.getStatusText());
             data.put(Constants.PARAM_PARAMS, call.getContext());
-            CallFlowEvent statusChangedEvent = new CallFlowEvent(CallFlowEventSubjects.CALLFLOWS_CALL_STATUS, data);
+            CallFlowEvent statusChangedEvent = new CallFlowEvent(CallFlowEventSubjectConstants.CALLFLOWS_CALL_STATUS, data);
             callFlowEventService.sendEventMessage(statusChangedEvent);
         }
     }
@@ -556,7 +555,7 @@ public class CallUtil {
         data.put(Constants.PARAM_STATUS, status.name());
         data.put(Constants.PARAM_REASON, reason);
         data.put(Constants.PARAM_PARAMS, params);
-        CallFlowEvent statusChangedEvent = new CallFlowEvent(CallFlowEventSubjects.CALLFLOWS_CALL_STATUS, data);
+        CallFlowEvent statusChangedEvent = new CallFlowEvent(CallFlowEventSubjectConstants.CALLFLOWS_CALL_STATUS, data);
         callFlowEventService.sendEventMessage(statusChangedEvent);
     }
 
@@ -703,7 +702,7 @@ public class CallUtil {
         eventParams.put(Constants.PARAM_PARAMS, params);
         eventParams.put(Constants.PARAM_HEADERS, config.getOutgoingCallPostHeadersMap());
         eventParams.put(Constants.PARAM_JOB_ID, callId);
-        CallFlowEvent event = new CallFlowEvent(CallFlowEventSubjects.CALLFLOWS_INITIATE_CALL, eventParams);
+        CallFlowEvent event = new CallFlowEvent(CallFlowEventSubjectConstants.CALLFLOWS_INITIATE_CALL, eventParams);
         schedulerService.scheduleRunOnceJob(event,
                 DateUtil.plusSeconds(DateUtil.now(), config.getOutboundCallRetrySeconds()), new CallFlowScheduledTask());
     }

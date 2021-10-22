@@ -176,7 +176,7 @@ public class CallUtilTest extends BaseTest {
 
         eventParams.put(Constants.PARAM_CONFIG, Constants.CONFIG_VOXEO);
         eventParams.put(Constants.PARAM_FLOW_NAME, Constants.CALLFLOW_MAIN);
-        callFlowEvent = new CallFlowEvent(CallFlowEventSubjects.CALLFLOWS_INITIATE_CALL, eventParams);
+        callFlowEvent = new CallFlowEvent(CallFlowEventSubjectConstants.CALLFLOWS_INITIATE_CALL, eventParams);
     }
 
     @Test
@@ -447,7 +447,7 @@ public class CallUtilTest extends BaseTest {
         eventParams.put(Constants.PARAM_JOB_ID, outboundCall.getCallId());
         eventParams.put(Constants.PARAM_RETRY_ATTEMPTS, 1);
         given(config.getOutboundCallRetryAttempts()).willReturn(5);
-        callFlowEvent = new CallFlowEvent(CallFlowEventSubjects.CALLFLOWS_INITIATE_CALL, eventParams);
+        callFlowEvent = new CallFlowEvent(CallFlowEventSubjectConstants.CALLFLOWS_INITIATE_CALL, eventParams);
 
         //When
         callUtil.checkCallCanBePlaced(outboundCall, config, eventParams);
@@ -491,7 +491,7 @@ public class CallUtilTest extends BaseTest {
         eventParams.put(Constants.PARAM_JOB_ID, outboundCall.getCallId());
         eventParams.put(Constants.PARAM_RETRY_ATTEMPTS, 6);
         given(config.getOutboundCallRetryAttempts()).willReturn(5);
-        callFlowEvent = new CallFlowEvent(CallFlowEventSubjects.CALLFLOWS_INITIATE_CALL, eventParams);
+        callFlowEvent = new CallFlowEvent(CallFlowEventSubjectConstants.CALLFLOWS_INITIATE_CALL, eventParams);
         given(config.getCallAllowed()).willReturn(true);
 
         //When
@@ -622,7 +622,7 @@ public class CallUtilTest extends BaseTest {
         eventParams.put(Constants.PARAM_JOB_ID, outboundCall.getCallId());
         eventParams.put(Constants.PARAM_RETRY_ATTEMPTS, null);
         given(config.getOutboundCallRetryAttempts()).willReturn(5);
-        callFlowEvent = new CallFlowEvent(CallFlowEventSubjects.CALLFLOWS_INITIATE_CALL, eventParams);
+        callFlowEvent = new CallFlowEvent(CallFlowEventSubjectConstants.CALLFLOWS_INITIATE_CALL, eventParams);
 
         //When
         callUtil.checkCallCanBePlaced(outboundCall, config, eventParams);
@@ -672,7 +672,7 @@ public class CallUtilTest extends BaseTest {
     }
 
     private void assertCallStatusEvent(CallFlowEvent event) {
-        assertThat(event.getSubject(), equalTo(CallFlowEventSubjects.CALLFLOWS_CALL_STATUS));
+        assertThat(event.getSubject(), equalTo(CallFlowEventSubjectConstants.CALLFLOWS_CALL_STATUS));
         Map<String, Object> eventParameters = event.getParameters();
         assertThat(eventParameters.get(Constants.PARAM_STATUS), equalTo(CallStatus.BUSY.name()));
         assertThat(eventParameters.get(Constants.PARAM_REASON), equalTo(Constants.STATUS_TEXT));
