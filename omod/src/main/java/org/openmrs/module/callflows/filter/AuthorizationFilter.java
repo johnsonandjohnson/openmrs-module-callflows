@@ -33,8 +33,6 @@ public class AuthorizationFilter implements Filter {
 
     private static final String BASIC_KEYWORD = "Basic ";
 
-    private FilterConfig config;
-
     private List<String> ignoredUrls = new ArrayList<>();
 
     /**
@@ -43,7 +41,6 @@ public class AuthorizationFilter implements Filter {
     @Override
     public void init(FilterConfig arg0) throws ServletException {
         LOGGER.debug("Initializing CallFlow Authorization filter");
-        this.config = arg0;
         this.ignoredUrls = filterOutBlankUrls(arg0);
     }
 
@@ -106,6 +103,7 @@ public class AuthorizationFilter implements Filter {
         } catch (Exception ex) {
             // This filter never stops execution. If the user failed to
             // authenticate, that will be caught later.
+            LOGGER.error(ex);
         }
     }
 

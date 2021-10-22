@@ -34,7 +34,10 @@ import java.util.Objects;
  */
 @Entity(name = "callFlow.Call")
 @Table(name = "cfl_calls", uniqueConstraints = @UniqueConstraint(name = "UNIQUE_CALLFLOWS_CALL_IDX", columnNames = { "callId" }))
+@SuppressWarnings({"PMD.ExcessivePublicCount", "PMD.TooManyFields"})
 public class Call extends AbstractBaseOpenmrsData {
+
+    private static final long serialVersionUID = 929823592424470736L;
 
     private static final String TEXT = "text";
 

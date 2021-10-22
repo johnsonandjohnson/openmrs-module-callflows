@@ -3,7 +3,7 @@ package org.openmrs.module.callflows.api.util;
 /**
  * Call flow events
  */
-public final class CallFlowEventSubjects {
+public final class CallFlowEventSubjectConstants {
 
     /**
      * The callflows module listens to this event to initiate a call
@@ -15,6 +15,6 @@ public final class CallFlowEventSubjects {
      */
     public static final String CALLFLOWS_CALL_STATUS = "callflows-call-status";
 
-    private CallFlowEventSubjects() {
+    private CallFlowEventSubjectConstants() {
     }
 }

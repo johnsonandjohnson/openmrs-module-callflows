@@ -4,7 +4,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.callflows.api.domain.Constants;
 import org.openmrs.module.callflows.api.service.CallService;
-import org.openmrs.module.callflows.api.util.CallFlowEventSubjects;
+import org.openmrs.module.callflows.api.util.CallFlowEventSubjectConstants;
 
 import java.util.Map;
 
@@ -19,7 +19,7 @@ public class CallFlowInitiateCallEventListener extends AbstractCallFlowEventList
 
     @Override
     public String getSubject() {
-        return CallFlowEventSubjects.CALLFLOWS_INITIATE_CALL;
+        return CallFlowEventSubjectConstants.CALLFLOWS_INITIATE_CALL;
     }
 
     @Override

@@ -66,6 +66,7 @@ public class CallServiceImpl implements CallService {
 
     @Override
     @Transactional
+    @SuppressWarnings("PMD.ExcessiveParameterList")
     public Call create(String config, CallFlow start, String startNode, CallDirection direction, String actorId,
                        String actorType, String externalId, String externalType, String playedMessages, String refKey,
                        Map<String, Object> params) {

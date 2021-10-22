@@ -8,18 +8,18 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @UniqueName
-public class ConfigContracts {
+public class ConfigContractList {
 
     @NotNull
     @Valid
     private List<ConfigContract> configContracts;
 
     @JsonCreator
-    public ConfigContracts() {
+    public ConfigContractList() {
     }
 
     @JsonCreator
-    public ConfigContracts(List<ConfigContract> configContracts) {
+    public ConfigContractList(List<ConfigContract> configContracts) {
         this.configContracts = configContracts;
     }
 
