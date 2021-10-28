@@ -30,7 +30,7 @@ import org.openmrs.module.callflows.api.helper.ConfigHelper;
 import org.openmrs.module.callflows.api.helper.FlowHelper;
 import org.openmrs.module.callflows.api.service.impl.CallServiceImpl;
 import org.openmrs.module.callflows.api.util.CallAssert;
-import org.openmrs.module.callflows.api.util.CallFlowEventSubjects;
+import org.openmrs.module.callflows.api.util.CallFlowEventSubjectConstants;
 import org.openmrs.module.callflows.api.util.CallUtil;
 import org.openmrs.module.callflows.api.util.DateUtil;
 import org.openmrs.module.callflows.api.util.TestUtil;
@@ -215,7 +215,7 @@ public class CallServiceTest extends BaseTest {
         errorParams.put("status", CallStatus.FAILED.name());
         errorParams.put("params", params);
         errorParams.put("reason", "Empty Phone no while initiating a outbound call for flow MainFlow");
-        callFailedEvent = new CallFlowEvent(CallFlowEventSubjects.CALLFLOWS_CALL_STATUS, errorParams);
+        callFailedEvent = new CallFlowEvent(CallFlowEventSubjectConstants.CALLFLOWS_CALL_STATUS, errorParams);
     }
 
     @Test

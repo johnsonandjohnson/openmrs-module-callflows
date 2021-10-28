@@ -5,7 +5,7 @@ import org.openmrs.module.callflows.api.builder.ConfigContractBuilder;
 import org.openmrs.module.callflows.api.builder.RendererBuilder;
 import org.openmrs.module.callflows.api.builder.RendererContractBuilder;
 import org.openmrs.module.callflows.api.contract.ConfigContract;
-import org.openmrs.module.callflows.api.contract.ConfigContracts;
+import org.openmrs.module.callflows.api.contract.ConfigContractList;
 import org.openmrs.module.callflows.api.contract.RendererContract;
 import org.openmrs.module.callflows.api.domain.Config;
 import org.openmrs.module.callflows.api.domain.Renderer;
@@ -61,7 +61,7 @@ public class CallFlowSettingsController extends RestController {
     @RequestMapping(value = "/configs", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public List<ConfigContract> updateConfigs(@RequestBody ConfigContracts configContracts) {
+    public List<ConfigContract> updateConfigs(@RequestBody ConfigContractList configContracts) {
         validationComponent.validate(configContracts);
 
         List<Config> configs = new ArrayList<>();

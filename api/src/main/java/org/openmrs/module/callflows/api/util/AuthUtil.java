@@ -61,8 +61,8 @@ public class AuthUtil {
     public String generateToken() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
         LOGGER.info("Generating JWT");
 
-        try (final InputStream ivrPropertiesFileStream = settingsManagerService.getRawConfig(IVR_PROPERTIES_FILE_NAME);
-             final InputStream privateKeyFileStream = settingsManagerService.getRawConfig(PRIVATE_KEY_FILE_NAME)) {
+        try (InputStream ivrPropertiesFileStream = settingsManagerService.getRawConfig(IVR_PROPERTIES_FILE_NAME);
+             InputStream privateKeyFileStream = settingsManagerService.getRawConfig(PRIVATE_KEY_FILE_NAME)) {
 
             final IVRProperties ivrProperties = new IVRProperties(ivrPropertiesFileStream);
             final PrivateKey key = loadPrivateKey(privateKeyFileStream, ivrProperties);
@@ -110,7 +110,7 @@ public class AuthUtil {
 
         final ByteArrayOutputStream newPrivateKeyFileBytesStream = new ByteArrayOutputStream();
 
-        try (final PemWriter pemWriter = new PemWriter(new OutputStreamWriter(newPrivateKeyFileBytesStream))) {
+        try (PemWriter pemWriter = new PemWriter(new OutputStreamWriter(newPrivateKeyFileBytesStream))) {
             pemWriter.writeObject(pemObject);
         }
 
@@ -131,8 +131,8 @@ public class AuthUtil {
 
         boolean isTokenValid = false;
 
-        try (final InputStream ivrPropertiesFileStream = settingsManagerService.getRawConfig(IVR_PROPERTIES_FILE_NAME);
-             final InputStream privateKeyFileStream = settingsManagerService.getRawConfig(PRIVATE_KEY_FILE_NAME)) {
+        try (InputStream ivrPropertiesFileStream = settingsManagerService.getRawConfig(IVR_PROPERTIES_FILE_NAME);
+             InputStream privateKeyFileStream = settingsManagerService.getRawConfig(PRIVATE_KEY_FILE_NAME)) {
 
             final IVRProperties ivrProperties = new IVRProperties(ivrPropertiesFileStream);
             final PrivateKey key = loadPrivateKey(privateKeyFileStream, ivrProperties);

@@ -1,6 +1,6 @@
 package org.openmrs.module.callflows.api.validate.annotation;
 
-import org.openmrs.module.callflows.ValidationMessages;
+import org.openmrs.module.callflows.ValidationMessageConstants;
 import org.openmrs.module.callflows.api.validate.validator.CallFlowValidator;
 
 import javax.validation.Constraint;
@@ -20,7 +20,7 @@ public @interface ValidCallFlow {
      *
      * @return the message about the error
      */
-    String message() default ValidationMessages.CALL_FLOW_INVALID;
+    String message() default ValidationMessageConstants.CALL_FLOW_INVALID;
 
     /**
      * Specify validation groups, to which this constraint belongs

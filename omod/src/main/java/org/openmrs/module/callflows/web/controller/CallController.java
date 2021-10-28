@@ -178,6 +178,7 @@ public class CallController extends RestController {
      * @return
      */
     @RequestMapping(value = "/in/{conf}/flows/{flowName}.{extension}", method = RequestMethod.GET)
+    @SuppressWarnings("PMD.ExcessiveMethodLength")
     public ResponseEntity<String> handleIncoming(HttpServletRequest request,
                                                  @PathVariable(value = "conf") String conf,
                                                  @PathVariable(value = "flowName") String flowName,

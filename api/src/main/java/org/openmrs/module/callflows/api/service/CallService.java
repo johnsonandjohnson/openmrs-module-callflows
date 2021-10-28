@@ -30,6 +30,7 @@ public interface CallService {
      * @param params         the initial params for the flow to function
      * @return a new call object with a generated call ID
      */
+    @SuppressWarnings("PMD.ExcessiveParameterList")
     Call create(String config, CallFlow start, String startNode, CallDirection direction, String actorId,
                 String actorType, String externalId, String externalType, String playedMessages, String refKey,
                 Map<String, Object> params);

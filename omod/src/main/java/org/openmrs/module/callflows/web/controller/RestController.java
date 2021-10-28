@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import static org.openmrs.module.callflows.ValidationMessages.SENT_DATA_IS_NOT_VALID;
-import static org.openmrs.module.callflows.ValidationMessages.VALIDATION_ERROR_OCCURS;
+import static org.openmrs.module.callflows.ValidationMessageConstants.SENT_DATA_IS_NOT_VALID;
+import static org.openmrs.module.callflows.ValidationMessageConstants.VALIDATION_ERROR_OCCURS;
 
 /**
  * Base Rest Controller
