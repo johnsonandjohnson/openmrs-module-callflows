@@ -1,6 +1,10 @@
 package org.openmrs.module.callflows.web.controller;
 
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.ApiParam;
 import org.openmrs.module.callflows.api.builder.CallFlowBuilder;
 import org.openmrs.module.callflows.api.builder.CallFlowResponseBuilder;
 import org.openmrs.module.callflows.api.contract.CallFlowRequest;
