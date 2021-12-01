@@ -31,7 +31,7 @@ import static org.openmrs.module.callflows.api.util.AuthUtil.IVR_PROPERTIES_FILE
     value = "Authentication settings",
     tags = {"REST API to load private key and IVR properties from the uploaded file"})
 @Controller
-@RequestMapping(value = "/rest/v1/callflows/auth")
+@RequestMapping(value = "/callflows/auth")
 public class AuthSettingsController extends RestController {
 
   private static final Log LOGGER = LogFactory.getLog(AuthSettingsController.class);

@@ -185,7 +185,10 @@ public class CallController extends RestController {
    * @param headers a map of headers that are passed along with the request
    * @return
    */
-  @ApiOperation(value = "Handles an incoming call", notes = "Handles an incoming call")
+  @ApiOperation(
+      value = "Handles an incoming call",
+      notes = "Handles an incoming call",
+      response = ResponseEntity.class)
   @ApiResponses(
       value = {
         @ApiResponse(
@@ -355,7 +358,10 @@ public class CallController extends RestController {
    * @param headers a map of headers that are passed along with the request
    * @return
    */
-  @ApiOperation(value = "Handles call continuation", notes = "Handles call continuation")
+  @ApiOperation(
+      value = "Handles call continuation",
+      notes = "Handles call continuation",
+      response = ResponseEntity.class)
   @ApiResponses(
       value = {
         @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "Successful call continuation"),
@@ -364,15 +370,27 @@ public class CallController extends RestController {
             message = "Failure in call continuation due to cyclic loop")
       })
   @RequestMapping(value = "/calls/{callId}.{extension}", method = RequestMethod.GET)
+  @SuppressWarnings("PMD.ExcessiveMethodLength")
   public ResponseEntity<String> handleContinuation(
       HttpServletRequest request,
-      @ApiParam(name = "callId", value = "callId", required = true) @PathVariable(value = "callId") String callId,
-      @ApiParam(name = "extension", value = "extension", required = true)
-      @PathVariable(value = "extension") String extension,
-      @ApiParam(name = "params", value = "params") @RequestParam Map<String, String> params,
-      @ApiParam(name = "headers", value = "headers") @RequestHeader Map<String, String> headers) {
+      @ApiParam(name = "callId", value = "Current call's unique identifier", required = true)
+          @PathVariable(value = "callId")
+          String callId,
+      @ApiParam(name = "extension", value = "The extension to process", required = true)
+          @PathVariable(value = "extension")
+          String extension,
+      @ApiParam(
+              name = "params",
+              value = "A map of parameters that are passed along with the request")
+          @RequestParam
+          Map<String, String> params,
+      @ApiParam(name = "headers", value = "A map of headers that are passed along with the request")
+          @RequestHeader
+          Map<String, String> headers) {
 
-    LOGGER.debug(String.format("handleContinuation(callId=%s, params=%s, headers=%s, extension=%s",
+    LOGGER.debug(
+        String.format(
+            "handleContinuation(callId=%s, params=%s, headers=%s, extension=%s",
             callId, params, headers, extension));
 
     // The requested configuration from the URL
@@ -410,7 +428,8 @@ public class CallController extends RestController {
         flow = flowService.load(jumpTo);
         currentNode = flow.getNodes().get(0);
       } else {
-        // Go to next node of where control last terminated, this would be a system node since nodes are in pairs
+        // Go to next node of where control last terminated, this would be a system node since nodes
+        // are in pairs
         currentNode = flowUtil.getNextNodeByStep(flow, call.getEndNode());
       }
 
@@ -433,7 +452,7 @@ public class CallController extends RestController {
       // update the played messages only when the data coming in as part of params
       if (StringUtils.isNotBlank(params.get(Constants.PARAM_PLAYED_MESSAGES))) {
         call.setPlayedMessages(
-                StringUtils.isNotBlank(playedMessages)
+            StringUtils.isNotBlank(playedMessages)
                 ? playedMessages
                     .concat(SEPERATOR_MESSAGE)
                     .concat(params.get(Constants.PARAM_PLAYED_MESSAGES))
@@ -456,8 +475,11 @@ public class CallController extends RestController {
 
     } catch (Exception e) {
       error = e;
-      LOGGER.error(String.format("ERROR has been caused by request: \n"
-                  + "handleContinuation(callId=%s, params=%s, headers=%s", callId, params, headers));
+      LOGGER.error(
+          String.format(
+              "ERROR has been caused by request: \n"
+                  + "handleContinuation(callId=%s, params=%s, headers=%s",
+              callId, params, headers));
       handleError(call, error);
     }
     return buildOutput(error, output, currentNode, call, extension, config);
@@ -474,7 +496,10 @@ public class CallController extends RestController {
    * @return an empty string if call could not be created or a json with callId, status and
    *     statusText for debugging purposes
    */
-  @ApiOperation(value = "Initiates an outbound call", notes = "Initiates an outbound call")
+  @ApiOperation(
+      value = "Initiates an outbound call",
+      notes = "Initiates an outbound call",
+      response = OutboundCallResponse.class)
   @ApiResponses(
       value = {
         @ApiResponse(
@@ -555,7 +580,10 @@ public class CallController extends RestController {
     }
   }
 
-  @ApiOperation(value = "Export calls details", notes = "Export calls details")
+  @ApiOperation(
+      value = "Export calls details",
+      notes = "Export calls details",
+      response = Map.class)
   @ApiResponses(
       value = {
         @ApiResponse(

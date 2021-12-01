@@ -59,11 +59,16 @@ public class CallFlowSettingsController extends RestController {
    */
   @ApiOperation(
       value = "Get all IVR based configurations defined in system",
-      notes = "Get all IVR based configurations defined in system")
+      notes = "Get all IVR based configurations defined in system",
+      response = List.class)
   @ApiResponses(
       value = {
-        @ApiResponse(code = HttpURLConnection.HTTP_OK, message = "Successfully returns all configurations"),
-              @ApiResponse(code = HttpURLConnection.HTTP_FORBIDDEN, message = "Successfully returns all configurations")
+        @ApiResponse(
+            code = HttpURLConnection.HTTP_OK,
+            message = "Successfully returns all configurations"),
+        @ApiResponse(
+            code = HttpURLConnection.HTTP_FORBIDDEN,
+            message = "Successfully returns all configurations")
       })
   @RequestMapping(value = "/configs", method = RequestMethod.GET)
   @ResponseBody
@@ -79,7 +84,8 @@ public class CallFlowSettingsController extends RestController {
    */
   @ApiOperation(
       value = "Update all IVR configurations in the system in one go",
-      notes = "Update all IVR configurations in the system in one go")
+      notes = "Update all IVR configurations in the system in one go",
+      response = List.class)
   @ApiResponses(
       value = {
         @ApiResponse(
@@ -112,7 +118,8 @@ public class CallFlowSettingsController extends RestController {
    */
   @ApiOperation(
       value = "Get all client side Renderers defined in the system",
-      notes = "Get all client side Renderers defined in the system")
+      notes = "Get all client side Renderers defined in the system",
+      response = List.class)
   @ApiResponses(
       value = {
         @ApiResponse(
@@ -133,7 +140,8 @@ public class CallFlowSettingsController extends RestController {
    */
   @ApiOperation(
       value = "Update all client side Renderers defined in the system",
-      notes = "Update all client side Renderers defined in the system")
+      notes = "Update all client side Renderers defined in the system",
+      response = List.class)
   @ApiResponses(
       value = {
         @ApiResponse(

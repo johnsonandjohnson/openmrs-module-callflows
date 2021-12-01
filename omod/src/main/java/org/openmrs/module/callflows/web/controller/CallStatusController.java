@@ -71,7 +71,10 @@ public class CallStatusController extends RestController {
    * @return blank response if the call status update is successful, otherwise returns a string
    *     containing error
    */
-  @ApiOperation(value = "Update the current call status", notes = "Update the current call status")
+  @ApiOperation(
+      value = "Update the current call status",
+      notes = "Update the current call status",
+      response = String.class)
   @ApiResponses(
       value = {
         @ApiResponse(
