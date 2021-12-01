@@ -57,7 +57,8 @@ public class CallFlowController extends RestController {
    */
   @ApiOperation(
       value = "Create a call flow",
-      notes = "Create a call flow if no duplicate (by name) exists")
+      notes = "Create a call flow if no duplicate (by name) exists",
+      response = CallFlowResponse.class)
   @ApiResponses(
       value = {
         @ApiResponse(
@@ -92,7 +93,10 @@ public class CallFlowController extends RestController {
    * @throws CallFlowAlreadyExistsException if a callflow by the same name already exists in the
    *     system
    */
-  @ApiOperation(value = "Update a call flow", notes = "Update a call flow")
+  @ApiOperation(
+      value = "Update a call flow",
+      notes = "Update a call flow",
+      response = CallFlowResponse.class)
   @ApiResponses(
       value = {
         @ApiResponse(
@@ -155,7 +159,10 @@ public class CallFlowController extends RestController {
    * @param term a search term that is interpreted by the concerned lookup function invoked
    * @return a list of found callflows
    */
-  @ApiOperation(value = "Search for call flow", notes = "Search for call flow")
+  @ApiOperation(
+      value = "Search for call flow",
+      notes = "Search for call flow",
+      response = SearchResponse.class)
   @ApiResponses(
       value = {
         @ApiResponse(

@@ -154,6 +154,7 @@
                                 <version>v1</version>
                                 <description>REST API for Call flows Module.</description>
                             </info>
+                            <swaggerUIDocBasePath>/openmrs/ws/rest/v1</swaggerUIDocBasePath>
                             <swaggerDirectory>${basedir}/src/main/webapp/resources/swagger/</swaggerDirectory>
                         </apiSource>
                     </apiSources>
