@@ -108,6 +108,27 @@
                 <artifactId>bcprov-jdk15on</artifactId>
                 <version>${bouncycastleVersion}</version>
             </dependency>
+            <!-- Swagger dependencies-->
+            <dependency>
+                <groupId>io.swagger</groupId>
+                <artifactId>swagger-core</artifactId>
+                <scope>provided</scope>
+                <version>${swaggerVersion}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>javax.ws.rs</groupId>
+                        <artifactId>jsr311-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>javax.validation</groupId>
+                        <artifactId>validation-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-api</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -337,5 +358,7 @@
         <pmdPluginSkip>false</pmdPluginSkip>
         <metadatasharingVersion>1.6.0</metadatasharingVersion>
         <bouncycastleVersion>1.68</bouncycastleVersion>
+        <uiframeworkVersion>3.4</uiframeworkVersion>
+        <swaggerVersion>1.6.2</swaggerVersion>
     </properties>
 </project>
