@@ -18,6 +18,62 @@
     "name" : "REST API to update the call status periodically"
   } ],
   "paths" : {
+    "/callflows/auth/upload/ivr-properties" : {
+      "post" : {
+        "tags" : [ "REST API to load private key and IVR properties from the uploaded file" ],
+        "summary" : "Loads IVR properties from the uploaded file",
+        "description" : "Loads IVR properties from the uploaded file",
+        "operationId" : "uploadIvrProperties",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "file",
+          "description" : "File containing the IVR properties file",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/MultipartFile"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successfully uploaded IVR properties"
+          },
+          "404" : {
+            "description" : "Authentication settings not found to upload IVR properties"
+          },
+          "500" : {
+            "description" : "Failure to upload IVR properties"
+          }
+        }
+      }
+    },
+    "/callflows/auth/upload/private-key" : {
+      "post" : {
+        "tags" : [ "REST API to load private key and IVR properties from the uploaded file" ],
+        "summary" : "Loads private key from the uploaded file",
+        "description" : "Loads private key from the uploaded file",
+        "operationId" : "uploadPrivateKey",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "file",
+          "description" : "File containing the private key file",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/MultipartFile"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successfully uploaded private key"
+          },
+          "404" : {
+            "description" : "Authentication settings not found to upload private key"
+          },
+          "500" : {
+            "description" : "Failure to upload private key"
+          }
+        }
+      }
+    },
     "/callflows/calls/export-details" : {
       "get" : {
         "tags" : [ "REST API to handle inbound and outbound calls" ],
@@ -54,35 +110,32 @@
         "parameters" : [ {
           "name" : "callId",
           "in" : "path",
-          "description" : "callId",
+          "description" : "Current call's unique identifier",
           "required" : true,
           "type" : "string"
         }, {
           "name" : "extension",
           "in" : "path",
-          "description" : "extension",
+          "description" : "The extension to process",
           "required" : true,
           "type" : "string"
         }, {
           "name" : "params",
           "in" : "query",
-          "description" : "params",
+          "description" : "A map of parameters that are passed along with the request",
           "required" : true,
           "type" : "object"
         }, {
           "name" : "headers",
           "in" : "header",
-          "description" : "headers",
+          "description" : "A map of headers that are passed along with the request",
           "required" : true,
           "type" : "object",
           "default" : ""
         } ],
         "responses" : {
           "200" : {
-            "description" : "Successful call continuation",
-            "schema" : {
-              "type" : "string"
-            }
+            "description" : "Successful call continuation"
           },
           "500" : {
             "description" : "Failure in call continuation due to cyclic loop"
@@ -105,6 +158,9 @@
                 "type" : "object"
               }
             }
+          },
+          "403" : {
+            "description" : "Successfully returns all configurations"
           }
         }
       },
@@ -296,10 +352,7 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "Successful completion of an incoming call",
-            "schema" : {
-              "type" : "string"
-            }
+            "description" : "Successful completion of an incoming call"
           },
           "400" : {
             "description" : "Passed an invalid configuration/flowName details"
@@ -471,62 +524,6 @@
           }
         }
       }
-    },
-    "/rest/v1/callflows/auth/upload/ivr-properties" : {
-      "post" : {
-        "tags" : [ "REST API to load private key and IVR properties from the uploaded file" ],
-        "summary" : "Loads IVR properties from the uploaded file",
-        "description" : "Loads IVR properties from the uploaded file",
-        "operationId" : "uploadIvrProperties",
-        "parameters" : [ {
-          "in" : "body",
-          "name" : "file",
-          "description" : "File containing the IVR properties file",
-          "required" : false,
-          "schema" : {
-            "$ref" : "#/definitions/MultipartFile"
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "Successfully uploaded IVR properties"
-          },
-          "404" : {
-            "description" : "Authentication settings not found to upload IVR properties"
-          },
-          "500" : {
-            "description" : "Failure to upload IVR properties"
-          }
-        }
-      }
-    },
-    "/rest/v1/callflows/auth/upload/private-key" : {
-      "post" : {
-        "tags" : [ "REST API to load private key and IVR properties from the uploaded file" ],
-        "summary" : "Loads private key from the uploaded file",
-        "description" : "Loads private key from the uploaded file",
-        "operationId" : "uploadPrivateKey",
-        "parameters" : [ {
-          "in" : "body",
-          "name" : "file",
-          "description" : "File containing the private key file",
-          "required" : false,
-          "schema" : {
-            "$ref" : "#/definitions/MultipartFile"
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "Successfully uploaded private key"
-          },
-          "404" : {
-            "description" : "Authentication settings not found to upload private key"
-          },
-          "500" : {
-            "description" : "Failure to upload private key"
-          }
-        }
-      }
     }
   },
   "definitions" : {
@@ -649,16 +646,16 @@
         "name" : {
           "type" : "string"
         },
+        "empty" : {
+          "type" : "boolean",
+          "default" : false
+        },
         "bytes" : {
           "type" : "array",
           "items" : {
             "type" : "string",
             "format" : "byte"
           }
-        },
-        "empty" : {
-          "type" : "boolean",
-          "default" : false
         },
         "size" : {
           "type" : "integer",
