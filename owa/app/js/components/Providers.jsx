@@ -39,6 +39,7 @@ import * as Default from '../shared/utils/messages';
 import { validateForm } from '../shared/utils/validation-util';
 import { errorToast } from '../shared/utils/toast-display-util';
 import { getIntl } from "@openmrs/react-components/lib/components/localization/withLocalization";
+import DOMPurify from 'dompurify';
 
 export class Providers extends React.Component {
   validationSchema = Yup.object().shape({
@@ -154,7 +155,7 @@ export class Providers extends React.Component {
                 buttonClass="confirm add-btn" />
             </div>
           </div>
-          {this.props.configForms.map(item => {
+          {DOMPurify.sanitize(this.props.configForms)?.map(item => {
             return (
               <Row key={item.localId}>
                 <Col sm={11}

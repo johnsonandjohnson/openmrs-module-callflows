@@ -12,6 +12,7 @@ import { connect } from 'react-redux';
 import { Accordion } from '@openmrs/react-components';
 import { Col, Row } from 'react-bootstrap';
 import _ from 'lodash';
+import DOMPurify from 'dompurify';
 
 import AddButton from '../add-button';
 import {
@@ -109,7 +110,7 @@ export class Renderers extends React.Component {
                 buttonClass='confirm add-btn' />
             </div>
           </div>
-          {this.props.rendererForms.map(item => {
+          {DOMPurify.sanitize(this.props.rendererForms)?.map(item => {
           return (
             <Row key={item.localId}>
               <Col sm={11}
