@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.openmrs.module</groupId>
         <artifactId>callflows</artifactId>
-        <version>1.1.3</version>
+        <version>1.1.4-SNAPSHOT</version>
     </parent>
 
     <artifactId>callflows-omod</artifactId>
@@ -15,12 +15,12 @@
         <dependency>
             <groupId>org.openmrs.module</groupId>
             <artifactId>callflows-api</artifactId>
-            <version>1.1.3</version>
+            <version>1.1.4-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.openmrs.module</groupId>
             <artifactId>callflows-api</artifactId>
-            <version>1.1.3</version>
+            <version>1.1.4-SNAPSHOT</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
