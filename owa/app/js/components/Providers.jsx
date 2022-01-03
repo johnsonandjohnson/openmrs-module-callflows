@@ -155,39 +155,37 @@ export class Providers extends React.Component {
                 buttonClass="confirm add-btn" />
             </div>
           </div>
-          {DOMPurify.sanitize(this.props.configForms)?.map(item => {
-            return (
-              <Row key={item.localId}>
-                <Col sm={11}
-                  className="cfl-col-field-left">
-                  <Accordion title={item.config.name}
-                    border={true}
-                    open={item.isOpenOnInit}>
-                    <div ref={(div) => {
-                      if (item.localId === this.props.focusEntry) {
-                        this.focusRef = div;
-                      }
-                    }}>
-                      <ConfigForm
-                        config={item.config}
-                        isOpenOnInit={item.isOpenOnInit}
-                        localId={item.localId}
-                        updateValues={this.props.updateConfigForm}
-                        validationSchema={this.validationSchema} />
-                    </div>
-                  </Accordion>
-                </Col>
-                <Col sm={1}
-                  className="cfl-col-field">
-                  <RemoveButton
-                    buttonClass="col-remove-button"
-                    handleRemove={this.handleRemove}
-                    localId={item.localId}
-                    tooltip="Delete Provider" />
-                </Col>
-              </Row>
-            );
-          })}
+          {this.props.configForms.map(item => (
+            <Row key={DOMPurify.sanitize(item.localId)}>
+              <Col sm={11}
+                className="cfl-col-field-left">
+                <Accordion title={DOMPurify.sanitize(item.config.name)}
+                  border={true}
+                  open={DOMPurify.sanitize(item.isOpenOnInit)}>
+                  <div ref={(div) => {
+                    if (item.localId === this.props.focusEntry) {
+                      this.focusRef = div;
+                    }
+                  }}>
+                    <ConfigForm
+                      config={DOMPurify.sanitize(item.config)}
+                      isOpenOnInit={DOMPurify.sanitize(item.isOpenOnInit)}
+                      localId={DOMPurify.sanitize(item.localId)}
+                      updateValues={this.props.updateConfigForm}
+                      validationSchema={this.validationSchema} />
+                  </div>
+                </Accordion>
+              </Col>
+              <Col sm={1}
+                className="cfl-col-field">
+                <RemoveButton
+                  buttonClass="col-remove-button"
+                  handleRemove={this.handleRemove}
+                  localId={DOMPurify.sanitize(item.localId)}
+                  tooltip="Delete Provider" />
+              </Col>
+            </Row>
+          ))}
           <Button className="btn confirm btn-xs"
             disabled={this.props.loading}
             onClick={this.handleSubmitConfigs}>

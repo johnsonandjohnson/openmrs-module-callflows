@@ -110,23 +110,22 @@ export class Renderers extends React.Component {
                 buttonClass='confirm add-btn' />
             </div>
           </div>
-          {DOMPurify.sanitize(this.props.rendererForms)?.map(item => {
-          return (
-            <Row key={item.localId}>
+          {this.props.rendererForms.map(item => (
+            <Row key={DOMPurify.sanitize(item.localId)}>
               <Col sm={11}
               className="cfl-col-field-left">
-                <Accordion title={item.renderer.name}
+                <Accordion title={DOMPurify.sanitize(item.renderer.name)}
                   border={true}
-                  open={item.isOpen}>
+                  open={DOMPurify.sanitize(item.isOpen)}>
                   <div ref={(div) => {
                     if (item.localId === this.props.focusEntry) {
                       this.focusRef = div;
                     }
                   }}>
                     <RendererForm
-                      renderer={item.renderer}
-                      isOpen={item.isOpen}
-                      localId={item.localId}
+                      renderer={DOMPurify.sanitize(item.renderer)}
+                      isOpen={DOMPurify.sanitize(item.isOpen)}
+                      localId={DOMPurify.sanitize(item.localId)}
                       updateValues={this.props.updateRendererForm}
                       submit={this.submitRenderers} />
                   </div>
@@ -137,12 +136,11 @@ export class Renderers extends React.Component {
                 <RemoveButton
                   buttonClass="col-remove-button"
                   handleRemove={this.handleRemove}
-                  localId={item.localId}
+                  localId={DOMPurify.sanitize(item.localId)}
                   tooltip="Delete Renderer" />
               </Col>
             </Row>
-            );
-          })}
+          ))}
         </div>
       </div>
     );
