@@ -17,16 +17,16 @@ import {
 } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
-
 import MapEntry from '../../shared/utils/map-entry-util';
 import RemoveButton from '../RemoveButton';
+import DOMPurify from 'dompurify';
 import './index.scss';
 
 const MapField = (props) => {
   const { fieldName, handleChange, keyLabel,
     valueLabel, entry, columnSizes, removeable } = props;
   return (
-    <FormGroup controlId={`${fieldName}_${entry.id}`}>
+    <FormGroup controlId={`${fieldName}_${DOMPurify.sanitize(entry.id)}`}>
       <Row>
         <Col componentClass={HelpBlock} sm={columnSizes.key}>{keyLabel}</Col>
         <Col componentClass={HelpBlock} sm={columnSizes.value}>{valueLabel}</Col>
@@ -39,14 +39,14 @@ const MapField = (props) => {
           className="map-field-left">
           <FormControl type="text"
             name="key"
-            value={entry.key}
+            value={DOMPurify.sanitize(entry.key)}
             onChange={handleChange} />
         </Col>
         <Col sm={columnSizes.value}
           className="map-field">
           <FormControl type="text"
             name="value"
-            value={entry.value}
+            value={DOMPurify.sanitize(entry.value)}
             onChange={handleChange} />
         </Col>
         {(columnSizes.button >= 0 && removeable) &&
@@ -55,7 +55,7 @@ const MapField = (props) => {
             <RemoveButton
               buttonClass="col-remove-button"
               handleRemove={props.handleRemove}
-              localId={entry.id} />
+              localId={DOMPurify.sanitize(entry.id)} />
           </Col>}
       </Row>
     </FormGroup>

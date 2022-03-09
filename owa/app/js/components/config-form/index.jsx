@@ -8,7 +8,6 @@
  */
 
 import {
-  Button,
   Checkbox,
   Col,
   ControlLabel,
@@ -21,13 +20,13 @@ import {
 } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
-
 import ConfigUI from './config-ui';
 import * as Default from '../../shared/utils/messages';
 import { getIntl } from "@openmrs/react-components/lib/components/localization/withLocalization";
 import MapFields from '../MapFields';
 import ErrorDesc from '@bit/soldevelo-omrs.cfl-components.error-description';
 import { validateField } from '../../shared/utils/validation-util';
+import DOMPurify from 'dompurify';
 
 const ConfigForm = (props) => {
   const { validationSchema } = props;
@@ -77,7 +76,7 @@ const ConfigForm = (props) => {
         <ControlLabel>{getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_NAME_HEADER', defaultMessage: Default.CONFIG_FORM_NAME_HEADER })}</ControlLabel>
         <FormControl type="text"
           name="name"
-          value={props.config.name}
+          value={DOMPurify.sanitize(props.config.name)}
           onChange={handleChange}
           className={errors && errors.name ? errorFieldClass : fieldClass} />
         {renderError("name")}
@@ -88,7 +87,7 @@ const ConfigForm = (props) => {
         <FormControl type="text"
           componentClass="textarea"
           name="outgoingCallUriTemplate"
-          value={props.config.outgoingCallUriTemplate}
+          value={DOMPurify.sanitize(props.config.outgoingCallUriTemplate)}
           onChange={handleChange} />
       </FormGroup>
       <FormGroup controlId={`outgoingCallMethod_${props.localId}`}>
@@ -97,15 +96,15 @@ const ConfigForm = (props) => {
           title="POST"
           value="POST"
           onChange={handleChange}
-          checked={'POST' === props.config.outgoingCallMethod}>{getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_METHOD_RADIO_POST', defaultMessage: Default.CONFIG_FORM_METHOD_RADIO_POST })}</Radio>
+          checked={'POST' === DOMPurify.sanitize(props.config.outgoingCallMethod)}>{getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_METHOD_RADIO_POST', defaultMessage: Default.CONFIG_FORM_METHOD_RADIO_POST })}</Radio>
         <Radio name="outgoingCallMethod"
           title="GET"
           value="GET"
           onChange={handleChange}
-          checked={'GET' === props.config.outgoingCallMethod}>{getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_METHOD_RADIO_GET', defaultMessage: Default.CONFIG_FORM_METHOD_RADIO_GET })}</Radio>
+          checked={'GET' === DOMPurify.sanitize(props.config.outgoingCallMethod)}>{getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_METHOD_RADIO_GET', defaultMessage: Default.CONFIG_FORM_METHOD_RADIO_GET })}</Radio>
       </FormGroup>
 
-      {'POST' === props.config.outgoingCallMethod &&
+      {'POST' === DOMPurify.sanitize(props.config.outgoingCallMethod) &&
         <div>
           <FormGroup controlId={`outgoingCallPostHeadersMap_${props.localId}`}>
             <ControlLabel>{getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_HEADERS_HEADER', defaultMessage: Default.CONFIG_FORM_HEADERS_HEADER })}</ControlLabel>
@@ -166,7 +165,7 @@ const ConfigForm = (props) => {
         <FormControl type="text"
           componentClass="textarea"
           name="servicesMap"
-          value={props.config.servicesMap}
+          value={DOMPurify.sanitize(props.config.servicesMap)}
           onChange={handleChange} />
       </FormGroup>
       <FormGroup controlId={`testUsersMap_${props.localId}`}>
