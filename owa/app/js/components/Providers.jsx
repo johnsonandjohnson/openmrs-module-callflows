@@ -161,15 +161,15 @@ export class Providers extends React.Component {
                 className="cfl-col-field-left">
                 <Accordion title={DOMPurify.sanitize(item.config.name)}
                   border={true}
-                  open={DOMPurify.sanitize(item.isOpenOnInit)}>
+                  open={item.isOpenOnInit}>
                   <div ref={(div) => {
                     if (item.localId === this.props.focusEntry) {
                       this.focusRef = div;
                     }
                   }}>
                     <ConfigForm
-                      config={DOMPurify.sanitize(item.config)}
-                      isOpenOnInit={DOMPurify.sanitize(item.isOpenOnInit)}
+                      config={item.config}
+                      isOpenOnInit={item.isOpenOnInit}
                       localId={DOMPurify.sanitize(item.localId)}
                       updateValues={this.props.updateConfigForm}
                       validationSchema={this.validationSchema} />
