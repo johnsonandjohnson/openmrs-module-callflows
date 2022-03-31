@@ -58,6 +58,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -410,69 +411,72 @@ public class CallController extends RestController {
     try {
       // load current call here persisted from the last persistence
       call = callService.findByCallId(callId);
-      // The configuration is part of the call, and hence why we need to retrieve the call first
-      config = configService.getConfig(call.getConfig());
 
-      context = initContext(config, params);
-      updateValueOfNextURL(request, extension, context, call);
+      if (!isCallCompleted(call)) {
+        // The configuration is part of the call, and hence why we need to retrieve the call first
+        config = configService.getConfig(call.getConfig());
 
-      // merge back
-      callUtil.mergeCallWithContext(call, context);
+        context = initContext(config, params);
+        updateValueOfNextURL(request, extension, context, call);
 
-      // Load flow object
-      Flow flow = flowService.load(call.getEndFlow().getName());
+        // merge back
+        callUtil.mergeCallWithContext(call, context);
 
-      String jumpTo = params.get(Constants.PARAM_JUMP_TO);
-      if (!StringUtils.isBlank(jumpTo)) {
-        // See if there is some jump to some other flow
-        flow = flowService.load(jumpTo);
-        currentNode = flow.getNodes().get(0);
-      } else {
-        // Go to next node of where control last terminated, this would be a system node since nodes
-        // are in pairs
-        currentNode = flowUtil.getNextNodeByStep(flow, call.getEndNode());
+        // Load flow object
+        Flow flow = flowService.load(call.getEndFlow().getName());
+
+        String jumpTo = params.get(Constants.PARAM_JUMP_TO);
+        if (!StringUtils.isBlank(jumpTo)) {
+          // See if there is some jump to some other flow
+          flow = flowService.load(jumpTo);
+          currentNode = flow.getNodes().get(0);
+        } else {
+          // Go to next node of where control last terminated, this would be a system node since
+          // nodes
+          // are in pairs
+          currentNode = flowUtil.getNextNodeByStep(flow, call.getEndNode());
+        }
+
+        // evaluate node sequentially across jumps to arrive at a position
+        // The position we arrived at will be a userNode or a systemNode
+        // IF it's a system node it's normally a error and call will also terminate
+        FlowPosition position = flowService.evalNode(flow, currentNode, context);
+
+        output = position.getOutput();
+        currentNode = position.getEnd();
+
+        call.setEndFlow(callFlowService.findByName(position.getEndFlow().getName()));
+        call.setEndNode(currentNode.getStep());
+
+        // retrieve existing played messages
+        String playedMessages = call.getPlayedMessages();
+
+        // update the messages played, include the '|' symbol in the code, to provide flexibility to
+        // submit the data after each node
+        // update the played messages only when the data coming in as part of params
+        if (StringUtils.isNotBlank(params.get(Constants.PARAM_PLAYED_MESSAGES))) {
+          call.setPlayedMessages(
+              StringUtils.isNotBlank(playedMessages)
+                  ? playedMessages
+                      .concat(SEPERATOR_MESSAGE)
+                      .concat(params.get(Constants.PARAM_PLAYED_MESSAGES))
+                  : params.get(Constants.PARAM_PLAYED_MESSAGES));
+        }
+
+        LOGGER.debug("\nOn Setting playedMessages : " + call.getPlayedMessages());
+
+        if (!position.isTerminated()) {
+          // We are now back at a user node, so evaluate that again
+          output = flowUtil.evalNode(flow, currentNode, context, extension);
+        }
+        call.setStatus(position.isTerminated() ? CallStatus.COMPLETED : call.getStatus());
+        // one more interaction happened
+        call.setSteps(call.getSteps() + 1);
+        // merge everything back
+        callUtil.mergeContextWithCall(context, call);
+        // persist
+        callService.update(call);
       }
-
-      // evaluate node sequentially across jumps to arrive at a position
-      // The position we arrived at will be a userNode or a systemNode
-      // IF it's a system node it's normally a error and call will also terminate
-      FlowPosition position = flowService.evalNode(flow, currentNode, context);
-
-      output = position.getOutput();
-      currentNode = position.getEnd();
-
-      call.setEndFlow(callFlowService.findByName(position.getEndFlow().getName()));
-      call.setEndNode(currentNode.getStep());
-
-      // retrieve existing played messages
-      String playedMessages = call.getPlayedMessages();
-
-      // update the messages played, include the '|' symbol in the code, to provide flexibility to
-      // submit the data after each node
-      // update the played messages only when the data coming in as part of params
-      if (StringUtils.isNotBlank(params.get(Constants.PARAM_PLAYED_MESSAGES))) {
-        call.setPlayedMessages(
-            StringUtils.isNotBlank(playedMessages)
-                ? playedMessages
-                    .concat(SEPERATOR_MESSAGE)
-                    .concat(params.get(Constants.PARAM_PLAYED_MESSAGES))
-                : params.get(Constants.PARAM_PLAYED_MESSAGES));
-      }
-
-      LOGGER.debug("\nOn Setting playedMessages : " + call.getPlayedMessages());
-
-      if (!position.isTerminated()) {
-        // We are now back at a user node, so evaluate that again
-        output = flowUtil.evalNode(flow, currentNode, context, extension);
-      }
-      call.setStatus(position.isTerminated() ? CallStatus.COMPLETED : call.getStatus());
-      // one more interaction happened
-      call.setSteps(call.getSteps() + 1);
-      // merge everything back
-      callUtil.mergeContextWithCall(context, call);
-      // persist
-      callService.update(call);
-
     } catch (Exception e) {
       error = e;
       LOGGER.error(
@@ -740,5 +744,15 @@ public class CallController extends RestController {
       }
     }
     return phoneNumber;
+  }
+
+  private boolean isCallCompleted(Call call) {
+    List<String> callflowEndedStatuses =
+        Arrays.asList(
+            Context.getAdministrationService()
+                .getGlobalProperty(Constants.CALLFLOW_ENDED_STATUSES_GP_KEY)
+                .split(","));
+
+    return callflowEndedStatuses.contains(call.getStatus().name());
   }
 }

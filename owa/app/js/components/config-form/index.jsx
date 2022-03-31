@@ -53,7 +53,7 @@ const ConfigForm = (props) => {
     validateAndUpdate(fieldName);
   };
 
-  const handleChecboxChange = (event) => {
+  const handleCheckboxChange = (event) => {
     const fieldName = event.target.name;
     props.config[fieldName] = event.target.checked;
     validateAndUpdate(fieldName);
@@ -71,112 +71,183 @@ const ConfigForm = (props) => {
   };
 
   return (
-    <Form className="form" onSubmit={e => e.preventDefault()}>
+    <Form className="form" onSubmit={(e) => e.preventDefault()}>
       <FormGroup controlId={`name_${props.localId}`}>
-        <ControlLabel>{getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_NAME_HEADER', defaultMessage: Default.CONFIG_FORM_NAME_HEADER })}</ControlLabel>
-        <FormControl type="text"
+        <ControlLabel>
+          {getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_NAME_HEADER', defaultMessage: Default.CONFIG_FORM_NAME_HEADER })}
+        </ControlLabel>
+        <FormControl
+          type="text"
           name="name"
           value={DOMPurify.sanitize(props.config.name)}
           onChange={handleChange}
-          className={errors && errors.name ? errorFieldClass : fieldClass} />
+          className={errors && errors.name ? errorFieldClass : fieldClass}
+        />
         {renderError("name")}
       </FormGroup>
       <FormGroup controlId={`outgoingCallUriTemplate_${props.localId}`}>
-        <ControlLabel>{getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_TEMPLATE_HEADER', defaultMessage: Default.CONFIG_FORM_TEMPLATE_HEADER })}</ControlLabel>
-        <HelpBlock>{getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_TEMPLATE_NOTE', defaultMessage: Default.CONFIG_FORM_TEMPLATE_NOTE })}</HelpBlock>
-        <FormControl type="text"
+        <ControlLabel>
+          {getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_TEMPLATE_HEADER', defaultMessage: Default.CONFIG_FORM_TEMPLATE_HEADER })}
+        </ControlLabel>
+        <HelpBlock>
+          {getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_TEMPLATE_NOTE', defaultMessage: Default.CONFIG_FORM_TEMPLATE_NOTE })}
+        </HelpBlock>
+        <FormControl
+          type="text"
           componentClass="textarea"
           name="outgoingCallUriTemplate"
           value={DOMPurify.sanitize(props.config.outgoingCallUriTemplate)}
-          onChange={handleChange} />
+          onChange={handleChange}
+        />
+      </FormGroup>
+      <FormGroup controlId={`hasAuthRequired_${props.localId}`}>
+        <ControlLabel>
+          {getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_AUTHENTICATION', defaultMessage: Default.CONFIG_FORM_AUTHENTICATION })}
+        </ControlLabel>
+        <Checkbox
+          name="hasAuthRequired"
+          checked={props.config.hasAuthRequired}
+          onChange={handleCheckboxChange}
+        >
+          {getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_HAS_AUTH_REQUIRED', defaultMessage: Default.CONFIG_FORM_HAS_AUTH_REQUIRED })}
+        </Checkbox>
       </FormGroup>
       <FormGroup controlId={`outgoingCallMethod_${props.localId}`}>
-        <ControlLabel>{getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_METHOD_HEADER', defaultMessage: Default.CONFIG_FORM_METHOD_HEADER })}</ControlLabel>
-        <Radio name="outgoingCallMethod"
+        <ControlLabel>
+          {getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_METHOD_HEADER', defaultMessage: Default.CONFIG_FORM_METHOD_HEADER })}
+        </ControlLabel>
+        <Radio
+          name="outgoingCallMethod"
           title="POST"
           value="POST"
           onChange={handleChange}
-          checked={'POST' === DOMPurify.sanitize(props.config.outgoingCallMethod)}>{getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_METHOD_RADIO_POST', defaultMessage: Default.CONFIG_FORM_METHOD_RADIO_POST })}</Radio>
-        <Radio name="outgoingCallMethod"
+          checked={'POST' === DOMPurify.sanitize(props.config.outgoingCallMethod)}
+        >
+          {getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_METHOD_RADIO_POST', defaultMessage: Default.CONFIG_FORM_METHOD_RADIO_POST })}
+        </Radio>
+        <Radio
+          name="outgoingCallMethod"
           title="GET"
           value="GET"
           onChange={handleChange}
-          checked={'GET' === DOMPurify.sanitize(props.config.outgoingCallMethod)}>{getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_METHOD_RADIO_GET', defaultMessage: Default.CONFIG_FORM_METHOD_RADIO_GET })}</Radio>
+          checked={'GET' === DOMPurify.sanitize(props.config.outgoingCallMethod)}
+        >
+          {getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_METHOD_RADIO_GET', defaultMessage: Default.CONFIG_FORM_METHOD_RADIO_GET })}
+        </Radio>
       </FormGroup>
-
-      {'POST' === DOMPurify.sanitize(props.config.outgoingCallMethod) &&
-        <div>
+      {'POST' === DOMPurify.sanitize(props.config.outgoingCallMethod) && (
+        <>
           <FormGroup controlId={`outgoingCallPostHeadersMap_${props.localId}`}>
-            <ControlLabel>{getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_HEADERS_HEADER', defaultMessage: Default.CONFIG_FORM_HEADERS_HEADER })}</ControlLabel>
-            <HelpBlock>{getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_HEADERS_NOTE', defaultMessage: Default.CONFIG_FORM_HEADERS_NOTE })}</HelpBlock>
+            <ControlLabel>
+              {getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_HEADERS_HEADER', defaultMessage: Default.CONFIG_FORM_HEADERS_HEADER })}
+            </ControlLabel>
+            <HelpBlock>
+              {getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_HEADERS_NOTE', defaultMessage: Default.CONFIG_FORM_HEADERS_NOTE })}
+            </HelpBlock>
             <MapFields
               entries={props.config.outgoingCallPostHeadersMap}
               fieldName="outgoingCallPostHeadersMap"
-              updateValues={handleArrayChange} />
+              updateValues={handleArrayChange}
+            />
           </FormGroup>
           <FormGroup controlId={`outgoingCallPostParams_${props.localId}`}>
-            <ControlLabel>{getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_TYPE_HEADER', defaultMessage: Default.CONFIG_FORM_TYPE_HEADER })}</ControlLabel>
-            <HelpBlock>{getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_TYPE_NOTE', defaultMessage: Default.CONFIG_FORM_TYPE_NOTE })}</HelpBlock>
-            <MapFields
-              entries={props.config.outgoingCallPostParams}
-              fieldName="outgoingCallPostParams"
-              updateValues={handleArrayChange} />
+            <ControlLabel>
+              {getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_TYPE_HEADER', defaultMessage: Default.CONFIG_FORM_TYPE_HEADER })}
+            </ControlLabel>
+            <HelpBlock>
+              {getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_TYPE_NOTE', defaultMessage: Default.CONFIG_FORM_TYPE_NOTE })}
+            </HelpBlock>
+            <FormControl
+              type="text"
+              componentClass="textarea"
+              name="outgoingCallPostParams"
+              value={DOMPurify.sanitize(props.config.outgoingCallPostParams)}
+              onChange={handleChange}
+            />
           </FormGroup>
-        </div>
-      }
-
+        </>
+      )}
       <FormGroup controlId={`queue_${props.localId}`}>
-        <ControlLabel>{getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_QUEUE_HEADER', defaultMessage: Default.CONFIG_FORM_QUEUE_HEADER })}</ControlLabel>
+        <ControlLabel>
+          {getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_QUEUE_HEADER', defaultMessage: Default.CONFIG_FORM_QUEUE_HEADER })}
+        </ControlLabel>
         <Row>
-          <Col componentClass={HelpBlock} sm={2}>{getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_QUEUE_LIMIT', defaultMessage: Default.CONFIG_FORM_QUEUE_LIMIT })}</Col>
-          <Col componentClass={HelpBlock} sm={2}>{getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_QUEUE_SEC', defaultMessage: Default.CONFIG_FORM_QUEUE_SEC })}</Col>
-          <Col componentClass={HelpBlock} sm={2}>{getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_QUEUE_ATTEMPTS', defaultMessage: Default.CONFIG_FORM_QUEUE_ATTEMPTS })}</Col>
-          <Col componentClass={HelpBlock} xs={2} sm={4}>{getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_QUEUE_CALL', defaultMessage: Default.CONFIG_FORM_QUEUE_CALL })}</Col>
+          <Col componentClass={HelpBlock} sm={2}>
+            {getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_QUEUE_LIMIT', defaultMessage: Default.CONFIG_FORM_QUEUE_LIMIT })}
+          </Col>
+          <Col componentClass={HelpBlock} sm={2}>
+            {getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_QUEUE_SEC', defaultMessage: Default.CONFIG_FORM_QUEUE_SEC })}
+          </Col>
+          <Col componentClass={HelpBlock} sm={2}>
+            {getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_QUEUE_ATTEMPTS', defaultMessage: Default.CONFIG_FORM_QUEUE_ATTEMPTS })}
+          </Col>
+          <Col componentClass={HelpBlock} xs={2} sm={4}>
+            {getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_QUEUE_CALL', defaultMessage: Default.CONFIG_FORM_QUEUE_CALL })}
+          </Col>
         </Row>
         <Row>
           <Col sm={2}>
-            <FormControl type="number"
+            <FormControl
+              type="number"
               name="outboundCallLimit"
               value={props.config.outboundCallLimit}
-              onChange={handleChange} />
+              onChange={handleChange}
+            />
           </Col>
           <Col sm={2}>
-            <FormControl type="number"
+            <FormControl
+              type="number"
               name="outboundCallRetrySeconds"
               value={props.config.outboundCallRetrySeconds}
-              onChange={handleChange} />
+              onChange={handleChange}
+            />
           </Col>
           <Col sm={2}>
-            <FormControl type="number"
+            <FormControl
+              type="number"
               name="outboundCallRetryAttempts"
               value={props.config.outboundCallRetryAttempts}
-              onChange={handleChange} />
+              onChange={handleChange}
+            />
           </Col>
           <Col xs={2} sm={4}>
-            <Checkbox name="callAllowed"
-              onChange={handleChecboxChange}
-              checked={props.config.callAllowed} />
+            <Checkbox
+              name="callAllowed"
+              onChange={handleCheckboxChange}
+              checked={props.config.callAllowed}
+            />
           </Col>
         </Row>
       </FormGroup>
       <FormGroup controlId={`servicesMap_${props.localId}`}>
-        <ControlLabel>{getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_SERVICE_MAP_HEADER', defaultMessage: Default.CONFIG_FORM_SERVICE_MAP_HEADER })}</ControlLabel>
-        <HelpBlock>{getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_SERVICE_MAP_NOTE', defaultMessage: Default.CONFIG_FORM_SERVICE_MAP_NOTE })}</HelpBlock>
-        <FormControl type="text"
+        <ControlLabel>
+          {getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_SERVICE_MAP_HEADER', defaultMessage: Default.CONFIG_FORM_SERVICE_MAP_HEADER })}
+        </ControlLabel>
+        <HelpBlock>
+          {getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_SERVICE_MAP_NOTE', defaultMessage: Default.CONFIG_FORM_SERVICE_MAP_NOTE })}
+        </HelpBlock>
+        <FormControl
+          type="text"
           componentClass="textarea"
           name="servicesMap"
           value={DOMPurify.sanitize(props.config.servicesMap)}
-          onChange={handleChange} />
+          onChange={handleChange}
+        />
       </FormGroup>
       <FormGroup controlId={`testUsersMap_${props.localId}`}>
-        <ControlLabel>{getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_USERS_HEADER', defaultMessage: Default.CONFIG_FORM_USERS_HEADER })}</ControlLabel>
-        <HelpBlock>{getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_USERS_NOTE', defaultMessage: Default.CONFIG_FORM_USERS_NOTE })}</HelpBlock>
+        <ControlLabel>
+          {getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_USERS_HEADER', defaultMessage: Default.CONFIG_FORM_USERS_HEADER })}
+        </ControlLabel>
+        <HelpBlock>
+          {getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_USERS_NOTE', defaultMessage: Default.CONFIG_FORM_USERS_NOTE })}
+        </HelpBlock>
         <MapFields
           entries={props.config.testUsersMap}
           fieldName="testUsersMap"
           updateValues={handleArrayChange}
           keyLabel={getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_USERS_KEY_LABEL', defaultMessage: Default.CONFIG_FORM_USERS_KEY_LABEL })}
-          valueLabel={getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_USERS_VALUE_LABEL', defaultMessage: Default.CONFIG_FORM_USERS_VALUE_LABEL })} />
+          valueLabel={getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_USERS_VALUE_LABEL', defaultMessage: Default.CONFIG_FORM_USERS_VALUE_LABEL })}
+        />
       </FormGroup>
     </Form>
   );

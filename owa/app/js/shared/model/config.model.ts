@@ -2,7 +2,7 @@ export default interface IConfig {
   name: string | null;
   outgoingCallUriTemplate?: string | null;
   outgoingCallPostHeadersMap?: any;
-  outgoingCallPostParams?: any;
+  outgoingCallPostParams?: string | null;
   outgoingCallMethod?: string | null;
   outboundCallLimit?: number;
   outboundCallRetrySeconds?: number;
@@ -17,7 +17,7 @@ export const defaultValue: Readonly<IConfig> = {
   name: 'New Config',
   outgoingCallUriTemplate: null,
   outgoingCallPostHeadersMap: {},
-  outgoingCallPostParams: {},
+  outgoingCallPostParams: null,
   outgoingCallMethod: null,
   outboundCallLimit: 0,
   outboundCallRetrySeconds: 0,

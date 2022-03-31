@@ -7,7 +7,7 @@ export default class ConfigUI {
   name: string;
   outgoingCallUriTemplate?: string;
   outgoingCallPostHeadersMap?: MapEntry[];
-  outgoingCallPostParams?: MapEntry[];
+  outgoingCallPostParams?: string;
   outgoingCallMethod?: string | null;
   outboundCallLimit?: number;
   outboundCallRetrySeconds?: number;
@@ -29,7 +29,7 @@ export default class ConfigUI {
     this.name = 'New config';
     this.outgoingCallUriTemplate = '';
     this.outgoingCallPostHeadersMap = [new MapEntry()];
-    this.outgoingCallPostParams = [new MapEntry()];
+    this.outgoingCallPostParams = '';
     this.outgoingCallMethod = 'POST';
     this.outboundCallLimit = 0;
     this.outboundCallRetrySeconds = 0;
@@ -51,8 +51,8 @@ export default class ConfigUI {
       if (!_.isEmpty(model.outgoingCallPostHeadersMap)) {
         this.outgoingCallPostHeadersMap = MapEntry.jsonToArray(model.outgoingCallPostHeadersMap);
       }
-      if (!_.isEmpty(model.outgoingCallPostParams)) {
-        this.outgoingCallPostParams = MapEntry.paramsToArray(model.outgoingCallPostParams, '&', '=');
+      if (!!model.outgoingCallPostParams) {
+        this.outgoingCallPostParams = model.outgoingCallPostParams.replace(/\\/g, '');
       }
       if (!!model.outgoingCallMethod) {
         this.outgoingCallMethod = model.outgoingCallMethod;
@@ -94,7 +94,7 @@ export default class ConfigUI {
       model.outgoingCallPostHeadersMap = MapEntry.arrayToJson(this.outgoingCallPostHeadersMap);
     }
     if (!!this.outgoingCallPostParams) {
-      model.outgoingCallPostParams = MapEntry.arrayToParams(this.outgoingCallPostParams, '&', '=');
+      model.outgoingCallPostParams = this.outgoingCallPostParams.replace(/\"/g, '\"');
     }
     if (!!this.outgoingCallMethod) {
       model.outgoingCallMethod = this.outgoingCallMethod;

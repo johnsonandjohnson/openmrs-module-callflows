@@ -9,7 +9,7 @@
 
     <groupId>org.openmrs.module</groupId>
     <artifactId>callflows</artifactId>
-    <version>1.1.5</version>
+    <version>1.1.6</version>
     <packaging>pom</packaging>
     <name>Callflows module</name>
     <description>
