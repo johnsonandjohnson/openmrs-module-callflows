@@ -90,6 +90,17 @@ const ConfigForm = (props) => {
           value={DOMPurify.sanitize(props.config.outgoingCallUriTemplate)}
           onChange={handleChange} />
       </FormGroup>
+
+      <FormGroup controlId={`hasAuthRequired_${props.localId}`}>
+        <ControlLabel>{getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_AUTHENTICATION', defaultMessage: Default.CONFIG_FORM_AUTHENTICATION })}</ControlLabel>
+        <Checkbox
+          name="hasAuthRequired"
+          checked={props.config.hasAuthRequired}
+          onChange={handleChecboxChange}>
+          {getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_HAS_AUTH_REQUIRED', defaultMessage: Default.CONFIG_FORM_HAS_AUTH_REQUIRED })}
+        </Checkbox>
+      </FormGroup>
+
       <FormGroup controlId={`outgoingCallMethod_${props.localId}`}>
         <ControlLabel>{getIntl().formatMessage({ id: 'CALLFLOW_CONFIG_FORM_METHOD_HEADER', defaultMessage: Default.CONFIG_FORM_METHOD_HEADER })}</ControlLabel>
         <Radio name="outgoingCallMethod"

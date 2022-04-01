@@ -40,6 +40,8 @@
     "CALLFLOW_CONFIG_FORM_TYPE_HEADER": "POST parameters",
     "CALLFLOW_CONFIG_FORM_TYPE_NOTE": "Type HTTP POST parameters",
     "CALLFLOW_CONFIG_FORM_QUEUE_HEADER": "Outbound Call Queue Configuration",
+    "CALLFLOW_CONFIG_FORM_AUTHENTICATION": "Authentication",
+    "CALLFLOW_CONFIG_FORM_HAS_AUTH_REQUIRED": "Is authentication required?",
     "CALLFLOW_CONFIG_FORM_QUEUE_LIMIT": "Call Limit",
     "CALLFLOW_CONFIG_FORM_QUEUE_SEC": "Retry Sec",
     "CALLFLOW_CONFIG_FORM_QUEUE_ATTEMPTS": "Retry Attempts",
