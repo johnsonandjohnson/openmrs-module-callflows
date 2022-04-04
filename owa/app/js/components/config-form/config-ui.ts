@@ -51,8 +51,8 @@ export default class ConfigUI {
       if (!_.isEmpty(model.outgoingCallPostHeadersMap)) {
         this.outgoingCallPostHeadersMap = MapEntry.jsonToArray(model.outgoingCallPostHeadersMap);
       }
-      if (!_.isEmpty(model.outgoingCallPostParams)) {
-        this.outgoingCallPostParams = model.outgoingCallPostParams;
+      if (!!model.outgoingCallPostParams) {
+        this.outgoingCallPostParams = model.outgoingCallPostParams.replace(/\\/g, '');
       }
       if (!!model.outgoingCallMethod) {
         this.outgoingCallMethod = model.outgoingCallMethod;
@@ -94,7 +94,7 @@ export default class ConfigUI {
       model.outgoingCallPostHeadersMap = MapEntry.arrayToJson(this.outgoingCallPostHeadersMap);
     }
     if (!!this.outgoingCallPostParams) {
-      model.outgoingCallPostParams = this.outgoingCallPostParams;
+      model.outgoingCallPostParams = this.outgoingCallPostParams.replace(/\"/g, '\"');
     }
     if (!!this.outgoingCallMethod) {
       model.outgoingCallMethod = this.outgoingCallMethod;
