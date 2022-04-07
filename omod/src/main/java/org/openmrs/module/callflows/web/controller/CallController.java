@@ -128,7 +128,6 @@ public class CallController extends RestController {
   private static final int DEFAULT_FETCH_SIZE = 10000;
   private static final int NUMBER_OF_TEN_K_FILES = 5;
   private static final String TELEPHONE_NUMBER = "Telephone Number";
-  private static final String CALLFLOW_ENDED_STATUSES_GP_KEY = "messages.statusesEndingCallflow";
 
   @Autowired
   @Qualifier("callflows.configService")
@@ -432,7 +431,8 @@ public class CallController extends RestController {
           flow = flowService.load(jumpTo);
           currentNode = flow.getNodes().get(0);
         } else {
-          // Go to next node of where control last terminated, this would be a system node since nodes
+          // Go to next node of where control last terminated, this would be a system node since
+          // nodes
           // are in pairs
           currentNode = flowUtil.getNextNodeByStep(flow, call.getEndNode());
         }
@@ -456,11 +456,11 @@ public class CallController extends RestController {
         // update the played messages only when the data coming in as part of params
         if (StringUtils.isNotBlank(params.get(Constants.PARAM_PLAYED_MESSAGES))) {
           call.setPlayedMessages(
-                  StringUtils.isNotBlank(playedMessages)
-                          ? playedMessages
-                          .concat(SEPERATOR_MESSAGE)
-                          .concat(params.get(Constants.PARAM_PLAYED_MESSAGES))
-                          : params.get(Constants.PARAM_PLAYED_MESSAGES));
+              StringUtils.isNotBlank(playedMessages)
+                  ? playedMessages
+                      .concat(SEPERATOR_MESSAGE)
+                      .concat(params.get(Constants.PARAM_PLAYED_MESSAGES))
+                  : params.get(Constants.PARAM_PLAYED_MESSAGES));
         }
 
         LOGGER.debug("\nOn Setting playedMessages : " + call.getPlayedMessages());
@@ -747,9 +747,11 @@ public class CallController extends RestController {
   }
 
   private boolean isCallCompleted(Call call) {
-    List<String> callflowEndedStatuses = Arrays.asList(Context.getAdministrationService()
-            .getGlobalProperty(CALLFLOW_ENDED_STATUSES_GP_KEY)
-            .split(","));
+    List<String> callflowEndedStatuses =
+        Arrays.asList(
+            Context.getAdministrationService()
+                .getGlobalProperty(Constants.CALLFLOW_ENDED_STATUSES_GP_KEY)
+                .split(","));
 
     return callflowEndedStatuses.contains(call.getStatus().name());
   }
