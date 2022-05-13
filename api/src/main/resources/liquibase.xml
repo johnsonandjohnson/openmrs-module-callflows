@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public License,
+  ~ v. 2.0. If a copy of the MPL was not distributed with this file, You can
+  ~ obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+  ~ the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+  ~ <p>
+  ~ Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+  ~ graphic logo is a trademark of OpenMRS Inc.
+  -->
+
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9
@@ -13,7 +23,7 @@
         for a list of supported elements and attributes
     -->
 
-    <changeSet id="callFlow-2019-09-06-10:00" author="Dawid Ruchniewicz">
+    <changeSet id="callFlow-2019-09-06-10:00" author="Connect for Life">
         <preConditions onFail="MARK_RAN">
             <not><tableExists tableName="cfl_callflows"/></not>
         </preConditions>
@@ -58,7 +68,7 @@
         </createIndex>
     </changeSet>
 
-    <changeSet id="callFlow-2019-09-06-11:00" author="Dawid Ruchniewicz">
+    <changeSet id="callFlow-2019-09-06-11:00" author="Connect for Life">
         <preConditions onFail="MARK_RAN">
             <not><tableExists tableName="cfl_calls"/></not>
         </preConditions>
@@ -157,32 +167,24 @@
         </createIndex>
     </changeSet>
 
-    <changeSet id="callFlow-2019-09-10-11:00" author="Arkadiusz Lalo">
+    <changeSet id="callFlow-2019-10-16-11:23" author="Connect for Life">
         <preConditions onFail="MARK_RAN">
-            <not><tableExists tableName="cfl_calls_providerdata"/></not>
+            <not>
+                <sqlCheck expectedResult="longtext">
+                    SELECT DATA_TYPE
+                    FROM INFORMATION_SCHEMA.COLUMNS
+                    WHERE TABLE_NAME = 'cfl_callflows'
+                    AND COLUMN_NAME = 'raw'
+                </sqlCheck>
+            </not>
         </preConditions>
-        <createTable tableName="cfl_calls_providerdata">
-            <column name="id_oid" type="int">
-                <constraints primaryKey="true"/>
-            </column>
-            <column name="key" type="varchar(255)">
-                <constraints primaryKey="true"/>
-            </column>
-            <column name="value" type="varchar(255)" />
-        </createTable>
-        <addForeignKeyConstraint constraintName="cfl_calls_providerdata_fk"
-                                 baseTableName="cfl_calls_providerdata" baseColumnNames="id_oid"
-                                 referencedTableName="cfl_calls" referencedColumnNames="cfl_calls_id"/>
-    </changeSet>
-
-    <changeSet id="callFlow-2019-10-16-11:23" author="Paweł Cieszko">
         <comment>Changing Callflows Raw column type to support large configurations</comment>
         <sql>
             ALTER TABLE cfl_callflows MODIFY raw LONGTEXT;
         </sql>
     </changeSet>
 
-    <changeSet id="callFlow-2020-01-03-11:00" author="Arkadiusz Lalo">
+    <changeSet id="callFlow-2020-01-03-11:00" author="Connect for Life">
         <preConditions onFail="MARK_RAN">
             <tableExists tableName="cfl_calls"/>
             <tableExists tableName="cfl_calls_providerdata"/>
@@ -195,9 +197,10 @@
         </addColumn>
     </changeSet>
 
-    <changeSet id="callFlow-2020-08-06-08:00" author="Arkadiusz Lalo">
+    <changeSet id="callFlow-2020-08-06-08:00" author="Connect for Life">
         <preConditions onFail="MARK_RAN">
-            <tableExists tableName="cfl_calls" />
+            <tableExists tableName="cfl_calls"/>
+            <not><tableExists tableName="cfl_calls_history"/></not>
         </preConditions>
         <comment>
             Adds the table used to store the history of call resources.
@@ -214,9 +217,12 @@
         </sql>
     </changeSet>
 
-    <changeSet id="callFlow-2020-08-06-08:10" author="Arkadiusz Lalo">
+    <changeSet id="callFlow-2020-08-06-08:10" author="Connect for Life">
         <preConditions onFail="MARK_RAN">
-            <tableExists tableName="cfl_calls" />
+            <tableExists tableName="cfl_calls"/>
+            <sqlCheck expectedResult="0">
+                SELECT count(*) FROM INFORMATION_SCHEMA.TRIGGERS WHERE TRIGGER_NAME = 'cfl_calls_history_insert'
+            </sqlCheck>
         </preConditions>
         <comment>
             Adds the inbuilt database triggers which will store information about
@@ -240,7 +246,7 @@
         </sql>
     </changeSet>
 
-    <changeSet id="callFlow-2021-02-09-12:00" author="Piotr Wargulak">
+    <changeSet id="callFlow-2021-02-09-12:00" author="Connect for Life">
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="cfl_callflows" columnName="voided" />
         </preConditions>
