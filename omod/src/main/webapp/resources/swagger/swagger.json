@@ -640,15 +640,8 @@
     "MultipartFile" : {
       "type" : "object",
       "properties" : {
-        "originalFilename" : {
-          "type" : "string"
-        },
         "name" : {
           "type" : "string"
-        },
-        "empty" : {
-          "type" : "boolean",
-          "default" : false
         },
         "bytes" : {
           "type" : "array",
@@ -656,6 +649,10 @@
             "type" : "string",
             "format" : "byte"
           }
+        },
+        "empty" : {
+          "type" : "boolean",
+          "default" : false
         },
         "size" : {
           "type" : "integer",
@@ -665,6 +662,9 @@
           "$ref" : "#/definitions/InputStream"
         },
         "contentType" : {
+          "type" : "string"
+        },
+        "originalFilename" : {
           "type" : "string"
         }
       }
