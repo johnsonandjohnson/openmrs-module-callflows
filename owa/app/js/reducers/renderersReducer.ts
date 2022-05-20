@@ -70,7 +70,9 @@ export default (state = initialState, action) => {
     case ACTION_TYPES.ADD_NEW_FORM: {
       let rendererForms = Array.from(state.rendererForms);
       let form = new RendererFormData();
+
       rendererForms.push(form);
+
       return {
         ...state,
         rendererForms,

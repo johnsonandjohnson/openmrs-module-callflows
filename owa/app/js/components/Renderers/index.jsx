@@ -111,21 +111,21 @@ export class Renderers extends React.Component {
             </div>
           </div>
           {this.props.rendererForms.map(item => (
-            <Row key={DOMPurify.sanitize(item.localId)}>
+            <Row key={item.localId}>
               <Col sm={11}
               className="cfl-col-field-left">
-                <Accordion title={DOMPurify.sanitize(item.renderer.name)}
+                <Accordion title={item.renderer.name}
                   border={true}
-                  open={DOMPurify.sanitize(item.isOpen)}>
+                  open={item.isOpen}>
                   <div ref={(div) => {
                     if (item.localId === this.props.focusEntry) {
                       this.focusRef = div;
                     }
                   }}>
                     <RendererForm
-                      renderer={DOMPurify.sanitize(item.renderer)}
-                      isOpen={DOMPurify.sanitize(item.isOpen)}
-                      localId={DOMPurify.sanitize(item.localId)}
+                      renderer={item.renderer}
+                      isOpen={item.isOpen}
+                      localId={item.localId}
                       updateValues={this.props.updateRendererForm}
                       submit={this.submitRenderers} />
                   </div>
@@ -136,7 +136,7 @@ export class Renderers extends React.Component {
                 <RemoveButton
                   buttonClass="col-remove-button"
                   handleRemove={this.handleRemove}
-                  localId={DOMPurify.sanitize(item.localId)}
+                  localId={item.localId}
                   tooltip="Delete Renderer" />
               </Col>
             </Row>
