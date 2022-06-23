@@ -1,7 +1,7 @@
 #!/bin/bash
 
 HOME_DIR=~
-CALLFLOWS_REPO=$HOME_DIR/cfl/omrs-callflows
+CALLFLOWS_REPO=$HOME_DIR/cfl/openmrs-module-callflows
 CALLFLOWS_OMOD=callflows-1.0.0-SNAPSHOT.omod
 CALLFLOWS_OMOD_PREFIX=callflows
 CFL_REPO=$HOME_DIR/cfl/cfl-openmrs
