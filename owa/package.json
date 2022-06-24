@@ -3,7 +3,7 @@
   "version": "1.1.7-SNAPSHOT",
   "description": "OWA project for Callflows Module",
   "dependencies": {
-    "@bit/soldevelo-cfl.omrs-components.customize": "^1.0.8",
+    "@bit/soldevelo-cfl.omrs-components.customize": "^1.0.10",
     "@bit/soldevelo-omrs.cfl-components.error-description": "^1.0.0",
     "@bit/soldevelo-omrs.cfl-components.localization-wrapper": "^1.0.2",
     "@bit/soldevelo-omrs.cfl-components.private-route": "^1.0.13",
