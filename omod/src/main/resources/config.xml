@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public License,
+  ~ v. 2.0. If a copy of the MPL was not distributed with this file, You can
+  ~ obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+  ~ the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+  ~ <p>
+  ~ Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+  ~ graphic logo is a trademark of OpenMRS Inc.
+  -->
+
+<module configVersion="1.2">
+
+    <!-- Base Module Properties -->
+    <id>${project.parent.artifactId}</id>
+    <name>${project.parent.name}</name>
+    <version>${project.parent.version}</version>
+    <package>org.openmrs.module.callflows</package>
+    <author>Connect for Life</author>
+    <description>
+        ${project.parent.description}
+    </description>
+
+    <activator>org.openmrs.module.callflows.CallflowsActivator</activator>
+
+    <require_version>${openmrsPlatformVersion}</require_version>
+
+    <require_modules>
+        <require_module version="${eventVersion}">org.openmrs.event</require_module>
+        <require_module version="${uiframeworkVersion}">org.openmrs.module.uiframework</require_module>
+    </require_modules>
+
+    <!-- Extensions -->
+    <extension>
+        <point>org.openmrs.admin.list</point>
+        <class>org.openmrs.module.callflows.extension.html.AdminList</class>
+    </extension>
+
+    <aware_of_modules>
+        <aware_of_module>org.openmrs.module.legacyui</aware_of_module>
+        <aware_of_module version="${metadatasharingVersion}">org.openmrs.module.metadatasharing</aware_of_module>
+    </aware_of_modules>
+
+    <filter>
+        <filter-name>CallFlow Module Authorization</filter-name>
+        <filter-class>org.openmrs.module.callflows.filter.AuthorizationFilter</filter-class>
+        <init-param>
+            <param-name>ignored-urls</param-name>
+            <param-value>
+                /ws/callflows/in/{conf}/flows/{flowName}.{extension}
+                /ws/callflows/calls/{callId}.{extension}
+                /ws/callflows/out/{configName}/flows/{name}.{extension}
+                /ws/callflows/calls/export-details
+                /ws/callflows/status/*
+            </param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>CallFlow Module Authorization</filter-name>
+        <url-pattern>/ws/callflows/*</url-pattern>
+    </filter-mapping>
+
+    <privilege>
+        <name>Callflows Privilege</name>
+        <description>Allows user to access Callflows module</description>
+    </privilege>
+
+    <!-- Internationalization -->
+    <!-- All message codes should start with @MODULE_ID@.* -->
+    <messages>
+        <lang>en</lang>
+        <file>messages.properties</file>
+    </messages>
+    <!-- /Internationalization -->
+
+</module>
+

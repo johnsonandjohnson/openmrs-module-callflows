@@ -1,0 +1,18 @@
+{
+  "version": "0.1.0",
+  "name": "callflows",
+  "description": "OWA project for Callflows Module",
+  "launch_path": "index.html",
+  "icons": {
+    "48": "/img/omrs-button.png"
+  },
+  "developer": {
+    "name": "Connect for Life"
+  },
+  "default_locale": "en",
+    "activities": {
+      "openmrs": {
+        "href": "*"
+      }
+    }
+}

@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public License,
+  ~ v. 2.0. If a copy of the MPL was not distributed with this file, You can
+  ~ obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+  ~ the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+  ~ <p>
+  ~ Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+  ~ graphic logo is a trademark of OpenMRS Inc.
+  -->
+
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9
+                  http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <!--
+    	See http://wiki.openmrs.org/display/docs/Module+liquibase+File for 
+    	documentation on this file.
+    
+        See http://www.liquibase.org/manual/home#available_database_refactorings
+        for a list of supported elements and attributes
+    -->
+
+    <changeSet id="callFlow-2019-09-06-10:00" author="Connect for Life">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="cfl_callflows"/></not>
+        </preConditions>
+        <comment>Created the cfl_callflows table</comment>
+        <createTable tableName="cfl_callflows">
+            <column name="cfl_callflows_id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" unique="true"/>
+            </column>
+            <column name="name" type="varchar(255)"></column>
+            <column name="description" type="varchar(255)"></column>
+            <column name="status" type="varchar(255)"></column>
+            <column name="raw" type="TEXT"></column>
+            <column name="uuid" type="char(38)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="creator" type="int"/>
+            <column name="changed_by" type="int"/>
+            <column name="date_changed" type="datetime"/>
+            <column name="date_created" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_voided" type="datetime"/>
+            <column name="void_reason" type="varchar(255)"/>
+            <column name="voided" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="voided_by" type="int"/>
+        </createTable>
+        <addForeignKeyConstraint constraintName="cfl_callflows_creator_fk"
+                                 baseTableName="cfl_callflows" baseColumnNames="creator"
+                                 referencedTableName="users" referencedColumnNames="user_id"/>
+        <addForeignKeyConstraint constraintName="cfl_callflows_changed_by_fk"
+                                 baseTableName="cfl_callflows" baseColumnNames="changed_by"
+                                 referencedTableName="users" referencedColumnNames="user_id"/>
+        <addForeignKeyConstraint constraintName="cfl_callflows_voided_by_fk"
+                                 baseTableName="cfl_callflows" baseColumnNames="voided_by"
+                                 referencedTableName="users" referencedColumnNames="user_id"/>
+        <addUniqueConstraint tableName="cfl_callflows" columnNames="name" constraintName="unique_callflow_idx"/>
+        <createIndex tableName="cfl_callflows"
+                     indexName="cfl_callflows_index_name">
+            <column name="name"></column>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="callFlow-2019-09-06-11:00" author="Connect for Life">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="cfl_calls"/></not>
+        </preConditions>
+        <comment>Created the cfl_calls table</comment>
+        <createTable tableName="cfl_calls">
+            <column name="cfl_calls_id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" unique="true"/>
+            </column>
+            <column name="callId" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="providerCallId" type="varchar(255)"></column>
+            <column name="direction" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="startFlow" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="startNode" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="startTime" type="datetime"></column>
+            <column name="endFlow" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="endNode" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="endTime" type="datetime"></column>
+            <column name="providerTime" type="varchar(255)"></column>
+            <column name="steps" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="config" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="actorId" type="varchar(255)"></column>
+            <column name="actorType" type="varchar(255)"></column>
+            <column name="statusText" type="varchar(255)"></column>
+            <column name="externalId" type="varchar(255)"></column>
+            <column name="externalType" type="varchar(255)"></column>
+            <column name="playedMessages" type="TEXT"></column>
+            <column name="refKey" type="varchar(255)"></column>
+            <column name="context" type="mediumblob"></column>
+            <column name="creationDate" type="datetime"></column>
+            <column name="uuid" type="char(38)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="creator" type="int"/>
+            <column name="changed_by" type="int"/>
+            <column name="date_changed" type="datetime"/>
+            <column name="date_created" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_voided" type="datetime"/>
+            <column name="void_reason" type="varchar(255)"/>
+            <column name="voided" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="voided_by" type="int"/>
+        </createTable>
+        <addForeignKeyConstraint constraintName="cfl_calls_creator_fk"
+                                 baseTableName="cfl_calls" baseColumnNames="creator"
+                                 referencedTableName="users" referencedColumnNames="user_id"/>
+        <addForeignKeyConstraint constraintName="cfl_calls_changed_by_fk"
+                                 baseTableName="cfl_calls" baseColumnNames="changed_by"
+                                 referencedTableName="users" referencedColumnNames="user_id"/>
+        <addForeignKeyConstraint constraintName="cfl_calls_voided_by_fk"
+                                 baseTableName="cfl_calls" baseColumnNames="voided_by"
+                                 referencedTableName="users" referencedColumnNames="user_id"/>
+        <addForeignKeyConstraint constraintName="cfl_calls_FK1"
+                                 baseTableName="cfl_calls" baseColumnNames="endFlow"
+                                 referencedTableName="cfl_callflows" referencedColumnNames="cfl_callflows_id"/>
+        <addForeignKeyConstraint constraintName="cfl_calls_FK2"
+                                 baseTableName="cfl_calls" baseColumnNames="startFlow"
+                                 referencedTableName="cfl_callflows" referencedColumnNames="cfl_callflows_id"/>
+        <addUniqueConstraint tableName="cfl_calls" columnNames="callId" constraintName="UNIQUE_CALLFLOWS_CALL_IDX"/>
+        <createIndex tableName="cfl_calls"
+                     indexName="cfl_calls_index_startFlow">
+            <column name="startFlow"></column>
+        </createIndex>
+        <createIndex tableName="cfl_calls"
+                     indexName="cfl_calls_index_direction">
+            <column name="direction"></column>
+        </createIndex>
+        <createIndex tableName="cfl_calls"
+                     indexName="cfl_calls_index_status">
+            <column name="status"></column>
+        </createIndex>
+        <createIndex tableName="cfl_calls"
+                     indexName="cfl_calls_index_endFlow">
+            <column name="endFlow"></column>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="callFlow-2019-10-16-11:23" author="Connect for Life">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sqlCheck expectedResult="longtext">
+                    SELECT DATA_TYPE
+                    FROM INFORMATION_SCHEMA.COLUMNS
+                    WHERE TABLE_NAME = 'cfl_callflows'
+                    AND COLUMN_NAME = 'raw'
+                </sqlCheck>
+            </not>
+        </preConditions>
+        <comment>Changing Callflows Raw column type to support large configurations</comment>
+        <sql>
+            ALTER TABLE cfl_callflows MODIFY raw LONGTEXT;
+        </sql>
+    </changeSet>
+
+    <changeSet id="callFlow-2020-01-03-11:00" author="Connect for Life">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="cfl_calls"/>
+            <tableExists tableName="cfl_calls_providerdata"/>
+        </preConditions>
+        <comment>Update the cfl_calls table</comment>
+        <dropForeignKeyConstraint baseTableName="cfl_calls_providerdata" constraintName="cfl_calls_providerdata_fk" />
+        <dropTable tableName="cfl_calls_providerdata" />
+        <addColumn tableName="cfl_calls">
+            <column name="provider_data" type="mediumblob"></column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="callFlow-2020-08-06-08:00" author="Connect for Life">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="cfl_calls"/>
+            <not><tableExists tableName="cfl_calls_history"/></not>
+        </preConditions>
+        <comment>
+            Adds the table used to store the history of call resources.
+        </comment>
+        <sql>
+            CREATE TABLE cfl_calls_history LIKE cfl_calls;
+
+            ALTER TABLE cfl_calls_history MODIFY COLUMN cfl_calls_id int(11) NOT NULL,
+            DROP PRIMARY KEY, DROP KEY cfl_calls_id, DROP KEY UNIQUE_CALLFLOWS_CALL_IDX,
+            DROP KEY uuid, ENGINE = MyISAM, ADD action VARCHAR(8) DEFAULT 'insert' FIRST,
+            ADD revision INT(6) NOT NULL AUTO_INCREMENT AFTER action,
+            ADD dt_datetime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER revision,
+            ADD PRIMARY KEY (cfl_calls_id, revision);
+        </sql>
+    </changeSet>
+
+    <changeSet id="callFlow-2020-08-06-08:10" author="Connect for Life">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="cfl_calls"/>
+            <sqlCheck expectedResult="0">
+                SELECT count(*) FROM INFORMATION_SCHEMA.TRIGGERS WHERE TRIGGER_NAME = 'cfl_calls_history_insert'
+            </sqlCheck>
+        </preConditions>
+        <comment>
+            Adds the inbuilt database triggers which will store information about
+            insert, update, delete of Call resources
+        </comment>
+        <sql>
+            CREATE TRIGGER cfl_calls_history_insert
+            AFTER INSERT ON cfl_calls FOR EACH ROW
+            INSERT INTO cfl_calls_history SELECT 'insert', NULL, NOW(), d.*
+                FROM cfl_calls AS d WHERE d.cfl_calls_id = NEW.cfl_calls_id;
+
+            CREATE TRIGGER cfl_calls_history_update
+            AFTER UPDATE ON cfl_calls FOR EACH ROW
+            INSERT INTO cfl_calls_history SELECT 'update', NULL, NOW(), d.*
+                FROM cfl_calls AS d WHERE d.cfl_calls_id = NEW.cfl_calls_id;
+
+            CREATE TRIGGER cfl_calls_history_delete
+            BEFORE DELETE ON cfl_calls FOR EACH ROW
+            INSERT INTO cfl_calls_history SELECT 'delete', NULL, NOW(), d.*
+                FROM cfl_calls AS d WHERE d.cfl_calls_id = OLD.cfl_calls_id;
+        </sql>
+    </changeSet>
+
+    <changeSet id="callFlow-2021-02-09-12:00" author="Connect for Life">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="cfl_callflows" columnName="voided" />
+        </preConditions>
+        <comment>CallFlow entity now derives from BaseOpenmrsMetadata</comment>
+        <renameColumn tableName="cfl_callflows" columnDataType="tinyint(1)" oldColumnName="voided" newColumnName="retired" />
+        <renameColumn tableName="cfl_callflows" columnDataType="datetime" oldColumnName="date_voided" newColumnName="date_retired" />
+        <renameColumn tableName="cfl_callflows" columnDataType="int(11)" oldColumnName="voided_by" newColumnName="retired_by" />
+        <renameColumn tableName="cfl_callflows" columnDataType="varchar(255)" oldColumnName="void_reason" newColumnName="retire_reason" />
+    </changeSet>
+
+</databaseChangeLog>

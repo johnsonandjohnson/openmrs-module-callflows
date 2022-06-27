@@ -1,0 +1,383 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public License,
+  ~ v. 2.0. If a copy of the MPL was not distributed with this file, You can
+  ~ obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+  ~ the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+  ~ <p>
+  ~ Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+  ~ graphic logo is a trademark of OpenMRS Inc.
+  -->
+
+<dataset>
+
+    <!-- Types -->
+    <relationship_type
+            relationship_type_id="100"
+            a_is_to_b="Caregiver"
+            b_is_to_a="Caretaker"
+            preferred="1"
+            weight="0"
+            description="Caregiver relationship"
+            creator="1"
+            date_created="2019-11-20 00:00:00.0"
+            uuid="acec590b-825e-45d2-876a-0028f174903d"
+            retired="false"/>
+
+    <patient_identifier_type
+            patient_identifier_type_id="100"
+            name="Test Identifier Type"
+            description="Test description"
+            creator="1"
+            date_created="2019-11-16 15:57:09.0"
+            required="true"
+            retired="false"
+            uuid="9768c389-6c3a-47c0-9d8b-3c9e42793da3"/>
+
+    <person_attribute_type
+            person_attribute_type_id="201"
+            name="Telephone Number"
+            description="The telephone number for the person"
+            format="java.lang.String"
+            searchable="false"
+            creator="1"
+            date_created="2008-08-15 15:53:36.0"
+            retired="false"
+            uuid="a0f5521c-dbbd-4c10-81b2-1b7ab18330pu"
+            sort_weight="2"/>
+
+    <person_attribute_type
+            person_attribute_type_id="202"
+            name="Patient status"
+            description="Patient status attribute"
+            format="java.lang.String"
+            searchable="false"
+            creator="1"
+            date_created="2008-08-15 16:53:36.0"
+            retired="false"
+            uuid="a0f5521c-dbbd-4c10-81b2-1b7ab18330ez"
+            sort_weight="2"/>
+
+
+    <!-- Caregiver #1 -->
+    <person
+            person_id="100"
+            gender="M"
+            dead="false"
+            creator="1"
+            date_created="2019-11-16 15:57:09.0"
+            voided="false"/>
+
+    <person_name
+            person_name_id="100"
+            preferred="true"
+            person_id="100"
+            given_name="John"
+            middle_name="First"
+            family_name="Caregiver"
+            creator="1"
+            date_created="2019-11-16 15:57:09.0"
+            voided="false"/>
+
+    <!-- Caregiver #1 old phone number-->
+    <person_attribute
+            person_attribute_id="100"
+            person_id="100"
+            value="48222444555"
+            person_attribute_type_id="201"
+            creator="1"
+            date_created="2008-08-15 15:46:47.0"
+            voided="true"
+            uuid="0768f3da-b692-44b7-a33f-abf2c450474a"/>
+
+    <!-- Caregiver #1 current phone number-->
+    <person_attribute
+            person_attribute_id="101"
+            person_id="100"
+            value="48222444666"
+            person_attribute_type_id="201"
+            creator="1"
+            date_created="2008-08-15 15:47:47.0"
+            voided="false"
+            uuid="0768f3da-b692-44b7-a33f-abf2c450474b"/>
+
+    <!-- Caregiver #2-->
+    <person
+            person_id="101"
+            gender="M"
+            dead="false"
+            creator="1"
+            date_created="2019-11-16 15:57:09.0"
+            voided="false"/>
+
+    <person_name
+            person_name_id="101"
+            preferred="true"
+            person_id="101"
+            given_name="John"
+            middle_name="Second"
+            family_name="Caregiver"
+            creator="1"
+            date_created="2019-11-16 15:57:09.0"
+            voided="false"/>
+
+    <!-- Caregiver #2 phone number-->
+    <person_attribute
+            person_attribute_id="102"
+            person_id="101"
+            value="48222444666"
+            person_attribute_type_id="201"
+            creator="1"
+            date_created="2008-08-15 15:46:47.0"
+            voided="false"
+            uuid="0768f5sa-b692-44b7-a33f-abf2c450474b"/>
+
+    <!-- Caregiver #3-->
+    <person
+            person_id="102"
+            gender="M"
+            dead="false"
+            creator="1"
+            date_created="2019-11-16 15:57:09.0"
+            voided="false"/>
+
+    <person_name
+            person_name_id="102"
+            preferred="true"
+            person_id="102"
+            given_name="John"
+            middle_name="Third"
+            family_name="Caregiver"
+            creator="1"
+            date_created="2019-11-16 15:57:09.0"
+            voided="false"/>
+
+    <!-- Caregiver #3 phone number-->
+    <person_attribute
+            person_attribute_id="103"
+            person_id="102"
+            value="48222444555"
+            person_attribute_type_id="201"
+            creator="1"
+            date_created="2008-08-15 15:46:47.0"
+            voided="false"
+            uuid="0768f3da-b692-44b7-a33f-abf2c450474z"/>
+
+    <!-- Patient #1 -->
+    <person
+            person_id="103"
+            gender="M"
+            dead="false"
+            creator="1"
+            date_created="2019-11-16 15:57:09.0"
+            voided="false"/>
+
+    <person_name
+            person_name_id="103"
+            preferred="true"
+            person_id="103"
+            given_name="George"
+            middle_name="Active"
+            family_name="Patient"
+            creator="1"
+            date_created="2019-11-16 15:57:09.0"
+            voided="false"/>
+
+    <patient
+            patient_id="103"
+            creator="1"
+            date_created="2019-11-16 15:57:09.0"
+            voided="false"/>
+
+    <patient_identifier
+            patient_identifier_id="101"
+            patient_id="103"
+            identifier="ABC123ABC123"
+            identifier_type="100"
+            preferred="1"
+            location_id="1"
+            creator="1"
+            date_created="2019-11-16 15:57:09.0"
+            voided="false"/>
+
+    <!-- Patient #1 phone number-->
+    <person_attribute
+            person_attribute_id="104"
+            person_id="103"
+            value="48222444111"
+            person_attribute_type_id="201"
+            creator="1"
+            date_created="2008-08-15 15:46:47.0"
+            voided="false"
+            uuid="0768f3da-b692-44b7-a33f-abf2c450471a"/>
+
+    <!-- Patient #1 status-->
+    <person_attribute
+            person_attribute_id="105"
+            person_id="103"
+            value="ACTIVE"
+            person_attribute_type_id="202"
+            creator="1"
+            date_created="2008-08-15 15:46:47.0"
+            voided="false"
+            uuid="0768f3da-b692-44b7-a33f-abf2c450472b"/>
+
+    <!-- Patient #2 -->
+    <person
+            person_id="104"
+            gender="M"
+            dead="false"
+            creator="1"
+            date_created="2019-11-16 15:57:09.0"
+            voided="false"/>
+
+    <person_name
+            person_name_id="104"
+            preferred="true"
+            person_id="104"
+            given_name="George"
+            middle_name="NO_CONSENT"
+            family_name="Patient"
+            creator="1"
+            date_created="2019-11-16 15:57:09.0"
+            voided="false"/>
+
+    <patient
+            patient_id="104"
+            creator="1"
+            date_created="2019-11-16 15:57:09.0"
+            voided="false"/>
+
+    <patient_identifier
+            patient_identifier_id="102"
+            patient_id="104"
+            identifier="ABC123ABC22"
+            identifier_type="100"
+            preferred="1"
+            location_id="1"
+            creator="1"
+            date_created="2019-11-16 15:57:09.0"
+            voided="false"/>
+
+    <!-- Patient #2 phone number-->
+    <person_attribute
+            person_attribute_id="106"
+            person_id="104"
+            value="48222444666"
+            person_attribute_type_id="201"
+            creator="1"
+            date_created="2008-08-15 15:46:47.0"
+            voided="false"
+            uuid="0768f3da-b692-44b7-a33f-abf2c450479a"/>
+
+    <!-- Patient #2 status-->
+    <person_attribute
+            person_attribute_id="107"
+            person_id="104"
+            value="NO_CONSENT"
+            person_attribute_type_id="202"
+            creator="1"
+            date_created="2008-08-15 15:46:47.0"
+            voided="false"
+            uuid="0768f3da-b692-44b7-a33f-abf2c450479b"/>
+
+    <!-- Patient #3 -->
+    <person
+            person_id="105"
+            gender="M"
+            dead="true"
+            creator="1"
+            date_created="2019-11-16 15:57:09.0"
+            voided="false"/>
+
+    <person_name
+            person_name_id="105"
+            preferred="true"
+            person_id="105"
+            given_name="George"
+            middle_name="Dead"
+            family_name="Patient"
+            creator="1"
+            date_created="2019-11-16 15:57:09.0"
+            voided="false"/>
+
+    <patient
+            patient_id="105"
+            creator="1"
+            date_created="2019-11-16 15:57:09.0"
+            voided="false"/>
+
+    <patient_identifier
+            patient_identifier_id="103"
+            patient_id="105"
+            identifier="ABC123ABC666"
+            identifier_type="100"
+            preferred="1"
+            location_id="1"
+            creator="1"
+            date_created="2019-11-16 15:57:09.0"
+            voided="false"/>
+
+    <!-- Patient #3 phone number-->
+    <person_attribute
+            person_attribute_id="108"
+            person_id="105"
+            value="48222444555"
+            person_attribute_type_id="201"
+            creator="1"
+            date_created="2008-08-15 15:46:47.0"
+            voided="false"
+            uuid="0768f3da-b692-44b7-a33f-abf2c450478w"/>
+
+    <!-- Patient #3 current status-->
+    <person_attribute
+            person_attribute_id="109"
+            person_id="105"
+            value="DEACTIVATE"
+            person_attribute_type_id="202"
+            creator="1"
+            date_created="2008-08-15 15:46:47.0"
+            voided="false"
+            uuid="0768f3da-b692-44b7-a33f-abf2c450478h"/>
+
+    <!-- Patient #3 old status-->
+    <person_attribute
+            person_attribute_id="110"
+            person_id="105"
+            value="ACTIVATE"
+            person_attribute_type_id="202"
+            creator="1"
+            date_created="2008-08-15 15:46:47.0"
+            voided="true"
+            uuid="0768f3da-b692-44b7-a33f-abf2c450478p"/>
+
+    <!-- Caregiver #1 -> Patient #1-->
+    <relationship
+            relationship_id="100"
+            person_a="100"
+            relationship="100"
+            person_b="103"
+            creator="1"
+            date_created="2019-11-20 00:00:00.0"
+            voided="false"/>
+
+    <!-- Caregiver #2 -> Patient #2-->
+    <relationship
+            relationship_id="101"
+            person_a="101"
+            relationship="100"
+            person_b="104"
+            creator="1"
+            date_created="2019-11-20 00:00:00.0"
+            voided="false"/>
+
+    <!-- Caregiver #3 -> Patient #3-->
+    <relationship
+            relationship_id="102"
+            person_a="102"
+            relationship="100"
+            person_b="105"
+            creator="1"
+            date_created="2019-11-20 00:00:00.0"
+            voided="false"/>
+</dataset>
