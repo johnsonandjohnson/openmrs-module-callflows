@@ -23,10 +23,19 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Abstract CallFlow Event Listener
+ */
 public abstract class AbstractCallFlowEventListener implements EventListener {
 
     private DaemonToken daemonToken;
 
+    /**
+     * Runs the event
+     *
+     * @param message to get from properties
+     * @throws CallFlowRuntimeException while handling the flow event.
+     */
     @Override
     public void onMessage(Message message) {
         try {
@@ -42,14 +51,36 @@ public abstract class AbstractCallFlowEventListener implements EventListener {
         }
     }
 
+    /**
+     * Get the Subject
+     *
+     * @return Returns a string
+     */
     public abstract String getSubject();
 
+    /**
+     * Set the Daemon token
+     *
+     * @param daemonToken Daemon token
+     */
     public void setDaemonToken(DaemonToken daemonToken) {
         this.daemonToken = daemonToken;
     }
 
+    /**
+     * Handle the event
+     *
+     * @param properties Map of properties
+     */
     protected abstract void handleEvent(Map<String, Object> properties);
 
+    /**
+     * Get the component
+     *
+     * @param beanName of type String
+     * @param type
+     * @return Return of type <T>
+     */
     protected <T> T getComponent(String beanName, Class<T> type) {
         return Context.getRegisteredComponent(beanName, type);
     }

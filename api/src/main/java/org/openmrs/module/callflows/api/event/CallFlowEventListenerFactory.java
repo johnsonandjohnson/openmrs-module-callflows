@@ -17,10 +17,16 @@ import org.openmrs.event.Event;
 
 import java.util.List;
 
+/**
+ * CallFlow Event Listener Factory
+ */
 public final class CallFlowEventListenerFactory {
 
     private static final Log LOGGER = LogFactory.getLog(CallFlowEventListenerFactory.class);
 
+    /**
+     * Register the event listeners
+     */
     public static void registerEventListeners() {
         List<AbstractCallFlowEventListener> eventComponents = Context.getRegisteredComponents(AbstractCallFlowEventListener.class);
         for (AbstractCallFlowEventListener eventListener : eventComponents) {
@@ -28,6 +34,9 @@ public final class CallFlowEventListenerFactory {
         }
     }
 
+    /**
+     * Unregister the event listeners
+     */
     public static void unRegisterEventListeners() {
         List<AbstractCallFlowEventListener> eventComponents = Context.getRegisteredComponents(AbstractCallFlowEventListener.class);
         for (AbstractCallFlowEventListener eventListener : eventComponents) {

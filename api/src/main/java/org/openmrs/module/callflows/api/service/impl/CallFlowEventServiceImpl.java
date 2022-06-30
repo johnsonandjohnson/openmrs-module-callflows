@@ -19,13 +19,26 @@ import org.openmrs.module.callflows.api.service.CallFlowEventService;
 import java.io.Serializable;
 import java.util.Map;
 
+/**
+ * Service to manage CallFlow Events.
+ */
 public class CallFlowEventServiceImpl extends BaseOpenmrsService implements CallFlowEventService {
 
+    /**
+     * Implementation to send the Event Message
+     *
+     * @param event CallFlow Event
+     */
     @Override
     public void sendEventMessage(CallFlowEvent event) {
         Event.fireEvent(event.getSubject(), convertParamsToEventMessage(event.getParameters()));
     }
-
+    /**
+     * Coverts the Params to Event Message
+     *
+     * @param params Map of params with String and Object as key and value respectively
+     * @return Event Message
+     */
     private EventMessage convertParamsToEventMessage(Map<String, Object> params) {
         EventMessage eventMessage = new EventMessage();
 

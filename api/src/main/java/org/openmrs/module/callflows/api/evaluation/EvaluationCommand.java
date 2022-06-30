@@ -15,11 +15,31 @@ import org.openmrs.module.DaemonToken;
 
 import java.io.IOException;
 
+/**
+ * Evaluation Command
+ */
 public interface EvaluationCommand extends OpenmrsService {
 
+    /**
+     * Sets the Daemon token
+     *
+     * @param daemonToken Daemon Token
+     */
     void setDaemonToken(DaemonToken daemonToken);
 
+    /**
+     * Gets the Daemon token
+     *
+     * @return returns the Daemon token
+     */
     DaemonToken getDaemonToken();
 
+    /**
+     * Executes the Evaluation
+     *
+     * @param context Evaluation context
+     * @throws IOException
+     * @return Returns string
+     */
     String execute(EvaluationContext context) throws IOException;
 }

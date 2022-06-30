@@ -16,8 +16,21 @@ import org.openmrs.module.ModuleFactory;
 
 import java.io.IOException;
 
+/**
+ * Evaluate Node Daemon
+ */
 public class EvalNodeDaemon extends Daemon {
 
+    /**
+     * Evaluate the Node
+     *
+     * @param command Evaluation command
+     * @param context Evaluation context
+     * @throws IOException
+     * @throws ContextAuthenticationException when token is invalid
+     * @return a string result
+     *
+     */
     public static String evalNode(EvaluationCommand command, EvaluationContext context) throws IOException {
         if (!ModuleFactory.isTokenValid(command.getDaemonToken())) {
             throw new ContextAuthenticationException("Invalid token " + command.getDaemonToken());

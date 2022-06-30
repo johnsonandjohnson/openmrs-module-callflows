@@ -11,16 +11,37 @@
 package org.openmrs.module.callflows.api.service;
 
 import org.openmrs.api.OpenmrsService;
+import org.openmrs.module.callflows.api.exception.CallFlowRuntimeException;
 import org.springframework.core.io.ByteArrayResource;
 
 import java.io.InputStream;
 
+/**
+ * Service to manage settings and configurations.
+ */
 public interface SettingsManagerService extends OpenmrsService {
 
+    /**
+     * Saves the raw configurations.
+     *
+     * @param configFileName Configuration file name
+     * @param resource Byte Array resource
+     */
     void saveRawConfig(String configFileName, ByteArrayResource resource);
 
+    /**
+     * Gets the Raw configuration.
+     *
+     * @param configFileName Configuration file name
+     * @throws CallFlowRuntimeException if there is an error loading a file
+     */
     InputStream getRawConfig(String configFileName);
 
+    /**
+     * Checks if Configuration exist.
+     *
+     * @param configurationFileName Configuration file name
+     */
     boolean configurationExist(String configurationFileName);
 
 }
