@@ -20,6 +20,9 @@ import org.openmrs.module.callflows.api.util.CallFlowTaskUtil;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * CallFlow Event
+ */
 public class CallFlowEvent {
 
     private static final String CUSTOM_PARAMS_DELIMITER = ",";
@@ -48,14 +51,29 @@ public class CallFlowEvent {
         this.parameters = parameters;
     }
 
+    /**
+     * Get the Job Id
+     *
+     * @return Return the string
+     */
     public String getJobId() {
         return (String) getParameters().get(Constants.PARAM_JOB_ID);
     }
 
+    /**
+     * Generate the task name
+     *
+     * @return the task name
+     */
     public String generateTaskName() {
         return CallFlowTaskUtil.generateTaskName(getSubject(), getJobId());
     }
 
+    /**
+     * convert the properties
+     *
+     * @return is a map result
+     */
     public Map<String, String> convertProperties() {
         Map<String, String> result = new HashMap<>();
 
@@ -72,6 +90,12 @@ public class CallFlowEvent {
         return result;
     }
 
+    /**
+     * convert the properties with a map of properties
+     *
+     * @param properties is a map
+     * @return is a map result
+     */
     public static Map<String, Object> convertProperties(Map<String, String> properties) {
         Map<String, Object> result = new HashMap<>();
         for (String key : properties.keySet()) {

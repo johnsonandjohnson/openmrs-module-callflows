@@ -35,6 +35,12 @@ public class CallFlowServiceImpl extends BaseOpenmrsService implements CallFlowS
 
     private static final String USER_DAO_BEAN_NAME = "userDAO";
 
+    /**
+     * Creates the CallFlow
+     *
+     * @param callflow CallFlow
+     * @return Return CallFlow
+     */
     @Override
     @Transactional
     public CallFlow create(CallFlow callflow) {
@@ -46,12 +52,24 @@ public class CallFlowServiceImpl extends BaseOpenmrsService implements CallFlowS
         return callFlowDao.create(callflow);
     }
 
+    /**
+     * Saves the CallFlow
+     *
+     * @param callFlow CallFlow
+     * @return Return CallFlow
+     */
     @Override
     @Transactional
     public CallFlow saveCallFlow(CallFlow callFlow) {
         return create(callFlow);
     }
 
+    /**
+     * Updates the CallFlow
+     *
+     * @param callflow CallFlow
+     * @return Return CallFlow
+     */
     @Override
     @Transactional
     public CallFlow update(CallFlow callflow) {
@@ -77,12 +95,24 @@ public class CallFlowServiceImpl extends BaseOpenmrsService implements CallFlowS
         return callFlowDao.update(existingFlow);
     }
 
+    /**
+     * Finds all CallFlow names by prefix string.
+     *
+     * @param prefix String Prefix
+     * @return Return list of CallFlows
+     */
     @Override
     @Transactional
     public List<CallFlow> findAllByNamePrefix(String prefix) {
         return callFlowDao.findAllByName(prefix);
     }
 
+    /**
+     * Finds the CallFlow by name string
+     *
+     * @param name String name
+     * @return Return CallFlow
+     */
     @Override
     public CallFlow findByName(String name) {
         CallFlow callflow = callFlowDao.findByName(name);
@@ -93,6 +123,11 @@ public class CallFlowServiceImpl extends BaseOpenmrsService implements CallFlowS
         }
     }
 
+    /**
+     * Deletes the CallFlow
+     *
+     * @param id CallFlow Id
+     */
     @Override
     public void delete(Integer id) {
         CallFlow callflow = callFlowDao.findById(id);
@@ -103,10 +138,20 @@ public class CallFlowServiceImpl extends BaseOpenmrsService implements CallFlowS
         }
     }
 
+    /**
+     * Sets the CallFlow Dao
+     *
+     * @param callFlowDao CallFlowDao
+     */
     public void setCallFlowDao(CallFlowDao callFlowDao) {
         this.callFlowDao = callFlowDao;
     }
 
+    /**
+     * Sets the Validation component
+     *
+     * @param validationComponent Validation Component
+     */
     public void setValidationComponent(ValidationComponent validationComponent) {
         this.validationComponent = validationComponent;
     }

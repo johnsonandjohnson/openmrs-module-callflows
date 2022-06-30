@@ -27,11 +27,21 @@ public class CallFlowInitiateCallEventListener extends AbstractCallFlowEventList
 
     private static final Log LOGGER = LogFactory.getLog(CallFlowInitiateCallEventListener.class);
 
+    /**
+     * Get the Subject
+     *
+     * @return is a subject string
+     */
     @Override
     public String getSubject() {
         return CallFlowEventSubjectConstants.CALLFLOWS_INITIATE_CALL;
     }
 
+    /**
+     * Handle the event
+     *
+     * @param properties is a map
+     */
     @Override
     protected void handleEvent(Map<String, Object> properties) {
         LOGGER.info(String.format("Handling outbound call event %s: %s", getSubject(), properties.toString()));

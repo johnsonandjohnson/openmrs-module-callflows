@@ -16,7 +16,8 @@ import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -78,7 +79,7 @@ import static org.mockito.Mockito.verifyZeroInteractions;
  * @author bramak09
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({CallServiceImpl.class, DateUtil.class, UUID.class, DefaultHttpClient.class})
+@PrepareForTest({CallServiceImpl.class, DateUtil.class, UUID.class, CloseableHttpClient.class})
 public class CallServiceTest extends BaseTest {
 
     private static final String PHONE_NUMBER = "1234567890";
@@ -122,7 +123,7 @@ public class CallServiceTest extends BaseTest {
     private static final String DATE_FORMAT = "MM/dd/yyyy";
 
     @Mock
-    private DefaultHttpClient client;
+    private CloseableHttpClient client;
 
     @Mock
     private CloseableHttpResponse okResponse;
@@ -148,7 +149,7 @@ public class CallServiceTest extends BaseTest {
     public void setUp() throws Exception {
         PowerMockito.mockStatic(DateUtil.class);
         PowerMockito.mockStatic(UUID.class);
-        PowerMockito.mockStatic(DefaultHttpClient.class);
+        PowerMockito.mockStatic(CloseableHttpClient.class);
 
         params = CallHelper.createParams();
         errorParams = new HashMap<>();
@@ -173,7 +174,7 @@ public class CallServiceTest extends BaseTest {
         Date date = DateUtil.parse(Constants.DATE_CURRENT, DATE_FORMAT);
         given(DateUtil.now()).willReturn(date);
 
-        PowerMockito.whenNew(DefaultHttpClient.class).withNoArguments().thenReturn(client);
+        PowerMockito.whenNew(CloseableHttpClient.class).withNoArguments().thenReturn(client);
 
         HttpEntity okEntity = mock(HttpEntity.class);
         given(okEntity.getContent()).willReturn(IOUtils.toInputStream("OK"));
