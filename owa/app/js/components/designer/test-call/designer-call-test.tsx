@@ -30,7 +30,7 @@ import * as Default from '../../../shared/utils/messages';
 import { getIntl } from "@openmrs/react-components/lib/components/localization/withLocalization";
 import { validateForm, validateField } from '../../../shared/utils/validation-util'
 import { IFlowCallError, validationSchema } from '../../../shared/model/flow-test.model';
-import ErrorDesc from '@bit/soldevelo-omrs.cfl-components.error-description';
+import ErrorDesc from '../../../components/error-description/error-desc';
 import { CONFIG_EXTENSIONS } from '../../../constants';
 import { handleCarret } from '../../../shared/utils/form-handling-util';
 import OpenMRSModal from '../../OpenMRSModal';
