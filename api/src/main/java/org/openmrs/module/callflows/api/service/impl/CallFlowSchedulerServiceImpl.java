@@ -39,10 +39,11 @@ public class CallFlowSchedulerServiceImpl extends BaseOpenmrsService implements 
      */
     @Override
     public void scheduleRunOnceJob(CallFlowEvent event, Date startTime, AbstractTask task) {
-        String taskName = event.generateTaskName();
+        String taskName = event.generateTaskName(startTime);
 
         TaskDefinition taskDefinition = new TaskDefinition();
         taskDefinition.setName(taskName);
+        taskDefinition.setDescription(event.generateTaskDescription());
         taskDefinition.setTaskClass(task.getClass().getName());
         taskDefinition.setStartTime(startTime);
         taskDefinition.setStartOnStartup(true);

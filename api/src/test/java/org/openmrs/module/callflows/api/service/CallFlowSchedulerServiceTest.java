@@ -1,6 +1,7 @@
 package org.openmrs.module.callflows.api.service;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -26,6 +27,11 @@ public class CallFlowSchedulerServiceTest extends BaseContextMockTest {
   @Mock
   private SchedulerService schedulerService;
 
+  @Before
+  public void initOpenMRSContextWithMocks() {
+    contextMockHelper.setService(SchedulerService.class, schedulerService);
+  }
+
   @Test
   public void scheduleRunOnceJob_shouldScheduleJob() throws SchedulerException {
     final Map<String, Object> eventParameters = new HashMap<>();
@@ -43,10 +49,9 @@ public class CallFlowSchedulerServiceTest extends BaseContextMockTest {
     Mockito.verify(schedulerService, Mockito.times(1)).scheduleTask(taskDefinitionCaptor.capture());
     final TaskDefinition capturedTaskDefinition = taskDefinitionCaptor.getValue();
 
-    Assert.assertEquals(event.generateTaskName(), capturedTaskDefinition.getName());
+    Assert.assertEquals(event.generateTaskName(JOB_START_DATETIME), capturedTaskDefinition.getName());
     Assert.assertEquals(CallFlowScheduledTask.class.getName(), capturedTaskDefinition.getTaskClass());
     Assert.assertEquals(JOB_START_DATETIME, capturedTaskDefinition.getStartTime());
-    // TODO: verify if this is correct requirement
-    Assert.assertEquals(false, capturedTaskDefinition.getStartOnStartup());
+    Assert.assertEquals(true, capturedTaskDefinition.getStartOnStartup());
   }
 }
