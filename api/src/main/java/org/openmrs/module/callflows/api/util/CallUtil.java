@@ -395,7 +395,7 @@ public class CallUtil {
                 } else {
                     // retry after some time
                     params.put(Constants.PARAM_RETRY_ATTEMPTS, retryAttempts + 1);
-                    scheduleOutboundCall(call.getCallId(), config, params);
+                    scheduleOutboundCall(call, config, params);
                     // Exception is thrown at this point in time to avoid placing of call directly and
                     // to place the call only at the recall time set for call queuing
                     throw new OperationNotSupportedException("Outbound call limit is exceeded");
@@ -702,16 +702,17 @@ public class CallUtil {
         }
     }
 
-    private void scheduleOutboundCall(String callId, Config config, Map<String, Object> params) {
+    private void scheduleOutboundCall(Call call, Config config, Map<String, Object> params) {
         Map<String, Object> eventParams = new HashMap<>();
         // set the flow name to be invoked
-        eventParams.put(Constants.PARAM_FLOW_NAME, (String) params.get(Constants.PARAM_FLOW_NAME));
+        eventParams.put(Constants.PARAM_FLOW_NAME, params.getOrDefault(Constants.PARAM_FLOW_NAME,
+            call.getStartFlow().getName()));
         // set the config name to place the call
         eventParams.put(Constants.PARAM_CONFIG, config.getName());
         //set the params
         eventParams.put(Constants.PARAM_PARAMS, params);
         eventParams.put(Constants.PARAM_HEADERS, config.getOutgoingCallPostHeadersMap());
-        eventParams.put(Constants.PARAM_JOB_ID, callId);
+        eventParams.put(Constants.PARAM_JOB_ID, call.getCallId());
         CallFlowEvent event = new CallFlowEvent(CallFlowEventSubjectConstants.CALLFLOWS_INITIATE_CALL, eventParams);
         schedulerService.scheduleRunOnceJob(event,
                 DateUtil.plusSeconds(DateUtil.now(), config.getOutboundCallRetrySeconds()), new CallFlowScheduledTask());
