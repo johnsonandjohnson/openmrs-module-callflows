@@ -13,7 +13,15 @@ package org.openmrs.module.callflows.api.service;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.callflows.api.event.CallFlowEvent;
 
+/**
+ * Service to send Event Message
+ */
 public interface CallFlowEventService extends OpenmrsService {
 
+    /**
+     * Send the Event message
+     *
+     * @param event CallFlow Even
+     */
     void sendEventMessage(CallFlowEvent event);
 }

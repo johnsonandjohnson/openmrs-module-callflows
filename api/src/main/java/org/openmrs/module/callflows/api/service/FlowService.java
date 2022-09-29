@@ -58,6 +58,13 @@ public interface FlowService extends OpenmrsService {
      */
     Flow load(String name);
 
+    /**
+     * Loads a flow by a given JSON
+     *
+     * @param json to search
+     * @return the flow
+     * @throws IllegalArgumentException if the flow could not be loaded
+     */
     Flow loadByJson(String json);
 
     /**

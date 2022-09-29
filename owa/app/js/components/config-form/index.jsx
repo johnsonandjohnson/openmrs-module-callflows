@@ -24,7 +24,7 @@ import ConfigUI from './config-ui';
 import * as Default from '../../shared/utils/messages';
 import { getIntl } from "@openmrs/react-components/lib/components/localization/withLocalization";
 import MapFields from '../MapFields';
-import ErrorDesc from '@bit/soldevelo-omrs.cfl-components.error-description';
+import ErrorDesc from '../error-description/error-desc';
 import { validateField } from '../../shared/utils/validation-util';
 import DOMPurify from 'dompurify';
 

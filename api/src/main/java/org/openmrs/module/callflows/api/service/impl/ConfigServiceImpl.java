@@ -51,11 +51,22 @@ public class ConfigServiceImpl extends BaseOpenmrsService implements ConfigServi
 
     private Map<String, Renderer> renderers = new LinkedHashMap<>();
 
+    /**
+     * Initializes and loads the Settings.
+     *
+     */
     @PostConstruct
     public void initialize() {
         loadSettings();
     }
 
+    /**
+     * Get a configuration for a specific name
+     *
+     * @param name identifying a configuration uniquely
+     * @return the configuration if found
+     * @throws IllegalArgumentException if configuration could not be found
+     */
     @Override
     public Config getConfig(String name) {
         if (configs.containsKey(name)) {
@@ -65,27 +76,56 @@ public class ConfigServiceImpl extends BaseOpenmrsService implements ConfigServi
         throw new IllegalArgumentException(message);
     }
 
+    /**
+     * Get all configurations present in the system
+     *
+     * @return a list of configurations
+     */
     @Override
     public List<Config> allConfigs() {
         return new ArrayList<Config>(configs.values());
     }
 
+    /**
+     * Checks if configuration for a given name exists
+     *
+     * @param name to check
+     * @return true or false indicating whether the configuration exists or not
+     */
     @Override
     public boolean hasConfig(String name) {
         return configs.containsKey(name);
     }
 
+    /**
+     * Updates a list of configurations
+     *
+     * @param configs a list of configurations
+     */
     @Override
     public void updateConfigs(List<Config> configs) {
         settings.setConfigs(configs);
         updateSettings(settings);
     }
 
+    /**
+     * Checks if renderer for a given name exists
+     *
+     * @param name to check
+     * @return true or false indicating whether the renderer exists or not
+     */
     @Override
     public boolean hasRenderer(String name) {
         return renderers.containsKey(name);
     }
 
+    /**
+     * Get a specific renderer
+     *
+     * @param name of the renderer to retrieve
+     * @return the renderer object if available
+     * @throws IllegalArgumentException if the renderer is not available
+     */
     @Override
     public Renderer getRenderer(String name) {
         if (renderers.containsKey(name)) {
@@ -95,11 +135,21 @@ public class ConfigServiceImpl extends BaseOpenmrsService implements ConfigServi
         throw new IllegalArgumentException(message);
     }
 
+    /**
+     * Get all renderers in the system
+     *
+     * @return a list of renderers
+     */
     @Override
     public List<Renderer> allRenderers() {
         return new ArrayList<Renderer>(renderers.values());
     }
 
+    /**
+     * Updates a list of renderers
+     *
+     * @param renderers a list of renderers
+     */
     @Override
     public void updateRenderers(List<Renderer> renderers) {
         settings.setRenderers(renderers);
@@ -162,6 +212,11 @@ public class ConfigServiceImpl extends BaseOpenmrsService implements ConfigServi
         }
     }
 
+    /**
+     * Sets the SettingsManagerService
+     *
+     * @param settingsManagerService to set
+     */
     public void setSettingsManagerService(SettingsManagerService settingsManagerService) {
         this.settingsManagerService = settingsManagerService;
     }

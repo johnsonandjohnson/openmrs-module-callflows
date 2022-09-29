@@ -18,8 +18,14 @@ import org.openmrs.scheduler.tasks.AbstractTask;
 
 import java.util.Map;
 
+/**
+ * CallFlow Scheduled Task
+ */
 public class CallFlowScheduledTask extends AbstractTask {
 
+    /**
+     * Method to Execute the task.
+     */
     @Override
     public void execute() {
         Map<String, Object> properties = CallFlowEvent.convertProperties(getTaskDefinition().getProperties());

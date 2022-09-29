@@ -23,16 +23,27 @@ import org.openmrs.scheduler.tasks.AbstractTask;
 
 import java.util.Date;
 
+/**
+ * Service Schedule the CallFlow
+ */
 public class CallFlowSchedulerServiceImpl extends BaseOpenmrsService implements CallFlowSchedulerService {
 
     private static final Log LOGGER = LogFactory.getLog(CallFlowSchedulerServiceImpl.class);
 
+    /**
+     * Schedule the Job to run
+     *
+     * @param event CallFlow Event
+     * @param startTime Start time of Job
+     * @param task Task to be done
+     */
     @Override
     public void scheduleRunOnceJob(CallFlowEvent event, Date startTime, AbstractTask task) {
-        String taskName = event.generateTaskName();
+        String taskName = event.generateTaskName(startTime);
 
         TaskDefinition taskDefinition = new TaskDefinition();
         taskDefinition.setName(taskName);
+        taskDefinition.setDescription(event.generateTaskDescription());
         taskDefinition.setTaskClass(task.getClass().getName());
         taskDefinition.setStartTime(startTime);
         taskDefinition.setStartOnStartup(true);
