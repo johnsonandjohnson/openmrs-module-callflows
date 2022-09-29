@@ -16,6 +16,9 @@ import org.apache.velocity.VelocityContext;
 import org.openmrs.module.callflows.api.domain.flow.Flow;
 import org.openmrs.module.callflows.api.domain.flow.Node;
 
+/**
+ * Evaluation context
+ */
 public class EvaluationContext {
 
     private Flow flow;
@@ -26,9 +29,20 @@ public class EvaluationContext {
 
     private String template;
 
+    /**
+     * Empty Constructor for Evaluation context
+     */
     public EvaluationContext() {
     }
 
+    /**
+     * Constructors setting the initial values on load
+     *
+     * @param flow flow set
+     * @param node node set
+     * @param context context set
+     * @param template template is set
+     */
     public EvaluationContext(Flow flow, Node node, VelocityContext context, String template) {
         this.flow = flow;
         this.node = node;
@@ -36,42 +50,88 @@ public class EvaluationContext {
         this.template = template;
     }
 
+    /**
+     * Get the Flow
+     *
+     * @return Flow is returned
+     */
     public Flow getFlow() {
         return flow;
     }
 
+    /**
+     * Set the flow
+     *
+     * @param flow is set
+     */
     public EvaluationContext setFlow(Flow flow) {
         this.flow = flow;
         return this;
     }
 
+    /**
+     * Get the Node
+     *
+     * @return Node is returned
+     */
     public Node getNode() {
         return node;
     }
 
+    /**
+     * Set the Node
+     *
+     * @param node is set
+     */
     public EvaluationContext setNode(Node node) {
         this.node = node;
         return this;
     }
 
+    /**
+     * Get the context
+     *
+     * @return Velocity context is returned
+     */
     public VelocityContext getContext() {
         return context;
     }
 
+    /**
+     * Set the Context
+     *
+     * @param context Velocity context is set
+     */
     public EvaluationContext setContext(VelocityContext context) {
         this.context = context;
         return this;
     }
 
+    /**
+     * Get the template
+     *
+     * @return Template string is returned
+     */
     public String getTemplate() {
         return template;
     }
 
+    /**
+     * Set the template
+     *
+     * @param template is set
+     */
     public EvaluationContext setTemplate(String template) {
         this.template = template;
         return this;
     }
 
+    /**
+     * Checks for Equality
+     *
+     * @param o check the object against this
+     * @return returns boolean result
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -85,6 +145,11 @@ public class EvaluationContext {
         return EqualsBuilder.reflectionEquals(this, o);
     }
 
+    /**
+     * Gets the HashCode
+     *
+     * @return return the HashCode
+     */
     @Override
     public int hashCode() {
         return HashCodeBuilder.reflectionHashCode(this);

@@ -16,7 +16,17 @@ import org.openmrs.scheduler.tasks.AbstractTask;
 
 import java.util.Date;
 
+/**
+ * Service to Schedule Call Flow
+ */
 public interface CallFlowSchedulerService extends OpenmrsService {
 
+    /**
+     * Schedules the Job to run
+     *
+     * @param event CallFLow Event
+     * @param  startTime Start Time of the Job to run
+     * @param task Task to be done
+     */
     void scheduleRunOnceJob(CallFlowEvent event, Date startTime, AbstractTask task);
 }

@@ -70,6 +70,13 @@ public class CallFlowValidator implements ConstraintValidator<ValidCallFlow, Cal
         // shouldn't any specific action be performed
     }
 
+    /**
+     * Validates if the name is Valid or not.
+     *
+     * @param callflow object which wraps configs to validate
+     * @param ctx      validation context
+     * @return the validation result
+     */
     private boolean isNameValid(CallFlow callflow, ConstraintValidatorContext ctx) {
         boolean isValid = true;
         if (StringUtils.isEmpty(callflow.getName()) || !ALPHA_NUMERIC.matcher(callflow.getName()).matches()) {
@@ -88,6 +95,13 @@ public class CallFlowValidator implements ConstraintValidator<ValidCallFlow, Cal
         return isValid;
     }
 
+    /**
+     * Validates if the raw name is Valid or not.
+     *
+     * @param callflow object which wraps configs to validate
+     * @param ctx      validation context
+     * @return the validation result
+     */
     private boolean isRawFlowValid(CallFlow callflow, ConstraintValidatorContext ctx) {
         boolean isValid = true;
         Flow flow;

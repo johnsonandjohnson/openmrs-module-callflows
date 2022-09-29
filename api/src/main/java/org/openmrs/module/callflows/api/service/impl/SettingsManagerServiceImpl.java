@@ -24,8 +24,17 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * Implementation for SettingsManagerService
+ */
 public class SettingsManagerServiceImpl extends BaseOpenmrsService implements SettingsManagerService {
 
+    /**
+     * Saves the raw configurations.
+     *
+     * @param configFileName Configuration file name
+     * @param resource Byte Array resource
+     */
     @Override
     public void saveRawConfig(String configFileName, ByteArrayResource resource) {
         File destinationFile = getDestinationFile(configFileName);
@@ -36,6 +45,12 @@ public class SettingsManagerServiceImpl extends BaseOpenmrsService implements Se
         }
     }
 
+    /**
+     * Gets the Raw configuration.
+     *
+     * @param configFileName Configuration file name
+     * @throws CallFlowRuntimeException if there is an error loading a file
+     */
     @Override
     public InputStream getRawConfig(String configFileName) {
         InputStream is = null;
@@ -50,6 +65,11 @@ public class SettingsManagerServiceImpl extends BaseOpenmrsService implements Se
         return is;
     }
 
+    /**
+     * Checks if Configuration exist.
+     *
+     * @param configurationFileName Configuration file name
+     */
     @Override
     public boolean configurationExist(String configurationFileName) {
         return getDestinationFile(configurationFileName).exists();

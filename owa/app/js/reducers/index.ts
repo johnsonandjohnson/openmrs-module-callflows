@@ -14,9 +14,9 @@ import designerReducer, { DesignerState } from './designer.reducer';
 import providersReducer, { ProvidersState } from './providers.reducer';
 import renderersReducer, { RenderersState } from './renderersReducer';
 import privateRouteReducer, { PrivateRouteState }
-  from '@bit/soldevelo-omrs.cfl-components.private-route/private-route.reducer';
+  from '../components/private-route/private-route.reducer';
 import customizeReducer, { CustomizeState } 
-  from '@bit/soldevelo-cfl.omrs-components.customize/customize.reducer';
+  from '../components/customize/customize.reducer';
 
 export interface IRootState {
   readonly designerReducer: DesignerState;

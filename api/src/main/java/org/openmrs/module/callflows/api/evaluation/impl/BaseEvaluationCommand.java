@@ -35,6 +35,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Base Evaluation Command
+ */
 public class BaseEvaluationCommand extends BaseOpenmrsService implements EvaluationCommand {
 
     private static final String JSON = "json";
@@ -67,16 +70,33 @@ public class BaseEvaluationCommand extends BaseOpenmrsService implements Evaluat
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
+    /**
+     * Sets the Daemon token
+     *
+     * @param daemonToken Daemon Token
+     */
     @Override
     public void setDaemonToken(DaemonToken daemonToken) {
         this.daemonToken = daemonToken;
     }
 
+    /**
+     * Gets the Daemon token
+     *
+     * @return returns the Daemon token
+     */
     @Override
     public DaemonToken getDaemonToken() {
         return daemonToken;
     }
 
+    /**
+     * Executes the Evaluation
+     *
+     * @param evalContext Evaluation context
+     * @throws IOException
+     * @return Returns string
+     */
     @Override
     public String execute(EvaluationContext evalContext) throws IOException {
         Flow flow = evalContext.getFlow();

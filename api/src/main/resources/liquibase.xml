@@ -185,6 +185,7 @@
     </changeSet>
 
     <changeSet id="callFlow-2020-01-03-11:00" author="Connect for Life">
+        <validCheckSum>3:55d2927a9574d7af884cbd2b5e20b3dd</validCheckSum>
         <preConditions onFail="MARK_RAN">
             <tableExists tableName="cfl_calls"/>
             <tableExists tableName="cfl_calls_providerdata"/>
@@ -192,8 +193,16 @@
         <comment>Update the cfl_calls table</comment>
         <dropForeignKeyConstraint baseTableName="cfl_calls_providerdata" constraintName="cfl_calls_providerdata_fk" />
         <dropTable tableName="cfl_calls_providerdata" />
+    </changeSet>
+
+    <changeSet id="callFlow-2020-01-03-11:00-2" author="Connect for Life">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="cfl_calls" columnName="provider_data" />
+            </not>
+        </preConditions>
         <addColumn tableName="cfl_calls">
-            <column name="provider_data" type="mediumblob"></column>
+            <column name="provider_data" type="mediumblob" />
         </addColumn>
     </changeSet>
 
