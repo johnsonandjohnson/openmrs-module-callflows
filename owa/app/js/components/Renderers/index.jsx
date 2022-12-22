@@ -111,10 +111,10 @@ export class Renderers extends React.Component {
             </div>
           </div>
           {this.props.rendererForms.map(item => (
-            <Row key={DOMPurify.sanitize(item.localId)}>
+            <Row key={item.localId}>
               <Col sm={11}
               className="cfl-col-field-left">
-                <Accordion title={DOMPurify.sanitize(item.renderer.name)}
+                <Accordion title={item.renderer.name}
                   border={true}
                   open={item.isOpen}>
                   <div ref={(div) => {
@@ -125,7 +125,7 @@ export class Renderers extends React.Component {
                     <RendererForm
                       renderer={item.renderer}
                       isOpen={item.isOpen}
-                      localId={DOMPurify.sanitize(item.localId)}
+                      localId={item.localId}
                       updateValues={this.props.updateRendererForm}
                       submit={this.submitRenderers} />
                   </div>

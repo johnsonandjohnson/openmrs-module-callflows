@@ -9,7 +9,6 @@
  */
 
 import axios from 'axios';
-import DOMPurify from 'dompurify';
 import { loginActions } from '@openmrs/react-components';
 
 // According to OpenMRS convention, setting page to 0 will result in returning all records
@@ -41,7 +40,7 @@ axiosInstance.interceptors.response.use(function (response) {
 
 const redirectToLoginPage = () => {
   loginActions.logout();
-  window.location.href = getApiBaseUrl() + '/login.htm?redirectUrl=' + DOMPurify.sanitize(window.location.href);
+  window.location.href = getApiBaseUrl() + '/login.htm?redirectUrl=' + window.location.href;
 }
 
 // verified if server response store the unauthorized message
