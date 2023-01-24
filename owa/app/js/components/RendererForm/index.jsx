@@ -17,7 +17,6 @@ import {
 } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
-
 import RendererUI from './RendererUI';
 import * as Default from '../../shared/utils/messages';
 import { getIntl } from "@openmrs/react-components/lib/components/localization/withLocalization";
