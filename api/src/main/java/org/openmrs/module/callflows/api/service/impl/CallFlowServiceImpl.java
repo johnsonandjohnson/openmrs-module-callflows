@@ -26,6 +26,7 @@ import java.util.List;
  *
  * @author bramak09
  */
+@Transactional
 public class CallFlowServiceImpl extends BaseOpenmrsService implements CallFlowService {
 
     private static final String ADMIN_USER = "admin";
@@ -42,7 +43,6 @@ public class CallFlowServiceImpl extends BaseOpenmrsService implements CallFlowS
      * @return Return CallFlow
      */
     @Override
-    @Transactional
     public CallFlow create(CallFlow callflow) {
         validationComponent.validate(callflow);
         if (Context.isSessionOpen() && !Context.isAuthenticated()) {
@@ -59,7 +59,6 @@ public class CallFlowServiceImpl extends BaseOpenmrsService implements CallFlowS
      * @return Return CallFlow
      */
     @Override
-    @Transactional
     public CallFlow saveCallFlow(CallFlow callFlow) {
         return create(callFlow);
     }
@@ -71,7 +70,6 @@ public class CallFlowServiceImpl extends BaseOpenmrsService implements CallFlowS
      * @return Return CallFlow
      */
     @Override
-    @Transactional
     public CallFlow update(CallFlow callflow) {
         validationComponent.validate(callflow);
 
@@ -102,7 +100,7 @@ public class CallFlowServiceImpl extends BaseOpenmrsService implements CallFlowS
      * @return Return list of CallFlows
      */
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public List<CallFlow> findAllByNamePrefix(String prefix) {
         return callFlowDao.findAllByName(prefix);
     }
@@ -114,6 +112,7 @@ public class CallFlowServiceImpl extends BaseOpenmrsService implements CallFlowS
      * @return Return CallFlow
      */
     @Override
+    @Transactional(readOnly = true)
     public CallFlow findByName(String name) {
         CallFlow callflow = callFlowDao.findByName(name);
         if (null == callflow) {
