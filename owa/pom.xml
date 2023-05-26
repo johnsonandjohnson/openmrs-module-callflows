@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.openmrs.module</groupId>
         <artifactId>callflows</artifactId>
-        <version>1.1.12</version>
+        <version>1.1.13</version>
     </parent>
 
     <artifactId>callflows-owa</artifactId>
@@ -28,8 +28,8 @@
                         </goals>
                         <phase>validate</phase>
                         <configuration>
-                            <nodeVersion>v10.16.3</nodeVersion>
-                            <npmVersion>6.9.0</npmVersion>
+                            <nodeVersion>v12.22.12</nodeVersion>
+                            <npmVersion>6.14.16</npmVersion>
                         </configuration>
                     </execution>
 

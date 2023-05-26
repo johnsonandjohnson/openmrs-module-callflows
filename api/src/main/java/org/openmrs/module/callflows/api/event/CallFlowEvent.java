@@ -10,27 +10,27 @@
 
 package org.openmrs.module.callflows.api.event;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.openmrs.module.callflows.api.domain.Constants;
+import org.openmrs.module.callflows.api.exception.CallFlowRuntimeException;
 import org.openmrs.module.callflows.api.util.CallFlowTaskUtil;
 import org.openmrs.module.callflows.api.util.DateUtil;
 
+import java.io.IOException;
+import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * CallFlow Event
  */
 public class CallFlowEvent {
 
+  private static final String RETRY_PROPERTIES = "RETRY_PROPERTIES";
   private static final String SHORT_DATE_FORMAT = "yyyyMMddHHmmz";
-  private static final String CUSTOM_PARAMS_DELIMITER = ",";
-  private static final String CUSTOM_PARAMS_KEY_VALUE_SEPARATOR = "=";
+  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
   private String subject;
   private Map<String, Object> parameters;
 
@@ -84,21 +84,13 @@ public class CallFlowEvent {
    *
    * @return is a map result
    */
-  public Map<String, String> convertProperties() {
-    Map<String, String> result = new HashMap<>();
-
-    for (Map.Entry<String, Object> parameter : getParameters().entrySet()) {
-      if (parameter.getValue() instanceof Map) {
-        result.put(parameter.getKey(), Joiner
-            .on(CUSTOM_PARAMS_DELIMITER)
-            .withKeyValueSeparator(CUSTOM_PARAMS_KEY_VALUE_SEPARATOR)
-            .join((Map<?, ?>) parameter.getValue()));
-      } else {
-        result.put(parameter.getKey(), Objects.toString(parameter.getValue(), null));
-      }
+  public Map<String, String> convertToTaskDefinitionProperties() {
+    try {
+      return Collections.singletonMap(RETRY_PROPERTIES, OBJECT_MAPPER.writeValueAsString(getParameters()));
+    } catch (IOException e) {
+      throw new CallFlowRuntimeException("Failed to write retry parameters from event's parameters: " + getParameters(),
+          e);
     }
-
-    return result;
   }
 
   /**
@@ -107,26 +99,12 @@ public class CallFlowEvent {
    * @param properties is a map
    * @return is a map result
    */
-  public static Map<String, Object> convertProperties(Map<String, String> properties) {
-    Map<String, Object> result = new HashMap<>();
-
-    for (Map.Entry<String, String> property : properties.entrySet()) {
-      if (Constants.PARAM_PARAMS.equals(property.getKey())) {
-        Map<String, Object> params = new HashMap<>(Splitter
-            .on(CUSTOM_PARAMS_DELIMITER)
-            .withKeyValueSeparator(CUSTOM_PARAMS_KEY_VALUE_SEPARATOR)
-            .split(property.getValue()));
-
-        // Convert retry attempts to Integer
-        params.computeIfPresent(Constants.PARAM_RETRY_ATTEMPTS, (key, value) -> Integer.valueOf(value.toString()));
-
-        result.put(property.getKey(), params);
-      } else {
-        result.put(property.getKey(), property.getValue());
-      }
+  public static Map<String, Object> convertFromTaskDefinitionProperties(Map<String, String> properties) {
+    try {
+      return OBJECT_MAPPER.readValue(properties.get(RETRY_PROPERTIES), Map.class);
+    } catch (IOException e) {
+      throw new CallFlowRuntimeException("Failed to read retry parameters from task's properties: " + properties, e);
     }
-
-    return result;
   }
 
   @Override

@@ -52,6 +52,6 @@ public class CallFlowSchedulerServiceTest extends BaseContextMockTest {
     Assert.assertEquals(event.generateTaskName(JOB_START_DATETIME), capturedTaskDefinition.getName());
     Assert.assertEquals(CallFlowScheduledTask.class.getName(), capturedTaskDefinition.getTaskClass());
     Assert.assertEquals(JOB_START_DATETIME, capturedTaskDefinition.getStartTime());
-    Assert.assertEquals(true, capturedTaskDefinition.getStartOnStartup());
+    Assert.assertEquals(false, capturedTaskDefinition.getStartOnStartup());
   }
 }

@@ -50,9 +50,7 @@ public interface CallDao {
      */
     long countFindCallsByDirectionAndStatus(CallDirection direction, Set<CallStatus> statusSet);
 
-    Call create(Call call);
-
-    Call update(Call call);
+    Call saveCall(Call call);
 
     Call findById(Integer id);
 
@@ -61,5 +59,4 @@ public interface CallDao {
     void deleteAll();
 
     long count();
-
 }

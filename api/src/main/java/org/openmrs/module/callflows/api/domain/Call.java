@@ -10,8 +10,6 @@
 
 package org.openmrs.module.callflows.api.domain;
 
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 import org.openmrs.module.callflows.api.dao.converter.MapConverter;
 import org.openmrs.module.callflows.api.domain.types.CallDirection;
 import org.openmrs.module.callflows.api.domain.types.CallStatus;
@@ -88,7 +86,6 @@ public class Call extends AbstractBaseOpenmrsData {
      * The call flow we started this call from. Doesn't change once set
      */
     @OneToOne
-    @Cascade(CascadeType.SAVE_UPDATE)
     @JoinColumn(name = "startFlow", nullable = false)
     private CallFlow startFlow;
 
@@ -108,7 +105,6 @@ public class Call extends AbstractBaseOpenmrsData {
      * The flow we ended at for now. This can change as the call continues
      */
     @OneToOne
-    @Cascade(CascadeType.SAVE_UPDATE)
     @JoinColumn(name = "endFlow", nullable = false)
     private CallFlow endFlow;
 

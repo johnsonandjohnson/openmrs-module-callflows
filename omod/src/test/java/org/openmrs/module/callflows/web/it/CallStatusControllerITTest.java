@@ -60,7 +60,9 @@ public class CallStatusControllerITTest extends BaseModuleWebContextSensitiveTes
     public void shouldReturnStatusOkIfTheCallStatusUpdateIsSuccessful() throws Exception {
         //Given
         Call call = CallHelper.createOutboundCall();
-        callDao.create(call);
+        callFlowDao.create(call.getStartFlow());
+        callFlowDao.create(call.getStartFlow());
+        callDao.saveCall(call);
 
         mockMvc.perform(get("/callflows/status/" + call.getId().toString())
                 .param("status", "ANSWERED")

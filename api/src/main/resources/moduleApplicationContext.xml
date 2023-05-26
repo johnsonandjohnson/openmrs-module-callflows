@@ -21,29 +21,19 @@
           primary="true"/>
 
     <bean id="callflows.validationComponent" class="org.openmrs.module.callflows.api.util.ValidationComponent">
-        <property name="factory">
-            <ref local="springValidationFactory"/>
-        </property>
+        <property name="factory" ref="springValidationFactory"/>
     </bean>
 
     <bean id="callflows.callFlowDao" class="org.openmrs.module.callflows.api.dao.impl.CallFlowDaoImpl">
-        <property name="dbSessionFactory">
-            <ref bean="dbSessionFactory"/>
-        </property>
+        <property name="dbSessionFactory" ref="dbSessionFactory"/>
     </bean>
 
     <bean id="callflows.callFlowService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-        <property name="transactionManager">
-            <ref bean="transactionManager" />
-        </property>
+        <property name="transactionManager" ref="transactionManager"/>
         <property name="target">
             <bean class="org.openmrs.module.callflows.api.service.impl.CallFlowServiceImpl">
-                <property name="callFlowDao">
-                    <ref local="callflows.callFlowDao"/>
-                </property>
-                <property name="validationComponent">
-                    <ref local="callflows.validationComponent"/>
-                </property>
+                <property name="callFlowDao" ref="callflows.callFlowDao"/>
+                <property name="validationComponent" ref="callflows.validationComponent"/>
             </bean>
         </property>
         <property name="preInterceptors">
@@ -58,7 +48,7 @@
         <property name="moduleService">
             <list merge="true">
                 <value>org.openmrs.module.callflows.api.service.CallFlowService</value>
-                <ref local="callflows.callFlowService"/>
+                <ref bean="callflows.callFlowService"/>
             </list>
         </property>
     </bean>
@@ -114,9 +104,7 @@
         </property>
         <property name="target">
             <bean class="org.openmrs.module.callflows.api.service.impl.ConfigServiceImpl">
-                <property name="settingsManagerService">
-                    <ref local="callflows.settings.manager"/>
-                </property>
+                <property name="settingsManagerService" ref="callflows.settings.manager"/>
             </bean>
         </property>
         <property name="preInterceptors">
@@ -131,14 +119,14 @@
         <property name="moduleService">
             <list merge="true">
                 <value>org.openmrs.module.callflows.api.service.ConfigService</value>
-                <ref local="callflows.configService"/>
+                <ref bean="callflows.configService"/>
             </list>
         </property>
     </bean>
 
     <bean id="callflows.callDao" class="org.openmrs.module.callflows.api.dao.impl.CallDaoImpl">
-        <property name="dbSessionFactory">
-            <ref bean="dbSessionFactory"/>
+        <property name="sessionFactory">
+            <ref bean="sessionFactory"/>
         </property>
     </bean>
 
@@ -158,9 +146,7 @@
     </bean>
 
     <bean id="callflows.flowUtil" class="org.openmrs.module.callflows.api.util.FlowUtil">
-        <property name="evaluationCommand">
-            <ref local="callflows.baseEvaluationCommand"/>
-        </property>
+        <property name="evaluationCommand" ref="callflows.baseEvaluationCommand"/>
     </bean>
 
     <bean id="callflows.flowService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
@@ -169,12 +155,8 @@
         </property>
         <property name="target">
             <bean class="org.openmrs.module.callflows.api.service.impl.FlowServiceImpl">
-                <property name="callFlowService">
-                    <ref local="callflows.callFlowService"/>
-                </property>
-                <property name="flowUtil">
-                    <ref local="callflows.flowUtil"/>
-                </property>
+                <property name="callFlowService" ref="callflows.callFlowService"/>
+                <property name="flowUtil" ref="callflows.flowUtil"/>
             </bean>
         </property>
         <property name="preInterceptors">
@@ -186,24 +168,13 @@
     </bean>
 
     <bean id="callflows.authUtil" class="org.openmrs.module.callflows.api.util.AuthUtil">
-        <property name="settingsManagerService">
-            <ref local="callflows.settings.manager"/>
-        </property>
+        <property name="settingsManagerService" ref="callflows.settings.manager"/>
     </bean>
 
     <bean id="callflows.callUtil" class="org.openmrs.module.callflows.api.util.CallUtil">
-        <property name="callDao">
-            <ref local="callflows.callDao"/>
-        </property>
-        <property name="schedulerService">
-            <ref local="callflows.schedulerService"/>
-        </property>
-        <property name="callFlowEventService">
-            <ref local="callflows.eventService"/>
-        </property>
-        <property name="authUtil">
-            <ref local="callflows.authUtil"/>
-        </property>
+        <property name="schedulerService" ref="callflows.schedulerService"/>
+        <property name="callFlowEventService" ref="callflows.eventService"/>
+        <property name="authUtil" ref="callflows.authUtil"/>
     </bean>
 
     <bean id="callflows.callService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
@@ -212,21 +183,11 @@
         </property>
         <property name="target">
             <bean class="org.openmrs.module.callflows.api.service.impl.CallServiceImpl">
-                <property name="callDao">
-                    <ref local="callflows.callDao"/>
-                </property>
-                <property name="callFlowService">
-                    <ref local="callflows.callFlowService"/>
-                </property>
-                <property name="flowService">
-                    <ref local="callflows.flowService"/>
-                </property>
-                <property name="configService">
-                    <ref local="callflows.configService"/>
-                </property>
-                <property name="callUtil">
-                    <ref local="callflows.callUtil"/>
-                </property>
+                <property name="callDao" ref="callflows.callDao"/>
+                <property name="callFlowService" ref="callflows.callFlowService"/>
+                <property name="flowService" ref="callflows.flowService"/>
+                <property name="configService" ref="callflows.configService"/>
+                <property name="callUtil" ref="callflows.callUtil"/>
             </bean>
         </property>
         <property name="preInterceptors">
@@ -234,6 +195,15 @@
         </property>
         <property name="transactionAttributeSource">
             <ref bean="transactionAttributeSource" />
+        </property>
+    </bean>
+
+    <bean parent="serviceContext">
+        <property name="moduleService">
+            <list merge="true">
+                <value>org.openmrs.module.callflows.api.service.CallService</value>
+                <ref bean="callflows.callService"/>
+            </list>
         </property>
     </bean>
 

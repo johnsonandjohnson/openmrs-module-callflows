@@ -13,6 +13,7 @@ package org.openmrs.module.callflows.web.it;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpStatus;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.hibernate.SessionFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -89,7 +90,7 @@ public class CallControllerITTest extends BaseModuleWebContextSensitiveTest {
 
   @Autowired private ConfigService configService;
 
-  @Autowired private DbSessionFactory dbSessionFactory;
+  @Autowired private SessionFactory sessionFactory;
 
   private CallDao callDao;
 
@@ -129,7 +130,7 @@ public class CallControllerITTest extends BaseModuleWebContextSensitiveTest {
   public void setUp() throws Exception {
     // Used to avoid the issues with the H2 when multiple transactions are used
     CallDaoImpl callDaoImpl = new CallDaoImpl();
-    ReflectionTestUtils.setField(callDaoImpl, "dbSessionFactory", dbSessionFactory);
+    callDaoImpl.setSessionFactory(sessionFactory);
     callDao = callDaoImpl;
     ReflectionTestUtils.setField(
         unwrapProxy(unwrapProxy(callService)), null, callDao, CallDao.class);

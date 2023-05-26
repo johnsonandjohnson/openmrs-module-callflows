@@ -13,6 +13,7 @@ package org.openmrs.module.callflows;
 import com.google.gson.GsonBuilder;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
+import org.openmrs.test.BaseContextMockTest;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 
 import java.io.IOException;
@@ -26,7 +27,7 @@ import java.io.IOException;
  * @author bramak09
  */
 @PowerMockIgnore("org.jacoco.agent.rt.*")
-public abstract class BaseTest {
+public abstract class BaseTest extends BaseContextMockTest {
 
 
     @Rule

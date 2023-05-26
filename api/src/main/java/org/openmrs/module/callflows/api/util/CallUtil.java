@@ -23,7 +23,6 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.exception.VelocityException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.openmrs.module.callflows.api.contract.JsonExecutionResponse;
-import org.openmrs.module.callflows.api.dao.CallDao;
 import org.openmrs.module.callflows.api.domain.Call;
 import org.openmrs.module.callflows.api.domain.CallFlow;
 import org.openmrs.module.callflows.api.domain.Config;
@@ -36,6 +35,7 @@ import org.openmrs.module.callflows.api.domain.types.CallStatus;
 import org.openmrs.module.callflows.api.event.CallFlowEvent;
 import org.openmrs.module.callflows.api.service.CallFlowEventService;
 import org.openmrs.module.callflows.api.service.CallFlowSchedulerService;
+import org.openmrs.module.callflows.api.service.CallService;
 import org.openmrs.module.callflows.api.task.CallFlowScheduledTask;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -136,7 +136,6 @@ public class CallUtil {
             {"id", ACTOR_ID, "phone", ACTOR_TYPE, "callId", "direction", "creationDate", "callReference", "status",
                     "statusText", "startTime", "endTime"};
     private ObjectMapper objectMapper = new ObjectMapper();
-    private CallDao callDao;
     private CallFlowSchedulerService schedulerService;
     private CallFlowEventService callFlowEventService;
     private AuthUtil authUtil;
@@ -361,15 +360,14 @@ public class CallUtil {
     /**
      * Hook before a call can be made. Checks outbound call limit and number of retries before placing the call
      *
+     * @param callService callService
      * @param call   object
      * @param config to use
      * @param params that were passed during call initiation
      * @throws OperationNotSupportedException when the call can not be placed
      */
-    public void checkCallCanBePlaced(Call call, Config config, Map<String, Object> params)
+    public void checkCallCanBePlaced(CallService callService, Call call, Config config, Map<String, Object> params)
             throws OperationNotSupportedException {
-
-        Integer retryAttempts = 0;
         LOGGER.debug(String.format("pre-call-hook => call : %s, config: %s, params: %s", call, config, params));
 
         // Only if outbound call limit is set, we have to worry about no of active calls, retries, etc
@@ -377,17 +375,17 @@ public class CallUtil {
             // Check how many current active calls are there
             Set<CallStatus> callStatusSet = new HashSet<>(ACTIVE_OUTBOUND_CALL_STATUSES);
             long currentOutboundCallCount =
-                    callDao.countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet);
+                    callService.countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet);
             // Do we have enough bandwidth to make this call?
             if (currentOutboundCallCount > config.getOutboundCallLimit()) {
                 // No we don't!
                 // So let's retry after some time and check again
                 // but before that how many retries have we made?
-                retryAttempts = null != params.get(Constants.PARAM_RETRY_ATTEMPTS) ?
-                        (Integer) params.get(Constants.PARAM_RETRY_ATTEMPTS) : 0;
+                int retryAttempts = null != params.get(Constants.PARAM_RETRY_ATTEMPTS) ?
+                    Integer.parseInt(params.get(Constants.PARAM_RETRY_ATTEMPTS).toString()) : 0;
                 if (retryAttempts >= config.getOutboundCallRetryAttempts()) {
                     // We have exceeded anyway , so only one thing to do
-                    if (!config.getCallAllowed()) {
+                    if (Boolean.FALSE.equals(config.getCallAllowed())) {
                         throw new OperationNotSupportedException("Outbound call limit is exceeded");
                     }
                     // otherwise we allow the call to do even though retries have been exceeded cause the configuration
@@ -733,10 +731,6 @@ public class CallUtil {
         }
         LOGGER.debug(String.format("user = %s, uri = %s", phone, uri));
         return uri;
-    }
-
-    public void setCallDao(CallDao callDao) {
-        this.callDao = callDao;
     }
 
     public void setSchedulerService(CallFlowSchedulerService schedulerService) {
