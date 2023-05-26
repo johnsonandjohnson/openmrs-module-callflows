@@ -168,16 +168,7 @@
     </changeSet>
 
     <changeSet id="callFlow-2019-10-16-11:23" author="Connect for Life">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <sqlCheck expectedResult="longtext">
-                    SELECT DATA_TYPE
-                    FROM INFORMATION_SCHEMA.COLUMNS
-                    WHERE TABLE_NAME = 'cfl_callflows'
-                    AND COLUMN_NAME = 'raw'
-                </sqlCheck>
-            </not>
-        </preConditions>
+        <validCheckSum>3:9e32dd11ee61280bdb864130182b98f8</validCheckSum>
         <comment>Changing Callflows Raw column type to support large configurations</comment>
         <sql>
             ALTER TABLE cfl_callflows MODIFY raw LONGTEXT;
