@@ -137,8 +137,8 @@
     </bean>
 
     <bean id="callflows.callDao" class="org.openmrs.module.callflows.api.dao.impl.CallDaoImpl">
-        <property name="dbSessionFactory">
-            <ref bean="dbSessionFactory"/>
+        <property name="sessionFactory">
+            <ref bean="sessionFactory"/>
         </property>
     </bean>
 
@@ -192,9 +192,6 @@
     </bean>
 
     <bean id="callflows.callUtil" class="org.openmrs.module.callflows.api.util.CallUtil">
-        <property name="callDao">
-            <ref local="callflows.callDao"/>
-        </property>
         <property name="schedulerService">
             <ref local="callflows.schedulerService"/>
         </property>
@@ -234,6 +231,15 @@
         </property>
         <property name="transactionAttributeSource">
             <ref bean="transactionAttributeSource" />
+        </property>
+    </bean>
+
+    <bean parent="serviceContext">
+        <property name="moduleService">
+            <list merge="true">
+                <value>org.openmrs.module.callflows.api.service.CallService</value>
+                <ref local="callflows.callService"/>
+            </list>
         </property>
     </bean>
 

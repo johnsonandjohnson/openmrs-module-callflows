@@ -10,12 +10,15 @@
 
 package org.openmrs.module.callflows.api.service;
 
+import org.openmrs.api.APIException;
 import org.openmrs.module.callflows.api.domain.Call;
 import org.openmrs.module.callflows.api.domain.CallFlow;
 import org.openmrs.module.callflows.api.domain.types.CallDirection;
+import org.openmrs.module.callflows.api.domain.types.CallStatus;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Call Service
@@ -42,6 +45,27 @@ public interface CallService {
      */
     @SuppressWarnings("PMD.ExcessiveParameterList")
     Call create(String config, CallFlow start, String startNode, CallDirection direction, String actorId,
+                String actorType, String externalId, String externalType, String playedMessages, String refKey,
+                Map<String, Object> params);
+
+    /**
+     * Creates Call in separate Transaction ensuring it's saved in DB regardless of a result of caller's transaction.
+     *
+     * @param config         to use when creating a call in the system
+     * @param start          the start flow to use
+     * @param startNode      the start node to use
+     * @param direction      the call direction either of outbound or inbound
+     * @param actorId        the actor associated with this call
+     * @param actorType      the type of actor, eg: patient, doctor, etc
+     * @param externalId     the externalId of the provider, if any, associated with this call
+     * @param externalType   type of the provider id, if any, associated with this call
+     * @param playedMessages information of any message being played
+     * @param refKey         reference information to link with different integrated systems
+     * @param params         the initial params for the flow to function
+     * @return a new call object with a generated call ID
+     */
+    @SuppressWarnings("PMD.ExcessiveParameterList")
+    Call createInOwnTransaction(String config, CallFlow start, String startNode, CallDirection direction, String actorId,
                 String actorType, String externalId, String externalType, String playedMessages, String refKey,
                 Map<String, Object> params);
 
@@ -137,4 +161,22 @@ public interface CallService {
      * @return total number of call records present in db
      */
     long retrieveCount();
+
+    /**
+     * Persists Call entity.
+     *
+     * @param call to persist, not null
+     * @return a persisted entity, never null
+     * @throws APIException if method failed
+     */
+    Call saveCall(Call call) throws APIException;
+
+    /**
+     * Find the call count based on the call direction and call status
+     *
+     * @param direction A direction of a call with respect to the system
+     * @param statusSet The set of IVR Call status
+     * @return call count for the specified Call direction and Call status
+     */
+    long countFindCallsByDirectionAndStatus(CallDirection direction, Set<CallStatus> statusSet);
 }

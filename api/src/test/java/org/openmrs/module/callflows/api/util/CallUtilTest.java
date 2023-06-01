@@ -24,7 +24,6 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.openmrs.module.callflows.BaseTest;
 import org.openmrs.module.callflows.Constants;
-import org.openmrs.module.callflows.api.dao.CallDao;
 import org.openmrs.module.callflows.api.domain.Call;
 import org.openmrs.module.callflows.api.domain.CallFlow;
 import org.openmrs.module.callflows.api.domain.Config;
@@ -38,6 +37,7 @@ import org.openmrs.module.callflows.api.helper.ConfigHelper;
 import org.openmrs.module.callflows.api.helper.FlowHelper;
 import org.openmrs.module.callflows.api.service.CallFlowEventService;
 import org.openmrs.module.callflows.api.service.CallFlowSchedulerService;
+import org.openmrs.module.callflows.api.service.CallService;
 import org.openmrs.module.callflows.api.service.impl.CallServiceImpl;
 import org.openmrs.module.callflows.api.task.CallFlowScheduledTask;
 import org.powermock.api.mockito.PowerMockito;
@@ -132,7 +132,7 @@ public class CallUtilTest extends BaseTest {
     private HttpServletRequest request;
 
     @Mock
-    private CallDao callDao;
+    private CallService callService;
 
     @Mock
     @Autowired
@@ -425,11 +425,11 @@ public class CallUtilTest extends BaseTest {
         given(config.getOutboundCallLimit()).willReturn(0);
 
         //When
-        callUtil.checkCallCanBePlaced(outboundCall, config, eventParams);
+        callUtil.checkCallCanBePlaced(callService, outboundCall, config, eventParams);
 
         //Then
         verify(config, times(1)).getOutboundCallLimit();
-        verifyZeroInteractions(callDao);
+        verifyZeroInteractions(callService);
         verifyZeroInteractions(schedulerService);
     }
 
@@ -439,11 +439,11 @@ public class CallUtilTest extends BaseTest {
         given(config.getOutboundCallLimit()).willReturn(5);
 
         //When
-        callUtil.checkCallCanBePlaced(outboundCall, config, eventParams);
+        callUtil.checkCallCanBePlaced(callService, outboundCall, config, eventParams);
 
         //Then
         verify(config, times(2)).getOutboundCallLimit();
-        verify(callDao, times(1)).countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet);
+        verify(callService, times(1)).countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet);
         verifyZeroInteractions(schedulerService);
     }
 
@@ -452,7 +452,7 @@ public class CallUtilTest extends BaseTest {
             throws OperationNotSupportedException {
         //Given
         given(config.getOutboundCallLimit()).willReturn(5);
-        given(callDao.countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet))
+        given(callService.countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet))
                 .willReturn(10L);
         eventParams.put(Constants.PARAM_JOB_ID, outboundCall.getCallId());
         eventParams.put(Constants.PARAM_RETRY_ATTEMPTS, 1);
@@ -460,11 +460,11 @@ public class CallUtilTest extends BaseTest {
         callFlowEvent = new CallFlowEvent(CallFlowEventSubjectConstants.CALLFLOWS_INITIATE_CALL, eventParams);
 
         //When
-        callUtil.checkCallCanBePlaced(outboundCall, config, eventParams);
+        callUtil.checkCallCanBePlaced(callService, outboundCall, config, eventParams);
 
         //Then
         verify(config, times(2)).getOutboundCallLimit();
-        verify(callDao, times(1)).countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet);
+        verify(callService, times(1)).countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet);
         assertThat(eventParams.get(Constants.PARAM_RETRY_ATTEMPTS).toString(), equalTo("2"));
         verify(schedulerService, times(1)).scheduleRunOnceJob(callFlowEvent,
                 DateUtil.plusSeconds(DateUtil.now(), Constants.CONFIG_VOXEO_OUTBOUND_CALL_RETRY_SECONDS), new CallFlowScheduledTask());
@@ -475,7 +475,7 @@ public class CallUtilTest extends BaseTest {
             throws OperationNotSupportedException {
         //Given
         given(config.getOutboundCallLimit()).willReturn(5);
-        given(callDao.countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet))
+        given(callService.countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet))
                 .willReturn(10L);
         eventParams.put(Constants.PARAM_JOB_ID, outboundCall.getCallId());
         eventParams.put(Constants.PARAM_RETRY_ATTEMPTS, 6);
@@ -483,11 +483,11 @@ public class CallUtilTest extends BaseTest {
         given(config.getCallAllowed()).willReturn(false);
 
         //When
-        callUtil.checkCallCanBePlaced(outboundCall, config, eventParams);
+        callUtil.checkCallCanBePlaced(callService, outboundCall, config, eventParams);
 
         //Then
         verify(config, times(2)).getOutboundCallLimit();
-        verify(callDao, times(1)).countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet);
+        verify(callService, times(1)).countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet);
         verifyZeroInteractions(schedulerService);
     }
 
@@ -496,7 +496,7 @@ public class CallUtilTest extends BaseTest {
             throws OperationNotSupportedException {
         //Given
         given(config.getOutboundCallLimit()).willReturn(5);
-        given(callDao.countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet))
+        given(callService.countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet))
                 .willReturn(10L);
         eventParams.put(Constants.PARAM_JOB_ID, outboundCall.getCallId());
         eventParams.put(Constants.PARAM_RETRY_ATTEMPTS, 6);
@@ -505,11 +505,11 @@ public class CallUtilTest extends BaseTest {
         given(config.getCallAllowed()).willReturn(true);
 
         //When
-        callUtil.checkCallCanBePlaced(outboundCall, config, eventParams);
+        callUtil.checkCallCanBePlaced(callService, outboundCall, config, eventParams);
 
         //Then
         verify(config, times(2)).getOutboundCallLimit();
-        verify(callDao, times(1)).countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet);
+        verify(callService, times(1)).countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet);
         verifyZeroInteractions(schedulerService);
     }
 
@@ -627,7 +627,7 @@ public class CallUtilTest extends BaseTest {
     public void shouldSetCallRetryLimitToOneIfRetryAttemptIsNull() throws OperationNotSupportedException {
         //Given
         given(config.getOutboundCallLimit()).willReturn(5);
-        given(callDao.countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet))
+        given(callService.countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet))
                 .willReturn(10L);
         eventParams.put(Constants.PARAM_JOB_ID, outboundCall.getCallId());
         eventParams.put(Constants.PARAM_RETRY_ATTEMPTS, null);
@@ -635,11 +635,11 @@ public class CallUtilTest extends BaseTest {
         callFlowEvent = new CallFlowEvent(CallFlowEventSubjectConstants.CALLFLOWS_INITIATE_CALL, eventParams);
 
         //When
-        callUtil.checkCallCanBePlaced(outboundCall, config, eventParams);
+        callUtil.checkCallCanBePlaced(callService, outboundCall, config, eventParams);
 
         //Then
         verify(config, times(2)).getOutboundCallLimit();
-        verify(callDao, times(1)).countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet);
+        verify(callService, times(1)).countFindCallsByDirectionAndStatus(CallDirection.OUTGOING, callStatusSet);
         assertThat(eventParams.get(Constants.PARAM_RETRY_ATTEMPTS).toString(), equalTo("1"));
         verify(schedulerService, times(1)).scheduleRunOnceJob(callFlowEvent,
                 DateUtil.plusSeconds(DateUtil.now(), Constants.CONFIG_VOXEO_OUTBOUND_CALL_RETRY_SECONDS), new CallFlowScheduledTask());

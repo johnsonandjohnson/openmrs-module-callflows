@@ -25,7 +25,6 @@ import java.util.List;
  * @see org.openmrs.module.callflows.api.domain.CallFlow
  */
 public interface CallFlowService extends OpenmrsService {
-
     /**
      * Create a call flow in the system.
      * Validates the call flow name to ensure that it contains only alphanumeric characters
@@ -72,6 +71,14 @@ public interface CallFlowService extends OpenmrsService {
      */
     @Authorized(PrivilegeConstants.CALLFLOWS_PRIVILEGE)
     List<CallFlow> findAllByNamePrefix(String prefix);
+
+    /**
+     * Get CallFlow by ID.
+     *
+     * @param id the ID of callflow, not nulle
+     * @return CallFlow or null if not found
+     */
+    CallFlow getCallFlow(Integer id);
 
     /**
      * Find a callflow by the given name

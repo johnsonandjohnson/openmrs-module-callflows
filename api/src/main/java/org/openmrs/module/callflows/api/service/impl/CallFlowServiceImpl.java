@@ -26,7 +26,6 @@ import java.util.List;
  *
  * @author bramak09
  */
-@Transactional
 public class CallFlowServiceImpl extends BaseOpenmrsService implements CallFlowService {
 
     private static final String ADMIN_USER = "admin";
@@ -36,6 +35,12 @@ public class CallFlowServiceImpl extends BaseOpenmrsService implements CallFlowS
 
     private static final String USER_DAO_BEAN_NAME = "userDAO";
 
+    @Override
+    @Transactional(readOnly = true)
+    public CallFlow getCallFlow(Integer id) {
+        return callFlowDao.findById(id);
+    }
+
     /**
      * Creates the CallFlow
      *
@@ -43,6 +48,7 @@ public class CallFlowServiceImpl extends BaseOpenmrsService implements CallFlowS
      * @return Return CallFlow
      */
     @Override
+    @Transactional
     public CallFlow create(CallFlow callflow) {
         validationComponent.validate(callflow);
         if (Context.isSessionOpen() && !Context.isAuthenticated()) {
@@ -59,6 +65,7 @@ public class CallFlowServiceImpl extends BaseOpenmrsService implements CallFlowS
      * @return Return CallFlow
      */
     @Override
+    @Transactional
     public CallFlow saveCallFlow(CallFlow callFlow) {
         return create(callFlow);
     }
@@ -70,6 +77,7 @@ public class CallFlowServiceImpl extends BaseOpenmrsService implements CallFlowS
      * @return Return CallFlow
      */
     @Override
+    @Transactional
     public CallFlow update(CallFlow callflow) {
         validationComponent.validate(callflow);
 
@@ -112,7 +120,7 @@ public class CallFlowServiceImpl extends BaseOpenmrsService implements CallFlowS
      * @return Return CallFlow
      */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, noRollbackFor = IllegalArgumentException.class)
     public CallFlow findByName(String name) {
         CallFlow callflow = callFlowDao.findByName(name);
         if (null == callflow) {
@@ -128,6 +136,7 @@ public class CallFlowServiceImpl extends BaseOpenmrsService implements CallFlowS
      * @param id CallFlow Id
      */
     @Override
+    @Transactional
     public void delete(Integer id) {
         CallFlow callflow = callFlowDao.findById(id);
         if (callflow == null) {

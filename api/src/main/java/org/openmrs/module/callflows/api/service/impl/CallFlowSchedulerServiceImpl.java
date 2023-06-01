@@ -20,42 +20,45 @@ import org.openmrs.module.callflows.api.service.CallFlowSchedulerService;
 import org.openmrs.scheduler.SchedulerException;
 import org.openmrs.scheduler.TaskDefinition;
 import org.openmrs.scheduler.tasks.AbstractTask;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 
-/**
- * Service Schedule the CallFlow
- */
-public class CallFlowSchedulerServiceImpl extends BaseOpenmrsService implements CallFlowSchedulerService {
+/** Service Schedule the CallFlow */
+public class CallFlowSchedulerServiceImpl extends BaseOpenmrsService
+    implements CallFlowSchedulerService {
 
-    private static final Log LOGGER = LogFactory.getLog(CallFlowSchedulerServiceImpl.class);
+  private static final Log LOGGER = LogFactory.getLog(CallFlowSchedulerServiceImpl.class);
 
-    /**
-     * Schedule the Job to run
-     *
-     * @param event CallFlow Event
-     * @param startTime Start time of Job
-     * @param task Task to be done
-     */
-    @Override
-    public void scheduleRunOnceJob(CallFlowEvent event, Date startTime, AbstractTask task) {
-        String taskName = event.generateTaskName(startTime);
+  /**
+   * Schedule the Job to run
+   *
+   * @param event CallFlow Event
+   * @param startTime Start time of Job
+   * @param task Task to be done
+   */
+  @Override
+  @Transactional
+  public void scheduleRunOnceJob(CallFlowEvent event, Date startTime, AbstractTask task) {
+    String taskName = event.generateTaskName(startTime);
 
-        TaskDefinition taskDefinition = new TaskDefinition();
-        taskDefinition.setName(taskName);
-        taskDefinition.setDescription(event.generateTaskDescription());
-        taskDefinition.setTaskClass(task.getClass().getName());
-        taskDefinition.setStartTime(startTime);
-        taskDefinition.setStartOnStartup(true);
-        taskDefinition.setProperties(event.convertProperties());
-        taskDefinition.setRepeatInterval(0L);
+    TaskDefinition taskDefinition = new TaskDefinition();
+    taskDefinition.setName(taskName);
+    taskDefinition.setDescription(event.generateTaskDescription());
+    taskDefinition.setTaskClass(task.getClass().getName());
+    taskDefinition.setStartTime(startTime);
+    taskDefinition.setStartOnStartup(true);
+    taskDefinition.setProperties(event.convertProperties());
+    taskDefinition.setRepeatInterval(0L);
 
-        try {
-            LOGGER.debug(String.format("Task %s (%s) scheduled to run once at %s", taskName, task.getClass().getName(),
-                    startTime));
-            Context.getSchedulerService().scheduleTask(taskDefinition);
-        } catch (SchedulerException ex) {
-            throw new CallFlowRuntimeException(ex);
-        }
+    try {
+      LOGGER.debug(
+          String.format(
+              "Task %s (%s) scheduled to run once at %s",
+              taskName, task.getClass().getName(), startTime));
+      Context.getSchedulerService().scheduleTask(taskDefinition);
+    } catch (SchedulerException ex) {
+      throw new CallFlowRuntimeException(ex);
     }
+  }
 }
