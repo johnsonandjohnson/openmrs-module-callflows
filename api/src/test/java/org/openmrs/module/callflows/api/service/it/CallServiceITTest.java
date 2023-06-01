@@ -239,6 +239,8 @@ public class CallServiceITTest extends BaseModuleContextSensitiveTest {
 
     // And we updated *all* the properties
     Call updatedCall = CallHelper.updateAllPropertiesInOutboundCall(outboundCall);
+    callFlowService.saveCallFlow(updatedCall.getStartFlow());
+    callFlowService.saveCallFlow(updatedCall.getEndFlow());
 
     // When
     Call returnedCall = callService.update(updatedCall);
@@ -260,6 +262,8 @@ public class CallServiceITTest extends BaseModuleContextSensitiveTest {
 
     // And we update all of it's properties
     Call updatedCall = CallHelper.updateAllPropertiesInOutboundCall(outboundCall);
+    callFlowService.saveCallFlow(updatedCall.getStartFlow());
+    callFlowService.saveCallFlow(updatedCall.getEndFlow());
 
     Context.flushSession();
     Context.clearSession();
