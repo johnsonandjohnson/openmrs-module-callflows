@@ -15,10 +15,10 @@ import { Link, withRouter, RouteComponentProps } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import UrlPattern from 'url-pattern';
 import { IRootState } from '../../reducers';
-
 import './bread-crumb.scss';
 import * as Default from '../../shared/utils/messages';
 import { getIntl } from "@openmrs/react-components/lib/components/localization/withLocalization";
+import { LocalizedMessage } from '@openmrs/react-components';
 
 export const DESIGNER_NEW_FLOW_ROUTE = '#/designer/new';
 const DESIGNER_NEW_FLOW_PATTERN = new UrlPattern('/designer/new');
@@ -71,7 +71,7 @@ class BreadCrumb extends React.PureComponent<IBreadCrumbProps, IBreadCrumbState>
   renderHomeCrumb = () => {
     return (
       <a href={OMRS_ROUTE} className="breadcrumb-link-item home-crumb">
-        <FontAwesomeIcon icon={['fas', 'home']} />
+        <LocalizedMessage id="CALLFLOW_HOME_BREADCRUMB" defaultMessage="Home"/>
       </a>);
   }
 
