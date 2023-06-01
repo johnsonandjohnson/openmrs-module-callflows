@@ -43,6 +43,7 @@ import javax.naming.OperationNotSupportedException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -362,7 +363,7 @@ public class CallServiceImpl implements CallService {
       callUtil.checkCallCanBePlaced(this, call, config, params);
 
       HttpUriRequest request = callUtil.buildOutboundRequest(phone, call, config, params);
-      makeOutboundRequest(request, call, params);
+      call = makeOutboundRequest(request, call, params);
     } catch (OperationNotSupportedException ose) {
       LOGGER.error(
           String.format(
@@ -490,7 +491,7 @@ public class CallServiceImpl implements CallService {
             context);
   }
 
-  private void makeOutboundRequest(HttpUriRequest request, Call call, Map<String, Object> params)
+  private Call makeOutboundRequest(HttpUriRequest request, Call call, Map<String, Object> params)
       throws IOException {
     try (CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
       HttpResponse response = httpClient.execute(request);
@@ -498,11 +499,11 @@ public class CallServiceImpl implements CallService {
       LOGGER.debug(
           String.format(
               "Response for call %s -> %s  headers : %s  ",
-              call.getCallId(), response.getStatusLine().toString(), response.getAllHeaders()));
+              call.getCallId(), response.getStatusLine().toString(), Arrays.toString(response.getAllHeaders())));
 
       // check status code for any possible issues
       if (!ACCEPTABLE_IVR_RESPONSE_STATUSES.contains(response.getStatusLine().getStatusCode())) {
-        handleError(
+        return handleError(
             call, "Unacceptable status line: " + response.getStatusLine().toString(), params);
       } else {
         // check content for possible issues, cause some IVR providers might return 200 and return a
@@ -513,13 +514,14 @@ public class CallServiceImpl implements CallService {
           LOGGER.debug(String.format("response : %s ", content));
 
           if (isFailedContent(content)) {
-            handleError(call, "Unacceptable body: " + content, params);
+            return handleError(call, "Unacceptable body: " + content, params);
           }
+          return call;
         } catch (IOException ioe) {
           LOGGER.error(
               String.format("Error retrieving content response for call %s ", call.getCallId()),
               ioe);
-          handleError(call, "Unreadable content: " + response.getStatusLine().toString(), params);
+          return handleError(call, "Unreadable content: " + response.getStatusLine().toString(), params);
         }
       }
     }
