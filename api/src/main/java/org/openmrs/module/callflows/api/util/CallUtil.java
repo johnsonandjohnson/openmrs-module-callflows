@@ -382,10 +382,10 @@ public class CallUtil {
                 // So let's retry after some time and check again
                 // but before that how many retries have we made?
                 int retryAttempts = null != params.get(Constants.PARAM_RETRY_ATTEMPTS) ?
-                        (Integer) params.get(Constants.PARAM_RETRY_ATTEMPTS) : 0;
+                    Integer.parseInt(params.get(Constants.PARAM_RETRY_ATTEMPTS).toString()) : 0;
                 if (retryAttempts >= config.getOutboundCallRetryAttempts()) {
                     // We have exceeded anyway , so only one thing to do
-                    if (!config.getCallAllowed()) {
+                    if (Boolean.FALSE.equals(config.getCallAllowed())) {
                         throw new OperationNotSupportedException("Outbound call limit is exceeded");
                     }
                     // otherwise we allow the call to do even though retries have been exceeded cause the configuration

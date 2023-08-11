@@ -47,8 +47,8 @@ public class CallFlowSchedulerServiceImpl extends BaseOpenmrsService
     taskDefinition.setDescription(event.generateTaskDescription());
     taskDefinition.setTaskClass(task.getClass().getName());
     taskDefinition.setStartTime(startTime);
-    taskDefinition.setStartOnStartup(true);
-    taskDefinition.setProperties(event.convertProperties());
+    taskDefinition.setStartOnStartup(false);
+    taskDefinition.setProperties(event.convertToTaskDefinitionProperties());
     taskDefinition.setRepeatInterval(0L);
 
     try {
