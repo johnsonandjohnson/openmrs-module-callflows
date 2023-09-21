@@ -60,7 +60,7 @@
     "sweetalert": "^2.1.0",
     "toastr": "^2.1.4",
     "url-pattern": "^1.0.3",
-    "yup": "^0.27.0"
+    "yup": "^1.2.0"
   },
   "devDependencies": {
     "@fortawesome/fontawesome-free": "5.11.2",
