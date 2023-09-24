@@ -871,11 +871,14 @@ public class CallControllerTest extends BaseTest {
     final String phone = "1234567890";
     final String actorType = "Patient";
     final Integer personId = 2;
+    final Integer actorId = 1;
 
     Map<String, Object> additionalParams = new HashMap<>();
     additionalParams.put("phone", phone);
     additionalParams.put("personId", personId);
     additionalParams.put("actorType", actorType);
+    additionalParams.put("actorId", personId);
+    
     // Given
     given(personService.getPersonByUuid(personUuid)).willReturn(person);
     given(person.getAttribute("Telephone Number")).willReturn(personAttribute);
@@ -907,11 +910,13 @@ public class CallControllerTest extends BaseTest {
     final String phone = "1234567890";
     final String customParam = "customParam";
     final Integer personId = 2;
+    final Integer actorId = 1;
 
     Map<String, Object> additionalParams = new HashMap<>();
     additionalParams.put("phone", phone);
     additionalParams.put("personId", personId);
     additionalParams.put("customParam", customParam);
+    additionalParams.put("actorId", personId);
     // Given
     given(personService.getPersonByUuid(personUuid)).willReturn(person);
     given(person.getAttribute("Telephone Number")).willReturn(personAttribute);

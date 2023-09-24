@@ -582,6 +582,7 @@ public class CallController extends RestController {
       Map<String, Object> additionalParams = new HashMap<>();
       additionalParams.put(Constants.PARAM_PHONE, phoneNumber);
       additionalParams.put(Constants.PARAM_PERSON_ID, person.getPersonId());
+      additionalParams.put(Constants.PARAM_ACTOR_ID, person.getPersonId());
 
       params.remove("returnUrl");
       additionalParams.putAll(params);
