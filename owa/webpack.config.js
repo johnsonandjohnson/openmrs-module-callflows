@@ -70,15 +70,10 @@ var browserSyncTarget = resolveBrowserSyncTarget();
 const rules = [
   {
     test: /\.(t|j)sx?$/,
-    loader: "awesome-typescript-loader",
+    loader: "ts-loader",
     include: [
       path.resolve(__dirname, "app/js")
-    ],
-    query: {
-      presets: ["env", "react"],
-      cacheDirectory: true,
-      plugins: ["transform-class-properties", "transform-object-rest-spread"]
-    }
+    ]
   },
   {
     test: /\.(png|jpg|jpeg|gif|svg|eot|ttf|woff|woff2)$/,
