@@ -10,6 +10,15 @@
 
 package org.openmrs.module.callflows.web.it;
 
+import static junit.framework.TestCase.assertNotNull;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.http.HttpStatus;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.After;
@@ -23,23 +32,13 @@ import org.openmrs.module.callflows.api.domain.Renderer;
 import org.openmrs.module.callflows.api.helper.ConfigHelper;
 import org.openmrs.module.callflows.api.helper.RendererHelper;
 import org.openmrs.module.callflows.api.service.ConfigService;
+import org.openmrs.module.callflows.web.controller.CallFlowSettingsController;
 import org.openmrs.web.test.BaseModuleWebContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import static junit.framework.TestCase.assertNotNull;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Config Controller Integration Tests
@@ -53,7 +52,7 @@ public class SettingsControllerITTest extends BaseModuleWebContextSensitiveTest 
     private ConfigService configService;
 
     @Autowired
-    private WebApplicationContext webApplicationContext;
+    private CallFlowSettingsController callFlowSettingsController;
 
     private MockMvc mockMvc;
 
@@ -75,7 +74,7 @@ public class SettingsControllerITTest extends BaseModuleWebContextSensitiveTest 
         rendererContracts = RendererHelper.createRendererContracts();
         configService.updateRenderers(renderers);
 
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(callFlowSettingsController).build();
     }
 
     @After
