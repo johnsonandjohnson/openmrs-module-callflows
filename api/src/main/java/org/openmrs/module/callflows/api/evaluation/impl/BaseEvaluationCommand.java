@@ -27,6 +27,8 @@ import org.openmrs.module.callflows.api.domain.flow.TextElement;
 import org.openmrs.module.callflows.api.domain.flow.UserNode;
 import org.openmrs.module.callflows.api.evaluation.EvaluationCommand;
 import org.openmrs.module.callflows.api.evaluation.EvaluationContext;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -98,6 +100,7 @@ public class BaseEvaluationCommand extends BaseOpenmrsService implements Evaluat
      * @return Returns string
      */
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public String execute(EvaluationContext evalContext) throws IOException {
         Flow flow = evalContext.getFlow();
         Node node = evalContext.getNode();

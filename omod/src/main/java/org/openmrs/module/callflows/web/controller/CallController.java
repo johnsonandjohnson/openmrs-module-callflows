@@ -12,9 +12,9 @@ package org.openmrs.module.callflows.web.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.ApiParam;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -381,7 +381,7 @@ public class CallController extends RestController {
             message = "Failure in call continuation due to cyclic loop")
       })
   @RequestMapping(value = "/calls/{callId}.{extension}", method = RequestMethod.GET)
-  @SuppressWarnings("PMD.ExcessiveMethodLength")
+  @SuppressWarnings({"PMD.ExcessiveMethodLength", "PMD.CyclomaticComplexity"})
   public ResponseEntity<String> handleContinuation(
       HttpServletRequest request,
       @ApiParam(name = "callId", value = "Current call's unique identifier", required = true)
@@ -403,6 +403,7 @@ public class CallController extends RestController {
         String.format(
             "handleContinuation(callId=%s, params=%s, headers=%s, extension=%s",
             callId, params, headers, extension));
+    LOGGER.debug("Context.getAuthenticatedUser()=" + Context.getAuthenticatedUser());
 
     // The requested configuration from the URL
     Config config = null;
