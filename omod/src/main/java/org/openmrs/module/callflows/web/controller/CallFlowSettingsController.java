@@ -12,15 +12,17 @@ package org.openmrs.module.callflows.web.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.ApiParam;
+import java.net.HttpURLConnection;
+import java.util.ArrayList;
+import java.util.List;
 import org.openmrs.module.callflows.api.builder.ConfigBuilder;
 import org.openmrs.module.callflows.api.builder.ConfigContractBuilder;
 import org.openmrs.module.callflows.api.builder.RendererBuilder;
 import org.openmrs.module.callflows.api.builder.RendererContractBuilder;
 import org.openmrs.module.callflows.api.contract.ConfigContract;
-import org.openmrs.module.callflows.api.contract.ConfigContractList;
 import org.openmrs.module.callflows.api.contract.RendererContract;
 import org.openmrs.module.callflows.api.domain.Config;
 import org.openmrs.module.callflows.api.domain.Renderer;
@@ -35,10 +37,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-
-import java.net.HttpURLConnection;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Controller to manage configurations settings, adapted and enhanced from MoTeCH's IVR module
@@ -110,11 +108,11 @@ public class CallFlowSettingsController extends RestController {
   @ResponseBody
   public List<ConfigContract> updateConfigs(
       @ApiParam(name = "configContracts", value = "List of configurations to update") @RequestBody
-          ConfigContractList configContracts) {
+          List<ConfigContract> configContracts) {
     validationComponent.validate(configContracts);
 
     List<Config> configs = new ArrayList<>();
-    for (ConfigContract configContract : configContracts.getConfigContracts()) {
+    for (ConfigContract configContract : configContracts) {
       configs.add(ConfigBuilder.createFrom(configContract));
     }
     configService.updateConfigs(configs);
