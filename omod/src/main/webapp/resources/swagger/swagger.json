@@ -175,7 +175,10 @@
           "description" : "List of configurations to update",
           "required" : false,
           "schema" : {
-            "$ref" : "#/definitions/ConfigContractList"
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/definitions/ConfigContract"
+            }
           }
         } ],
         "responses" : {
@@ -622,28 +625,16 @@
         }
       }
     },
-    "ConfigContractList" : {
-      "type" : "object",
-      "required" : [ "configContracts" ],
-      "properties" : {
-        "configContracts" : {
-          "type" : "array",
-          "items" : {
-            "$ref" : "#/definitions/ConfigContract"
-          }
-        }
-      }
-    },
     "InputStream" : {
       "type" : "object"
     },
     "MultipartFile" : {
       "type" : "object",
       "properties" : {
-        "originalFilename" : {
+        "contentType" : {
           "type" : "string"
         },
-        "contentType" : {
+        "originalFilename" : {
           "type" : "string"
         },
         "name" : {

@@ -41,6 +41,7 @@ public class CallFlowDaoImpl implements CallFlowDao {
     public List<CallFlow> findAllByName(String prefix) {
         Criteria crit = getSession().createCriteria(this.mappedClass);
         crit.add(Restrictions.like("name", prefix, MatchMode.START));
+        crit.add(Restrictions.eq("retired", Boolean.FALSE));
 
         return crit.list();
     }
